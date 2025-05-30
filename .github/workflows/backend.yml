@@ -48,7 +48,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_PAT || secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.GHCR_PAT_J || secrets.GITHUB_TOKEN }}
 
       - name: Set lowercase repository name
         id: set_repo
