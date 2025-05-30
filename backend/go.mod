@@ -1,4 +1,4 @@
-module Test-autobuilt-image/backend
+module CUGrader/backend
 
 go 1.24.3
 
