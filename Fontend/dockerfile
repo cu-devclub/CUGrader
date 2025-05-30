@@ -1,0 +1,33 @@
+
+FROM node:21 AS build
+
+WORKDIR /app
+
+# ติดตั้ง dependencies
+COPY src/package*.json ./
+RUN npm install
+
+# คัดลอก source code
+COPY src/ .
+#  คัดลอก .env ที่สร้างไว้จาก GitHub Workflow
+# COPY ../.env .env
+
+
+RUN npm run build
+
+# STEP 2: Serve with nginx
+FROM nginx:alpine
+
+# ลบ default nginx index page
+RUN rm -rf /usr/share/nginx/html/*
+
+# คัดลอก build ที่ถูกสร้างจาก step แรก
+COPY --from=build /app/build /usr/share/nginx/html
+
+# เพิ่ม nginx config 
+COPY nginx.conf /etc/nginx/nginx.conf
+
+EXPOSE 80
+EXPOSE 443
+
+CMD ["nginx", "-g", "daemon off;"]
