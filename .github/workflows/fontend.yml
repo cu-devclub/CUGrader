@@ -2,7 +2,9 @@ name: Build & Push React App to GHCR
 
 on:
   push:
-    branches: [main, 'test-*']  # Added support for test branches
+    branches:
+      - main
+      - testing
 
 jobs:
   build:
