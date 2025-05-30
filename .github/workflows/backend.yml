@@ -16,6 +16,14 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+              
+      # - name: Generate .env from secrets
+      #   working-directory: ./backend
+      #   run: |
+      #     echo "PORT=${{ secrets.PORT }}" >> .env
+      #     echo "DB_URL=${{ secrets.DB_URL }}" >> .env
+      #     echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+
 
       - name: Set up Go
         uses: actions/setup-go@v4
