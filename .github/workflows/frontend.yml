@@ -3,9 +3,7 @@ name: Build & Push React App to GHCR
 on:
   push:
     branches:
-      - main
-      - testing
-      - ..
+      - '**'
 
 jobs:
   build:
