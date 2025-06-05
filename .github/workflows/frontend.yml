@@ -45,5 +45,5 @@ jobs:
           file: ./Frontend/Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ env.REPO_LOWER }}/frontend:latest
-            ghcr.io/${{ env.REPO_LOWER }}/frontend:${{ github.sha }}
+            ghcr.io/cu-devclub/cugrader/frontend:latest
+            ghcr.io/cu-devclub/cugrader/frontend:${{ github.sha }}
