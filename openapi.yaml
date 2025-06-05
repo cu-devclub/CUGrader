@@ -1,0 +1,719 @@
+openapi: '3.0.0'
+servers:
+  - url: 127.0.0.1
+info:
+  contact:
+    name: Jon
+  version: '1.0.0'
+  title: 'Grader'
+
+paths:
+  /v1/student:
+    post:
+      summary: Insert student
+      parameters:
+        - in: header
+          name: Authentication
+          description: "Bearer ..."
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateStudent"
+      responses:
+        '200':
+          description: Empty JSON
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Request body not met requirement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+    delete:
+      summary: Delete student
+      parameters:
+        - in: header
+          name: Authentication
+          description: "Bearer ..."
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeleteStudent"
+      responses:
+        '200':
+          description: Empty JSON
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Request body not met requirement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+    patch:
+      summary: Edit student info
+      parameters:
+        - in: header
+          name: Authentication
+          description: "Bearer ..."
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EditStudent"
+      responses:
+        '200':
+          description: Empty JSON
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Request body not met requirement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+    get:
+      summary: get list of students
+      parameters:
+        - in: header
+          name: Authentication
+          description: "Bearer ..."
+          schema:
+            type: string
+      responses:
+        '200':
+          description: student object in array
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/students"
+        '500':
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+  /v1/class:
+    post:
+      summary: Create class
+      parameters:
+        - in: header
+          name: Authentication
+          description: "Bearer ..."
+          schema:
+            type: string
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateClassBody'
+      responses:
+        '200':
+          description: Empty JSON
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Request body not met requirement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+        summary: partially edit class information
+        parameters:
+        - in: header
+          name: Authentication
+          description: "Bearer ..."
+          schema:
+            type: string
+        requestBody:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/EditClassBody'
+        responses:
+            '200':
+                description: Empty JSON
+                content:
+                    application/json:
+                        schema:
+                            type: object
+            '400':
+                description: Request body not met requirement
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Error'
+            '500':
+                description: Unexpected error
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Error'
+
+  /v1/classes/semesters:
+    summary: List of year-semester
+    get:
+      parameters:
+        - in: header
+          name: Authentication
+          description: "Bearer ..."
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List year-semester
+          content:
+            application/json:
+              schema:
+                properties:
+                  semesters:
+                    type: array
+                    items:
+                      type: string
+                      description: 'year-semester'
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /v1/classes/classes/{year-semester}:
+    summary: List of class in year-semester
+    get:
+      parameters:
+        - in: header
+          name: Authentication
+          description: "Bearer ..."
+          schema:
+            type: string
+        - name: year-semester
+          description: The unique identifier of the class
+          in: path
+          required: true
+          schema:
+            type: string
+            description: "year-semester"
+      responses:
+        '200':
+          description: List of class object
+          content:
+            application/json:
+              schema:
+                properties:
+                  assistant:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ClassObject'
+                  study:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ClassObject'
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /v1/TA:          
+    post:
+      parameters:
+        - in: header
+          name: Authentication
+          description: "Bearer ..."
+          schema:
+            type: string
+      summary: Add TA to class
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TAeditBody'
+      responses:
+        '200':
+          description: Empty JSON
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Request body not met requirement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          
+    delete:
+      summary: Delete TA from class
+      parameters:
+        - in: header
+          name: Authentication
+          description: "Bearer ..."
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TAeditBody"
+      responses:
+        '200':
+          description: Empty JSON
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Request body not met requirement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+    get:
+      summary: get list of assistant and instructor
+      parameters:
+        - in: header
+          name: Authentication
+          description: "Bearer ..."
+          schema:
+            type: string
+      responses:
+        '200':
+          description: assistants array and instructor array
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Assistant"
+        '500':
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+  /v1/section/{class_id}:
+    get:
+      parameters:
+        - name: class_id
+          description: The unique identifier of the class
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/class_id"
+      responses:
+        '200':
+          description: assistants array and instructor array
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/sectionArray"
+        '500':
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+  /v1/group/{class_id}:
+    get:
+      parameters:
+        - name: class_id
+          description: The unique identifier of the class
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/class_id"
+      responses:
+        '200':
+          description: assistants array and instructor array
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/groupArray"
+        '500':
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+  /v1/picutre/{picture_id}:
+    summary: get 
+    get:
+      summary: getting image with picture id
+      parameters:
+        - name: picture_id
+          description: The unique identifier of the picture
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: image file
+          content:
+            image:
+                schema:
+                    type: object
+        '500':
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+  /v1/login:
+    summary: get google Authentication url for redirect
+    get:
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                properties:
+                  url: 
+                    description: google Oauth for redirect to google login page
+                    type: string
+                  state:
+                    default: state to verify
+                    type: string
+                required:
+                  - "url"
+                  - "state"
+  /v1/callback:
+    summary: get token using credential from google callback
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+                properties:
+                  credential:
+                    description: credential from url parameter callback from google to backend
+                    type: string
+                  state:
+                    default: state to verify from login path
+                    type: string
+                required:
+                  - "credential"
+                  - "state"
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                properties:
+                  access-token:
+                    description: JWT Token with "Bearer " prefix
+                    type: string
+                required:
+                  - "access-token"
+
+components:
+  schemas:
+    class_id:
+      description: class_id primary key
+      type: integer
+    sectionArray:
+      type: object
+      properties:
+        sections:
+          type: array
+          items:
+            type: integer
+            description: section number
+    groupArray:
+      type: object
+      properties:
+        groups:
+          type: array
+          items:
+            type: string
+            description: group name
+    TAInfo:
+      type: object
+      properties:
+        name:
+          type: string
+        picture:
+          description: url
+          type: string
+        leader:
+          type: boolean
+      required:
+        - "name"
+        - "picture"
+        - "leader"
+    InstructorInfo:
+      type: object
+      properties:
+        name:
+          type: string
+        picture:
+          description: url
+          type: string
+      required:
+        - "name"
+        - "picture"
+    Assistant:
+      type: object
+      properties:
+        assistant:
+          type: array
+          items:
+            $ref: "#/components/schemas/TAInfo"
+        instructor:
+          type: array
+          items:
+            $ref: "#/components/schemas/InstructorInfo"
+      required:
+        - "assistant"
+        - "instructor"
+    studentInfo:
+      type: object
+      properties:
+        student_id:
+          type: string
+        name:
+          type: string
+        section:
+          type: integer
+        group:
+          type: string
+        picture:
+          description: url
+          type: string
+        score:
+          type: number
+        max_score:
+          type: number
+        withdrawal:
+          type: boolean
+      required:
+        - "student_id"
+        - "name"
+        - "section"
+        - "group"
+        - "picture"
+        - "score"
+        - "max_score"
+        - "withdrawal"
+    students:
+      type: object
+      required:
+        - "students"
+      properties:
+        students:
+          description: List of student
+          type: array
+          items:
+            $ref: "#/components/schemas/studentInfo"
+    CreateStudent:
+      type: object
+      properties:
+        class_id:
+          $ref: "#/components/schemas/class_id"
+        email:
+          description: student's email
+          type: string
+        section:
+          description:  section of student
+          type: integer
+        group:
+          description: group of student
+          type: string
+      required:
+        - "class_id"
+        - "email"
+        - "section"
+    EditStudent:
+      type: object
+      properties:
+        class_id:
+          $ref: "#/components/schemas/class_id"
+        student_id:
+          description: student id primary key
+          type: string
+        section:
+          description:  section of student
+          type: integer
+        group:
+          description: group of student
+          type: string
+        withdrawal:
+          description: is student withdrawn
+          type: boolean
+      required:
+        - "class_id"
+        - "student_id"
+    DeleteStudent:
+      type: object
+      properties:
+        class_id:
+          $ref: "#/components/schemas/class_id"
+        student_id:
+          description: student id primary key
+          type: string
+      required:
+        - "class_id"
+        - "student_id"
+    TAeditBody:
+      type: object
+      properties:
+        class_id:
+          $ref: "#/components/schemas/class_id"
+        email:
+          description: TA's email
+          type: string
+      required:
+        - "id"
+        - "email"
+    ClassObject:
+      type: object
+      properties:
+        id:
+          type: integer
+        class_id:
+          type: integer
+        class_name:
+          type: string
+        image:
+          type: string
+      required:
+        - id
+        - class_id
+        - class_name
+        - image
+    SemesterClasses:
+      type: object
+      properties:
+        assistant:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClassObject'
+        study:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClassObject'
+        semester:
+          type: string
+          description: semester of classes
+      required:
+        - assistant
+        - study
+        - semester
+    ClassList:
+      type: object
+      required:
+        - "classes"
+      properties:
+        classes:
+          description: List of semesterClasses
+          type: array
+          items:
+            $ref: "#/components/schemas/SemesterClasses"
+    UserID:
+      description: User indentifier
+      type: integer
+    CreateClassBody:
+      type: object
+      required:
+        - "id"
+        - "name"
+        - "semester"
+        - "course_id"
+      properties:
+        course_id:
+          description: course id according to reg cu
+          type: integer
+        name:
+          description: Name of class
+          type: string
+        semester:
+          description: Semester of class
+          type: string
+        image:
+          description: Class image file
+          type: object
+        students:
+          description: Student csv file
+          type: object
+    EditClassBody:
+      type: object
+      required:
+        - "class_id"
+      properties:
+        class_id:
+          $ref: "#/components/schemas/class_id"
+        course_id:
+          description: course id according to reg cu
+          type: integer
+        name:
+          description: Name of class
+          type: string
+        semester:
+          description: Semester of class
+          type: string
+        image:
+          description: Class image file
+          type: object
+    Error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          description: A human readable error message
+          type: string
