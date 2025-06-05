@@ -1,22 +1,29 @@
 package main
 
 import (
-	"net/http"
+	"log"
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+
+	v1 "CUGrader/backend/versions/v1"
 )
 
 func main() {
-	router := gin.Default()
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("No .env file found")
+	}
 
-	router.GET("/", func(c *gin.Context) {
-		message := os.Getenv("APP_MESSAGE")
-		if message == "" {
-			message = "Hello from Gin inside Docker!"
-		}
-		c.JSON(http.StatusOK, gin.H{"message": message})
-	})
+	r := gin.Default()
 
-	router.Run(":8080") // Listen and serve on 0.0.0.0:8080
+	v1.RegisterRoutes(r.Group("/v1"))
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "5000"
+	}
+
+	r.Run(":" + port)
 }
