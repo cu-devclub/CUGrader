@@ -29,9 +29,6 @@ type CreateClassRequestBody = CreateClassBody & {
 
 type EditClassRequestBody = EditClassBody & {
     image?: File;
-    /**
-     * Student csv file, we can parse this from the client tho
-     */
     semester: Semester;
 };
 
