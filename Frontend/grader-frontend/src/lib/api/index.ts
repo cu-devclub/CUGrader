@@ -2,5 +2,5 @@ import '@/lib/env-config';
 import { mockClient } from './mock';
 import { client } from './client';
 
-export const api = process.env.USE_MOCK_API ? mockClient : client;
-
+const mock = process.env.USE_MOCK_API!.toLowerCase() === "true";
+export const api = mock ? mockClient : client;
