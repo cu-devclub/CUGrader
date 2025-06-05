@@ -24,6 +24,32 @@ export default function ExamplePage() {
                         </Link>
                     </div>
 
+                    <div className="border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors">
+                        <h2 className="text-xl font-semibold text-gray-800 mb-2">Ant Design Components</h2>
+                        <p className="text-gray-600 mb-4">
+                            Explore Ant Design&apos;s rich component library with tables, forms, modals, and more using mock data.
+                        </p>
+                        <Link
+                            href="/example/ant_design_example"
+                            className="inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition-colors"
+                        >
+                            View Ant Design Demo
+                        </Link>
+                    </div>
+
+                    <div className="border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors">
+                        <h2 className="text-xl font-semibold text-gray-800 mb-2">shadcn/ui Instructor Dashboard</h2>
+                        <p className="text-gray-600 mb-4">
+                            A complete instructor dashboard for class management and code grader system using shadcn/ui components.
+                        </p>
+                        <Link
+                            href="/example/shadcn_example"
+                            className="inline-block bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition-colors"
+                        >
+                            View Instructor Dashboard
+                        </Link>
+                    </div>
+
                     {/* Placeholder for future examples */}
                     <div className="border border-gray-200 rounded-lg p-6 opacity-50">
                         <h2 className="text-xl font-semibold text-gray-800 mb-2">More Examples Coming Soon</h2>
