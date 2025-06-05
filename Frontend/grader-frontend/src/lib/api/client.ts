@@ -39,7 +39,6 @@ export const client = {
         // call this first, save the state, redirect to the returned url
         login: () => generatedClient.v1LoginGet(),
         // after google redirect the user back to our site, then sent credentials and state to the server?
-        // oh ok
         getAccessToken: (body: V1CallbackPostRequest) => generatedClient
             .v1CallbackPost({ v1CallbackPostRequest: body })
             .then(it => it.accessToken),
@@ -73,7 +72,7 @@ export const client = {
     },
     class: {
         listBySemester: (semester: string) => generatedClient.v1ClassesClassesYearSemesterGet({ yearSemester: semester }),
-        // TODO: make this multipart/form-data in openapi.yaml
+        // TODO: make this multipart/form-data
         create: (body: CreateClassRequestBody) => generatedClient.v1ClassPost({
             createClassBody: body
         }),

@@ -156,8 +156,7 @@ export const mockClient: typeof client = {
     },
     class: {
         create: async ({ courseId, name, semester, image, students }) => {
-            // ignoring image for now
-            // TODO: handle file: image, students
+            // TODO: parse csv maybe?
             if (students) {
                 console.warn("[mock] Ignoring students csv file");
             }
@@ -179,7 +178,6 @@ export const mockClient: typeof client = {
         edit: async (id, body) => {
             const target = getClassById(id);
 
-            // idk which id tho
             if (body.courseId) {
                 target.courseId = String(body.courseId);
             }
@@ -197,7 +195,6 @@ export const mockClient: typeof client = {
             return {};
         },
         listBySemester: async (semester) => {
-            // we dont have user info, so im gonna just return everything
             return unimplemented("TODO: fix inconsistent type");
             // return {
             //     assistant: classes.map(it => ({ ...it, classId: it.courseId })),
