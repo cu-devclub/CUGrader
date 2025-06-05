@@ -1,3 +1,4 @@
+import '@/lib/env-config';
 import { unimplemented } from "../utils";
 import { Configuration, DefaultApi, TAInfo, type CreateClassBody, type CreateStudent, type DeleteStudent, type EditClassBody, type EditStudent, type V1CallbackPostRequest } from "./generated";
 
@@ -9,7 +10,8 @@ const config = new Configuration({
             const token = "TODO: put it here";
             return `Bearer ${token}`;
         }
-    }
+    },
+    basePath: process.env.BACKEND_URL
 });
 
 const generatedClient = new DefaultApi(config);
