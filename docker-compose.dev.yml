@@ -1,0 +1,45 @@
+version: "3.8"
+
+services:
+    backend:
+        build:
+            context: ./Backend
+            dockerfile: Dockerfile
+        container_name: backend
+        ports:
+            - "5000:5000"
+        environment:
+            - NODE_ENV=development
+        depends_on:
+            - yugabytedb
+
+    frontend:
+        build:
+            context: ./Frontend
+            dockerfile: Dockerfile
+        container_name: frontend
+        ports:
+            - "3000:3000"
+        environment:
+            - NODE_ENV=development
+
+    yugabytedb:
+        image: yugabytedb/yugabyte
+        container_name: yugabyte
+        ports:
+            - "7000:7000"     # Admin UI
+            - "9000:9000"     # Master Admin UI
+            - "15433:15433"   # YSQL Web UI
+            - "5433:5433"     # YSQL
+        environment:
+            YSQL_USER: yugabyte
+            YSQL_PASSWORD: yugabyte
+        volumes:
+            - yugabyte_data:/home/yugabyte/yb_data    
+        command: >
+            bin/yugabyted start
+            --base_dir=/home/yugabyte/yb_data
+            --background=false
+
+volumes:
+  yugabyte_data:
