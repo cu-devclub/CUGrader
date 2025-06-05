@@ -18,34 +18,47 @@ type Assistant = TAInfo & {
     email: string;
 };
 
-// const mockStudents: Student[] = [
-//     {
-//         name: "Kim jong un",
-//         group: "1",
-//         picture: "",
-//         score: 87,
-//         section: 1,
-//         studentId: "00000001",
-//         withdrawal: false
-//     }
-// ];
-const classes: Class[] = [];
-const assistants: Assistant[] = [
+
+const classes: Class[] = [
     {
-        name: "Putin",
-        leader: true,
-        picture: "hehe",
-        email: "idk@gov.ru"
+        id: 0,
+        courseId: "1213",
+        className: "Test",
+        image: "",
+        semester: "2025/1",
+        assistants: [
+            {
+                name: generateName(),
+                email: "ta@test.com",
+                leader: true,
+                picture: ""
+            }
+        ],
+        students: [
+            {
+                name: generateName(),
+                group: "default",
+                picture: "",
+                score: 12,
+                section: 1,
+                studentId: "111111",
+                withdrawal: false
+            }
+        ]
     }
 ];
-const instructors: Instructor[] = [];
+const instructors: Instructor[] = [
+    {
+        name: "John Instructor",
+        picture: "",
+    }
+];
 // const sections = ["2025/1", "2024/2", "2024/1"];
 const semesters: Semester[] = ["2025/1", "2024/2", "2024/1"];
 
 const currentUser = {};
 
-let currentClassId = 0;
-
+let currentClassId = 10;
 
 function capFirst(string: string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -82,7 +95,7 @@ export const mockClient: typeof client = {
             const { email, section, group } = student;
             target.students.push({
                 studentId: email.split("@")[0],
-                group: group ?? "default group",
+                group: group ?? "default",
                 name: generateName(),
                 score: 0,
                 picture: "",
@@ -91,7 +104,7 @@ export const mockClient: typeof client = {
             });
             return {};
         },
-        removeFromClass: async ({ classId, studentId }) => {
+        removeFromClass: async (classId, studentId) => {
             const target = getClassById(classId);
             target.students = target.students.filter(it => it.studentId !== studentId);
             return {};
@@ -185,19 +198,26 @@ export const mockClient: typeof client = {
         },
         listBySemester: async (semester) => {
             // we dont have user info, so im gonna just return everything
-            unimplemented("TODO: fix inconsistent type")
-            return {
-                assistant: classes.map(it => ({ ...it, classId: it.courseId })),
-                study: classes.map(it => ({ ...it, classId: it.courseId }))
-            };
+            return unimplemented("TODO: fix inconsistent type");
+            // return {
+            //     assistant: classes.map(it => ({ ...it, classId: it.courseId })),
+            //     study: classes.map(it => ({ ...it, classId: it.courseId }))
+            // };
         }
     },
     group: {
-        listByClass: async (classId) => unimplemented()
+        listByClass: async (classId) => {
+            // idk tho
+            const target = getClassById(classId);
+            const groups = target.students.map(it => it.group);
+            const deduped = [...new Set(groups)];
+            return deduped;
+        }
     },
     listAssistantAndInstructor: async () => {
+        const assistant = classes.map(it => it.assistants).flat();
         return {
-            assistant: assistants,
+            assistant,
             instructor: instructors
         };
     },
@@ -205,6 +225,9 @@ export const mockClient: typeof client = {
         listByClass: async (classId) => unimplemented()
     },
     semester: {
-        list: async () => semesters
+        list: async () => {
+            const s = classes.map(it => it.semester);
+            return [...new Set(s)]; // remove duplicated
+        }
     }
 };

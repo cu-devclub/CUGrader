@@ -34,13 +34,13 @@ type EditClassRequestBody = EditClassBody & {
 };
 
 
-// well we have 16 route - 1 for picture
+// well for now ,we have 16 routes - 1 for picture
 export const client = {
     auth: {
         // call this first, save the state, redirect to the returned url
         login: () => generatedClient.v1LoginGet(),
         // after google redirect the user back to our site, then sent credentials and state to the server?
-        // wtf why
+        // oh ok
         getAccessToken: (body: V1CallbackPostRequest) => generatedClient
             .v1CallbackPost({ v1CallbackPostRequest: body })
             .then(it => it.accessToken),
@@ -62,7 +62,7 @@ export const client = {
                 ...body
             }
         }),
-        removeFromClass: ({ classId, studentId }: DeleteStudent) => generatedClient.v1StudentDelete({
+        removeFromClass: (classId: number, studentId: string) => generatedClient.v1StudentDelete({
             deleteStudent: { classId, studentId }
         }),
     },
