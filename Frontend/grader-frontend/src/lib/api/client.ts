@@ -1,4 +1,5 @@
-import { Configuration, DefaultApi, type CreateClassBody, type CreateStudent, type DeleteStudent, type EditClassBody, type EditStudent, type V1CallbackPostRequest } from "./generated";
+import { unimplemented } from "../utils";
+import { Configuration, DefaultApi, TAInfo, type CreateClassBody, type CreateStudent, type DeleteStudent, type EditClassBody, type EditStudent, type V1CallbackPostRequest } from "./generated";
 
 const config = new Configuration({
     headers: {
@@ -13,12 +14,27 @@ const config = new Configuration({
 
 const generatedClient = new DefaultApi(config);
 
-export interface StudentInClassSelector {
-    classId: number;
-    studentId: string;
-}
+export type Semester = `${number}/${number}`;
 
-// well we have around 15 route - 1 for picture
+type CreateClassRequestBody = CreateClassBody & {
+    image?: File;
+    /**
+     * Student csv file, we can parse this from the client tho
+     */
+    students?: File;
+    semester: Semester;
+};
+
+type EditClassRequestBody = EditClassBody & {
+    image?: File;
+    /**
+     * Student csv file, we can parse this from the client tho
+     */
+    semester: Semester;
+};
+
+
+// well we have 16 route - 1 for picture
 export const client = {
     auth: {
         // call this first, save the state, redirect to the returned url
@@ -39,9 +55,10 @@ export const client = {
                 ...student
             }
         }),
-        update: (selector: StudentInClassSelector, body: Omit<EditStudent, "classId" | "studentId">) => generatedClient.v1StudentPatch({
+        update: (classId: number, studentId: string, body: Omit<EditStudent, "classId" | "studentId">) => generatedClient.v1StudentPatch({
             editStudent: {
-                ...selector,
+                classId,
+                studentId,
                 ...body
             }
         }),
@@ -50,25 +67,30 @@ export const client = {
         }),
     },
     semester: {
-        list: () => generatedClient.v1ClassesSemestersGet().then(it => it.semesters ?? [])
+        list: () => generatedClient.v1ClassesSemestersGet().then(it => it.semesters ?? []),
     },
     group: {
         listByClass: (classId: number) => generatedClient.v1GroupClassIdGet({ classId }).then(it => it.groups ?? []),
     },
     class: {
         listBySemester: (semester: string) => generatedClient.v1ClassesClassesYearSemesterGet({ yearSemester: semester }),
-        create: (body: CreateClassBody) => generatedClient.v1ClassPost({
+        // TODO: make this multipart/form-data in openapi.yaml
+        create: (body: CreateClassRequestBody) => generatedClient.v1ClassPost({
             createClassBody: body
         }),
-        edit: (classId: number, body: Omit<EditClassBody, "classId">) => generatedClient.v1ClassPatch({
+        edit: (classId: number, body: Omit<EditClassRequestBody, "classId">) => generatedClient.v1ClassPatch({
             editClassBody: {
                 classId,
                 ...body
             }
         }),
     },
+    section: {
+        listByClass: (classId: number) => generatedClient.v1SectionClassIdGet({ classId }).then(it => it.sections),
+    },
     assistant: {
-        listByClass: (classId: number) => generatedClient.v1SectionClassIdGet({ classId }),
+        // Not exist yet
+        listByClass: async (classId: number): Promise<TAInfo[]> => unimplemented(),
         addToClass: (classId: number, email: string) => generatedClient.v1TAPost({
             tAeditBody: {
                 classId,
