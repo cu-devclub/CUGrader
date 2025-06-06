@@ -75,8 +75,12 @@ export const client = {
         listByClass: (classId: number) => generatedClient.v1GroupClassIdGet({ classId }).then(it => it.groups ?? []),
     },
     class: {
-        listBySemester: (semester: string) => generatedClient.v1ClassesClassesYearSemesterGet({ yearSemester: semester }),
-        // TODO: make this multipart/form-data
+        listBySemester: (semester: string) => generatedClient
+            .v1ClassesClassesYearSemesterGet({ yearSemester: semester })
+            .then(it => ({
+                assistant: it.assistant ?? [],
+                study: it.study ?? []
+            })),
         create: (body: CreateClassRequestBody) => generatedClient.v1ClassPost(body),
         edit: (classId: number, body: Omit<EditClassRequestBody, "classId">) => generatedClient.v1ClassPatch({
             classId,
@@ -84,7 +88,7 @@ export const client = {
         }),
     },
     section: {
-        listByClass: (classId: number) => generatedClient.v1SectionClassIdGet({ classId }).then(it => it.sections),
+        listByClass: (classId: number) => generatedClient.v1SectionClassIdGet({ classId }).then(it => it.sections ?? []),
     },
     assistant: {
         listByClass: async (classId: number): Promise<TAInfo[]> => unimplemented("This api not yet exist."),
