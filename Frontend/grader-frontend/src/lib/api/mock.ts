@@ -188,11 +188,11 @@ export const mockClient: typeof client = {
             return {};
         },
         listBySemester: async (semester) => {
-            return unimplemented("TODO: fix inconsistent type");
-            // return {
-            //     assistant: classes.map(it => ({ ...it, classId: it.courseId })),
-            //     study: classes.map(it => ({ ...it, classId: it.courseId }))
-            // };
+            // TODO: split this later
+            return {
+                assistant: classes,
+                study: classes
+            };
         }
     },
     group: {
