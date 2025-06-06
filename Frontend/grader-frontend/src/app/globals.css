@@ -120,3 +120,12 @@
     @apply bg-background text-foreground;
   }
 }
+.login-bg
+{
+  background-image: linear-gradient(to right top, #db5f8e, #df8cbc, #e1b5dd, #e9dcf3, #ffffff);
+}
+
+.login-bg-2
+{
+  background-image: linear-gradient(to right top, #db5f8e, #e3749d, #ea88ac, #f19cbb, #f7afca, #f4bdde, #f0caee, #edd8fb, #dde5ff, #d3f0ff, #d4f9ff, #dffffd);
+}
