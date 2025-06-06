@@ -16,10 +16,8 @@
 import * as runtime from '../runtime';
 import type {
   Assistant,
-  CreateClassBody,
   CreateStudent,
   DeleteStudent,
-  EditClassBody,
   EditStudent,
   GroupArray,
   SectionArray,
@@ -34,14 +32,10 @@ import type {
 import {
     AssistantFromJSON,
     AssistantToJSON,
-    CreateClassBodyFromJSON,
-    CreateClassBodyToJSON,
     CreateStudentFromJSON,
     CreateStudentToJSON,
     DeleteStudentFromJSON,
     DeleteStudentToJSON,
-    EditClassBodyFromJSON,
-    EditClassBodyToJSON,
     EditStudentFromJSON,
     EditStudentToJSON,
     GroupArrayFromJSON,
@@ -69,13 +63,22 @@ export interface V1CallbackPostOperationRequest {
 }
 
 export interface V1ClassPatchRequest {
+    classId: number;
     authentication?: string;
-    editClassBody?: EditClassBody;
+    courseId?: number;
+    name?: string;
+    semester?: string;
+    image?: Blob;
+    students?: Blob;
 }
 
 export interface V1ClassPostRequest {
+    courseId: number;
+    name: string;
+    semester: string;
     authentication?: string;
-    createClassBody?: CreateClassBody;
+    image?: Blob;
+    students?: Blob;
 }
 
 export interface V1ClassesClassesYearSemesterGetRequest {
@@ -168,14 +171,61 @@ export class DefaultApi extends runtime.BaseAPI {
      * partially edit class information
      */
     async v1ClassPatchRaw(requestParameters: V1ClassPatchRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
+        if (requestParameters['classId'] == null) {
+            throw new runtime.RequiredError(
+                'classId',
+                'Required parameter "classId" was null or undefined when calling v1ClassPatch().'
+            );
+        }
+
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        headerParameters['Content-Type'] = 'application/json';
-
         if (requestParameters['authentication'] != null) {
             headerParameters['Authentication'] = String(requestParameters['authentication']);
+        }
+
+        const consumes: runtime.Consume[] = [
+            { contentType: 'multipart/form-data' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any };
+        let useForm = false;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters['classId'] != null) {
+            formParams.append('class_id', requestParameters['classId'] as any);
+        }
+
+        if (requestParameters['courseId'] != null) {
+            formParams.append('course_id', requestParameters['courseId'] as any);
+        }
+
+        if (requestParameters['name'] != null) {
+            formParams.append('name', requestParameters['name'] as any);
+        }
+
+        if (requestParameters['semester'] != null) {
+            formParams.append('semester', requestParameters['semester'] as any);
+        }
+
+        if (requestParameters['image'] != null) {
+            formParams.append('image', requestParameters['image'] as any);
+        }
+
+        if (requestParameters['students'] != null) {
+            formParams.append('students', requestParameters['students'] as any);
         }
 
         const response = await this.request({
@@ -183,7 +233,7 @@ export class DefaultApi extends runtime.BaseAPI {
             method: 'PATCH',
             headers: headerParameters,
             query: queryParameters,
-            body: EditClassBodyToJSON(requestParameters['editClassBody']),
+            body: formParams,
         }, initOverrides);
 
         return new runtime.JSONApiResponse<any>(response);
@@ -192,7 +242,7 @@ export class DefaultApi extends runtime.BaseAPI {
     /**
      * partially edit class information
      */
-    async v1ClassPatch(requestParameters: V1ClassPatchRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+    async v1ClassPatch(requestParameters: V1ClassPatchRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
         const response = await this.v1ClassPatchRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -201,14 +251,71 @@ export class DefaultApi extends runtime.BaseAPI {
      * Create class
      */
     async v1ClassPostRaw(requestParameters: V1ClassPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
+        if (requestParameters['courseId'] == null) {
+            throw new runtime.RequiredError(
+                'courseId',
+                'Required parameter "courseId" was null or undefined when calling v1ClassPost().'
+            );
+        }
+
+        if (requestParameters['name'] == null) {
+            throw new runtime.RequiredError(
+                'name',
+                'Required parameter "name" was null or undefined when calling v1ClassPost().'
+            );
+        }
+
+        if (requestParameters['semester'] == null) {
+            throw new runtime.RequiredError(
+                'semester',
+                'Required parameter "semester" was null or undefined when calling v1ClassPost().'
+            );
+        }
+
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        headerParameters['Content-Type'] = 'application/json';
-
         if (requestParameters['authentication'] != null) {
             headerParameters['Authentication'] = String(requestParameters['authentication']);
+        }
+
+        const consumes: runtime.Consume[] = [
+            { contentType: 'multipart/form-data' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any };
+        let useForm = false;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters['courseId'] != null) {
+            formParams.append('course_id', requestParameters['courseId'] as any);
+        }
+
+        if (requestParameters['name'] != null) {
+            formParams.append('name', requestParameters['name'] as any);
+        }
+
+        if (requestParameters['semester'] != null) {
+            formParams.append('semester', requestParameters['semester'] as any);
+        }
+
+        if (requestParameters['image'] != null) {
+            formParams.append('image', requestParameters['image'] as any);
+        }
+
+        if (requestParameters['students'] != null) {
+            formParams.append('students', requestParameters['students'] as any);
         }
 
         const response = await this.request({
@@ -216,7 +323,7 @@ export class DefaultApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: CreateClassBodyToJSON(requestParameters['createClassBody']),
+            body: formParams,
         }, initOverrides);
 
         return new runtime.JSONApiResponse<any>(response);
@@ -225,7 +332,7 @@ export class DefaultApi extends runtime.BaseAPI {
     /**
      * Create class
      */
-    async v1ClassPost(requestParameters: V1ClassPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+    async v1ClassPost(requestParameters: V1ClassPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
         const response = await this.v1ClassPostRaw(requestParameters, initOverrides);
         return await response.value();
     }

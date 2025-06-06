@@ -1,15 +1,13 @@
 import { unimplemented } from "../utils";
-import { client, Semester } from "./client";
-import { ClassObject, InstructorInfo, StudentInfo, TAInfo } from "./generated";
+import type { client, Semester } from "./client";
+import type { ClassObject, InstructorInfo, StudentInfo, TAInfo } from "./generated";
 
 const fileRegistry: File[] = [];
 
-// why is there both id and classId, assuming its courseId
-type Class = Omit<ClassObject, "classId"> & {
+type Class = ClassObject & {
     students: Student[];
-    courseId: string;
     semester: Semester;
-    assistants: Assistant[]; // email
+    assistants: Assistant[];
 };
 
 type Student = Omit<StudentInfo, "maxScore">;
@@ -18,12 +16,11 @@ type Assistant = TAInfo & {
     email: string;
 };
 
-
 const classes: Class[] = [
     {
-        id: 0,
-        courseId: "1213",
-        className: "Test",
+        classId: 0,
+        courseId: 1213,
+        courseName: "Test",
         image: "",
         semester: "2025/1",
         assistants: [
@@ -60,24 +57,20 @@ const currentUser = {};
 
 let currentClassId = 10;
 
-function capFirst(string: string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
+function choice<T>(elements: T[]): T {
+    const index = Math.floor(Math.random() * elements.length);
+    return elements[index];
 }
 
-function getRandomInt(min: number, max: number) {
-    return Math.floor(Math.random() * (max - min)) + min;
-}
-
-const firstNames = ["Arjun", "Ryan", "Shah", "May", "Thomas", "Erdogan", "Taylor", "Muhammad", "Martin", "Azhar", "Thaksin", "Ivan", "Francis", "Leo", "Haruka", "Evan", "Satya",];
-const lastNames = ["Smith", "Brown", "Williams", "Shinawatra", "Miller", "Wang", "Kowalski", "Anderson", "Ryan", "Singh", "Watson", "Yoisaki", "Doe", "Li", "Kim", "Nguyen"];
 
 function generateName() {
-    const name = capFirst(firstNames[getRandomInt(0, firstNames.length + 1)]) + ' ' + capFirst(lastNames[getRandomInt(0, lastNames.length + 1)]);
-    return name;
+    const firstNames = ["Arjun", "Ryan", "Shah", "May", "Thomas", "Erdogan", "Taylor", "Muhammad", "Martin", "Azhar", "Thaksin", "Ivan", "Francis", "Leo", "Haruka", "Evan", "Satya",];
+    const lastNames = ["Smith", "Brown", "Williams", "Shinawatra", "Miller", "Wang", "Kowalski", "Anderson", "Ryan", "Singh", "Watson", "Yoisaki", "Doe", "Li", "Kim", "Nguyen"];
+    return `${choice(firstNames)} ${choice(lastNames)}`;
 }
 
 function getClassById(id: number) {
-    const target = classes.find(it => it.id === id);
+    const target = classes.find(it => it.classId === id);
     if (!target) {
         throw new Error("Not found");
     }
@@ -164,9 +157,9 @@ export const mockClient: typeof client = {
                 fileRegistry.push(image);
             }
             classes.push({
-                courseId: String(courseId), // dafaq
-                className: name,
-                id: currentClassId++,
+                courseId, // dafaq
+                courseName: name,
+                classId: currentClassId++,
                 // TODO: better fallback image
                 image: image ? URL.createObjectURL(image) : "",
                 students: [],
@@ -179,10 +172,10 @@ export const mockClient: typeof client = {
             const target = getClassById(id);
 
             if (body.courseId) {
-                target.courseId = String(body.courseId);
+                target.courseId = body.courseId;
             }
             if (body.name) {
-                target.className = body.name;
+                target.courseName = body.name;
             }
             if (body.semester) {
                 target.semester = body.semester;
@@ -195,11 +188,11 @@ export const mockClient: typeof client = {
             return {};
         },
         listBySemester: async (semester) => {
-            return unimplemented("TODO: fix inconsistent type");
-            // return {
-            //     assistant: classes.map(it => ({ ...it, classId: it.courseId })),
-            //     study: classes.map(it => ({ ...it, classId: it.courseId }))
-            // };
+            // TODO: split this later
+            return {
+                assistant: classes,
+                study: classes
+            };
         }
     },
     group: {

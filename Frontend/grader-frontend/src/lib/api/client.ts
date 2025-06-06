@@ -1,23 +1,22 @@
-import '@/lib/env-config';
 import { unimplemented } from "../utils";
-import { Configuration, DefaultApi, TAInfo, type CreateClassBody, type CreateStudent, type DeleteStudent, type EditClassBody, type EditStudent, type V1CallbackPostRequest } from "./generated";
+import { Configuration, DefaultApi, TAInfo, V1ClassPatchRequest, V1ClassPostRequest, type CreateStudent, type DeleteStudent, type EditStudent, type V1CallbackPostRequest } from "./generated";
 
 const config = new Configuration({
     headers: {
-        // very cursed, or should i just recreate the entire thing 
-        // and then just `const api = useApi()`
+        // cursed af
         get "Authentication"() {
             const token = "TODO: put it here";
             return `Bearer ${token}`;
         }
     },
-    basePath: process.env.BACKEND_URL
+    basePath: process.env.NEXT_PUBLIC_BACKEND_URL
 });
 
 const generatedClient = new DefaultApi(config);
 
 export type Semester = `${number}/${number}`;
 
+type CreateClassBody = Omit<V1ClassPostRequest, "authentication">;
 type CreateClassRequestBody = CreateClassBody & {
     image?: File;
     /**
@@ -27,9 +26,14 @@ type CreateClassRequestBody = CreateClassBody & {
     semester: Semester;
 };
 
+type EditClassBody = Omit<V1ClassPatchRequest, "authentication">;
 type EditClassRequestBody = EditClassBody & {
     image?: File;
-    semester: Semester;
+    /**
+     * Student csv file
+     */
+    students?: File;
+    semester?: Semester;
 };
 
 
@@ -71,24 +75,23 @@ export const client = {
         listByClass: (classId: number) => generatedClient.v1GroupClassIdGet({ classId }).then(it => it.groups ?? []),
     },
     class: {
-        listBySemester: (semester: string) => generatedClient.v1ClassesClassesYearSemesterGet({ yearSemester: semester }),
-        // TODO: make this multipart/form-data
-        create: (body: CreateClassRequestBody) => generatedClient.v1ClassPost({
-            createClassBody: body
-        }),
+        listBySemester: (semester: string) => generatedClient
+            .v1ClassesClassesYearSemesterGet({ yearSemester: semester })
+            .then(it => ({
+                assistant: it.assistant ?? [],
+                study: it.study ?? []
+            })),
+        create: (body: CreateClassRequestBody) => generatedClient.v1ClassPost(body),
         edit: (classId: number, body: Omit<EditClassRequestBody, "classId">) => generatedClient.v1ClassPatch({
-            editClassBody: {
-                classId,
-                ...body
-            }
+            classId,
+            ...body
         }),
     },
     section: {
-        listByClass: (classId: number) => generatedClient.v1SectionClassIdGet({ classId }).then(it => it.sections),
+        listByClass: (classId: number) => generatedClient.v1SectionClassIdGet({ classId }).then(it => it.sections ?? []),
     },
     assistant: {
-        // Not exist yet
-        listByClass: async (classId: number): Promise<TAInfo[]> => unimplemented(),
+        listByClass: async (classId: number): Promise<TAInfo[]> => unimplemented("This api not yet exist."),
         addToClass: (classId: number, email: string) => generatedClient.v1TAPost({
             tAeditBody: {
                 classId,

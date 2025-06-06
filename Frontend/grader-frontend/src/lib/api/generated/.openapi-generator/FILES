@@ -1,13 +1,12 @@
+.openapi-generator-ignore
 apis/DefaultApi.ts
 apis/index.ts
 index.ts
 models/Assistant.ts
 models/ClassList.ts
 models/ClassObject.ts
-models/CreateClassBody.ts
 models/CreateStudent.ts
 models/DeleteStudent.ts
-models/EditClassBody.ts
 models/EditStudent.ts
 models/GroupArray.ts
 models/InstructorInfo.ts

@@ -20,23 +20,23 @@ import { mapValues } from '../runtime';
  */
 export interface ClassObject {
     /**
-     * 
-     * @type {number}
-     * @memberof ClassObject
-     */
-    id: number;
-    /**
-     * 
+     * class_id primary key
      * @type {number}
      * @memberof ClassObject
      */
     classId: number;
     /**
+     * id of corse from reg
+     * @type {number}
+     * @memberof ClassObject
+     */
+    courseId: number;
+    /**
      * 
      * @type {string}
      * @memberof ClassObject
      */
-    className: string;
+    courseName: string;
     /**
      * 
      * @type {string}
@@ -49,9 +49,9 @@ export interface ClassObject {
  * Check if a given object implements the ClassObject interface.
  */
 export function instanceOfClassObject(value: object): value is ClassObject {
-    if (!('id' in value) || value['id'] === undefined) return false;
     if (!('classId' in value) || value['classId'] === undefined) return false;
-    if (!('className' in value) || value['className'] === undefined) return false;
+    if (!('courseId' in value) || value['courseId'] === undefined) return false;
+    if (!('courseName' in value) || value['courseName'] === undefined) return false;
     if (!('image' in value) || value['image'] === undefined) return false;
     return true;
 }
@@ -66,9 +66,9 @@ export function ClassObjectFromJSONTyped(json: any, ignoreDiscriminator: boolean
     }
     return {
         
-        'id': json['id'],
         'classId': json['class_id'],
-        'className': json['class_name'],
+        'courseId': json['course_id'],
+        'courseName': json['course_name'],
         'image': json['image'],
     };
 }
@@ -84,9 +84,9 @@ export function ClassObjectToJSONTyped(value?: ClassObject | null, ignoreDiscrim
 
     return {
         
-        'id': value['id'],
         'class_id': value['classId'],
-        'class_name': value['className'],
+        'course_id': value['courseId'],
+        'course_name': value['courseName'],
         'image': value['image'],
     };
 }

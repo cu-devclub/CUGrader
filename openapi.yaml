@@ -138,7 +138,7 @@ paths:
 
       requestBody:
         content:
-          application/json:
+          multipart/form-data:
             schema:
               $ref: '#/components/schemas/CreateClassBody'
       responses:
@@ -170,7 +170,7 @@ paths:
             type: string
         requestBody:
             content:
-                application/json:
+                multipart/form-data:
                     schema:
                         $ref: '#/components/schemas/EditClassBody'
         responses:
@@ -623,18 +623,20 @@ components:
     ClassObject:
       type: object
       properties:
-        id:
-          type: integer
         class_id:
+          description: class_id primary key
           type: integer
-        class_name:
+        course_id:
+          description: id of corse from reg
+          type: integer
+        course_name:
           type: string
         image:
           type: string
       required:
-        - id
         - class_id
-        - class_name
+        - course_id
+        - course_name
         - image
     SemesterClasses:
       type: object
@@ -670,7 +672,6 @@ components:
     CreateClassBody:
       type: object
       required:
-        - "id"
         - "name"
         - "semester"
         - "course_id"
@@ -686,10 +687,13 @@ components:
           type: string
         image:
           description: Class image file
-          type: object
+          type: string
+          format: binary
         students:
           description: Student csv file
-          type: object
+          type: string
+          format: binary
+
     EditClassBody:
       type: object
       required:
@@ -708,7 +712,12 @@ components:
           type: string
         image:
           description: Class image file
-          type: object
+          type: string
+          format: binary
+        students:
+          description: Student csv file
+          type: string
+          format: binary
     Error:
       type: object
       required:
