@@ -1,4 +1,3 @@
-import '@/lib/env-config';
 import { unimplemented } from "../utils";
 import { Configuration, DefaultApi, TAInfo, V1ClassPatchRequest, V1ClassPostRequest, type CreateStudent, type DeleteStudent, type EditStudent, type V1CallbackPostRequest } from "./generated";
 
@@ -10,7 +9,7 @@ const config = new Configuration({
             return `Bearer ${token}`;
         }
     },
-    basePath: process.env.BACKEND_URL
+    basePath: process.env.NEXT_PUBLIC_BACKEND_URL
 });
 
 const generatedClient = new DefaultApi(config);
