@@ -687,10 +687,13 @@ components:
           type: string
         image:
           description: Class image file
-          type: object
+          type: string
+          format: binary
         students:
           description: Student csv file
-          type: object
+          type: string
+          format: binary
+
     EditClassBody:
       type: object
       required:
@@ -709,10 +712,12 @@ components:
           type: string
         image:
           description: Class image file
-          type: object
+          type: string
+          format: binary
         students:
           description: Student csv file
-          type: object
+          type: string
+          format: binary
     Error:
       type: object
       required:

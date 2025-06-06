@@ -68,8 +68,8 @@ export interface V1ClassPatchRequest {
     courseId?: number;
     name?: string;
     semester?: string;
-    image?: object;
-    students?: object;
+    image?: Blob;
+    students?: Blob;
 }
 
 export interface V1ClassPostRequest {
@@ -77,8 +77,8 @@ export interface V1ClassPostRequest {
     name: string;
     semester: string;
     authentication?: string;
-    image?: object;
-    students?: object;
+    image?: Blob;
+    students?: Blob;
 }
 
 export interface V1ClassesClassesYearSemesterGetRequest {
@@ -194,6 +194,10 @@ export class DefaultApi extends runtime.BaseAPI {
 
         let formParams: { append(param: string, value: any): any };
         let useForm = false;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
         if (useForm) {
             formParams = new FormData();
         } else {
@@ -217,12 +221,12 @@ export class DefaultApi extends runtime.BaseAPI {
         }
 
         if (requestParameters['image'] != null) {
-            formParams.append('image', new Blob([JSON.stringify(objectToJSON(requestParameters['image']))], { type: "application/json", }));
-                    }
+            formParams.append('image', requestParameters['image'] as any);
+        }
 
         if (requestParameters['students'] != null) {
-            formParams.append('students', new Blob([JSON.stringify(objectToJSON(requestParameters['students']))], { type: "application/json", }));
-                    }
+            formParams.append('students', requestParameters['students'] as any);
+        }
 
         const response = await this.request({
             path: `/v1/class`,
@@ -284,6 +288,10 @@ export class DefaultApi extends runtime.BaseAPI {
 
         let formParams: { append(param: string, value: any): any };
         let useForm = false;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
         if (useForm) {
             formParams = new FormData();
         } else {
@@ -303,12 +311,12 @@ export class DefaultApi extends runtime.BaseAPI {
         }
 
         if (requestParameters['image'] != null) {
-            formParams.append('image', new Blob([JSON.stringify(objectToJSON(requestParameters['image']))], { type: "application/json", }));
-                    }
+            formParams.append('image', requestParameters['image'] as any);
+        }
 
         if (requestParameters['students'] != null) {
-            formParams.append('students', new Blob([JSON.stringify(objectToJSON(requestParameters['students']))], { type: "application/json", }));
-                    }
+            formParams.append('students', requestParameters['students'] as any);
+        }
 
         const response = await this.request({
             path: `/v1/class`,
