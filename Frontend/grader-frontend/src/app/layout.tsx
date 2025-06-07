@@ -1,8 +1,8 @@
-import { AntdRegistry } from '@ant-design/nextjs-registry';
+import { AntdRegistry } from "@ant-design/nextjs-registry";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Rubik } from "next/font/google";
 import "./globals.css";
-import Providers from './providers';
+import Providers from "./providers";
 
 // TODO: get thai font
 const rubik = Rubik({
@@ -37,9 +37,7 @@ export default function RootLayout({
         className={`${geistMono.variable} ${rubik.variable} antialiased font-sans text-foreground`}
       >
         <Providers>
-          <AntdRegistry>
-            {children}
-          </AntdRegistry>
+          <AntdRegistry>{children}</AntdRegistry>
         </Providers>
       </body>
     </html>
