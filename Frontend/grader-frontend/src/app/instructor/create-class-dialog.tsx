@@ -1,62 +1,95 @@
 import { Button } from "@/components/ui/button";
 import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+  DialogTitle
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { DialogClose } from "@radix-ui/react-dialog";
-import { EllipsisVertical, Plus } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 
 interface CreateClassDialogProps {
-
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-// TODO: get that shade of pink
-export function CreateClassDialog({ }) {
+export function CreateClassDialog({ open, onOpenChange }: CreateClassDialogProps) {
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="ghost" size="icon">
-          <Plus />
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create Class</DialogTitle>
-          <div className="mt-2">
-            <h3 className="font-semibold"> Class Info </h3>
-            <hr className="mt-0.5" />
-            <div className="space-y-3 mt-3">
-              <div className="grid w-full items-center gap-2">
-                <Label htmlFor="class-name" className="font-normal">Class name</Label>
-                <Input id="class-name" placeholder="Class name" />
-              </div>
-              <div className="grid w-full items-center gap-2">
-                <Label htmlFor="class-id" className="font-normal">Class ID</Label>
-                <Input id="class-id" placeholder="2301111" />
-              </div>
+          <DialogTitle className="text-primary text-xl">Create Class</DialogTitle>
+          <DialogDescription>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit.
+          </DialogDescription>
+        </DialogHeader>
 
-              <div className="grid w-full items-center gap-2">
-                <Label htmlFor="class-name" className="font-normal">Class name</Label>
-                <Input id="class-name" placeholder="Class name" />
-              </div>
+        <div className="mt-2">
+          <h3 className="font-medium"> Class Info </h3>
+          <hr className="mt-2" />
+          <div className="space-y-4 mt-4">
+            <div className="grid w-full items-center gap-2">
+              <Label className="font-normal" htmlFor="class-name">Class name</Label>
+              <Input id="class-name" placeholder="Data structures and Algorithms" />
+            </div>
+            <div className="grid w-full items-center gap-2">
+              <Label className="font-normal" htmlFor="class-id">Class ID</Label>
+              <Input id="class-id" placeholder="2301111" />
+            </div>
+            <div className="grid w-full items-center gap-2">
+              <Label className="font-normal" htmlFor="class-name">Academic Year/Semester</Label>
+              {/* TODO: get current semester */}
+              <Input id="class-name" placeholder="2025/1" />
             </div>
           </div>
-          <div className="mt-2">
-            <h3 className="font-semibold"> Add Students <span className="font-normal text-pink-300">(Optional)</span> </h3>
-            <hr className="mt-0.5" />
+        </div>
+
+        <Collapsible
+          className="flex flex-col gap-2"
+        >
+          <div className="flex items-center justify-between gap-4 ">
+            <h3 className="font-medium"> Add Students <span className="font-normal text-primary/50">(Optional)</span> </h3>
+            <CollapsibleTrigger asChild>
+              {/* TODO: make clickable area bigger */}
+              <Button variant="ghost" size="icon" className="size-7">
+                <ChevronRight />
+                <span className="sr-only">Toggle</span>
+              </Button>
+            </CollapsibleTrigger>
           </div>
-          <div className="mt-2">
-            <h3 className="font-semibold"> Class Picture <span className="font-normal text-pink-300">(Optional)</span></h3>
-            <hr className="mt-0.5" />
+          <hr />
+          <CollapsibleContent className="flex flex-col gap-2">
+            TODO: File Upload
+          </CollapsibleContent>
+        </Collapsible>
+
+        <Collapsible
+          className="flex flex-col gap-2"
+        >
+          <div className="flex items-center justify-between gap-4 ">
+            <h3 className="font-medium"> Class Picture <span className="font-normal text-primary/50">(Optional)</span> </h3>
+            <CollapsibleTrigger asChild>
+              {/* TODO: make clickable area bigger */}
+              <Button variant="ghost" size="icon" className="size-7">
+                <ChevronRight />
+                <span className="sr-only">Toggle</span>
+              </Button>
+            </CollapsibleTrigger>
           </div>
-        </DialogHeader>
+          <hr />
+          <CollapsibleContent className="flex flex-col gap-2">
+            TODO: File Upload
+          </CollapsibleContent>
+        </Collapsible>
         <DialogFooter >
           <DialogClose asChild>
             <Button type="button" variant="secondary">
