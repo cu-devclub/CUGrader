@@ -1,4 +1,4 @@
-import { SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger } from "@/components/ui/select";
+import { SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
 import { Select, SelectValue } from "@radix-ui/react-select";
 
 export interface SemesterSelectorProps {
