@@ -6,8 +6,9 @@ import { StudentInfo } from "@/lib/api/generated";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Table, TableColumnsType } from "antd";
 import { TableRowSelection } from "antd/es/table/interface";
-import { Download, Edit2, Plus, TableOfContents, Upload } from "lucide-react";
+import { ChevronDown, ChevronRight, Download, Edit2, Plus, TableOfContents, Upload } from "lucide-react";
 import { useState } from "react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Student, StudentEditDialog, StudentWithoutIdAndName, useEditDialogState } from "./student-edit-dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { StudentAddDialog, StudentAddDialogMode, useStudentAddDialogState } from "./student-add-dialog";
@@ -131,41 +132,56 @@ export function StudentSection() {
   const studentAddDialog = useStudentAddDialogState();
 
   return (
-    <section className="mt-2">
-      <div className="flex justify-end gap-2">
-        <StudentAddDialog state={studentAddDialog.state} />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button>
-              <Plus />
-              <span>Add Student</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem onClick={() => studentAddDialog.launch("manual")}>
-              <TableOfContents /> Manual
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => studentAddDialog.launch("file")}>
-              <Upload /> Upload file
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="secondary">
-              <Download />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            {/* TODO: icon maybe? */}
-            <DropdownMenuItem>Download Student list</DropdownMenuItem>
-            <DropdownMenuItem>Download Template</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+    <Collapsible defaultOpen>
+      <div className="flex justify-between">
+        <CollapsibleTrigger className="flex gap-3 items-center group">
+          <ChevronDown className="group-data-[state=closed]:hidden" />
+          <ChevronRight className="group-data-[state=open]:hidden" />
+          <h2 className="text-xl font-medium"> Students (420) </h2>
+        </CollapsibleTrigger>
+        <div className="flex justify-end gap-2">
+          <StudentAddDialog state={studentAddDialog.state} />
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button>
+                <Plus />
+                <span>Add Student</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={() => studentAddDialog.launch("manual")}>
+                <TableOfContents /> Manual
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => studentAddDialog.launch("file")}>
+                <Upload /> Upload file
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="secondary">
+                <Download />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              {/* TODO: icon maybe? */}
+              <DropdownMenuItem>Download Student list</DropdownMenuItem>
+              <DropdownMenuItem>Download Template</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+        </div>
 
       </div>
-      <StudentTable classId={0} />
-    </section>
+      <CollapsibleContent>
+        <section className="mt-4">
+          <StudentTable classId={0} />
+        </section>
+      </CollapsibleContent>
+    </Collapsible>
+
   );
 }
