@@ -15,7 +15,7 @@ export function LoginForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="p-6 md:p-8">
+          <div className="p-6 md:p-8">
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold">GraderV.2</h1>
@@ -25,11 +25,11 @@ export function LoginForm({
               </div>
               {process.env.NEXT_PUBLIC_AUTH_API_URL ? (
                 <Link href={process.env.NEXT_PUBLIC_AUTH_API_URL}>
-                  <Button type="submit" className="w-full">
+                  <Button className="w-full">
                     Login
                   </Button>
                 </Link>
-              ) : <Button type="submit" className="w-full">
+              ) : <Button className="w-full">
                 Error loading auth API URL
               </Button>}
 
@@ -68,7 +68,7 @@ export function LoginForm({
                 </a>
               </div>
             </div>
-          </form>
+          </div>
           <div className="bg-muted relative hidden md:block">
             <img
               src="/placeholder.svg"
