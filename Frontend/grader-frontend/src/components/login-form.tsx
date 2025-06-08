@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import Image from "next/image"
 import githubIcon from "@/../public/github-icon.svg"
+import { redirect } from "next/navigation"
+import Link from "next/link"
 
 export function LoginForm({
   className,
@@ -20,10 +22,16 @@ export function LoginForm({
                   Grading & Class management system
                 </p>
               </div>
+              {process.env.NEXT_PUBLIC_AUTH_API_URL ? (
+                <Link href={process.env.NEXT_PUBLIC_AUTH_API_URL}>
+                  <Button type="submit" className="w-full">
+                    Login
+                  </Button>
+                </Link>
+              ) : <Button type="submit" className="w-full">
+                Error loading auth API URL
+              </Button>}
 
-              <Button type="submit" className="w-full">
-                Login
-              </Button>
               <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
                 <span className="bg-card text-muted-foreground relative z-10 px-2">
                   Made with ❤️ by CU Devclub
