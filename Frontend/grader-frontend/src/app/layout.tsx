@@ -3,7 +3,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Rubik } from "next/font/google";
 import "./globals.css";
 import Providers from './providers';
-import '@ant-design/v5-patch-for-react-19';
+import { Toaster } from "@/components/ui/sonner";
+
 
 // TODO: get thai font
 const rubik = Rubik({
@@ -42,6 +43,7 @@ export default function RootLayout({
             {children}
           </AntdRegistry>
         </Providers>
+        <Toaster />
       </body>
     </html>
   );

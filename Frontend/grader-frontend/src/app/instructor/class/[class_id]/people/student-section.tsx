@@ -6,20 +6,23 @@ import { StudentInfo } from "@/lib/api/generated";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Table, TableColumnsType } from "antd";
 import { TableRowSelection } from "antd/es/table/interface";
-import { Download, Edit2, Plus } from "lucide-react";
+import { Download, Edit2, Plus, TableOfContents, Upload } from "lucide-react";
 import { useState } from "react";
 import { Student, StudentEditDialog, StudentWithoutIdAndName, useEditDialogState } from "./student-edit-dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { StudentAddDialog, StudentAddDialogMode, useStudentAddDialogState } from "./student-add-dialog";
 
+// TODO: deal with this later
+// import '@ant-design/v5-patch-for-react-19';
 
 interface StudentTableProps {
   classId: number;
 }
 
-// i hate react, but suspense is good tho
 function StudentTable({ classId }: StudentTableProps) {
   const query = useSuspenseQuery({
     queryKey: ["class", classId, "student"],
-    // TODO: get student by CLASS ID
+    // TODO: get student by class
     queryFn: () => api.student.list()
   });
 
@@ -30,7 +33,7 @@ function StudentTable({ classId }: StudentTableProps) {
         section: value.section,
         withdrawal: value.withdrawed
       });
-      await query.refetch()
+      await query.refetch();
     },
   });
 
@@ -125,17 +128,42 @@ function StudentTable({ classId }: StudentTableProps) {
 }
 
 export function StudentSection() {
+  const studentAddDialog = useStudentAddDialogState();
 
   return (
     <section className="mt-2">
       <div className="flex justify-end gap-2">
-        <Button>
-          <Plus />
-          <span>Add Student</span>
-        </Button>
-        <Button variant="secondary">
-          <Download />
-        </Button>
+        <StudentAddDialog state={studentAddDialog.state} />
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button>
+              <Plus />
+              <span>Add Student</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem onClick={() => studentAddDialog.launch("manual")}>
+              <TableOfContents /> Manual
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => studentAddDialog.launch("file")}>
+              <Upload /> Upload file
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="secondary">
+              <Download />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            {/* TODO: icon maybe? */}
+            <DropdownMenuItem>Download Student list</DropdownMenuItem>
+            <DropdownMenuItem>Download Template</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
       </div>
       <StudentTable classId={0} />
     </section>

@@ -28,6 +28,7 @@ interface MenuProps {
   items: MenuItem[];
 }
 
+// TODO: render this
 function Menu({ items }: MenuProps) {
   return (
     <DropdownMenu>
@@ -41,7 +42,6 @@ function Menu({ items }: MenuProps) {
         <DropdownMenuItem>Billing</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-
   );
 }
 

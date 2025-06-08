@@ -59,7 +59,6 @@ export function CreateClassDialog({ open, onOpenChange }: CreateClassDialogProps
           <div className="flex items-center justify-between gap-4 ">
             <h3 className="font-medium"> Add Students <span className="font-normal text-primary/50">(Optional)</span> </h3>
             <CollapsibleTrigger asChild>
-              {/* TODO: make clickable area bigger */}
               <Button variant="ghost" size="icon" className="size-7">
                 <ChevronRight />
                 <span className="sr-only">Toggle</span>
@@ -78,7 +77,6 @@ export function CreateClassDialog({ open, onOpenChange }: CreateClassDialogProps
           <div className="flex items-center justify-between gap-4 ">
             <h3 className="font-medium"> Class Picture <span className="font-normal text-primary/50">(Optional)</span> </h3>
             <CollapsibleTrigger asChild>
-              {/* TODO: make clickable area bigger */}
               <Button variant="ghost" size="icon" className="size-7">
                 <ChevronRight />
                 <span className="sr-only">Toggle</span>
