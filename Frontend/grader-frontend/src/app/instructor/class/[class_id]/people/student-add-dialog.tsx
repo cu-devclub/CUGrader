@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api } from "@/lib/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { FileSpreadsheet, Paperclip, Plus, TableOfContents, Trash2, Upload } from "lucide-react";
+import { Cross, FileSpreadsheet, Paperclip, Plus, TableOfContents, Trash2, Upload, X } from "lucide-react";
 import { startTransition, useEffect, useMemo, useState } from "react";
 import { FileWithPath, useDropzone } from 'react-dropzone';
 import { useFieldArray, useForm } from "react-hook-form";
@@ -109,7 +109,14 @@ export function StudentAddDialog({ state: { mode, setMode, open, setOpen } }: St
   });
 
   const form = useForm({
-    resolver: zodResolver(studentFormSchema)
+    resolver: zodResolver(studentFormSchema),
+    defaultValues: {
+      students: [
+        {
+
+        }
+      ]
+    }
   });
   const { fields, append, remove, insert } = useFieldArray({
     control: form.control, // control props comes from useForm (optional: if you are using FormProvider)
@@ -200,6 +207,9 @@ export function StudentAddDialog({ state: { mode, setMode, open, setOpen } }: St
                         </FormItem>
                       )}
                     />
+                    <Button variant="ghost" size="icon" className="group-[:first-child]:mt-6 transition-none" onClick={() => remove(index)}>
+                      <Trash2 className="text-destructive" />
+                    </Button>
                   </div>
                 ))}
               </Form>

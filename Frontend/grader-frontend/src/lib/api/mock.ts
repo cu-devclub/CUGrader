@@ -80,10 +80,9 @@ function choice<T>(elements: T[]): T {
     return elements[index];
 }
 
-
-function generateName() {
-    const firstNames = ["Arjun", "Ryan", "Shah", "May", "Thomas", "Erdogan", "Taylor", "Muhammad", "Martin", "Azhar", "Thaksin", "Ivan", "Francis", "Leo", "Haruka", "Evan", "Satya",];
-    const lastNames = ["Smith", "Brown", "Williams", "Shinawatra", "Miller", "Wang", "Kowalski", "Anderson", "Ryan", "Singh", "Watson", "Yoisaki", "Doe", "Li", "Kim", "Nguyen"];
+export function generateName() {
+    const firstNames = ["Arjun", "Ryan", "Shah", "May", "Thomas", "Erdogan", "Taylor", "Muhammad", "Martin", "Azhar", "Thaksin", "Ivan", "Francis", "Leo", "Evan", "Satya",];
+    const lastNames = ["Smith", "Brown", "Williams", "Shinawatra", "Miller", "Wang", "Kowalski", "Anderson", "Adolf", "Singh", "Watson", "Yoisaki", "Doe", "Li", "Kim", "Nguyen"];
     return `${choice(firstNames)} ${choice(lastNames)}`;
 }
 
