@@ -17,12 +17,12 @@ func (am *AuthModel) Callback(code string) (*oauth2Service.Userinfo, error) {
 	client := am.GoogleOauth.Client(context.Background(), token)
 	oauth2Service, err := oauth2Service.New(client)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to create OAuth2 service: %w", err)
+		return nil, fmt.Errorf("failed to create OAuth2 service: %w", err)
 	}
 
 	userInfo, err := oauth2Service.Userinfo.Get().Do()
 	if err != nil {
-		return nil, fmt.Errorf("Failed to get user info: %w", err)
+		return nil, fmt.Errorf("failed to get user info: %w", err)
 	}
 
 	return userInfo, nil
