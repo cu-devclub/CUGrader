@@ -1,10 +1,12 @@
 package main
 
 import (
-	v1 "CUGrader/backend/versions/v1"
+	v1 "CUGrader/Auth/versions/v1"
 	"log"
 	"os"
 
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -17,11 +19,14 @@ func main() {
 
 	r := gin.Default()
 
+	store := cookie.NewStore([]byte(os.Getenv("COOKIE_SECRET")))
+	r.Use(sessions.Sessions("AuthenSession", store))
+
 	v1.RegisterRoutes(r.Group("/v1"))
 
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "5000"
+		port = "6000"
 	}
 
 	r.Run(":" + port)
