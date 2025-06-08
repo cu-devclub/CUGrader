@@ -84,7 +84,7 @@ export default function Layout({
         </Button>
       </nav>
 
-      <main className="max-w-2xl px-8 mt-4 mb-16 mx-auto ">
+      <main className="max-w-4xl px-8 mt-4 mb-16 mx-auto ">
         <Tabs value={activeTab ?? undefined}>
           <TabsList className="w-full grid-cols-4">
             <TabsTrigger value="assignments" asChild>

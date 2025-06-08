@@ -55,22 +55,34 @@ export interface ClassCardProps {
   href?: string;
 }
 
+interface WithHrefProps {
+  children: React.ReactNode,
+  href?: string;
+}
+
+function WithHref({ children, href }: WithHrefProps) {
+  return href ? <Link href={href} className="hover:underline underline-offset-2 flex-1"> {children}</Link > : children;
+}
+
 export function ClassCard({ className, courseId, href, name, semester, headerImageUrl, menuItems }: ClassCardProps) {
-  const content = (
+  return (
     <Card className={cn("pt-0 pb-4 overflow-clip gap-2 hover:shadow-lg transition-shadow", className)}>
       <CardHeader className="bg-blue-500 h-28 p-0">
         {headerImageUrl}
       </CardHeader>
       <CardContent className="pl-4 pr-2">
         <div className="flex justify-between items-center h-9">
-          <CardTitle>{name} ({semester})</CardTitle>
+          <WithHref href={href}>
+            <CardTitle>{name} ({semester})</CardTitle>
+          </WithHref>
           {menuItems && <Menu items={menuItems} />}
         </div>
-        <CardDescription>
-          {courseId}
-        </CardDescription>
+        <WithHref href={href}>
+          <CardDescription>
+            {courseId}
+          </CardDescription>
+        </WithHref>
       </CardContent>
     </Card>
   );
-  return href ? <Link href={href} className="hover:underline underline-offset-2"> {content}</Link > : content;
 }

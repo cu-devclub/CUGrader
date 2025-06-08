@@ -40,6 +40,24 @@ const classes: Class[] = [
                 section: 1,
                 studentId: "111111",
                 withdrawal: false
+            },
+            {
+                name: generateName(),
+                group: "default",
+                picture: "",
+                score: 45,
+                section: 1,
+                studentId: "11111342",
+                withdrawal: true
+            },
+            {
+                name: generateName(),
+                group: "default",
+                picture: "",
+                score: 222,
+                section: 2,
+                studentId: "1223412344",
+                withdrawal: false
             }
         ]
     }
