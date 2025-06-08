@@ -18,7 +18,6 @@ export default function InstructorPage() {
 
   const [selectedSemester, setSelectedSemester] = useState(semesterList[0]);
 
-  // TODO: ask: how to get class i teach 
   const { data: classes } = useSuspenseQuery({
     queryKey: ['class', selectedSemester],
     queryFn: () => api.class.listBySemester(selectedSemester),
@@ -33,7 +32,7 @@ export default function InstructorPage() {
         <div className='flex justify-between items-center'>
           <div className='flex items-center gap-6'>
             <h1 className='text-3xl font-medium text-primary'> All Classes </h1>
-            <SemesterSelector semester={selectedSemester} onSemesterChange={() => { }} semesterList={semesterList} />
+            <SemesterSelector semester={selectedSemester} onSemesterChange={setSelectedSemester} semesterList={semesterList} />
           </div>
           <Button variant="ghost" size="icon" onClick={() => setShowCreateClassDialog(true)}>
             <Plus />
