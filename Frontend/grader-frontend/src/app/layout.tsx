@@ -1,8 +1,15 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
 import { AntdRegistry } from '@ant-design/nextjs-registry';
+import type { Metadata } from "next";
+import { Geist, Geist_Mono, Rubik } from "next/font/google";
+import "./globals.css";
+import Providers from './providers';
 
+// TODO: get thai font
+const rubik = Rubik({
+  variable: "--font-rubik",
+  // variable: "--font-rubikasdmnli",
+  subsets: ["latin"],
+});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,11 +34,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistMono.variable} ${rubik.variable} antialiased font-sans text-foreground`}
       >
-        <AntdRegistry>
-          {children}
-        </AntdRegistry>
+        <Providers>
+          <AntdRegistry>
+            {children}
+          </AntdRegistry>
+        </Providers>
       </body>
     </html>
   );
