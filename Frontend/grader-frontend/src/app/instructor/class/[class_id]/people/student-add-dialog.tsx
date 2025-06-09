@@ -174,6 +174,7 @@ export function StudentAddDialog({ state: { mode, setMode, open, setOpen } }: St
                           <FormLabel className="group-[:not(:first-child)]:hidden">Student ID</FormLabel>
                           <FormControl>
                             {/* TODO: design for small screen */}
+                            {/* TODO: update placeholder */}
                             <Input className="w-full" placeholder="6812345678" pattern="^[0-9]\d*$" {...field} />
                           </FormControl>
                           <FormMessage />
