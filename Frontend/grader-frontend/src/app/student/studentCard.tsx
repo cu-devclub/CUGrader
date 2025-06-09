@@ -22,7 +22,7 @@ function studentCard({ class_id, class_name, image, semester }: Props) {
 
   return (
     <>
-      <Card className="w-60 h-40 bg-gray-300 p-0 m-0 overflow-hidden relative">
+      <Card className="w-80 h-40 bg-gray-300 p-0 m-0 overflow-hidden relative">
         <div className="h-full w-full">
           <div className="flex h-[45%] w-full m-0 p-0 items-center justify-center border border-solid bg-white">
             IMAGE HERE
