@@ -51,7 +51,7 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  --primary: oklch(0.6527 0.1619 358.83);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
@@ -63,7 +63,7 @@
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-1: oklch(0.6527 0.1619 358.83);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
@@ -120,4 +120,14 @@
   body {
     @apply bg-background text-foreground;
   }
+
+}
+.login-bg
+{
+  background-image: linear-gradient(to right top, #db5f8e, #df8cbc, #e1b5dd, #e9dcf3, #ffffff);
+}
+
+.login-bg-2
+{
+  background-image: linear-gradient(to right top, #db5f8e, #e3749d, #ea88ac, #f19cbb, #f7afca, #f4bdde, #f0caee, #edd8fb, #dde5ff, #d3f0ff, #d4f9ff, #dffffd);
 }
