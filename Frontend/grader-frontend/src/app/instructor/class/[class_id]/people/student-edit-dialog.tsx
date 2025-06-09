@@ -252,7 +252,6 @@ export function StudentBatchEditDialog({ state, studentCount }: StudentBatchEdit
     }
   }, [state.open]);
 
-
   async function onSubmit(value: StudentFormSchema) {
     if (!state.open) {
       return;

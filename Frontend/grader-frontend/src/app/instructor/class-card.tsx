@@ -47,7 +47,7 @@ function Menu({ items }: MenuProps) {
 
 export interface ClassCardProps {
   name: string;
-  courseId: number;
+  courseId: string;
   semester: string;
   menuItems?: MenuItem[];
   headerImageUrl?: string;
