@@ -1,12 +1,20 @@
+import { use } from "react";
 import { InstructorSection, TeachingAssistantSection } from "./instructor-section";
 import { StudentSection } from "./student-section";
 
-export default function Page() {
+interface Props {
+  params: Promise<{ class_id: string; }>;
+}
+
+export default function Page({ params }: Props) {
+  const { class_id } = use(params);
+  // TODO: deal with this, 404 maybe
+  const classId = parseInt(class_id)
   return (
     <>
       <div className="space-y-8">
-        <InstructorSection />
-        <TeachingAssistantSection />
+        <InstructorSection classId={classId} />
+        <TeachingAssistantSection classId={classId} />
         <StudentSection />
       </div>
     </>

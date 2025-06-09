@@ -143,7 +143,7 @@ export function StudentAddDialog({ state: { mode, setMode, open, setOpen } }: St
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="gap-0 p-0 max-h-screen">
           <DialogHeader className="px-6 pt-6">
-            <DialogTitle>Add students</DialogTitle>
+            <DialogTitle >Add students</DialogTitle>
             <DialogDescription>
               Some text here for aesthetics
             </DialogDescription>
