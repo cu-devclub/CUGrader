@@ -122,7 +122,7 @@ export function SettingsForm({ classId }: SettingsFormProps) {
             )}
           />
         </div>
-        <div className="max-w-sm space-y-2">
+        <div className="max-w-72 space-y-2">
           <Label> Preview </Label>
           <ClassCard
             name={formValues.name || "Name"}

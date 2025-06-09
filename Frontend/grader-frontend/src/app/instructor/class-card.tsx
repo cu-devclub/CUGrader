@@ -68,7 +68,7 @@ export function ClassCard({ className, courseId, href, name, semester, headerIma
   return (
     <Card className={cn("pt-0 pb-4 overflow-clip gap-2 hover:shadow-lg transition-shadow", className)}>
       <CardHeader className="bg-blue-500 h-28 p-0">
-        {headerImageUrl}
+        <img src={headerImageUrl} alt="" className="h-28 w-full object-cover" />
       </CardHeader>
       <CardContent className="pl-4 pr-2">
         <div className="flex justify-between items-center h-9">
