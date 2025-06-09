@@ -1,10 +1,18 @@
+"use client";
+
 import React from "react";
-import AssignmentCard from "./AssignmentTable";
-import mockDataType from "./mockDataType";
+import AssignmentTab from "./AssignmentTab";
+
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function page() {
-  const mockData = mockDataType(); // Mock Up Data TODO: Give real data
+  const router = useRouter();
+
+  const toProfilePage = () => {
+    router.push("./profile");
+  };
 
   return (
     <div className="flex min-h-screen">
@@ -23,27 +31,21 @@ export default function page() {
 
       <div className="w-5/6 border-gray-300 flex flex-col items-center">
         <div className="flex flex-row min-w-full h-20 space-x-5 px-24">
-          <Button className="flex self-end h-13 w-30 bg-gray-300 justify-start items-center px-2">
+          <Button
+            className="flex self-end h-13 w-30 bg-pink-500 justify-start items-center px-2"
+            // onClick={() => setActiveTab("assignment")}
+          >
             Assignment
           </Button>
-          <button className="self-end h-13 w-30">profile</button>
+          <Button
+            variant="ghost"
+            className="self-end h-13 w-30"
+            onClick={() => toProfilePage()}
+          >
+            profile
+          </Button>
         </div>
-
-        <div className="w-full h-full mt-4">
-          <div className="w-full h-1/2 flex flex-col pl-20 pr-8">
-            <h1 className="px-4 mb-1">Assigned</h1>
-            <div className="h-full w-full  flex flex-col">
-              <AssignmentCard data={mockData}></AssignmentCard>
-            </div>
-          </div>
-
-          <div className="w-full h-1/2 flex flex-col pl-20 pr-8 ">
-            <h1 className="px-4 mb-1">Done</h1>
-            <div className="h-full w-full">
-              <AssignmentCard data={mockData}></AssignmentCard>
-            </div>
-          </div>
-        </div>
+        <AssignmentTab />
       </div>
     </div>
   );
