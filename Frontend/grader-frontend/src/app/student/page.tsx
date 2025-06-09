@@ -8,17 +8,20 @@ import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { Ghost } from "lucide-react";
+import { json } from "stream/consumers";
 
 export default function page() {
   const fetchData = async () => {
-    const res = await api.semester.list();
+    const res = await api.class.listBySemester("2024/2");
     return res;
   };
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["Semester"],
+  const { data: classData, isLoading } = useQuery({
+    queryKey: ["ClassData"],
     queryFn: fetchData,
   });
+
+  console.log(JSON.stringify(classData, null, 2));
 
   return (
     <div className="flex min-h-screen">
@@ -61,36 +64,23 @@ export default function page() {
           <div className="flex h-16 p-4 space-x-4">
             <h1 className="text-2xl font-bold">TA</h1>
             <select className="border rounded px-2 py-1">
-              {data?.map((semester: string) => (
-                <option
-                  key={semester}
-                  className="flex justify-center items-center"
-                >
-                  {semester}
-                </option>
-              ))}
+              <option className="flex justify-center items-center">
+                2025/1
+              </option>
             </select>
           </div>
 
           <div className="grid grid-cols-5 gap-4 my-4 space-x-10 min-w-full">
-            <ClassCard
-              id={1}
-              class_name="101 Class"
-              class_id={2301111}
-              image="Image"
-              semester="2025/1"
-            />
-
-            {/* {data?.map((sem: string) => (
+            {classData?.assistant.map((classTA, index) => (
               <ClassCard
-                key={sem}
-                id={1}
-                class_name="101 Class"
-                class_id={2301111}
-                image="Image"
-                semester={sem}
+                key={index}
+                id={classTA.classId}
+                image={classTA.image}
+                class_name={classTA.courseName}
+                class_id={classTA.courseId}
+                semester="2025/1"
               />
-            ))} */}
+            ))}
           </div>
         </div>
 
@@ -99,13 +89,17 @@ export default function page() {
             <h1 className="text-2xl font-bold">Student</h1>
           </div>
           <div className="grid grid-cols-5 gap-4 my-4">
-            <StudentCard
-              id={1}
-              class_name="101 Class"
-              class_id={2301111}
-              image="Image"
-              semester="2025/1"
-            />
+            {/* {classData?.assistant.map((classTA, index) => ( */}
+            {classData?.study.map((studyClass, index) => (
+              <StudentCard
+                key={studyClass.classId}
+                id={studyClass.classId}
+                class_name={studyClass.courseName}
+                class_id={studyClass.courseId}
+                image={studyClass.image}
+                semester="2025/1"
+              />
+            ))}
           </div>
         </div>
       </div>
