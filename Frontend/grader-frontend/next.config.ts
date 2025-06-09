@@ -15,7 +15,10 @@ const nextConfig: NextConfig = {
     '@ant-design/pro-table'
   ],
   experimental: {
-    optimizePackageImports: ['antd']
+    optimizePackageImports: ['antd'],
+    reactCompiler: {
+      compilationMode: 'annotation',
+    },
   }
 };
 

@@ -3,10 +3,19 @@
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
-import { ClipboardList, FileText, Settings, Users } from "lucide-react";
+import { ClipboardList, FileText, Settings, Trash2, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { use, useEffect, useState } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
 
 function useActiveTab() {
   const path = usePathname();
@@ -19,6 +28,10 @@ function useActiveTab() {
   if (path.endsWith("exam-mode")) {
     return "exam-mode";
   }
+  if (path.endsWith("settings")) {
+    return "settings";
+  }
+
 
   return null;
 }
@@ -76,12 +89,29 @@ export default function Layout({
           <h1 className="font-medium"> Class name (2024/1) </h1>
           <h2 className="text-primary"> 2302348 </h2>
         </div>
-        <Button
-          variant="secondary"
-          size="icon"
-          className={cn("size-10 rounded-full", isAtTop ? "bg-black/10 hover:bg-black/15 text-white" : "bg-black/5 hover:bg-black/10")}>
-          <Settings className="size-5" />
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="secondary"
+              size="icon"
+              className={cn("size-10 rounded-full", isAtTop ? "bg-black/10 hover:bg-black/15 text-white" : "bg-black/5 hover:bg-black/10")}>
+              <Settings className="size-5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <Link href={prefix + "settings"} className="">
+              <DropdownMenuItem>
+                <Settings className="text-foreground" />
+                <span>Settings</span>
+              </DropdownMenuItem>
+            </Link>
+            <DropdownMenuItem>
+              <Trash2 className="text-destructive hover:text-destructive" />
+              <span className="text-destructive hover:text-destructive">Delete</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
       </nav>
 
       <main className="max-w-4xl px-8 mt-4 mb-16 mx-auto ">
@@ -103,6 +133,12 @@ export default function Layout({
               <Link href={prefix + "exam-mode"} className="flex flex-1 items-center space-x-2">
                 <ClipboardList className="w-4 h-4" />
                 <span>Exam mode</span>
+              </Link>
+            </TabsTrigger>
+            <TabsTrigger value="settings" asChild>
+              <Link href={prefix + "settings"} className="flex flex-1 items-center space-x-2">
+                <Settings className="w-4 h-4" />
+                <span>Settings</span>
               </Link>
             </TabsTrigger>
           </TabsList>
