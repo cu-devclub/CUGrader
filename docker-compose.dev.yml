@@ -10,8 +10,13 @@ services:
             - "6000:6000"
         environment:
             - SERVICE_ENV=development
+            - CERT_PATH=/etc/ssl/auth/fullchain.pem
+            - KEY_PATH=/etc/ssl/auth/privkey.pem
         depends_on:
             - yugabytedb
+        volumes:
+            - /home/ubuntu/ssl/auth:/etc/ssl/auth:ro
+
     backend:
         build:
             context: ./Backend
