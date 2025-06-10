@@ -1,109 +1,154 @@
 import { unimplemented } from "../utils";
-import { Configuration, DefaultApi, TAInfo, V1ClassPatchRequest, V1ClassPostRequest, type CreateStudent, type DeleteStudent, type EditStudent, type V1CallbackPostRequest } from "./generated";
+import { ClassObject, Configuration, DefaultApi } from "./generated";
+import { APIClient, Class, Instructor, Semester, Student } from "./type";
 
-const config = new Configuration({
+
+export function createClient(): APIClient {
+  const authToken = "TODO: get it, after auth is implemented";
+  const config = new Configuration({
     headers: {
-        // cursed af
-        get "Authentication"() {
-            const token = "TODO: put it here";
-            return `Bearer ${token}`;
-        }
+      "Authentication": `Bearer ${authToken}`,
     },
     basePath: process.env.NEXT_PUBLIC_BACKEND_URL
-});
+  });
 
-const generatedClient = new DefaultApi(config);
+  const generatedClient = new DefaultApi(config);
 
-export type Semester = `${number}/${number}`;
-
-type CreateClassBody = Omit<V1ClassPostRequest, "authentication">;
-type CreateClassRequestBody = CreateClassBody & {
-    image?: File;
-    /**
-     * Student csv file, we can parse this from the client tho
-     */
-    students?: File;
-    semester: Semester;
-};
-
-type EditClassBody = Omit<V1ClassPatchRequest, "authentication">;
-type EditClassRequestBody = EditClassBody & {
-    image?: File;
-    /**
-     * Student csv file
-     */
-    students?: File;
-    semester?: Semester;
-};
-
-
-// well for now ,we have 16 routes - 1 for picture
-export const client = {
-    auth: {
-        // call this first, save the state, redirect to the returned url
-        login: () => generatedClient.v1LoginGet(),
-        // after google redirect the user back to our site, then sent credentials and state to the server?
-        getAccessToken: (body: V1CallbackPostRequest) => generatedClient
-            .v1CallbackPost({ v1CallbackPostRequest: body })
-            .then(it => it.accessToken),
-    },
-
-    listAssistantAndInstructor: () => generatedClient.v1TAGet({}),
-    student: {
-        list: () => generatedClient.v1StudentGet({}).then(it => it.students),
-        addToClass: (classId: number, student: Omit<CreateStudent, "classId">) => generatedClient.v1StudentPost({
-            createStudent: {
-                classId,
-                ...student
-            }
-        }),
-        update: (classId: number, studentId: string, body: Omit<EditStudent, "classId" | "studentId">) => generatedClient.v1StudentPatch({
-            editStudent: {
+  return {
+    students: {
+      addToClass: async (classId, { email, section, group }) => {
+        await generatedClient.v1StudentPost({
+          createStudent: {
+            classId,
+            email,
+            section,
+            group
+          }
+        });
+      },
+      listByClass: async (classId) => {
+        // TODO: pass in classId
+        const { students } = await generatedClient.v1StudentClassIdGet({ classId });
+        return students.map(it => ({
+          ...it,
+          // email: "",
+          withdrawed: it.withdrawal
+        } satisfies Student));
+      },
+      removeFromClass: async (classId, studentId) => {
+        await generatedClient.v1StudentDelete({
+          deleteStudent: {
+            classId,
+            studentId
+          }
+        });
+      },
+      update: async (classId, studentId, { withdrawed, group, section }) => {
+        await generatedClient.v1StudentPatch({
+          editStudent: {
+            classId,
+            studentId,
+            group,
+            section,
+            withdrawal: withdrawed
+          }
+        });
+      },
+      updateMany: async (classId, studentIds, data) => {
+        // TODO: async queue
+        await Promise.all(
+          studentIds.map(studentId => {
+            generatedClient.v1StudentPatch({
+              editStudent: {
                 classId,
                 studentId,
-                ...body
-            }
-        }),
-        removeFromClass: (classId: number, studentId: string) => generatedClient.v1StudentDelete({
-            deleteStudent: { classId, studentId }
-        }),
+                ...data
+              }
+            });
+          })
+        );
+      },
     },
-    semester: {
-        list: () => generatedClient.v1ClassesSemestersGet().then(it => it.semesters ?? []),
-    },
-    group: {
-        listByClass: (classId: number) => generatedClient.v1GroupClassIdGet({ classId }).then(it => it.groups ?? []),
-    },
-    class: {
-        listBySemester: (semester: string) => generatedClient
-            .v1ClassesClassesYearSemesterGet({ yearSemester: semester })
-            .then(it => ({
-                assistant: it.assistant ?? [],
-                study: it.study ?? []
-            })),
-        create: (body: CreateClassRequestBody) => generatedClient.v1ClassPost(body),
-        edit: (classId: number, body: Omit<EditClassRequestBody, "classId">) => generatedClient.v1ClassPatch({
-            classId,
-            ...body
-        }),
-    },
-    section: {
-        listByClass: (classId: number) => generatedClient.v1SectionClassIdGet({ classId }).then(it => it.sections ?? []),
-    },
-    assistant: {
-        listByClass: async (classId: number): Promise<TAInfo[]> => unimplemented("This api not yet exist."),
-        addToClass: (classId: number, email: string) => generatedClient.v1TAPost({
-            tAeditBody: {
-                classId,
-                email
-            }
-        }),
-        removeFromClass: (classId: number, email: string) => generatedClient.v1TADelete({
-            tAeditBody: {
-                classId,
-                email
-            }
-        }),
-    },
-};
+    classes: {
+      // TODO: will soon exist
+      getById: async (classId) => {
+        return unimplemented("[classes.getById] not exist yet");
+      },
+      listParticipatingBySemester: async (semester) => {
+        const { assistant, study } = await generatedClient.v1ClassesClassesYearSemesterGet({ yearSemester: semester });
 
+        function toClass(input: ClassObject): Class {
+          return {
+            classId: input.classId,
+            courseId: String(input.courseId),
+            courseName: input.courseName,
+            imageUrl: input.image
+          };
+        }
+        return {
+          assisting: assistant!.map(toClass),
+          studying: study!.map(toClass)
+        };
+      },
+      create: async ({ courseId, name, semester, image, students }) => {
+        await generatedClient.v1ClassPost({
+          courseId,
+          name,
+          semester,
+          image,
+          students
+        });
+      },
+      update: async (classId, { courseId, image, name, semester, students }) => {
+        await generatedClient.v1ClassPatch({
+          classId,
+          courseId,
+          image,
+          name,
+          semester,
+          students
+        });
+      },
+    },
+    semesters: {
+      list: async () => {
+        const { semesters } = await generatedClient.v1ClassesSemestersGet();
+        // TODO: validate formatting
+        return semesters! as Semester[];
+      },
+    },
+    instructorsAndTAs: {
+      listByClass: async (classId) => {
+        const { assistant, instructor } = await generatedClient.v1TAClassIdGet({ classId });
+
+        return {
+          instructors: instructor.map(it => ({
+            name: it.name,
+            imageUrl: it.picture
+          }) satisfies Instructor),
+          teachingAssistant: assistant.map(it => ({
+            leader: it.leader,
+            name: it.name,
+            imageUrl: it.picture
+          }))
+        };
+      },
+      addToClass: async (classId, email) => {
+        await generatedClient.v1TAPost({
+          tAeditBody: {
+            classId,
+            email
+          }
+        });
+      },
+      removeFromClass: async (classId, email) => {
+        await generatedClient.v1TADelete({
+          tAeditBody: {
+            classId,
+            email
+          }
+        });
+      },
+    },
+  } satisfies APIClient;
+};
