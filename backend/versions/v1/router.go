@@ -79,6 +79,7 @@ func RegisterRoutes(r *gin.RouterGroup) {
 	userController := &userController.UserController{Service: userService, IsDev: is_dev}
 
 	r.POST("/class", classController.CreateClassHandler)
+	// r.Get("/class/semesters", classController)
 
 	r.POST("/callback", userController.Callback)
 }
