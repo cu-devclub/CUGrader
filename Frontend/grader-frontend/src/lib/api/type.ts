@@ -27,6 +27,7 @@ export interface Student {
 export interface Instructor {
   name: string;
   imageUrl?: string;
+  email: string // TODO: tell backedn to add this
 }
 
 export interface ClassParticipants {
@@ -37,7 +38,7 @@ export interface ClassParticipants {
 
 export interface TeachingAssistant {
   name: string;
-  // email: string;
+  email: string;  // TODO: tell backedn to add this
   imageUrl?: string;
   leader: boolean;
 }
@@ -90,7 +91,6 @@ export interface APIClient {
     removeFromClass: (classId: number, studentId: string) => Promise<void>,
     update: (classId: number, studentId: string, data: UpdateStudentRequest) => Promise<void>,
     updateMany: (classId: number, studentIds: string[], data: UpdateStudentRequest) => Promise<void>,
-    // TODO: get profile data 
   },
   classes: {
     // will soon exist

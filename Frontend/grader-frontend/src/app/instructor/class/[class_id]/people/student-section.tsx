@@ -18,9 +18,6 @@ import { Student } from "@/lib/api/type";
 // TODO: deal with this later
 // import '@ant-design/v5-patch-for-react-19';
 
-interface StudentTableProps {
-  classId: number;
-}
 
 function createColumnDefs(editDialog: ReturnType<typeof useEditDialogState<DialogStudent, StudentWithoutIdAndName>>) {
   const columns: TableColumnsType<Student> = [
@@ -95,7 +92,11 @@ function createColumnDefs(editDialog: ReturnType<typeof useEditDialogState<Dialo
   return columns;
 }
 
-function StudentTable({ classId }: StudentTableProps) {
+export interface StudentSectionProps {
+  classId: number;
+}
+
+export function StudentSection({ classId }: StudentSectionProps) {
   const query = useSuspenseQuery({
     queryKey: ["class", classId, "student"],
     // TODO: get student by class
@@ -144,69 +145,6 @@ function StudentTable({ classId }: StudentTableProps) {
     });
   }
 
-  return (
-    <div className="mt-2 flex flex-col gap-4">
-      <StudentEditDialog state={studentEditDialog.state} />
-      <StudentAddDialog state={studentAddDialog.state} />
-      <StudentBatchEditDialog state={studentBatchEditdialog.state} studentCount={selectedRowKeys.length} />
-
-      <div className="flex justify-between gap-2">
-        <div className="flex gap-2">
-          <Input placeholder="Search" value={search} onInput={e => setSearch((e.target as any).value)} />
-        </div>
-        <div className="flex gap-2">
-          {hasSelected &&
-            <Button onClick={launchBatchEditDialog}>
-              <Edit2 />
-              <span> Edit all </span>
-            </Button>
-          }
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button>
-                <Plus />
-                <span>Add Student</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem onClick={() => studentAddDialog.launch("manual")}>
-                <TableOfContents /> Manual
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => studentAddDialog.launch("file")}>
-                <Upload /> Upload file
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="secondary" size="icon">
-                <Download />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              {/* TODO: icon maybe? */}
-              <DropdownMenuItem>Download Student list</DropdownMenuItem>
-              <DropdownMenuItem>Download Template</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
-
-      <Table
-        columns={columns}
-        rowSelection={rowSelection}
-        dataSource={filteredStudents}
-        rowKey={({ studentId }) => studentId}
-      />
-    </div>
-  );
-}
-
-export interface StudentSectionProps {
-  classId: number;
-}
-
-export function StudentSection({ classId }: StudentSectionProps) {
 
   return (
     <Collapsible defaultOpen>
@@ -214,13 +152,66 @@ export function StudentSection({ classId }: StudentSectionProps) {
         <CollapsibleTrigger className="flex gap-3 items-center group">
           <ChevronDown className="group-data-[state=closed]:hidden" />
           <ChevronRight className="group-data-[state=open]:hidden" />
-          <h2 className="text-xl font-medium"> Students (420) </h2>
+          <h2 className="text-xl font-medium"> Students ({query.data.length}) </h2>
         </CollapsibleTrigger>
 
       </div>
       <CollapsibleContent>
         <section className="mt-4">
-          <StudentTable classId={classId} />
+          <div className="mt-2 flex flex-col gap-4">
+            <StudentEditDialog state={studentEditDialog.state} />
+            <StudentAddDialog state={studentAddDialog.state} classId={classId} refetch={() => query.refetch()} />
+            <StudentBatchEditDialog state={studentBatchEditdialog.state} studentCount={selectedRowKeys.length} />
+
+            <div className="flex justify-between gap-2">
+              <div className="flex gap-2">
+                <Input placeholder="Search" value={search} onInput={e => setSearch((e.target as any).value)} />
+              </div>
+              <div className="flex gap-2">
+                {hasSelected &&
+                  <Button onClick={launchBatchEditDialog}>
+                    <Edit2 />
+                    <span> Edit all </span>
+                  </Button>
+                }
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button>
+                      <Plus />
+                      <span>Add Student</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={() => studentAddDialog.launch("manual")}>
+                      <TableOfContents /> Manual
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => studentAddDialog.launch("file")}>
+                      <Upload /> Upload file
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="secondary" size="icon">
+                      <Download />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    {/* TODO: icon maybe? */}
+                    <DropdownMenuItem>Download Student list</DropdownMenuItem>
+                    <DropdownMenuItem>Download Template</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </div>
+
+            <Table
+              columns={columns}
+              rowSelection={rowSelection}
+              dataSource={filteredStudents}
+              rowKey={({ studentId }) => studentId}
+            />
+          </div>
         </section>
       </CollapsibleContent>
     </Collapsible>

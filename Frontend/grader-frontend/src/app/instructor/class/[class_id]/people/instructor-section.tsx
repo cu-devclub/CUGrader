@@ -3,15 +3,14 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { api } from "@/lib/api";
-import { generateName } from "@/lib/api/mock";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { ChevronDown, ChevronRight, Edit2, Plus, Trash2, User } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -76,7 +75,8 @@ function InviteForm({ onAdd, title }: InviteFormProps) {
 
 interface RowProps {
   name: string,
-  imageUrl: string,
+  email: string;
+  imageUrl?: string,
   onRemove?: () => any;
   onEdit?: () => any;
 }
@@ -94,13 +94,13 @@ function Row({ imageUrl, name, onEdit, onRemove }: RowProps) {
         <span>{name}</span>
       </div>
       <div className="flex gap-0.5">
-        {onRemove &&
-          <Button size="icon" variant="ghost">
+        {onEdit &&
+          <Button size="icon" variant="ghost" onClick={onEdit}>
             <Edit2 />
           </Button>
         }
-        {onEdit &&
-          <Button size="icon" variant="ghost">
+        {onRemove &&
+          <Button size="icon" variant="ghost" onClick={onRemove}>
             <Trash2 className="text-destructive" />
           </Button>
         }
@@ -109,34 +109,47 @@ function Row({ imageUrl, name, onEdit, onRemove }: RowProps) {
   );
 }
 
+interface People {
+  name: string,
+  imageUrl?: string;
+  email: string;
+}
+
 interface SharedSectionProps {
   // TODO: fix plural form of this and i18n
   title: string;
-  onRemove?: (id: string) => any;
-  onEdit?: (id: string) => any;
+  onRemove?: (email: string) => any;
+  onEdit?: (id: string) => any; // we dont have this
+  // TODO: seperate endpoint???
   invite: (email: string) => any;
+  peoples: (People)[];
   // TODO: access control
 }
 
 // shared by both instructors and teaching assistants
-function SharedSection({ title, invite }: SharedSectionProps) {
+function SharedSection({ title, invite, peoples, onRemove }: SharedSectionProps) {
   return (
     <Collapsible defaultOpen>
       <div className="flex justify-between">
         <CollapsibleTrigger className="flex gap-3 items-center group">
           <ChevronDown className="group-data-[state=closed]:hidden" />
           <ChevronRight className="group-data-[state=open]:hidden" />
-          <h2 className="text-xl font-medium"> {title}s (2) </h2>
+          <h2 className="text-xl font-medium"> {title}s ({peoples.length}) </h2>
         </CollapsibleTrigger>
         <InviteForm onAdd={invite} title={`Add ${title}`} />
       </div>
       <CollapsibleContent>
         <section className="mt-3">
           <div className="flex flex-col">
-            <Row
-              name={generateName()}
-              imageUrl="  "
-            />
+            {peoples.map(it => (
+              <Row
+                name={it.name}
+                key={it.email}
+                email={it.email}
+                imageUrl={it.imageUrl}
+                onRemove={onRemove ? (() => onRemove?.(it.email)) : undefined}
+              />
+            ))}
           </div>
         </section>
       </CollapsibleContent>
@@ -144,39 +157,30 @@ function SharedSection({ title, invite }: SharedSectionProps) {
   );
 }
 
-export interface InstructorSectionProps {
+export interface InstructorAndTASectionProps {
   classId: number;
 }
 
-export function InstructorSection({ classId }: InstructorSectionProps) {
-  const inviteMutation = useMutation({
-    mutationFn: async (email: string) => {
-      console.log("Unimplemented");
-    },
-    onSuccess: (_, email) => toast.success("Added " + email),
-    onError: (error, email) => {
-      console.error(error);
-      toast.error(`Error adding ${email}`, {
-        description: error.message
-      });
-    }
+export function InstructorAndTASection({ classId }: InstructorAndTASectionProps) {
+  const query = useSuspenseQuery({
+    queryKey: ["class", classId, "instructors-and-tas"],
+    // TODO: get student by class
+    queryFn: () => api.instructorsAndTAs.listByClass(classId)
   });
-  return (
-    <SharedSection
-      title="Instructor"
-      invite={(email) => inviteMutation.mutate(email)}
-    />
-  );
-}
 
-export interface TeachingAssistantSectionProps {
-  classId: number;
-}
+  const [instructors, teachingAssistant] = useMemo(() => {
+    return [
+      query.data.instructors.map(it => ({ ...it, } satisfies People)),
+      query.data.teachingAssistant.map(it => ({ ...it, } satisfies People))
+    ];
+  }, [query.data]);
 
-export function TeachingAssistantSection({ classId }: TeachingAssistantSectionProps) {
   const inviteMutation = useMutation({
     mutationFn: (email: string) => api.instructorsAndTAs.addToClass(classId, email),
-    onSuccess: (_, email) => toast.success("Added " + email),
+    onSuccess: (_, email) => {
+      toast.success("Added " + email);
+      query.refetch();
+    },
     onError: (error, email) => {
       console.error(error);
       toast.error(`Error adding ${email}`, {
@@ -185,10 +189,19 @@ export function TeachingAssistantSection({ classId }: TeachingAssistantSectionPr
     }
   });
 
+
   return (
-    <SharedSection
-      title="Teaching assistant"
-      invite={(email) => inviteMutation.mutate(email)}
-    />
+    <>
+      <SharedSection
+        title="Instructor"
+        peoples={instructors}
+        invite={(email) => inviteMutation.mutate(email)}
+      />
+      <SharedSection
+        title="Teaching assistant"
+        peoples={teachingAssistant}
+        invite={(email) => inviteMutation.mutate(email)}
+      />
+    </>
   );
 }

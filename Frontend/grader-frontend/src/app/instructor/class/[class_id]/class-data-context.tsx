@@ -3,7 +3,7 @@
 import { createContext, ReactNode, use } from 'react';
 
 export interface ClassData {
-  id: string;
+  id: number;
   name: string;
   courseId: string;
   year: number;
