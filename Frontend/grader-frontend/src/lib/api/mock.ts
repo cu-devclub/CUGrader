@@ -1,3 +1,4 @@
+import { CreateStudent } from "./generated";
 import { APIClient, Class, Instructor, Semester, Student, TeachingAssistant } from "./type";
 
 type DbClass = Omit<Class, "imageUrl"> & {
@@ -35,7 +36,7 @@ export function generateName() {
 export const files: Map<number, File> = new Map();
 
 // TODO: env
-const useMockServer = false;
+export const useMockServer = true;
 function getImageUrl(id: number | undefined) {
   if (!id) {
     return "";
@@ -47,17 +48,59 @@ function getImageUrl(id: number | undefined) {
   }
 }
 
-export function createClient(): APIClient {
+function createClient(): APIClient {
   const classes: DbClass[] = [];
 
-  let currentClassId = 0;
+  let currentClassId = 420;
 
   function getClassById(id: number) {
     const target = classes.find(it => it.classId === id);
     if (!target) {
-      throw new Error("class not found");
+      throw new Error(`${id} class not found`);
     }
     return target;
+  }
+
+  async function init() {
+    await client.classes.create({
+      courseId: 1,
+      name: "Programming",
+      semester: "2025/1",
+    });
+
+    await client.classes.create({
+      courseId: 758,
+      name: "sone",
+      semester: "2024/2",
+    });
+
+    await client.instructorsAndTAs.addToClass(420, "ame@student.chula.ac.th");
+    await client.instructorsAndTAs.addToClass(420, "suisei@student.chula.ac.th");
+    await client.instructorsAndTAs.addToClass(420, "mark45@chula.ac.th");
+
+    await client.instructorsAndTAs.addToClass(421, "71382213@student.chula.ac.th");
+    await client.instructorsAndTAs.addToClass(421, "wave@chula.ac.th");
+    await client.instructorsAndTAs.addToClass(421, "ajarn@chula.ac.th");
+
+    await client.students.addToClass(420, {
+      email: "12@student.chula.ac.th",
+      section: 0,
+    });
+
+    await client.students.addToClass(420, {
+      email: "45@student.chula.ac.th",
+      section: 0,
+    });
+
+    await client.students.addToClass(420, {
+      email: "2223@student.chula.ac.th",
+      section: 0,
+    });
+
+    await client.students.addToClass(420, {
+      email: "12313@student.chula.ac.th",
+      section: 0,
+    });
   }
 
   const client: APIClient = {
@@ -86,6 +129,7 @@ export function createClient(): APIClient {
       },
       async update(classId, studentId, { group, section, withdrawed }) {
         const target = getClassById(classId);
+        // console.log(studentId)
         const student = target.students.find(it => it.studentId === studentId);
         if (!student) {
           throw new Error("student not found");
@@ -146,8 +190,8 @@ export function createClient(): APIClient {
       },
       async listParticipatingBySemester(semester) {
         return {
-          assisting: classes,
-          studying: classes
+          assisting: classes.filter(it => it.semester === semester),
+          studying: classes.filter(it => it.semester === semester)
         };
       },
       async update(classId, payload) {
@@ -210,9 +254,9 @@ export function createClient(): APIClient {
     }
   };
 
+  init();
   return client;
 }
-
 
 
 // TODO: handle file upload
@@ -228,8 +272,14 @@ export interface MockRPCCommand {
   params: any[];
 }
 
-// const api = createClient();
+export const api = createClient();
 
-export async function dispatch(command: MockRPCCommand) {
-
+export async function dispatch({ command, params }: MockRPCCommand) {
+  const path = command.split(".");
+  // console.log({ api, path });
+  let fn = api as any;
+  while (path.length !== 0) {
+    fn = fn[path.shift()!];
+  }
+  return await fn(...params);
 }

@@ -1,9 +1,6 @@
-import { APIClient } from "./type";
-import { createClient, type MockRPCCommand } from "./mock";
 import { parse, stringify } from "devalue";
-
-// TODO: env
-const useMockServer = false;
+import { api, useMockServer, type MockRPCCommand } from "./mock";
+import { APIClient } from "./type";
 
 export function createMockClient(): APIClient {
   if (useMockServer) {
@@ -14,7 +11,7 @@ export function createMockClient(): APIClient {
 }
 
 function createClientOnlyMockClient(): APIClient {
-  return createClient();
+  return api;
 }
 
 function createServerBackedMockClient() {
@@ -24,7 +21,7 @@ function createServerBackedMockClient() {
       params
     };
 
-    const response = await fetch("/api/dev", {
+    const response = await fetch((process.env.NEXT_PUBLIC_URL ?? "http://localhost:3000") + "/api/dev", {
       method: "POST",
       body: stringify(command as any)
     });

@@ -9,7 +9,6 @@ import { CreateClassDialog } from "./create-class-dialog";
 import { SemesterSelector } from "./semester-selector";
 import { api } from "@/lib/api";
 
-// TODO: rename this
 export default function InstructorPage() {
   const { data: semesterList } = useSuspenseQuery({
     queryKey: ["semester"],
@@ -18,7 +17,7 @@ export default function InstructorPage() {
 
   const [selectedSemester, setSelectedSemester] = useState(semesterList[0]);
 
-  const { data: classes } = useSuspenseQuery({
+  const { data: classes, isLoading } = useSuspenseQuery({
     queryKey: ["class", selectedSemester],
     queryFn: () => api.classes.listParticipatingBySemester(selectedSemester),
   });

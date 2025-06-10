@@ -135,7 +135,7 @@ function SharedSection({ title, invite }: SharedSectionProps) {
           <div className="flex flex-col">
             <Row
               name={generateName()}
-              imageUrl="/TODO"
+              imageUrl="  "
             />
           </div>
         </section>
