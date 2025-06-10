@@ -440,14 +440,10 @@ paths:
             schema:
                 properties:
                   credential:
-                    description: credential from url parameter callback from google to backend
-                    type: string
-                  state:
-                    default: state to verify from login path
+                    description: Base64 CipherText
                     type: string
                 required:
                   - "credential"
-                  - "state"
       responses:
         '200':
           description: success
