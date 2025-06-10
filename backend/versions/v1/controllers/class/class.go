@@ -69,15 +69,3 @@ func (cc *ClassController) CreateClassHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"class_id": classID})
 }
-
-func (cc *ClassController) GetSemesterHandler(c *gin.Context) {
-	authHeader := c.GetHeader("Authentication")
-	if !strings.HasPrefix(authHeader, "Bearer ") || len(authHeader) <= 7 {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-		return
-	}
-
-	// TODO: Validate the token
-
-	// TODO: Implement this
-}
