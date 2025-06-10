@@ -1,10 +1,11 @@
 import { SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
+import { Semester } from "@/lib/api/type";
 import { Select, SelectValue } from "@radix-ui/react-select";
 
 export interface SemesterSelectorProps {
   semester: string;
   semesterList: string[];
-  onSemesterChange: (semester: string) => any;
+  onSemesterChange: (semester: Semester) => any;
 }
 
 export function SemesterSelector({ onSemesterChange, semester, semesterList }: SemesterSelectorProps) {

@@ -1,17 +1,14 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import StudentCard from "./studentCard";
-import OldClassCard from "./ClassCard";
-import MockClass from "./mockClass";
 import { ClassCard } from "@/components/class-card";
-import { Plus } from "lucide-react";
+import { Bell, LogOut, Plus } from "lucide-react";
+import { useState } from "react";
 import { SemesterSelector } from "../instructor/semester-selector";
-import { LogOut, Bell } from "lucide-react";
+import StudentCard from "./studentCard";
 
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
-import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 type Assistant = {
@@ -35,14 +32,14 @@ export default function Page() {
 
   const { data: semesterList } = useSuspenseQuery({
     queryKey: ["semester"],
-    queryFn: () => api.semester.list(),
+    queryFn: () => api.semesters.list(),
   });
 
   const [selectedSemester, setSelectedSemester] = useState(semesterList[0]);
 
   const { data, isLoading } = useSuspenseQuery({
     queryKey: ["ClassData", semesterList],
-    queryFn: async () => api.class.listBySemester(selectedSemester),
+    queryFn: async () => api.classes.listParticipatingBySemester(selectedSemester),
   });
 
   // const classData = MockClass(); // Use mocked data
@@ -114,7 +111,7 @@ export default function Page() {
         </div>
 
         <div className="grid gap-7 grid-cols-[repeat(auto-fill,minmax(16rem,20rem))]">
-          {data.assistant.map((classTA, index) => (
+          {data.assisting.map((classTA, index) => (
             <ClassCard
               key={index}
               className={classTA.courseName}
@@ -122,7 +119,7 @@ export default function Page() {
               href=""
               name={classTA.courseName}
               semester={selectedSemester}
-              headerImageUrl={classTA.image}
+              headerImageUrl={classTA.imageUrl}
               menuItems={[]}
             />
           ))}
@@ -151,13 +148,13 @@ export default function Page() {
           />
         </div>
         <div className="grid grid-cols-4 gap-4 my-4">
-          {data.study.map((studyClass, index) => (
+          {data.studying.map((studyClass, index) => (
             <StudentCard
               key={index}
               id={studyClass.classId}
               class_name={studyClass.courseName}
               class_id={studyClass.courseId}
-              image={studyClass.image}
+              image={studyClass.imageUrl}
               semester={selectedSemester}
             />
           ))}
