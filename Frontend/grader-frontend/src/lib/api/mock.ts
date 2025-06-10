@@ -42,9 +42,9 @@ function getImageUrl(id: number | undefined) {
     return "";
   }
   if (useMockServer) {
-    return URL.createObjectURL(files.get(id)!);
-  } else {
     return `/api/dev/file?fileId=${id}`;
+  } else {
+    return URL.createObjectURL(files.get(id)!);
   }
 }
 
@@ -107,6 +107,7 @@ function createClient(): APIClient {
     students: {
       async addToClass(classId, { email, section, group }) {
         const c = getClassById(classId);
+        console.log({ email });
         c.students.push({
           group: group ?? "Default",
           section,
@@ -225,9 +226,9 @@ function createClient(): APIClient {
         };
       },
       async addToClass(classId, email) {
-        // if students.chula.ac.th -> TA otherwise its instructor
+        // if student.chula.ac.th -> TA otherwise its instructor
         const c = getClassById(classId);
-        if (email.split("@")[1] === "students.chula.ac.th") {
+        if (email.split("@")[1] === "student.chula.ac.th") {
           c.assistants.push({
             name: generateName(),
             email,

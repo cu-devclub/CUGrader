@@ -27,7 +27,6 @@ export function createClient(): APIClient {
         });
       },
       listByClass: async (classId) => {
-        // TODO: pass in classId
         const { students } = await generatedClient.v1StudentClassIdGet({ classId });
         return students.map(it => ({
           ...it,
@@ -124,12 +123,14 @@ export function createClient(): APIClient {
         return {
           instructors: instructor.map(it => ({
             name: it.name,
-            imageUrl: it.picture
+            imageUrl: it.picture,
+            email: "not-exist",
           }) satisfies Instructor),
           teachingAssistant: assistant.map(it => ({
             leader: it.leader,
             name: it.name,
-            imageUrl: it.picture
+            imageUrl: it.picture,
+            email: "not-exist",
           }))
         };
       },
