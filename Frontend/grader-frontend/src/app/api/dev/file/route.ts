@@ -1,6 +1,6 @@
 // gemini 2.5 pro and claude 4 wrote this
 
-import { files } from '@/lib/api/mock-v2';
+import { files } from '@/lib/api/mock';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {

@@ -1,4 +1,4 @@
-import { dispatch, MockRPCCommand } from "@/lib/api/mock-v2";
+import { dispatch, MockRPCCommand } from "@/lib/api/mock";
 import { parse, stringify } from "devalue";
 
 export async function POST(request: Request) {

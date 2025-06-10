@@ -1,5 +1,5 @@
 import { APIClient } from "./type";
-import { createClient, type MockRPCCommand } from "./mock-v2";
+import { createClient, type MockRPCCommand } from "./mock";
 import { parse, stringify } from "devalue";
 
 // TODO: env
