@@ -1,6 +1,6 @@
 'use client';
 
-import { ClassCard } from '@/components/class-card
+import { ClassCard } from '@/components/class-card';
 import { Button } from '@/components/ui/button';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
