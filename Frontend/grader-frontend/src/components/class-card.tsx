@@ -95,15 +95,7 @@ export function ClassCard({
       )}
     >
       <CardHeader className="bg-blue-500 h-28 p-0">
-        {headerImageUrl ? (
-          <img
-            src={headerImageUrl}
-            alt=""
-            className="h-28 w-full object-cover"
-          />
-        ) : (
-          <div className="h-28 w-full bg-blue-500" />
-        )}
+        <img src={headerImageUrl} alt="" className="h-28 w-full object-cover" />
       </CardHeader>
       <CardContent className="pl-4 pr-2">
         <div className="flex justify-between items-center h-9">

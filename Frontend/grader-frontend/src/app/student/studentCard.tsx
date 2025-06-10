@@ -37,11 +37,15 @@ function studentCard({ class_id, class_name, image, semester }: Props) {
       >
         <div className="h-full w-full">
           <div className="flex h-[45%] w-full m-0 p-0 items-center justify-center border border-solid bg-blue-500 overflow-hidden">
-            <img
-              src={image || "./placeholder.png"}
-              alt=""
-              className="h-full w-full object-cover border border-solid"
-            />
+            {image ? (
+              <img
+                src={image}
+                alt=""
+                className="h-full w-full object-cover border border-solid"
+              />
+            ) : (
+              <div className="h-full w-full object-cover border border-solid"></div>
+            )}
           </div>
           <div className="flex h-[55%] w-full m-0 p-0 flex-col">
             <div className="flex items-end min-w-full space-x-5 px-4 pt-2">
