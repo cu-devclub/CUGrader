@@ -12,3 +12,12 @@ type SemesterModel struct {
 	Year     int
 	Semester int
 }
+
+type ClassObjectModel struct {
+	DB *sql.DB
+
+	ClassID    int    `json:"class_id"`
+	CourseID   int    `json:"course_id"`
+	CourseName string `json:"course_name"`
+	Image      string `json:"image"`
+}
