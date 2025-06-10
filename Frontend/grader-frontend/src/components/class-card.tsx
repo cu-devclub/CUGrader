@@ -1,6 +1,6 @@
 import { EllipsisVertical, LucideIcon } from "lucide-react";
-import { Button } from "../../components/ui/button";
-import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card";
+import { Button } from "./ui/button";
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,

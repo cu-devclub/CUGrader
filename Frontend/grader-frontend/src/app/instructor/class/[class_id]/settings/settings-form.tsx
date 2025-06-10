@@ -1,6 +1,6 @@
 'use client';
 
-import { ClassCard } from "@/app/instructor/class-card";
+import { ClassCard } from "@/components/class-card
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { ImageUploadPreview } from "@/components/ui/image-upload-preview";
