@@ -15,7 +15,7 @@ export default function Page({ params }: Props) {
       <div className="space-y-8">
         <InstructorSection classId={classId} />
         <TeachingAssistantSection classId={classId} />
-        <StudentSection />
+        <StudentSection classId={classId} />
       </div>
     </>
   );

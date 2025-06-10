@@ -202,7 +202,11 @@ function StudentTable({ classId }: StudentTableProps) {
   );
 }
 
-export function StudentSection() {
+export interface StudentSectionProps {
+  classId: number;
+}
+
+export function StudentSection({ classId }: StudentSectionProps) {
 
   return (
     <Collapsible defaultOpen>
@@ -216,7 +220,7 @@ export function StudentSection() {
       </div>
       <CollapsibleContent>
         <section className="mt-4">
-          <StudentTable classId={0} />
+          <StudentTable classId={classId} />
         </section>
       </CollapsibleContent>
     </Collapsible>

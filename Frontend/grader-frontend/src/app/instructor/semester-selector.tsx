@@ -12,7 +12,7 @@ export function SemesterSelector({ onSemesterChange, semester, semesterList }: S
   return (
     <Select value={semester} onValueChange={onSemesterChange}>
       <SelectTrigger className="w-28">
-        <SelectValue placeholder="Select a fruit" />
+        <SelectValue placeholder="Select a semester" />
       </SelectTrigger>
       <SelectContent>
         {semesterList.map(semester => <SelectItem key={semester} value={semester}>{semester}</SelectItem>)}
