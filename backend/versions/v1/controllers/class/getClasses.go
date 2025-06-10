@@ -20,25 +20,24 @@ func (cc *ClassController) GetClassByYearSemesterHandler(c *gin.Context) {
 	yearSemester := c.Param("yearSemester")
 	yearSemesterParts := strings.Split(yearSemester, "-")
 	if len(yearSemesterParts) != 2 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid year-semester format"})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid year-semester format"})
 		return
 	}
 	year, err := strconv.Atoi(yearSemesterParts[0])
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid year format"})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid year format"})
 		return
 	}
 	semester, err := strconv.Atoi(yearSemesterParts[1])
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid semester format"})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid semester format"})
 		return
 	}
 	classes, err := cc.Service.GetClassByYearSemester(year, semester)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve classes"})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to retrieve classes"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"classes": classes})
 	if len(classes) == 0 {
 		c.JSON(http.StatusNotFound, gin.H{"message": "No classes found for the specified year and semester"})
 		return
