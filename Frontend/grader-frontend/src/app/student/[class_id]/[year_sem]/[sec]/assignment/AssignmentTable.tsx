@@ -61,7 +61,7 @@ export default function AssignmentTable({ data }: Props) {
       <Table<DataType>
         columns={columns}
         dataSource={data}
-        pagination={{ pageSize: 3, size: "small" }}
+        pagination={false}
         size="middle"
         className="text-xs leading-tight "
       />

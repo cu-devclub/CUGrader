@@ -2,8 +2,10 @@
 
 import React, { useEffect, useState } from "react";
 import StudentCard from "./studentCard";
-import ClassCard from "./ClassCard";
+import OldClassCard from "./ClassCard";
 import MockClass from "./mockClass";
+import { ClassCard } from "@/components/class-card";
+import { Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
@@ -31,13 +33,20 @@ export default function Page() {
 
   const { data, isLoading } = useQuery({
     queryKey: ["ClassData"],
-    queryFn: async () => {
-      const res = await api.class.listBySemester("2024/2");
-      return res;
-    },
+    queryFn: async () => api.class.listBySemester("2025/1"),
   });
 
+  // const { data: section } = useQuery({
+  //   queryKey: ["Sec"],
+  //   queryFn: async () => {
+  //     const res = await api.section;
+  //     return res;
+  //   },
+  // });
+
   console.log(JSON.stringify(data, null, 2));
+
+  // console.log(JSON.stringify(section, null, 2));
 
   const classData = MockClass(); // Use mocked data
 
@@ -81,11 +90,13 @@ export default function Page() {
     <div className="flex-col flex min-h-screen items-center">
       <div className="flex w-[90%] h-25 justify-between items-end border-b pb-4 pl-5">
         {/* Left side: Title */}
-        <h1 className="text-3xl font-bold text-pink-500">All Classes</h1>
+        <h1 className="text-3xl font-bold text-primary">All Classes</h1>
 
         {/* Right side: Buttons */}
         <div className="flex items-center space-x-4">
-          <button className="text-xl mr-8">＋</button>
+          <button className="text-xl mr-8">
+            <Plus></Plus>
+          </button>
           <button className="text-xl">🔔</button>
           <button className="text-xl">👤</button>
         </div>
@@ -107,9 +118,22 @@ export default function Page() {
           </select>
         </div>
 
-        <div className="grid grid-cols-5 gap-4 my-4 space-x-20 min-w-full">
+        <div className="grid gap-7 grid-cols-[repeat(auto-fill,minmax(16rem,20rem))]">
           {displayClassesTA.map((classTA, index) => (
             <ClassCard
+              key={index}
+              className={classTA.courseName}
+              courseId={classTA.courseId.toString()}
+              href=""
+              name={classTA.courseName}
+              semester={classTA.semester}
+              headerImageUrl={classTA.image}
+              menuItems={[]}
+            />
+          ))}
+
+          {/* {displayClassesTA.map((classTA, index) => (
+            <OldClassCard
               key={index}
               id={classTA.classId}
               image={classTA.image}
@@ -117,7 +141,7 @@ export default function Page() {
               class_id={classTA.courseId}
               semester={classTA.semester}
             />
-          ))}
+          ))} */}
         </div>
       </div>
 
