@@ -20,17 +20,11 @@ import { mapValues } from '../runtime';
  */
 export interface V1CallbackPostRequest {
     /**
-     * credential from url parameter callback from google to backend
+     * Base64 CipherText
      * @type {string}
      * @memberof V1CallbackPostRequest
      */
     credential: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof V1CallbackPostRequest
-     */
-    state: string;
 }
 
 /**
@@ -38,7 +32,6 @@ export interface V1CallbackPostRequest {
  */
 export function instanceOfV1CallbackPostRequest(value: object): value is V1CallbackPostRequest {
     if (!('credential' in value) || value['credential'] === undefined) return false;
-    if (!('state' in value) || value['state'] === undefined) return false;
     return true;
 }
 
@@ -53,7 +46,6 @@ export function V1CallbackPostRequestFromJSONTyped(json: any, ignoreDiscriminato
     return {
         
         'credential': json['credential'],
-        'state': json['state'],
     };
 }
 
@@ -69,7 +61,6 @@ export function V1CallbackPostRequestToJSONTyped(value?: V1CallbackPostRequest |
     return {
         
         'credential': value['credential'],
-        'state': value['state'],
     };
 }
 
