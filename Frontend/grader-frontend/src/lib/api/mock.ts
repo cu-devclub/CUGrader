@@ -40,6 +40,24 @@ const classes: Class[] = [
                 section: 1,
                 studentId: "111111",
                 withdrawal: false
+            },
+            {
+                name: generateName(),
+                group: "default",
+                picture: "",
+                score: 45,
+                section: 1,
+                studentId: "11111342",
+                withdrawal: true
+            },
+            {
+                name: generateName(),
+                group: "default",
+                picture: "",
+                score: 222,
+                section: 2,
+                studentId: "1223412344",
+                withdrawal: false
             }
         ]
     }
@@ -62,10 +80,9 @@ function choice<T>(elements: T[]): T {
     return elements[index];
 }
 
-
-function generateName() {
-    const firstNames = ["Arjun", "Ryan", "Shah", "May", "Thomas", "Erdogan", "Taylor", "Muhammad", "Martin", "Azhar", "Thaksin", "Ivan", "Francis", "Leo", "Haruka", "Evan", "Satya",];
-    const lastNames = ["Smith", "Brown", "Williams", "Shinawatra", "Miller", "Wang", "Kowalski", "Anderson", "Ryan", "Singh", "Watson", "Yoisaki", "Doe", "Li", "Kim", "Nguyen"];
+export function generateName() {
+    const firstNames = ["Arjun", "Ryan", "Shah", "May", "Thomas", "Erdogan", "Taylor", "Muhammad", "Martin", "Azhar", "Thaksin", "Ivan", "Francis", "Leo", "Evan", "Satya",];
+    const lastNames = ["Smith", "Brown", "Williams", "Shinawatra", "Miller", "Wang", "Kowalski", "Anderson", "Adolf", "Singh", "Watson", "Yoisaki", "Doe", "Li", "Kim", "Nguyen"];
     return `${choice(firstNames)} ${choice(lastNames)}`;
 }
 
