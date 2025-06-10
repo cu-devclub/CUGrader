@@ -80,6 +80,7 @@ func RegisterRoutes(r *gin.RouterGroup) {
 
 	r.POST("/class", classController.CreateClassHandler)
 	r.GET("/classes/semesters", classController.GetSemesterHandler)
+	r.GET("/classes/classes/:yearSemester", classController.GetClassByYearSemesterHandler)
 
 	r.POST("/callback", userController.Callback)
 }
