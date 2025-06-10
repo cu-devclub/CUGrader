@@ -131,7 +131,7 @@ export default function Layout({
               <Button
                 variant="secondary"
                 size="icon"
-                className={cn("size-10 rounded-full", isAtTop ? "bg-black/10 hover:bg-black/15 text-white" : "bg-black/5 hover:bg-black/10")}>
+                className={cn("size-10 rounded-full backdrop-blur-xl", isAtTop ? "bg-black/10 hover:bg-black/15 text-white" : "bg-black/5 hover:bg-black/10")}>
                 <Settings className="size-5" />
               </Button>
             </DropdownMenuTrigger>
