@@ -67,6 +67,7 @@ export function useEditDialogState<TPrefilled, TOutput, TKey = string>(config: E
 export interface Student {
   studentId: string,
   name: string,
+  imageUrl?: string,
   section: number,
   group: string,
   withdrawed: boolean;
@@ -77,10 +78,10 @@ export type StudentWithoutIdAndName = Omit<Student, "name" | "studentId">;
 export function useStudentEditDialog(classId: number, invalidate?: () => any) {
   return useEditDialogState<Student, StudentWithoutIdAndName>({
     async onDone(id, value) {
-      await api.student.update(classId, id, {
+      await api.students.update(classId, id, {
         group: value.group,
         section: value.section,
-        withdrawal: value.withdrawed
+        withdrawed: value.withdrawed
       });
       await invalidate?.();
     },
@@ -223,10 +224,10 @@ export function StudentEditDialog({ state }: StudentEditDialogProps) {
 export function useStudentBatchEditDialog(classId: number, invalidate?: () => any) {
   return useEditDialogState<StudentWithoutIdAndName, StudentWithoutIdAndName>({
     async onDone(id, value) {
-      await api.student.update(classId, id, {
+      await api.students.update(classId, id, {
         group: value.group,
         section: value.section,
-        withdrawal: value.withdrawed
+        withdrawed: value.withdrawed
       });
       await invalidate?.();
     },

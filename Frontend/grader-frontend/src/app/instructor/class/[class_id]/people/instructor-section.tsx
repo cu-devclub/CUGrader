@@ -175,7 +175,7 @@ export interface TeachingAssistantSectionProps {
 
 export function TeachingAssistantSection({ classId }: TeachingAssistantSectionProps) {
   const inviteMutation = useMutation({
-    mutationFn: (email: string) => api.assistant.addToClass(classId, email),
+    mutationFn: (email: string) => api.instructorsAndTAs.addToClass(classId, email),
     onSuccess: (_, email) => toast.success("Added " + email),
     onError: (error, email) => {
       console.error(error);

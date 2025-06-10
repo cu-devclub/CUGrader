@@ -90,7 +90,7 @@ export function StudentAddDialog({ state: { mode, setMode, open, setOpen } }: St
       if (files.length === 0) return;
       // TODO: make better api wrapper
       const classId = 1;
-      await api.class.edit(classId, {
+      await api.classes.update(classId, {
         students: files[0]
       });
     },

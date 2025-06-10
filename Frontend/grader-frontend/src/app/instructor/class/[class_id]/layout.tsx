@@ -62,8 +62,8 @@ interface LayoutProps {
 
 async function getClassDetails(classId: number): Promise<ClassData> {
   // TODO: new api for this
-  const classes = await api.class.listBySemester("2025/1");
-  const target = classes.assistant.find(it => it.classId === classId);
+  const classes = await api.classes.listParticipatingBySemester("2025/1");
+  const target = classes.assisting.find(it => it.classId === classId);
   if (!target) {
     notFound();
   }
@@ -73,7 +73,7 @@ async function getClassDetails(classId: number): Promise<ClassData> {
     name: target.courseName,
     semester: 1,
     year: 2025,
-    headerImageUrl: target.image,
+    headerImageUrl: target.imageUrl,
     courseId: String(target.courseId)
   };
 }
