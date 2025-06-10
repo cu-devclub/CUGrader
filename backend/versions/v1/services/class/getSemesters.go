@@ -9,7 +9,7 @@ func (s *ClassService) GetSemester(userId int) ([]string, error) {
 	}
 	result := make([]string, len(semesters))
 	for i, semester := range semesters {
-		result[i] = fmt.Sprintf("%d/%d", semester.Semester, semester.Year)
+		result[i] = fmt.Sprintf("%d-%d", semester.Year, semester.Semester)
 	}
 	return result, nil
 }
