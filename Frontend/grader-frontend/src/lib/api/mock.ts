@@ -1,4 +1,3 @@
-import { CreateStudent } from "./generated";
 import { APIClient, Class, Instructor, Semester, Student, TeachingAssistant } from "./type";
 
 type DbClass = Omit<Class, "imageUrl"> & {
@@ -36,7 +35,7 @@ export function generateName() {
 export const files: Map<number, File> = new Map();
 
 // TODO: env
-export const useMockServer = true;
+export const useMockServer = process.env.NEXT_PUBLIC_MOCK_PRESERVE_STATE === "true";
 function getImageUrl(id: number | undefined) {
   if (!id) {
     return "";
