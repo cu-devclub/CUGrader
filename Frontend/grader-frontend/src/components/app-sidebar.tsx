@@ -1,3 +1,5 @@
+'use client'
+
 import {
     Sidebar,
     SidebarContent,
@@ -9,6 +11,7 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { Home, Bell, LogOut } from "lucide-react"
 import Link from "next/link"
@@ -25,18 +28,21 @@ export function AppSidebar() {
     }
 
     return (
-        <Sidebar>
+        <Sidebar collapsible="icon">
             <SidebarHeader className="border-b p-4">
-                <h2 className="text-lg font-bold">GraderV.2</h2>
+                <div className="flex items-center gap-2">
+                    <h2 className="text-lg font-bold group-data-[collapsible=icon]:hidden">GraderV.2</h2>
+                    <SidebarTrigger className="ml-auto" />
+                </div>
             </SidebarHeader>
 
             <SidebarContent>
                 <SidebarGroup>
-                    <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+                    <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden">Navigation</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             <SidebarMenuItem>
-                                <SidebarMenuButton asChild>
+                                <SidebarMenuButton asChild tooltip="Home">
                                     <Link href="/instructor">
                                         <Home className="h-4 w-4" />
                                         <span>Home</span>
@@ -44,7 +50,7 @@ export function AppSidebar() {
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             <SidebarMenuItem>
-                                <SidebarMenuButton asChild>
+                                <SidebarMenuButton asChild tooltip="Notification">
                                     <Link href="/instructor/notification">
                                         <Bell className="h-4 w-4" />
                                         <span>Notification</span>
@@ -59,11 +65,12 @@ export function AppSidebar() {
             <SidebarFooter className="border-t p-4 flex ">
                 <Button
                     variant="outline"
-                    //onClick={handleSignOut}
+                    onClick={handleSignOut}
                     className="w-full justify-center"
+                    title="Sign Out"
                 >
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Sign Out
+                    <LogOut className="h-4 w-4 mr-2 group-data-[collapsible=icon]:mr-0" />
+                    <span className="group-data-[collapsible=icon]:hidden">Sign Out</span>
                 </Button>
             </SidebarFooter>
         </Sidebar>

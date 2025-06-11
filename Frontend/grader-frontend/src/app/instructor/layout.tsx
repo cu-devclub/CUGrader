@@ -12,7 +12,7 @@ export default function InstructorLayout({
       <SidebarProvider>
         <AppSidebar />
         <main>
-          <SidebarTrigger />
+
           {children}
         </main>
       </SidebarProvider>
