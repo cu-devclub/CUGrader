@@ -121,13 +121,14 @@ interface SharedSectionProps {
   onRemove?: (email: string) => any;
   onEdit?: (id: string) => any; // we dont have this
   // TODO: seperate endpoint???
-  invite: (email: string) => any;
+  invite?: (email: string) => any;
+  allowEdit: boolean;
   peoples: (People)[];
   // TODO: access control
 }
 
 // shared by both instructors and teaching assistants
-function SharedSection({ title, invite, peoples, onRemove }: SharedSectionProps) {
+function SharedSection({ title, invite, peoples, onRemove, allowEdit }: SharedSectionProps) {
   return (
     <Collapsible defaultOpen>
       <div className="flex justify-between">
@@ -136,7 +137,9 @@ function SharedSection({ title, invite, peoples, onRemove }: SharedSectionProps)
           <ChevronRight className="group-data-[state=open]:hidden" />
           <h2 className="text-xl font-medium"> {title}s ({peoples.length}) </h2>
         </CollapsibleTrigger>
-        <InviteForm onAdd={invite} title={`Add ${title}`} />
+        {allowEdit && invite &&
+          <InviteForm onAdd={invite} title={`Add ${title}`} />
+        }
       </div>
       <CollapsibleContent>
         <section className="mt-3">
@@ -147,7 +150,7 @@ function SharedSection({ title, invite, peoples, onRemove }: SharedSectionProps)
                 key={it.email}
                 email={it.email}
                 imageUrl={it.imageUrl}
-                onRemove={onRemove ? (() => onRemove?.(it.email)) : undefined}
+                onRemove={allowEdit && onRemove ? (() => onRemove?.(it.email)) : undefined}
               />
             ))}
           </div>
@@ -159,26 +162,27 @@ function SharedSection({ title, invite, peoples, onRemove }: SharedSectionProps)
 
 export interface InstructorAndTASectionProps {
   classId: number;
+  allowEdit?: boolean;
 }
 
-export function InstructorAndTASection({ classId }: InstructorAndTASectionProps) {
+export function InstructorAndTASection({ classId, allowEdit = false }: InstructorAndTASectionProps) {
   const query = useSuspenseQuery({
     queryKey: ["class", classId, "instructors-and-tas"],
-    queryFn: () => api.instructorsAndTAs.listByClass(classId)
-  });
+    queryFn: async () => {
+      const { instructors, teachingAssistant } = await api.instructorsAndTAs.listByClass(classId);
 
-  const [instructors, teachingAssistant] = useMemo(() => {
-    return [
-      query.data.instructors.map(it => ({ ...it, } satisfies People)),
-      query.data.teachingAssistant.map(it => ({ ...it, } satisfies People))
-    ];
-  }, [query.data]);
+      return {
+        instructors: instructors.map(it => ({ ...it, } satisfies People)),
+        teachingAssistant: teachingAssistant.map(it => ({ ...it, } satisfies People))
+      };
+    }
+  });
 
   const inviteMutation = useMutation({
     mutationFn: (email: string) => api.instructorsAndTAs.addToClass(classId, email),
-    onSuccess: (_, email) => {
+    onSuccess: async (_, email) => {
+      await query.refetch();
       toast.success("Added " + email);
-      query.refetch();
     },
     onError: (error, email) => {
       console.error(error);
@@ -188,18 +192,21 @@ export function InstructorAndTASection({ classId }: InstructorAndTASectionProps)
     }
   });
 
+  const invite = useMemo(() => (email: string) => inviteMutation.mutate(email), [allowEdit, inviteMutation.mutate]);
 
   return (
     <>
       <SharedSection
         title="Instructor"
-        peoples={instructors}
-        invite={(email) => inviteMutation.mutate(email)}
+        peoples={query.data.instructors}
+        invite={invite}
+        allowEdit={allowEdit}
       />
       <SharedSection
         title="Teaching assistant"
-        peoples={teachingAssistant}
-        invite={(email) => inviteMutation.mutate(email)}
+        peoples={query.data.teachingAssistant}
+        invite={invite}
+        allowEdit={allowEdit}
       />
     </>
   );
