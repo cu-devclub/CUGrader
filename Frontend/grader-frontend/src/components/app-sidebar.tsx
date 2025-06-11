@@ -13,9 +13,12 @@ import {
     SidebarMenuItem,
     SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { Home, Bell, LogOut } from "lucide-react"
+import { Home, Bell, LogOut, BookOpen } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { api } from "@/lib/api"
+import { useSuspenseQuery } from "@tanstack/react-query"
+import { useState } from "react"
 
 export function AppSidebar() {
     const handleSignOut = () => {
@@ -29,6 +32,19 @@ export function AppSidebar() {
         // Redirect to login page
         window.location.href = '/'
     }
+
+    // Fetch semester list and classes data
+    const { data: semesterList } = useSuspenseQuery({
+        queryKey: ["semester"],
+        queryFn: () => api.semesters.list(),
+    });
+
+    const [selectedSemester] = useState(semesterList[0]);
+
+    const { data: classes } = useSuspenseQuery({
+        queryKey: ["class", selectedSemester],
+        queryFn: () => api.classes.listParticipatingBySemester(selectedSemester),
+    });
 
     return (
         <Sidebar collapsible="icon">
@@ -60,6 +76,24 @@ export function AppSidebar() {
                                     </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
+                        </SidebarMenu>
+                    </SidebarGroupContent>
+                </SidebarGroup>
+
+                <SidebarGroup>
+                    <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden">Classes</SidebarGroupLabel>
+                    <SidebarGroupContent>
+                        <SidebarMenu>
+                            {classes.assisting.map((classItem) => (
+                                <SidebarMenuItem key={classItem.classId}>
+                                    <SidebarMenuButton asChild tooltip={classItem.courseName}>
+                                        <Link href={`/instructor/class/${classItem.classId}/people`}>
+                                            <BookOpen className="h-4 w-4" />
+                                            <span className="truncate">{classItem.courseName}</span>
+                                        </Link>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            ))}
                         </SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>
