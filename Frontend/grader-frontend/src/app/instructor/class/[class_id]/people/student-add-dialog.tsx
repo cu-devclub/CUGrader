@@ -1,9 +1,11 @@
+import { FileCard } from "@/components/file-card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api } from "@/lib/api";
+import { useDropzoneFrFr } from "@/lib/file";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { FileSpreadsheet, Paperclip, TableOfContents, Trash2, Upload } from "lucide-react";
@@ -65,33 +67,6 @@ const student = z.object({
 const studentFormSchema = z.object({
   students: student.array()
 });
-
-// useDropzone dont provide a method to remove files, so i wrap it
-function useDropzoneFrFr() {
-  const { acceptedFiles, inputRef, ...rest } = useDropzone({});
-
-  // i hate react
-  const [files, setFiles] = useState(acceptedFiles);
-  useEffect(() => {
-    setFiles(acceptedFiles);
-  }, [acceptedFiles.length]);
-
-  const hasFile = files.length > 0;
-
-  const removeFiles = useMemo(() => () => {
-    // console.log(inputRef.current.value);
-    setFiles([]);
-    inputRef.current.value = ""; // bruh
-  }, [inputRef]);
-
-  return {
-    ...rest,
-    hasFile,
-    removeFiles,
-    inputRef,
-    files
-  };
-}
 
 export function StudentAddDialog({ state: { mode, setMode, open, setOpen }, classId, refetch }: StudentAddDialogProps) {
   const { getInputProps, getRootProps, hasFile, files, removeFiles } = useDropzoneFrFr();
@@ -275,7 +250,7 @@ export function StudentAddDialog({ state: { mode, setMode, open, setOpen }, clas
 
               {hasFile
                 ? <div>
-                  <FileCard file={files[0]} remove={removeFiles} />
+                  <FileCard icon={FileSpreadsheet} file={files[0]} remove={removeFiles} />
                 </div>
                 : <div className="rounded-lg border-dashed border-2 cursor-pointer flex items-center justify-center h-full" {...getRootProps()}>
                   <div className="flex flex-col items-center text-muted-foreground gap-3 text-sm">
@@ -304,39 +279,5 @@ export function StudentAddDialog({ state: { mode, setMode, open, setOpen }, clas
         </DialogContent>
       </Dialog>
     </>
-  );
-}
-
-
-interface FileCardProps {
-  file: FileWithPath;
-  remove: () => any;
-}
-
-function FileCard({ file, remove }: FileCardProps) {
-  return (
-    <div className="border rounded-md bg-background p-3 flex gap-3 items-center">
-      <div className="aspect-square">
-        <div className="rounded-full bg-green-500/15 text-green-600 p-2">
-          <FileSpreadsheet className="size-5" />
-        </div>
-      </div>
-      <div className="flex-1 leading-4">
-        <p className="text-sm wrap-anywhere">
-          {file.name}
-        </p>
-        <p className="text-sm wrap-anywhere text-muted-foreground">
-          {file.size} Bytes
-          {/* TODO: format size string */}
-        </p>
-        {/* More file info */}
-      </div>
-      <div>
-        <Button variant="ghost" size="icon" onClick={remove}>
-          <Trash2 />
-        </Button>
-      </div>
-    </div>
-
   );
 }

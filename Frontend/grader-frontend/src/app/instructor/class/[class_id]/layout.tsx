@@ -69,7 +69,7 @@ async function getClassDetails(classId: number): Promise<ClassData> {
     ...target,
     id: classId,
     name: target.courseName,
-    semester: 1, // TODO: stop mock this after we have the api
+    semester: "1", // TODO: stop mock this after we have the api
     year: 2025,
     headerImageUrl: target.imageUrl,
     courseId: String(target.courseId)
