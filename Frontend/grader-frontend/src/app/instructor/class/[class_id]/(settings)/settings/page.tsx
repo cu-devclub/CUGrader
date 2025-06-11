@@ -13,7 +13,7 @@ export default function Page({ params }: PageProps) {
   return (
     <main className="space-y-6">
       <h1 className="text-2xl font-medium"> Settings </h1>
-      <SettingsForm classId={classId} />
+      <SettingsForm />
     </main>
   );
 }
