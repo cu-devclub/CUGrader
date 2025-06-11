@@ -10,8 +10,6 @@ services:
             - "6000:6000"
         environment:
             - SERVICE_ENV=development
-        depends_on:
-            - yugabytedb
     backend:
         build:
             context: ./Backend
