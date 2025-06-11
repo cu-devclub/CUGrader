@@ -29,7 +29,7 @@ export function AppSidebar() {
         //localStorage.removeItem('auth_token')
         //localStorage.removeItem('user_data')
 
-        // Redirect to login page
+        // Redirect to login page -> Don't directly redicrect to login page, Change this to a proper API call when ready
         window.location.href = '/login'
     }
 
