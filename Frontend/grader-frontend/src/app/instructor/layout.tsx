@@ -1,4 +1,4 @@
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { SidebarProvider } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
 
 
@@ -12,7 +12,6 @@ export default function InstructorLayout({
       <SidebarProvider>
         <AppSidebar />
         <main>
-
           {children}
         </main>
       </SidebarProvider>
