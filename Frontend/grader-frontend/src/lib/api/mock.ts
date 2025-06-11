@@ -1,240 +1,285 @@
-import { unimplemented } from "../utils";
-import type { client, Semester } from "./client";
-import type { ClassObject, InstructorInfo, StudentInfo, TAInfo } from "./generated";
+import { APIClient, Class, Instructor, Semester, Student, TeachingAssistant } from "./type";
 
-const fileRegistry: File[] = [];
+type DbClass = Omit<Class, "imageUrl"> & {
+  students: DbStudent[];
+  semester: Semester; // TODO: move this to normal api response later
+  assistants: DbAssistant[];
+  instructors: DbInstructor[];
 
-type Class = ClassObject & {
-    students: Student[];
-    semester: Semester;
-    assistants: Assistant[];
+  imageFileId?: number;
 };
 
-type Student = Omit<StudentInfo, "maxScore">;
-type Instructor = InstructorInfo;
-type Assistant = TAInfo & {
-    email: string;
+type DbStudent = Omit<Student, "maxScore" | "imageUrl"> & {
+  imageFileId?: number;
 };
-
-const classes: Class[] = [
-    {
-        classId: 0,
-        courseId: 1213,
-        courseName: "Test",
-        image: "",
-        semester: "2025/1",
-        assistants: [
-            {
-                name: generateName(),
-                email: "ta@test.com",
-                leader: true,
-                picture: ""
-            }
-        ],
-        students: [
-            {
-                name: generateName(),
-                group: "default",
-                picture: "",
-                score: 12,
-                section: 1,
-                studentId: "111111",
-                withdrawal: false
-            },
-            {
-                name: generateName(),
-                group: "default",
-                picture: "",
-                score: 45,
-                section: 1,
-                studentId: "11111342",
-                withdrawal: true
-            },
-            {
-                name: generateName(),
-                group: "default",
-                picture: "",
-                score: 222,
-                section: 2,
-                studentId: "1223412344",
-                withdrawal: false
-            }
-        ]
-    }
-];
-const instructors: Instructor[] = [
-    {
-        name: "John Instructor",
-        picture: "",
-    }
-];
-// const sections = ["2025/1", "2024/2", "2024/1"];
-const semesters: Semester[] = ["2025/1", "2024/2", "2024/1"];
-
-const currentUser = {};
-
-let currentClassId = 10;
+type DbInstructor = Omit<Instructor, ""> & {
+  email: string;
+  imageFileId?: number;
+};
+type DbAssistant = TeachingAssistant & {
+  email: string;
+  imageFileId?: number;
+};
 
 function choice<T>(elements: T[]): T {
-    const index = Math.floor(Math.random() * elements.length);
-    return elements[index];
+  const index = Math.floor(Math.random() * elements.length);
+  return elements[index];
 }
 
 export function generateName() {
-    const firstNames = ["Arjun", "Ryan", "Shah", "May", "Thomas", "Erdogan", "Taylor", "Muhammad", "Martin", "Azhar", "Thaksin", "Ivan", "Francis", "Leo", "Evan", "Satya",];
-    const lastNames = ["Smith", "Brown", "Williams", "Shinawatra", "Miller", "Wang", "Kowalski", "Anderson", "Adolf", "Singh", "Watson", "Yoisaki", "Doe", "Li", "Kim", "Nguyen"];
-    return `${choice(firstNames)} ${choice(lastNames)}`;
+  const firstNames = ["Arjun", "Ryan", "Shah", "May", "Thomas", "Erdogan", "Taylor", "Muhammad", "Martin", "Azhar", "Thaksin", "Ivan", "Francis", "Leo", "Evan", "Satya",];
+  const lastNames = ["Smith", "Brown", "Williams", "Shinawatra", "Miller", "Wang", "Kowalski", "Anderson", "Adolf", "Singh", "Watson", "Yoisaki", "Doe", "Li", "Kim", "Nguyen"];
+  return `${choice(firstNames)} ${choice(lastNames)}`;
 }
 
-function getClassById(id: number) {
+export const files: Map<number, File> = new Map();
+
+// TODO: env
+export const useMockServer = process.env.NEXT_PUBLIC_MOCK_PRESERVE_STATE === "true";
+function getImageUrl(id: number | undefined) {
+  if (!id) {
+    return "";
+  }
+  if (useMockServer) {
+    return `/api/dev/file?fileId=${id}`;
+  } else {
+    return URL.createObjectURL(files.get(id)!);
+  }
+}
+
+function createClient(): APIClient {
+  const classes: DbClass[] = [];
+
+  let currentClassId = 420;
+
+  function getClassById(id: number) {
     const target = classes.find(it => it.classId === id);
     if (!target) {
-        throw new Error("Not found");
+      throw new Error(`${id} class not found`);
     }
     return target;
+  }
+
+  async function init() {
+    await client.classes.create({
+      courseId: "1",
+      name: "Programming",
+      semester: "2025/1",
+    });
+
+    await client.classes.create({
+      courseId: "758",
+      name: "sone",
+      semester: "2024/2",
+    });
+
+    await client.instructorsAndTAs.addToClass(420, "ame@student.chula.ac.th");
+    await client.instructorsAndTAs.addToClass(420, "suisei@student.chula.ac.th");
+    await client.instructorsAndTAs.addToClass(420, "mark45@chula.ac.th");
+
+    await client.instructorsAndTAs.addToClass(421, "71382213@student.chula.ac.th");
+    await client.instructorsAndTAs.addToClass(421, "wave@chula.ac.th");
+    await client.instructorsAndTAs.addToClass(421, "ajarn@chula.ac.th");
+
+    await client.students.addToClass(420, {
+      email: "12@student.chula.ac.th",
+      section: 0,
+    });
+
+    await client.students.addToClass(420, {
+      email: "45@student.chula.ac.th",
+      section: 0,
+    });
+
+    await client.students.addToClass(420, {
+      email: "2223@student.chula.ac.th",
+      section: 0,
+    });
+
+    await client.students.addToClass(420, {
+      email: "12313@student.chula.ac.th",
+      section: 0,
+    });
+  }
+
+  const client: APIClient = {
+    students: {
+      async addToClass(classId, { email, section, group }) {
+        const c = getClassById(classId);
+        console.log({ email });
+        c.students.push({
+          group: group ?? "Default",
+          section,
+          studentId: email.split("@")[0],
+          name: generateName(),
+          score: 0,
+          withdrawed: false,
+        });
+      },
+      async listByClass(classId) {
+        return getClassById(classId).students.map(it => ({
+          ...it,
+          imageUrl: getImageUrl(it.imageFileId),
+          maxScore: 100,
+        }));
+      },
+      async removeFromClass(classId, studentId) {
+        const target = getClassById(classId);
+        target.students = target.students.filter(it => it.studentId !== studentId);
+      },
+      async update(classId, studentId, { group, section, withdrawed }) {
+        const target = getClassById(classId);
+        // console.log(studentId)
+        const student = target.students.find(it => it.studentId === studentId);
+        if (!student) {
+          throw new Error("student not found");
+        }
+        if (group) {
+          student.group = group;
+        }
+        if (section) {
+          student.section = section;
+        }
+        if (withdrawed) {
+          student.withdrawed = withdrawed;
+        }
+      },
+      async updateMany(classId, studentIds, { group, section, withdrawed }) {
+        const target = getClassById(classId);
+        for (const id of studentIds) {
+          const student = target.students.find(it => it.studentId === id);
+          if (!student) {
+            continue;
+            // throw new Error("student not found");
+          }
+          if (group) {
+            student.group = group;
+          }
+          if (section) {
+            student.section = section;
+          }
+          if (withdrawed) {
+            student.withdrawed = withdrawed;
+          }
+        }
+      },
+    },
+    classes: {
+      async create({ courseId, name, semester, image, students }) {
+        if (students) {
+          console.warn("[mock] Ignoring students csv file");
+        }
+        const fileId = image ? Date.now() : undefined;
+        if (image) {
+          files.set(fileId!, image);
+        }
+        classes.push({
+          courseId: String(courseId),
+          courseName: name,
+          classId: currentClassId++,
+          // TODO: this wont work on the server
+          imageFileId: fileId,
+          students: [],
+          semester,
+          assistants: [],
+          instructors: []
+        });
+      },
+      async getById(classId) {
+        return getClassById(classId);
+      },
+      async listParticipatingBySemester(semester) {
+        return {
+          assisting: classes.filter(it => it.semester === semester),
+          studying: classes.filter(it => it.semester === semester)
+        };
+      },
+      async update(classId, payload) {
+        const target = getClassById(classId);
+
+        if (payload.courseId) {
+          target.courseId = String(payload.courseId);
+        }
+        if (payload.name) {
+          target.courseName = payload.name;
+        }
+        if (payload.semester) {
+          target.semester = payload.semester;
+        }
+        if (payload.image) {
+          const id = Date.now();
+          files.set(id, payload.image);
+          target.imageFileId = id;
+        }
+        if (payload.students) {
+          console.warn("[mock] Ignoring students csv file");
+        }
+      },
+    },
+    instructorsAndTAs: {
+      async listByClass(classId) {
+        const c = getClassById(classId);
+        return {
+          instructors: c.instructors,
+          teachingAssistant: c.assistants
+        };
+      },
+      async addToClass(classId, email) {
+        // if student.chula.ac.th -> TA otherwise its instructor
+        const c = getClassById(classId);
+        if (email.split("@")[1] === "student.chula.ac.th") {
+          c.assistants.push({
+            name: generateName(),
+            email,
+            leader: false,
+          });
+        } else {
+          c.instructors.push({
+            name: generateName(),
+            email,
+          });
+        }
+      },
+      async removeFromClass(classId, email) {
+        const target = getClassById(classId);
+        target.instructors = target.instructors.filter(it => it.email !== email);
+        target.assistants = target.assistants.filter(it => it.email !== email);
+      },
+    },
+    semesters: {
+      list: async () => {
+        const s = classes.map(it => it.semester);
+        return [...new Set(s)]; // remove duplicated
+      }
+    }
+  };
+
+  init();
+  return client;
 }
 
-export const mockClient: typeof client = {
-    student: {
-        list: async () => classes
-            .map(it => it.students)
-            .flat()
-            .map(it => ({ ...it, maxScore: 100 })), // mock until we implement submission
-        addToClass: async (classId, student) => {
-            const target = getClassById(classId);
-            const { email, section, group } = student;
-            target.students.push({
-                studentId: email.split("@")[0],
-                group: group ?? "default",
-                name: generateName(),
-                score: 0,
-                picture: "",
-                section,
-                withdrawal: false
-            });
-            return {};
-        },
-        removeFromClass: async (classId, studentId) => {
-            const target = getClassById(classId);
-            target.students = target.students.filter(it => it.studentId !== studentId);
-            return {};
-        },
-        update: async (classId, studentId, body) => {
-            const target = getClassById(classId);
-            const student = target.students.find(it => it.studentId === studentId);
-            if (!student) {
-                throw new Error("student not found");
-            }
-            if (body.group) {
-                student.group = body.group;
-            }
-            if (body.section) {
-                student.section = body.section;
-            }
-            if (body.withdrawal) {
-                student.withdrawal = body.withdrawal;
-            }
 
-            return {};
-        }
-    },
-    assistant: {
-        addToClass: async (classId, email) => {
-            const target = getClassById(classId);
-            target.assistants.push({
-                email,
-                leader: false,
-                name: generateName(),
-                picture: "" // TODO: default pic
-            });
-            return {};
-        },
-        listByClass: async (classId) => {
-            const target = getClassById(classId);
-            return target.assistants;
-        },
-        removeFromClass: async (classId, email) => {
-            const target = getClassById(classId);
-            target.assistants = target.assistants.filter(it => it.email !== email);
-            return {};
-        }
-    },
-    auth: {
-        // we cant really do much about it 
-        login: async () => unimplemented("auth is hard to mock"),
-        getAccessToken: async () => unimplemented("auth is hard to mock"),
-    },
-    class: {
-        create: async ({ courseId, name, semester, image, students }) => {
-            // TODO: parse csv maybe?
-            if (students) {
-                console.warn("[mock] Ignoring students csv file");
-            }
-            if (image) {
-                fileRegistry.push(image);
-            }
-            classes.push({
-                courseId, // dafaq
-                courseName: name,
-                classId: currentClassId++,
-                // TODO: better fallback image
-                image: image ? URL.createObjectURL(image) : "",
-                students: [],
-                semester,
-                assistants: []
-            });
-            return {};
-        },
-        edit: async (id, body) => {
-            const target = getClassById(id);
+// TODO: handle file upload
 
-            if (body.courseId) {
-                target.courseId = body.courseId;
-            }
-            if (body.name) {
-                target.courseName = body.name;
-            }
-            if (body.semester) {
-                target.semester = body.semester;
-            }
-            if (body.image) {
-                fileRegistry.push(body.image);
-                target.image = URL.createObjectURL(body.image);
-            }
+type Leaves<T> = T extends object
+  ? {
+    [K in keyof T]: `${Exclude<K, symbol>}${Leaves<T[K]> extends never ? "" : `.${Leaves<T[K]>}`}`;
+  }[keyof T]
+  : never;
 
-            return {};
-        },
-        listBySemester: async (semester) => {
-            // TODO: split this later
-            return {
-                assistant: classes,
-                study: classes
-            };
-        }
-    },
-    group: {
-        listByClass: async (classId) => {
-            // idk tho
-            const target = getClassById(classId);
-            const groups = target.students.map(it => it.group);
-            const deduped = [...new Set(groups)];
-            return deduped;
-        }
-    },
-    listAssistantAndInstructor: async () => {
-        const assistant = classes.map(it => it.assistants).flat();
-        return {
-            assistant,
-            instructor: instructors
-        };
-    },
-    section: {
-        listByClass: async (classId) => unimplemented()
-    },
-    semester: {
-        list: async () => {
-            const s = classes.map(it => it.semester);
-            return [...new Set(s)]; // remove duplicated
-        }
-    }
-};
+export interface MockRPCCommand {
+  command: Leaves<APIClient>,
+  params: any[];
+}
+
+export const api = createClient();
+
+export async function dispatch({ command, params }: MockRPCCommand) {
+  const path = command.split(".");
+  // console.log({ api, path });
+  let fn = api as any;
+  while (path.length !== 0) {
+    fn = fn[path.shift()!];
+  }
+  return await fn(...params);
+}

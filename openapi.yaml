@@ -1,11 +1,11 @@
-openapi: '3.0.0'
+openapi: "3.0.0"
 servers:
   - url: 127.0.0.1
 info:
   contact:
     name: Jon
-  version: '1.0.0'
-  title: 'Grader'
+  version: "1.0.0"
+  title: "Grader"
 
 paths:
   /v1/student:
@@ -23,24 +23,24 @@ paths:
             schema:
               $ref: "#/components/schemas/CreateStudent"
       responses:
-        '200':
+        "200":
           description: Empty JSON
           content:
             application/json:
               schema:
                 type: object
-        '400':
+        "400":
           description: Request body not met requirement
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
-            description: Unexpected error
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
     delete:
       summary: Delete student
       parameters:
@@ -55,24 +55,24 @@ paths:
             schema:
               $ref: "#/components/schemas/DeleteStudent"
       responses:
-        '200':
+        "200":
           description: Empty JSON
           content:
             application/json:
               schema:
                 type: object
-        '400':
+        "400":
           description: Request body not met requirement
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
-            description: Unexpected error
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
     patch:
       summary: Edit student info
       parameters:
@@ -87,24 +87,24 @@ paths:
             schema:
               $ref: "#/components/schemas/EditStudent"
       responses:
-        '200':
+        "200":
           description: Empty JSON
           content:
             application/json:
               schema:
                 type: object
-        '400':
+        "400":
           description: Request body not met requirement
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
-            description: Unexpected error
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
     get:
       summary: get list of students
       parameters:
@@ -114,18 +114,49 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: student object in array
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/students"
-        '500':
-            description: Unexpected error
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/Error'
+        "500":
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /v1/student/{class_id}:
+    get:
+      summary: "list student by class"
+      parameters:
+        - in: header
+          name: Authentication
+          description: "Bearer ..."
+          schema:
+            type: string
+        - name: class_id
+          description: The unique identifier of the class
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/class_id"
+      responses:
+        "200":
+          description: Array of students 
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/students"
+                # NOTE: idk
+                # TODO: fix this
+        "500":
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
   /v1/class:
     post:
       summary: Create class
@@ -140,58 +171,58 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CreateClassBody'
+              $ref: "#/components/schemas/CreateClassBody"
       responses:
-        '200':
+        "200":
           description: Empty JSON
           content:
             application/json:
               schema:
                 type: object
-        '400':
+        "400":
           description: Request body not met requirement
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
+                $ref: "#/components/schemas/Error"
+        "500":
           description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
     patch:
-        summary: partially edit class information
-        parameters:
+      summary: partially edit class information
+      parameters:
         - in: header
           name: Authentication
           description: "Bearer ..."
           schema:
             type: string
-        requestBody:
-            content:
-                multipart/form-data:
-                    schema:
-                        $ref: '#/components/schemas/EditClassBody'
-        responses:
-            '200':
-                description: Empty JSON
-                content:
-                    application/json:
-                        schema:
-                            type: object
-            '400':
-                description: Request body not met requirement
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/Error'
-            '500':
-                description: Unexpected error
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/Error'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/EditClassBody"
+      responses:
+        "200":
+          description: Empty JSON
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          description: Request body not met requirement
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
   /v1/classes/semesters:
     summary: List of year-semester
@@ -203,7 +234,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: List year-semester
           content:
             application/json:
@@ -213,13 +244,13 @@ paths:
                     type: array
                     items:
                       type: string
-                      description: 'year-semester'
-        '500':
+                      description: "year-semester"
+        "500":
           description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
   /v1/classes/classes/{year-semester}:
     summary: List of class in year-semester
     get:
@@ -237,7 +268,7 @@ paths:
             type: string
             description: "year-semester"
       responses:
-        '200':
+        "200":
           description: List of class object
           content:
             application/json:
@@ -246,18 +277,18 @@ paths:
                   assistant:
                     type: array
                     items:
-                      $ref: '#/components/schemas/ClassObject'
+                      $ref: "#/components/schemas/ClassObject"
                   study:
                     type: array
                     items:
-                      $ref: '#/components/schemas/ClassObject'
-        '500':
+                      $ref: "#/components/schemas/ClassObject"
+        "500":
           description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-  /v1/TA:          
+                $ref: "#/components/schemas/Error"
+  /v1/TA:
     post:
       parameters:
         - in: header
@@ -270,27 +301,27 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TAeditBody'
+              $ref: "#/components/schemas/TAeditBody"
       responses:
-        '200':
+        "200":
           description: Empty JSON
           content:
             application/json:
               schema:
                 type: object
-        '400':
+        "400":
           description: Request body not met requirement
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
+                $ref: "#/components/schemas/Error"
+        "500":
           description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-          
+                $ref: "#/components/schemas/Error"
+
     delete:
       summary: Delete TA from class
       parameters:
@@ -305,24 +336,24 @@ paths:
             schema:
               $ref: "#/components/schemas/TAeditBody"
       responses:
-        '200':
+        "200":
           description: Empty JSON
           content:
             application/json:
               schema:
                 type: object
-        '400':
+        "400":
           description: Request body not met requirement
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
-            description: Unexpected error
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
     get:
       summary: get list of assistant and instructor
       parameters:
@@ -332,18 +363,51 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: assistants array and instructor array
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Assistant"
-        '500':
-            description: Unexpected error
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/Error'
+        "500":
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  
+  /v1/TA/{class_id}:
+    get:
+      summary: "list ta and instructor by class"
+      parameters:
+        - in: header
+          name: Authentication
+          description: "Bearer ..."
+          schema:
+            type: string
+        - name: class_id
+          description: The unique identifier of the class
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/class_id"
+      responses:
+        "200":
+          description: assistants array and instructor array
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Assistant"
+                # NOTE: idk
+                # TODO: fix this
+        "500":
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+
   /v1/section/{class_id}:
     get:
       parameters:
@@ -354,18 +418,18 @@ paths:
           schema:
             $ref: "#/components/schemas/class_id"
       responses:
-        '200':
+        "200":
           description: assistants array and instructor array
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/sectionArray"
-        '500':
-            description: Unexpected error
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/Error'
+        "500":
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /v1/group/{class_id}:
     get:
       parameters:
@@ -376,20 +440,20 @@ paths:
           schema:
             $ref: "#/components/schemas/class_id"
       responses:
-        '200':
+        "200":
           description: assistants array and instructor array
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/groupArray"
-        '500':
-            description: Unexpected error
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/Error'
+        "500":
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /v1/picutre/{picture_id}:
-    summary: get 
+    summary: get
     get:
       summary: getting image with picture id
       parameters:
@@ -400,29 +464,29 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        "200":
           description: image file
           content:
             image:
-                schema:
-                    type: object
-        '500':
-            description: Unexpected error
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/Error'
+              schema:
+                type: object
+        "500":
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /v1/login:
     summary: get google Authentication url for redirect
     get:
       responses:
-        '200':
+        "200":
           description: success
           content:
             application/json:
               schema:
                 properties:
-                  url: 
+                  url:
                     description: google Oauth for redirect to google login page
                     type: string
                   state:
@@ -438,18 +502,14 @@ paths:
         content:
           application/json:
             schema:
-                properties:
-                  credential:
-                    description: credential from url parameter callback from google to backend
-                    type: string
-                  state:
-                    default: state to verify from login path
-                    type: string
-                required:
-                  - "credential"
-                  - "state"
+              properties:
+                credential:
+                  description: Base64 CipherText
+                  type: string
+              required:
+                - "credential"
       responses:
-        '200':
+        "200":
           description: success
           content:
             application/json:
@@ -569,7 +629,7 @@ components:
           description: student's email
           type: string
         section:
-          description:  section of student
+          description: section of student
           type: integer
         group:
           description: group of student
@@ -587,7 +647,7 @@ components:
           description: student id primary key
           type: string
         section:
-          description:  section of student
+          description: section of student
           type: integer
         group:
           description: group of student
@@ -644,11 +704,11 @@ components:
         assistant:
           type: array
           items:
-            $ref: '#/components/schemas/ClassObject'
+            $ref: "#/components/schemas/ClassObject"
         study:
           type: array
           items:
-            $ref: '#/components/schemas/ClassObject'
+            $ref: "#/components/schemas/ClassObject"
         semester:
           type: string
           description: semester of classes

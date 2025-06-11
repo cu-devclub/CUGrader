@@ -7,9 +7,9 @@ import { useRouter } from "next/navigation";
 
 interface Props {
   id: number;
-  class_id: number;
+  class_id: string;
   class_name: string;
-  image: string;
+  image?: string;
   semester: string;
 }
 

@@ -9,18 +9,17 @@ import { CreateClassDialog } from "./create-class-dialog";
 import { SemesterSelector } from "./semester-selector";
 import { api } from "@/lib/api";
 
-// TODO: rename this
 export default function InstructorPage() {
   const { data: semesterList } = useSuspenseQuery({
     queryKey: ["semester"],
-    queryFn: () => api.semester.list(),
+    queryFn: () => api.semesters.list(),
   });
 
   const [selectedSemester, setSelectedSemester] = useState(semesterList[0]);
 
-  const { data: classes } = useSuspenseQuery({
+  const { data: classes, isLoading } = useSuspenseQuery({
     queryKey: ["class", selectedSemester],
-    queryFn: () => api.class.listBySemester(selectedSemester),
+    queryFn: () => api.classes.listParticipatingBySemester(selectedSemester),
   });
 
   const [showCreateClassDialog, setShowCreateClassDialog] = useState(false);
@@ -53,14 +52,14 @@ export default function InstructorPage() {
         <hr />
 
         <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(16rem,1fr))]">
-          {classes.assistant.map((it) => (
+          {classes.assisting.map((it) => (
             <ClassCard
               key={it.classId}
               courseId={it.courseId}
               menuItems={[]}
               href={`/instructor/class/${it.classId}/people`}
               name={it.courseName}
-              headerImageUrl={it.image}
+              headerImageUrl={it.imageUrl}
               semester={selectedSemester}
             />
           ))}

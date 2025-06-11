@@ -1,35 +1,32 @@
 'use client';
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import { api } from "@/lib/api";
-import { StudentInfo } from "@/lib/api/generated";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Table, TableColumnsType } from "antd";
 import { TableRowSelection } from "antd/es/table/interface";
 import { ChevronDown, ChevronRight, Download, Edit2, Plus, TableOfContents, Upload, User } from "lucide-react";
 import { useMemo, useState } from "react";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { EditDialogState, Student, StudentBatchEditDialog, StudentEditDialog, StudentWithoutIdAndName, useEditDialogState, useStudentBatchEditDialog, useStudentEditDialog } from "./student-edit-dialog";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { StudentAddDialog, StudentAddDialogMode, useStudentAddDialogState } from "./student-add-dialog";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Input } from "@/components/ui/input";
+import { StudentAddDialog, useStudentAddDialogState } from "./student-add-dialog";
+import { Student as DialogStudent, StudentBatchEditDialog, StudentEditDialog, StudentWithoutIdAndName, useEditDialogState, useStudentBatchEditDialog, useStudentEditDialog } from "./student-edit-dialog";
+import { Student } from "@/lib/api/type";
 
 // TODO: deal with this later
 // import '@ant-design/v5-patch-for-react-19';
 
-interface StudentTableProps {
-  classId: number;
-}
 
-function createColumnDefs(editDialog: ReturnType<typeof useEditDialogState<Student, StudentWithoutIdAndName>>) {
-  const columns: TableColumnsType<StudentInfo> = [
+function createColumnDefs(editDialog: ReturnType<typeof useEditDialogState<DialogStudent, StudentWithoutIdAndName>>) {
+  const columns: TableColumnsType<Student> = [
     {
       key: "image",
       render(_, record) {
         return (
           <Avatar className="size-9">
-            <AvatarImage src={record.picture} />
+            <AvatarImage src={record.imageUrl} />
             <AvatarFallback>
               <User className="size-5" />
             </AvatarFallback>
@@ -73,13 +70,13 @@ function createColumnDefs(editDialog: ReturnType<typeof useEditDialogState<Stude
       key: "actions",
       render: (_, record) => {
         function launch() {
-          const { studentId, group, name, withdrawal, section } = record;
+          const { studentId, group, name, section, withdrawed } = record;
           editDialog.launch(studentId, {
             group,
             name,
             section,
             studentId,
-            withdrawed: withdrawal
+            withdrawed
           });
         }
 
@@ -95,11 +92,15 @@ function createColumnDefs(editDialog: ReturnType<typeof useEditDialogState<Stude
   return columns;
 }
 
-function StudentTable({ classId }: StudentTableProps) {
+export interface StudentSectionProps {
+  classId: number;
+}
+
+export function StudentSection({ classId }: StudentSectionProps) {
   const query = useSuspenseQuery({
     queryKey: ["class", classId, "student"],
     // TODO: get student by class
-    queryFn: () => api.student.list()
+    queryFn: () => api.students.listByClass(classId)
   });
 
   const studentAddDialog = useStudentAddDialogState();
@@ -109,7 +110,7 @@ function StudentTable({ classId }: StudentTableProps) {
   const [search, setSearch] = useState("");
 
   // react compiler: still dont do memoization for this
-  const columns: TableColumnsType<StudentInfo> = useMemo(() => createColumnDefs(studentEditDialog), [studentEditDialog]);
+  const columns: TableColumnsType<Student> = useMemo(() => createColumnDefs(studentEditDialog), [studentEditDialog]);
 
   const filteredStudents = useMemo(() => {
     const s = search.toLowerCase();
@@ -124,7 +125,7 @@ function StudentTable({ classId }: StudentTableProps) {
     setSelectedRowKeys(newSelectedRowKeys);
   };
 
-  const rowSelection: TableRowSelection<StudentInfo> = {
+  const rowSelection: TableRowSelection<Student> = {
     selectedRowKeys,
     onChange: onSelectChange,
   };
@@ -144,65 +145,6 @@ function StudentTable({ classId }: StudentTableProps) {
     });
   }
 
-  return (
-    <div className="mt-2 flex flex-col gap-4">
-      <StudentEditDialog state={studentEditDialog.state} />
-      <StudentAddDialog state={studentAddDialog.state} />
-      <StudentBatchEditDialog state={studentBatchEditdialog.state} studentCount={selectedRowKeys.length} />
-
-      <div className="flex justify-between gap-2">
-        <div className="flex gap-2">
-          <Input placeholder="Search" value={search} onInput={e => setSearch((e.target as any).value)} />
-        </div>
-        <div className="flex gap-2">
-          {hasSelected &&
-            <Button onClick={launchBatchEditDialog}>
-              <Edit2 />
-              <span> Edit all </span>
-            </Button>
-          }
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button>
-                <Plus />
-                <span>Add Student</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem onClick={() => studentAddDialog.launch("manual")}>
-                <TableOfContents /> Manual
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => studentAddDialog.launch("file")}>
-                <Upload /> Upload file
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="secondary" size="icon">
-                <Download />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              {/* TODO: icon maybe? */}
-              <DropdownMenuItem>Download Student list</DropdownMenuItem>
-              <DropdownMenuItem>Download Template</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
-
-      <Table
-        columns={columns}
-        rowSelection={rowSelection}
-        dataSource={filteredStudents}
-        rowKey={({ studentId }) => studentId}
-      />
-    </div>
-  );
-}
-
-export function StudentSection() {
 
   return (
     <Collapsible defaultOpen>
@@ -210,13 +152,66 @@ export function StudentSection() {
         <CollapsibleTrigger className="flex gap-3 items-center group">
           <ChevronDown className="group-data-[state=closed]:hidden" />
           <ChevronRight className="group-data-[state=open]:hidden" />
-          <h2 className="text-xl font-medium"> Students (420) </h2>
+          <h2 className="text-xl font-medium"> Students ({query.data.length}) </h2>
         </CollapsibleTrigger>
 
       </div>
       <CollapsibleContent>
         <section className="mt-4">
-          <StudentTable classId={0} />
+          <div className="mt-2 flex flex-col gap-4">
+            <StudentEditDialog state={studentEditDialog.state} />
+            <StudentAddDialog state={studentAddDialog.state} classId={classId} refetch={() => query.refetch()} />
+            <StudentBatchEditDialog state={studentBatchEditdialog.state} studentCount={selectedRowKeys.length} />
+
+            <div className="flex justify-between gap-2">
+              <div className="flex gap-2">
+                <Input placeholder="Search" value={search} onInput={e => setSearch((e.target as any).value)} />
+              </div>
+              <div className="flex gap-2">
+                {hasSelected &&
+                  <Button onClick={launchBatchEditDialog}>
+                    <Edit2 />
+                    <span> Edit all </span>
+                  </Button>
+                }
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button>
+                      <Plus />
+                      <span>Add Student</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={() => studentAddDialog.launch("manual")}>
+                      <TableOfContents /> Manual
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => studentAddDialog.launch("file")}>
+                      <Upload /> Upload file
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="secondary" size="icon">
+                      <Download />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    {/* TODO: icon maybe? */}
+                    <DropdownMenuItem>Download Student list</DropdownMenuItem>
+                    <DropdownMenuItem>Download Template</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </div>
+
+            <Table
+              columns={columns}
+              rowSelection={rowSelection}
+              dataSource={filteredStudents}
+              rowKey={({ studentId }) => studentId}
+            />
+          </div>
         </section>
       </CollapsibleContent>
     </Collapsible>

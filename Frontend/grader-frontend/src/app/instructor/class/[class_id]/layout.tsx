@@ -61,19 +61,17 @@ interface LayoutProps {
 }
 
 async function getClassDetails(classId: number): Promise<ClassData> {
-  // TODO: new api for this
-  const classes = await api.class.listBySemester("2025/1");
-  const target = classes.assistant.find(it => it.classId === classId);
+  const target = await api.classes.getById(classId);
   if (!target) {
     notFound();
   }
   return {
     ...target,
-    id: String(classId),
+    id: classId,
     name: target.courseName,
-    semester: 1,
+    semester: "1", // TODO: stop mock this after we have the api
     year: 2025,
-    headerImageUrl: target.image,
+    headerImageUrl: target.imageUrl,
     courseId: String(target.courseId)
   };
 }

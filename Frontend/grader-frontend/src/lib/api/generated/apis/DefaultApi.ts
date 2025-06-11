@@ -102,6 +102,11 @@ export interface V1SectionClassIdGetRequest {
     classId: number;
 }
 
+export interface V1StudentClassIdGetRequest {
+    classId: number;
+    authentication?: string;
+}
+
 export interface V1StudentDeleteRequest {
     authentication?: string;
     deleteStudent?: DeleteStudent;
@@ -119,6 +124,11 @@ export interface V1StudentPatchRequest {
 export interface V1StudentPostRequest {
     authentication?: string;
     createStudent?: CreateStudent;
+}
+
+export interface V1TAClassIdGetRequest {
+    classId: number;
+    authentication?: string;
 }
 
 export interface V1TADeleteRequest {
@@ -520,6 +530,43 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
+     * list student by class
+     */
+    async v1StudentClassIdGetRaw(requestParameters: V1StudentClassIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Students>> {
+        if (requestParameters['classId'] == null) {
+            throw new runtime.RequiredError(
+                'classId',
+                'Required parameter "classId" was null or undefined when calling v1StudentClassIdGet().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters['authentication'] != null) {
+            headerParameters['Authentication'] = String(requestParameters['authentication']);
+        }
+
+        const response = await this.request({
+            path: `/v1/student/{class_id}`.replace(`{${"class_id"}}`, encodeURIComponent(String(requestParameters['classId']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => StudentsFromJSON(jsonValue));
+    }
+
+    /**
+     * list student by class
+     */
+    async v1StudentClassIdGet(requestParameters: V1StudentClassIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Students> {
+        const response = await this.v1StudentClassIdGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
      * Delete student
      */
     async v1StudentDeleteRaw(requestParameters: V1StudentDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
@@ -645,6 +692,43 @@ export class DefaultApi extends runtime.BaseAPI {
      */
     async v1StudentPost(requestParameters: V1StudentPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
         const response = await this.v1StudentPostRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * list ta and instructor by class
+     */
+    async v1TAClassIdGetRaw(requestParameters: V1TAClassIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Assistant>> {
+        if (requestParameters['classId'] == null) {
+            throw new runtime.RequiredError(
+                'classId',
+                'Required parameter "classId" was null or undefined when calling v1TAClassIdGet().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters['authentication'] != null) {
+            headerParameters['Authentication'] = String(requestParameters['authentication']);
+        }
+
+        const response = await this.request({
+            path: `/v1/TA/{class_id}`.replace(`{${"class_id"}}`, encodeURIComponent(String(requestParameters['classId']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => AssistantFromJSON(jsonValue));
+    }
+
+    /**
+     * list ta and instructor by class
+     */
+    async v1TAClassIdGet(requestParameters: V1TAClassIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Assistant> {
+        const response = await this.v1TAClassIdGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
