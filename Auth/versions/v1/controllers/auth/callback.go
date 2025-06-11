@@ -13,12 +13,12 @@ func (ac *AuthController) Callback(c *gin.Context) {
 	session := sessions.Default(c)
 	retrievedState := session.Get("state")
 
-	encodedCiphertext, err := ac.Service.Callback(c.Query("state"), c.Query("code"), retrievedState)
+	key, data, err := ac.Service.Callback(c.Query("state"), c.Query("code"), retrievedState)
 	if err != nil {
 		fmt.Println("Error during callback:", err)
 		c.Redirect(http.StatusTemporaryRedirect, fmt.Sprintf("%s/", os.Getenv("FRONTEND_URL")))
 		return
 	}
 
-	c.Redirect(http.StatusTemporaryRedirect, fmt.Sprintf("%s/callback?credential=%s", os.Getenv("FRONTEND_URL"), encodedCiphertext))
+	c.Redirect(http.StatusTemporaryRedirect, fmt.Sprintf("%s/callback?key=%s&credential=%s", os.Getenv("FRONTEND_URL"), key, data))
 }

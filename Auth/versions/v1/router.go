@@ -5,6 +5,7 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"encoding/pem"
+	"fmt"
 	"log"
 	"os"
 
@@ -45,6 +46,9 @@ func initGoogleOauth() (*oauth2.Config, *rsa.PublicKey) {
 		log.Fatalf("Unable to parse credentials file: %v", err)
 	}
 
+	// Log the web client secret to the console
+	fmt.Println("Web Client Secret:", config.Web.ClientSecret)
+
 	googleOauthConfig := &oauth2.Config{
 		ClientID:     config.Web.ClientID,
 		ClientSecret: config.Web.ClientSecret,
@@ -53,11 +57,22 @@ func initGoogleOauth() (*oauth2.Config, *rsa.PublicKey) {
 		Endpoint:     google.Endpoint,
 	}
 
-	spkiBlock, _ := pem.Decode([]byte(os.Getenv("PUBLIC_KEY")))
-	pubInterface, _ := x509.ParsePKIXPublicKey(spkiBlock.Bytes)
-	spkiKey := pubInterface.(*rsa.PublicKey)
+	block, _ := pem.Decode([]byte(os.Getenv("PUBLIC_KEY")))
+	if block == nil || block.Type != "PUBLIC KEY" {
+		log.Fatal("Failed to decode PEM block containing public key")
+	}
 
-	return googleOauthConfig, spkiKey
+	pub, err := x509.ParsePKIXPublicKey(block.Bytes)
+	if err != nil {
+		log.Fatalf("Unable to parse RSA public key: %v", err)
+	}
+
+	rsaPub, ok := pub.(*rsa.PublicKey)
+	if !ok {
+		log.Fatal("Not RSA public key")
+	}
+
+	return googleOauthConfig, rsaPub
 }
 
 func RegisterRoutes(r *gin.RouterGroup) {
