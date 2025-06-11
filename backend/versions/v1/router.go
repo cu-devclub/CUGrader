@@ -68,7 +68,7 @@ func RegisterRoutes(r *gin.RouterGroup) {
 
 	is_dev := os.Getenv("SERVICE_ENV") == "development"
 
-	utilsModel := &utilsModel.UtilsModel{DB: db}
+	utilsModel := &utilsModel.UtilsModel{DB: db, JWT_KEY: jwt_key}
 
 	classModel := &classModel.ClassModel{DB: db}
 	classService := &classService.ClassService{Model: classModel, Utils: utilsModel}
