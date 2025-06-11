@@ -65,12 +65,14 @@ export default function Layout({
   const prefix = `/instructor/class/${class_id}/`;
   const scrollPosition = useScrollPosition();
   const isAtTop = scrollPosition <= 54;
+  
+  const classId = parseInt(class_id);
 
   const { data: classData } = useSuspenseQuery({
-    queryKey: ["class", class_id],
+    queryKey: ["class", classId],
     queryFn: async () => {
+      console.log("revalidate");
       try {
-        const classId = parseInt(class_id);
         return await getClassDetails(classId);
       } catch (err) {
         console.error(err);
@@ -85,8 +87,7 @@ export default function Layout({
         <div className="bg-blue-500 absolute inset-0">
           some bg
         </div>
-        {/* TODO: replace this with real image */}
-        <img src="https://picsum.photos/1920/1280" alt="" className="absolute inset-0 object-cover h-full w-full" />
+        <img src={classData.headerImageUrl} alt="Class header image" className="absolute inset-0 object-cover h-full w-full" />
         <div className="absolute flex h-full items-center">
           <div className="bg-background p-8 py-5 pr-16 rounded-r-3xl leading-5">
             <h1 className="text-2xl font-medium"> {classData?.name} ({classData?.year}/{classData?.semester}) </h1>

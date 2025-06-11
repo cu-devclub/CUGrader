@@ -1,7 +1,8 @@
-import { use } from "react";
+'use client';
+
+import { useClassData } from "../../class-data-context";
 import { InstructorAndTASection } from "../../instructor-section";
 import { StudentSection } from "./student-section";
-import { useClassData } from "../../class-data-context";
 
 
 export default function Page() {

@@ -3,18 +3,16 @@
 import { ClassCard } from "@/components/class-card";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { ImageUploadPreview } from "@/components/ui/image-upload-preview";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { api } from "@/lib/api";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { RotateCcw, Save, X } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { RotateCcw, Save } from "lucide-react";
+import { useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 import { useClassData } from "../../class-data-context";
-import { useMemo, useRef } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { api } from "@/lib/api";
-import { toast } from "sonner";
 
 // TODO: really thing about number and string
 const settingsSchema = z.object({
@@ -53,11 +51,11 @@ export function SettingsForm() {
         image: value.image
       });
     },
-    onSuccess: () => {
-      toast.success("Updated");
-      queryClient.invalidateQueries({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
         queryKey: ["class", classData.id]
       });
+      toast.success("Saved");
     },
     onError: (error) => {
       console.error(error);
@@ -69,7 +67,7 @@ export function SettingsForm() {
   });
 
   const formValues = form.watch();
-  const selectedImageFileUrl = useMemo(() => formValues.image ? URL.createObjectURL(formValues.image) : undefined, [formValues.image]);
+  const selectedImageFileUrl = useMemo(() => formValues.image ? URL.createObjectURL(formValues.image) : classData.headerImageUrl, [formValues.image]);
 
   function onSubmit(value: z.infer<typeof settingsSchema>) {
     // TODO: tanstack

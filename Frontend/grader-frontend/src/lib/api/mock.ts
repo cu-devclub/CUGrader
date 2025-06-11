@@ -192,12 +192,16 @@ function createClient(): APIClient {
         });
       },
       async getById(classId) {
-        return getClassById(classId);
+        const c = getClassById(classId);
+        return {
+          ...c,
+          imageUrl: getImageUrl(c.imageFileId)
+        };
       },
       async listParticipatingBySemester(semester) {
         return {
-          assisting: classes.filter(it => it.semester === semester),
-          studying: classes.filter(it => it.semester === semester)
+          assisting: classes.filter(it => it.semester === semester).map(it => ({ ...it, imageUrl: getImageUrl(it.imageFileId) })),
+          studying: classes.filter(it => it.semester === semester).map(it => ({ ...it, imageUrl: getImageUrl(it.imageFileId) }))
         };
       },
       async update(classId, payload) {
