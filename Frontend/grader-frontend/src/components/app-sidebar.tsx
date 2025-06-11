@@ -33,9 +33,9 @@ export function AppSidebar() {
     return (
         <Sidebar collapsible="icon">
             <SidebarHeader className="border-b p-4">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 group-data-[collapsible=icon]:justify-center">
                     <h2 className="text-lg font-bold group-data-[collapsible=icon]:hidden">GraderV.2</h2>
-                    <SidebarTrigger className="ml-auto" />
+                    <SidebarTrigger className="ml-auto group-data-[collapsible=icon]:ml-0" />
                 </div>
             </SidebarHeader>
 
