@@ -24,7 +24,7 @@ export function LoginForm({
                 </p>
               </div>
               {process.env.NEXT_PUBLIC_AUTH_API_URL ? (
-                <Link href={process.env.NEXT_PUBLIC_AUTH_API_URL}>
+                <Link href={`${process.env.NEXT_PUBLIC_AUTH_API_URL}/login`}>
                   <Button className="w-full">
                     Login
                   </Button>
