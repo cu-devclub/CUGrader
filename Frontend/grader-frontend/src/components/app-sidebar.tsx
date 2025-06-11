@@ -30,7 +30,7 @@ export function AppSidebar() {
         //localStorage.removeItem('user_data')
 
         // Redirect to login page
-        window.location.href = '/'
+        window.location.href = '/login'
     }
 
     // Fetch semester list and classes data
