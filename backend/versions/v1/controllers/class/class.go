@@ -17,7 +17,7 @@ type ClassController struct {
 func (cc *ClassController) CreateClassHandler(c *gin.Context) {
 	authHeader := c.GetHeader("Authentication")
 	if !strings.HasPrefix(authHeader, "Bearer ") || len(authHeader) <= 7 {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
 		return
 	}
 	// You may want to validate the token here
@@ -27,19 +27,19 @@ func (cc *ClassController) CreateClassHandler(c *gin.Context) {
 	semesterStr := c.PostForm("semester")
 
 	if courseIDStr == "" || name == "" || semesterStr == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing required fields"})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Missing required fields"})
 		return
 	}
 
 	courseID, err := strconv.Atoi(courseIDStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid course_id"})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid course_id"})
 		return
 	}
 
 	semester, err := strconv.Atoi(semesterStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid semester"})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid semester"})
 		return
 	}
 
@@ -63,7 +63,7 @@ func (cc *ClassController) CreateClassHandler(c *gin.Context) {
 
 	classID, err := cc.Service.CreateClass(courseID, name, semester, 0, pictureID, creatorUserID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 
