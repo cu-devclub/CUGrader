@@ -63,7 +63,7 @@ function InviteForm({ onAdd, title }: InviteFormProps) {
                 </FormItem>
               )}
             />
-            <Button type="submit">
+            <Button type="submit" variant="outline" className="text-primary hover:text-primary border-2 border-primary">
               Add
             </Button>
           </form>
@@ -164,7 +164,6 @@ export interface InstructorAndTASectionProps {
 export function InstructorAndTASection({ classId }: InstructorAndTASectionProps) {
   const query = useSuspenseQuery({
     queryKey: ["class", classId, "instructors-and-tas"],
-    // TODO: get student by class
     queryFn: () => api.instructorsAndTAs.listByClass(classId)
   });
 
