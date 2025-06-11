@@ -1,3 +1,7 @@
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { AppSidebar } from "@/components/app-sidebar"
+
+
 export default function InstructorLayout({
   children,
 }: Readonly<{
@@ -5,7 +9,13 @@ export default function InstructorLayout({
 }>) {
   return (
     <>
-      {children}
+      <SidebarProvider>
+        <AppSidebar />
+        <main>
+          <SidebarTrigger />
+          {children}
+        </main>
+      </SidebarProvider>
     </>
   );
 }

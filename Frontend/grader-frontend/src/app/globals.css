@@ -122,12 +122,24 @@
   }
 
 }
-.login-bg
-{
+
+.login-bg {
   background-image: linear-gradient(to right top, #db5f8e, #df8cbc, #e1b5dd, #e9dcf3, #ffffff);
 }
 
-.login-bg-2
-{
+.login-bg-2 {
   background-image: linear-gradient(to right top, #db5f8e, #e3749d, #ea88ac, #f19cbb, #f7afca, #f4bdde, #f0caee, #edd8fb, #dde5ff, #d3f0ff, #d4f9ff, #dffffd);
+}
+
+@layer base {
+  :root {
+    --sidebar: oklch(0.985 0 0);
+    --sidebar-foreground: oklch(0.145 0 0);
+    --sidebar-primary: oklch(0.205 0 0);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.97 0 0);
+    --sidebar-accent-foreground: oklch(0.205 0 0);
+    --sidebar-border: oklch(0.922 0 0);
+    --sidebar-ring: oklch(0.708 0 0);
+  }
 }
