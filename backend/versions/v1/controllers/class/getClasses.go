@@ -11,7 +11,7 @@ import (
 func (cc *ClassController) GetClassByYearSemesterHandler(c *gin.Context) {
 	authHeader := c.GetHeader("Authentication")
 	if !strings.HasPrefix(authHeader, "Bearer ") || len(authHeader) <= 7 {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
 		return
 	}
 
@@ -36,10 +36,6 @@ func (cc *ClassController) GetClassByYearSemesterHandler(c *gin.Context) {
 	classes, err := cc.Service.GetClassByYearSemester(year, semester)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to retrieve classes"})
-		return
-	}
-	if len(classes) == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"message": "No classes found for the specified year and semester"})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"classes": classes})
