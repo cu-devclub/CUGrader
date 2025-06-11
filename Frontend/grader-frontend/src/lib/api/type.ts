@@ -1,4 +1,4 @@
-export type Semester = `${number}/${number}`;
+export type Semester = `${number}/${string}`;
 
 export interface Class {
   classId: number, // map to class_id
@@ -68,7 +68,7 @@ export interface UpdateStudentRequest {
 }
 
 export interface CreateClassRequest {
-  courseId: number;
+  courseId: string;
   name: string;
   semester: Semester;
   image?: File;

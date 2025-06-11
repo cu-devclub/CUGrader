@@ -7,7 +7,7 @@ export interface ClassData {
   name: string;
   courseId: string;
   year: number;
-  semester: number;
+  semester: string;
   headerImageUrl?: string;
 }
 

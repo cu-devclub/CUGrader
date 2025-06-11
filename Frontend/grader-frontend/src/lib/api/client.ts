@@ -91,7 +91,7 @@ export function createClient(): APIClient {
       },
       create: async ({ courseId, name, semester, image, students }) => {
         await generatedClient.v1ClassPost({
-          courseId,
+          courseId: parseInt(courseId),
           name,
           semester,
           image,
@@ -101,7 +101,7 @@ export function createClient(): APIClient {
       update: async (classId, { courseId, image, name, semester, students }) => {
         await generatedClient.v1ClassPatch({
           classId,
-          courseId,
+          courseId: courseId ? parseInt(courseId) : undefined,
           image,
           name,
           semester,

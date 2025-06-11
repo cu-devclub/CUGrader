@@ -18,10 +18,10 @@ import { toast } from "sonner";
 
 // TODO: really thing about number and string
 const settingsSchema = z.object({
-  courseId: z.coerce.number(),
+  courseId: z.string().min(1),
   year: z.coerce.number(),
-  semester: z.coerce.number(), // idk tho summer?
-  name: z.string(),
+  semester: z.string().min(1),
+  name: z.string().min(1),
   image: z.instanceof(File).optional()
 });
 
@@ -38,7 +38,7 @@ export function SettingsForm({ classId }: SettingsFormProps) {
     resolver: zodResolver(settingsSchema),
     defaultValues: {
       name: classData.name,
-      courseId: parseInt(classData.courseId),
+      courseId: classData.courseId,
       year: classData.year,
       semester: classData.semester,
       image: undefined, // TODO: get current image

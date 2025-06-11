@@ -62,13 +62,13 @@ function createClient(): APIClient {
 
   async function init() {
     await client.classes.create({
-      courseId: 1,
+      courseId: "1",
       name: "Programming",
       semester: "2025/1",
     });
 
     await client.classes.create({
-      courseId: 758,
+      courseId: "758",
       name: "sone",
       semester: "2024/2",
     });
