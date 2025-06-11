@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api } from "@/lib/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { Cross, FileSpreadsheet, Paperclip, Plus, TableOfContents, Trash2, Upload, X } from "lucide-react";
+import { FileSpreadsheet, Paperclip, TableOfContents, Trash2, Upload } from "lucide-react";
 import { startTransition, useEffect, useMemo, useRef, useState } from "react";
 import { FileWithPath, useDropzone } from 'react-dropzone';
 import { useFieldArray, useForm } from "react-hook-form";
@@ -47,10 +47,19 @@ export interface StudentAddDialogProps {
   refetch: () => any; // TODO: move this to dialog state
 }
 
+const numericString = z.string().min(1).refine(value => {
+  try {
+    parseInt(value);
+  } catch {
+    return false;
+  }
+  return true;
+}, { message: "Invalid format" });
+
 const student = z.object({
-  id: z.coerce.number(),
-  section: z.coerce.number(),
-  group: z.string()
+  id: numericString,
+  section: numericString,
+  group: z.string().min(1)
 });
 
 const studentFormSchema = z.object({
@@ -70,7 +79,7 @@ function useDropzoneFrFr() {
   const hasFile = files.length > 0;
 
   const removeFiles = useMemo(() => () => {
-    console.log(inputRef.current.value);
+    // console.log(inputRef.current.value);
     setFiles([]);
     inputRef.current.value = ""; // bruh
   }, [inputRef]);
@@ -108,12 +117,12 @@ export function StudentAddDialog({ state: { mode, setMode, open, setOpen }, clas
   // TODO: refactor: merge these two 
   const addStudentsMutation = useMutation({
     mutationFn: async (value: z.infer<typeof studentFormSchema>) => {
-      console.log(value.students);
+      // console.log(value.students);
       for (const { group, id, section } of value.students) {
         // TODO: add many
         await api.students.addToClass(classId, {
           email: id + "@student.chula.ac.th", // TODO: email id 
-          section,
+          section: parseInt(section),
           group
         });
       }
@@ -132,7 +141,13 @@ export function StudentAddDialog({ state: { mode, setMode, open, setOpen }, clas
   const form = useForm({
     resolver: zodResolver(studentFormSchema),
     defaultValues: {
-      students: [{}]
+      students: [
+        {
+          id: "",
+          group: "",
+          section: "",
+        }
+      ]
     }
   });
   const { fields, append, remove, insert } = useFieldArray({
@@ -141,15 +156,20 @@ export function StudentAddDialog({ state: { mode, setMode, open, setOpen }, clas
   });
   const addRow = useMemo(() => () => {
     append({
-      id: 1,
+      id: "",
       group: "",
-      section: 1,
+      section: "",
     });
   }, []);
 
+  useEffect(() => {
+    if (open === true) {
+      form.reset();
+    }
+  }, [open]);
+
   // TODO: tanstack query this
   const onAdd = async () => {
-    console.log(mode);
     if (mode === "file") {
       uploadFileMutation.mutate();
     } else {
@@ -158,7 +178,6 @@ export function StudentAddDialog({ state: { mode, setMode, open, setOpen }, clas
   };
 
   function onSubmit(value: z.infer<typeof studentFormSchema>) {
-    console.log("sndfyujk", value.students);
     addStudentsMutation.mutate(value);
   }
 
@@ -186,57 +205,61 @@ export function StudentAddDialog({ state: { mode, setMode, open, setOpen }, clas
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="manual" className="px-6 py-6 space-y-4 overflow-auto">
+            {/* TODO: rewrite validation */}
+            <TabsContent value="manual" className="px-6 py-6 overflow-auto space-y-4">
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} ref={formRef}>
+                <form onSubmit={form.handleSubmit(onSubmit)} ref={formRef} className="space-y-4">
                   {fields.map((field, index) => (
-                    <div key={field.id} className="flex gap-2 group">
-                      <FormField
-                        control={form.control}
-                        name={`students.${index}.id`}
-                        render={({ field }) => (
-                          <FormItem className="flex-1">
-                            {/* bruh */}
-                            <FormLabel className="group-[:not(:first-child)]:hidden">Student ID</FormLabel>
-                            <FormControl>
-                              {/* TODO: design for small screen */}
-                              {/* TODO: update placeholder */}
-                              <Input className="w-full" placeholder="6812345678" pattern="^[0-9]\d*$" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name={`students.${index}.section`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="group-[:not(:first-child)]:hidden">Section</FormLabel>
-                            <FormControl>
-                              <Input className="w-24" type="number" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                    <div key={field.id} className="group">
+                      <div className="flex gap-2 items-start">
+                        <FormField
+                          control={form.control}
+                          name={`students.${index}.id`}
+                          render={({ field }) => (
+                            <FormItem className="flex-1">
+                              {/* bruh */}
+                              <FormLabel className="group-[:not(:first-child)]:hidden">Student ID</FormLabel>
+                              <FormControl>
+                                {/* TODO: design for small screen */}
+                                {/* TODO: update placeholder */}
+                                <Input className="w-full" placeholder="6812345678" pattern="^[0-9]\d*$" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name={`students.${index}.section`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="group-[:not(:first-child)]:hidden">Section</FormLabel>
+                              <FormControl>
+                                <Input className="w-24" type="number" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
 
-                      <FormField
-                        control={form.control}
-                        name={`students.${index}.group`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="group-[:not(:first-child)]:hidden">Group</FormLabel>
-                            <FormControl>
-                              <Input className="w-24" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <Button variant="ghost" size="icon" className="group-[:first-child]:mt-6 transition-none" onClick={() => remove(index)}>
-                        <Trash2 className="text-destructive" />
-                      </Button>
+                        <FormField
+                          control={form.control}
+                          name={`students.${index}.group`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="group-[:not(:first-child)]:hidden">Group</FormLabel>
+                              <FormControl>
+                                <Input className="w-24" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <Button variant="ghost" size="icon" className="group-[:first-child]:mt-6 transition-none" onClick={() => remove(index)}>
+                          <Trash2 className="text-destructive" />
+                        </Button>
+                      </div>
+                      {/* {JSON.stringify(form.formState.errors.students)} */}
                     </div>
                   ))}
                 </form>
