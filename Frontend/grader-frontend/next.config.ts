@@ -17,9 +17,6 @@ const nextConfig: NextConfig = {
   ],
   experimental: {
     optimizePackageImports: ['antd'],
-    reactCompiler: {
-      compilationMode: 'annotation',
-    },
   }
 };
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');

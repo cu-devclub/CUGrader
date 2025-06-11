@@ -17,7 +17,7 @@ export default function InstructorPage() {
 
   const [selectedSemester, setSelectedSemester] = useState(semesterList[0]);
 
-  const { data: classes, isLoading } = useSuspenseQuery({
+  const { data: classes } = useSuspenseQuery({
     queryKey: ["class", selectedSemester],
     queryFn: () => api.classes.listParticipatingBySemester(selectedSemester),
   });

@@ -65,13 +65,12 @@ export default function Layout({
   const prefix = `/instructor/class/${class_id}/`;
   const scrollPosition = useScrollPosition();
   const isAtTop = scrollPosition <= 54;
-  
+
   const classId = parseInt(class_id);
 
   const { data: classData } = useSuspenseQuery({
     queryKey: ["class", classId],
     queryFn: async () => {
-      console.log("revalidate");
       try {
         return await getClassDetails(classId);
       } catch (err) {
@@ -85,7 +84,7 @@ export default function Layout({
     <div>
       <div className="h-60 relative">
         <div className="bg-blue-500 absolute inset-0">
-          some bg
+          {classData.headerImageUrl}
         </div>
         <img src={classData.headerImageUrl} alt="Class header image" className="absolute inset-0 object-cover h-full w-full" />
         <div className="absolute flex h-full items-center">
