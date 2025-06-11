@@ -19,9 +19,12 @@ import { Button } from "@/components/ui/button"
 
 export function AppSidebar() {
     const handleSignOut = () => {
+        // TODO : When the backend is ready, make an API call to sign out + handle middleware for auth
+        // For now, just clear local storage and redirect to login page
+
         // Clear auth token and user data
-        localStorage.removeItem('auth_token')
-        localStorage.removeItem('user_data')
+        //localStorage.removeItem('auth_token')
+        //localStorage.removeItem('user_data')
 
         // Redirect to login page
         window.location.href = '/'
