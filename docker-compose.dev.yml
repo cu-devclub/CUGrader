@@ -1,6 +1,20 @@
 version: "3.8"
 
 services:
+    authenticator:
+        build:
+            context: ./Auth
+            dockerfile: Dockerfile
+        container_name: authenticator
+        ports:
+            - "6000:6000"
+        environment:
+            - SERVICE_ENV=development
+            - CERT_PATH=/etc/ssl/auth/fullchain.pem
+            - KEY_PATH=/etc/ssl/auth/privkey.pem
+        volumes:
+            - /home/ubuntu/ssl/auth:/etc/ssl/auth:ro
+
     backend:
         build:
             context: ./Backend
@@ -9,7 +23,7 @@ services:
         ports:
             - "5000:5000"
         environment:
-            - NODE_ENV=development
+            - SERVICE_ENV=development
         depends_on:
             - yugabytedb
 

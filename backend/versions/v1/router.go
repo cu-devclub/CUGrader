@@ -2,10 +2,17 @@ package v1
 
 import (
 	classController "CUGrader/backend/versions/v1/controllers/class"
+	userController "CUGrader/backend/versions/v1/controllers/user"
 	classModel "CUGrader/backend/versions/v1/models/class"
+	userModel "CUGrader/backend/versions/v1/models/user"
 	utilsModel "CUGrader/backend/versions/v1/models/utils"
 	classService "CUGrader/backend/versions/v1/services/class"
+	userService "CUGrader/backend/versions/v1/services/user"
+	"crypto/rsa"
+	"crypto/x509"
 	"database/sql"
+	"encoding/pem"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -16,6 +23,8 @@ import (
 )
 
 var db *sql.DB
+var privKey *rsa.PrivateKey
+var jwt_key []byte
 
 func initDB() *sql.DB {
 	connStr := fmt.Sprintf(
@@ -34,14 +43,42 @@ func initDB() *sql.DB {
 	return database
 }
 
+func loadPrivateKeyFromEnv() (*rsa.PrivateKey, error) {
+	privKeyPEM := os.Getenv("PRIVATE_KEY")
+	block, _ := pem.Decode([]byte(privKeyPEM))
+	if block == nil {
+		return nil, errors.New("failed to parse PEM block containing the private key")
+	}
+	privKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+	if err != nil {
+		return nil, err
+	}
+	return privKey, nil
+}
+
 func RegisterRoutes(r *gin.RouterGroup) {
 	db = initDB()
+	var err error
+	privKey, err = loadPrivateKeyFromEnv()
+	if err != nil {
+		log.Fatalf("Failed to load private key: %v", err)
+	}
 
-	utilsModel := &utilsModel.UtilsModel{DB: db}
+	jwt_key = []byte(os.Getenv("JWT_KEY"))
+
+	is_dev := os.Getenv("SERVICE_ENV") == "development"
+
+	utilsModel := &utilsModel.UtilsModel{DB: db, JWT_KEY: jwt_key}
 
 	classModel := &classModel.ClassModel{DB: db}
 	classService := &classService.ClassService{Model: classModel, Utils: utilsModel}
 	classController := &classController.ClassController{Service: classService}
 
+	userModel := &userModel.UserModel{DB: db}
+	userService := &userService.UserService{Model: userModel, PrivKey: privKey, IsDev: is_dev, JWT_Key: jwt_key}
+	userController := &userController.UserController{Service: userService, IsDev: is_dev}
+
 	r.POST("/class", classController.CreateClassHandler)
+
+	r.POST("/callback", userController.Callback)
 }
