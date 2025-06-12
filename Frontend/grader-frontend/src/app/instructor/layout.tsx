@@ -9,7 +9,7 @@ export default function InstructorLayout({
 }>) {
   return (
     <>
-      <SidebarProvider>
+      <SidebarProvider defaultOpen={false}>
         <AppSidebar />
         <main className="flex-1 overflow-auto">
           {children}
