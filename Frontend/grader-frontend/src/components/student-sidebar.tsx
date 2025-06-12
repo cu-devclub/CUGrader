@@ -95,7 +95,7 @@ export function StudentSidebar() {
                                 classes.assisting.map((classItem) => (
                                     <SidebarMenuItem key={classItem.classId}>
                                         <SidebarMenuButton asChild tooltip={classItem.courseName}>
-                                            <Link href={`/student/ta/class/${classItem.classId}/people`}>
+                                            <Link href={`/student/ta/${classItem.courseId}/${selectedSemester.replace("/", "-")}/people`}>
                                                 <BookMarked className="h-4 w-4" />
                                                 <span className="truncate">{classItem.courseName}</span>
                                             </Link>
@@ -125,7 +125,7 @@ export function StudentSidebar() {
                                 classes.studying.map((classItem) => (
                                     <SidebarMenuItem key={classItem.classId}>
                                         <SidebarMenuButton asChild tooltip={classItem.courseName}>
-                                            <Link href={`/student/class/${classItem.classId}/assignments`}>
+                                            <Link href={`/student/${classItem.courseId}/${selectedSemester.replace("/", "-")}/1/assignment`}>
                                                 <BookOpen className="h-4 w-4" />
                                                 <span className="truncate">{classItem.courseName}</span>
                                             </Link>
