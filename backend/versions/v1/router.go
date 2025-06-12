@@ -1,10 +1,17 @@
 package v1
 
 import (
+	assistantController "CUGrader/backend/versions/v1/controllers/assistant"
 	classController "CUGrader/backend/versions/v1/controllers/class"
+	studentController "CUGrader/backend/versions/v1/controllers/student"
+	assistantModel "CUGrader/backend/versions/v1/models/assistant"
 	classModel "CUGrader/backend/versions/v1/models/class"
+	studentModel "CUGrader/backend/versions/v1/models/student"
 	utilsModel "CUGrader/backend/versions/v1/models/utils"
+	assistantService "CUGrader/backend/versions/v1/services/assistant"
 	classService "CUGrader/backend/versions/v1/services/class"
+	studentService "CUGrader/backend/versions/v1/services/student"
+
 	"database/sql"
 	"fmt"
 	"log"
@@ -43,5 +50,23 @@ func RegisterRoutes(r *gin.RouterGroup) {
 	classService := &classService.ClassService{Model: classModel, Utils: utilsModel}
 	classController := &classController.ClassController{Service: classService}
 
+	assistantModel := &assistantModel.AssistantModel{DB: db}
+	assistantService := &assistantService.AssistantService{Model: assistantModel, Utils: utilsModel}
+	assistantController := &assistantController.AssistantController{Service: assistantService}
+
+	studentModel := &studentModel.StudentModel{DB: db}
+	studentService := &studentService.StudentService{Model: studentModel, Utils: utilsModel}
+	studentController := &studentController.StudentController{Service: studentService}
+
 	r.POST("/class", classController.CreateClassHandler)
+	r.PATCH("/class", classController.EditClassHandler)
+
+	r.POST("/assistant", assistantController.InsertAssistantHandler)
+	r.DELETE("/assistant", assistantController.RemoveAssistantHandler)
+	r.GET("/assistant", assistantController.GetAssistantListHandler)
+
+	r.POST("/student", studentController.AddStudentHandler)
+	r.DELETE("/student", studentController.DeleteStudentHandler)
+	r.PATCH("/student", studentController.PatchStudentHandler)
+	r.GET("/student", studentController.GetStudentsHandler)
 }
