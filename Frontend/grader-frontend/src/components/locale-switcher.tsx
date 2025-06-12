@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { useLocale } from "next-intl"
-import { Languages } from "lucide-react"
+import { Globe } from "lucide-react"
 
 interface LocaleSwitcherProps {
     variant?: 'default' | 'sidebar'
@@ -29,9 +29,12 @@ export function LocaleSwitcher({ variant = 'default' }: LocaleSwitcherProps) {
                 className="w-full justify-center"
                 title={`Switch to ${locale === 'en' ? 'Thai' : 'English'}`}
             >
-                <Languages className="h-4 w-4 mr-2 group-data-[collapsible=icon]:mr-0" />
+                <Globe className="h-4 w-4 mr-2 group-data-[collapsible=icon]:hidden" />
                 <span className="group-data-[collapsible=icon]:hidden">
                     {locale === 'en' ? 'ไทย' : 'EN'}
+                </span>
+                <span className="hidden group-data-[collapsible=icon]:inline-block text-xs font-medium">
+                    {locale === 'en' ? 'EN' : 'TH'}
                 </span>
             </Button>
         )
@@ -44,7 +47,7 @@ export function LocaleSwitcher({ variant = 'default' }: LocaleSwitcherProps) {
             onClick={toggleLocale}
             className="flex items-center gap-2"
         >
-            <Languages className="h-4 w-4" />
+            <Globe className="h-4 w-4" />
             {locale === 'en' ? 'ไทย' : 'EN'}
         </Button>
     )
