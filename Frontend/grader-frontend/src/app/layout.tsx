@@ -4,7 +4,6 @@ import { Geist, Geist_Mono, Rubik } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
 import { Toaster } from "@/components/ui/sonner";
-
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
 
@@ -43,13 +42,13 @@ export default async function RootLayout({
       <body
         className={`${geistMono.variable} ${rubik.variable} antialiased font-sans text-foreground`}
       >
-
         <Providers>
           <AntdRegistry>
             <NextIntlClientProvider locale={locale} messages={messages}>
               {children}
             </NextIntlClientProvider>
           </AntdRegistry>
+          <AntdRegistry>{children}</AntdRegistry>
         </Providers>
         <Toaster />
       </body>
