@@ -1,13 +1,12 @@
 package main
 
 import (
+	v1 "CUGrader/backend/versions/v1"
 	"log"
 	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-
-	v1 "CUGrader/backend/versions/v1"
 )
 
 func main() {
