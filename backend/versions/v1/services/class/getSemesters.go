@@ -14,7 +14,7 @@ func formatSemesters(semesters []classModel.SemesterModel) ([]string, error) {
 }
 
 func (s *ClassService) GetSemester(userId int) ([]string, error) {
-	semesters, err := s.Model.GetSemstersByUserId(userId)
+	semesters, err := s.Model.GetSemstersForUser(userId)
 	if err != nil {
 		return nil, err
 	}
