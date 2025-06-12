@@ -118,14 +118,16 @@ func (us *UserService) Callback(key string, credential string) (string, int, err
 	} else if strings.HasSuffix(email, "@chula.ac.th") {
 		role = "teacher"
 	}
-	claims := jwt.MapClaims{
-		"firstname": firstname,
-		"lastname":  lastname,
-		"email":     email,
-		"user_id":   userID,
-		"profile":   picture,
-		"role":      role,
-		"exp":       time.Now().Add(24 * time.Hour).Unix(),
+	claims := JWTCustomClaims{
+		FirstName: firstname,
+		LastName:  lastname,
+		Email:     email,
+		UserID:    userID,
+		Profile:   picture,
+		Role:      role,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(us.JWT_Key)
