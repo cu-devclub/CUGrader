@@ -19,5 +19,5 @@ type ClassObjectModel struct {
 	ClassID    int    `json:"class_id"`
 	CourseID   int    `json:"course_id"`
 	CourseName string `json:"course_name"`
-	Image      string `json:"image"`
+	Image      int    `json:"picture_id"`
 }
