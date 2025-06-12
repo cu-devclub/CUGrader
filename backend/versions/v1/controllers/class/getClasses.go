@@ -10,12 +10,13 @@ import (
 
 func (cc *ClassController) GetClassByYearSemesterHandler(c *gin.Context) {
 	authHeader := c.GetHeader("Authentication")
-	if !strings.HasPrefix(authHeader, "Bearer ") || len(authHeader) <= 7 {
+
+	claims, err := cc.Service.Utils.GetJWTClaims(authHeader)
+
+	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
 		return
 	}
-
-	// TODO: Validate the token
 
 	yearSemester := c.Param("yearSemester")
 	yearSemesterParts := strings.Split(yearSemester, "-")
@@ -33,10 +34,26 @@ func (cc *ClassController) GetClassByYearSemesterHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid semester format"})
 		return
 	}
-	classes, err := cc.Service.GetClassByYearSemester(year, semester)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to retrieve classes"})
+
+	if claims.Role == "student" || claims.Role == "teacher" {
+		classes, err := cc.Service.GetClassesByYearSemesterForUser(year, semester, claims.UserID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to retrieve classes"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"classes": classes})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"classes": classes})
+
+	if claims.Role == "admin" {
+		classes, err := cc.Service.Model.GetAllClasses()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to retrieve classes"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"classes": classes})
+		return
+	}
+
+	c.JSON(http.StatusForbidden, gin.H{"message": "Forbidden: You do not have permission to access this resource"})
 }
