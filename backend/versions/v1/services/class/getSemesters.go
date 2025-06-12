@@ -13,7 +13,7 @@ func formatSemesters(semesters []classModel.SemesterModel) ([]string, error) {
 	return result, nil
 }
 
-func (s *ClassService) GetSemester(userId int) ([]string, error) {
+func (s *ClassService) GetSemestersForUser(userId int) ([]string, error) {
 	semesters, err := s.Model.GetSemstersForUser(userId)
 	if err != nil {
 		return nil, err
