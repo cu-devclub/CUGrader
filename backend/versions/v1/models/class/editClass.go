@@ -20,8 +20,8 @@ func (m *ClassModel) Edit(id int, updates map[string]interface{}) error {
 
 	args = append(args, id)
 
-	query := fmt.Sprintf("UPDATE classes SET %s WHERE id = ?", strings.Join(setClauses, ", "))
-
+	query := fmt.Sprintf("UPDATE class SET %s WHERE id = ?;", strings.Join(setClauses, ", "))
+	fmt.Println("Executing query:", query, "with args:", args)
 	_, err := m.DB.Exec(query, args...)
 	return err
 }
