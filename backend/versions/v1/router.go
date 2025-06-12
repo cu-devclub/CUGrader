@@ -1,12 +1,18 @@
 package v1
 
 import (
+	assistantController "CUGrader/backend/versions/v1/controllers/assistant"
 	classController "CUGrader/backend/versions/v1/controllers/class"
+	studentController "CUGrader/backend/versions/v1/controllers/student"
 	userController "CUGrader/backend/versions/v1/controllers/user"
+	assistantModel "CUGrader/backend/versions/v1/models/assistant"
 	classModel "CUGrader/backend/versions/v1/models/class"
+	studentModel "CUGrader/backend/versions/v1/models/student"
 	userModel "CUGrader/backend/versions/v1/models/user"
 	utilsModel "CUGrader/backend/versions/v1/models/utils"
+	assistantService "CUGrader/backend/versions/v1/services/assistant"
 	classService "CUGrader/backend/versions/v1/services/class"
+	studentService "CUGrader/backend/versions/v1/services/student"
 	userService "CUGrader/backend/versions/v1/services/user"
 	"crypto/rsa"
 	"crypto/x509"
@@ -78,7 +84,26 @@ func RegisterRoutes(r *gin.RouterGroup) {
 	userService := &userService.UserService{Model: userModel, PrivKey: privKey, IsDev: is_dev, JWT_Key: jwt_key}
 	userController := &userController.UserController{Service: userService, IsDev: is_dev}
 
-	r.POST("/class", classController.CreateClassHandler)
+	assistantModel := &assistantModel.AssistantModel{DB: db}
+	assistantService := &assistantService.AssistantService{Model: assistantModel, Utils: utilsModel}
+	assistantController := &assistantController.AssistantController{Service: assistantService}
+
+	studentModel := &studentModel.StudentModel{DB: db}
+	studentService := &studentService.StudentService{Model: studentModel, Utils: utilsModel}
+	studentController := &studentController.StudentController{Service: studentService}
 
 	r.POST("/callback", userController.Callback)
+
+	r.POST("/class", classController.CreateClassHandler)
+	r.PATCH("/class", classController.EditClassHandler)
+
+	r.POST("/TA", assistantController.InsertAssistantHandler)
+	r.DELETE("/TA", assistantController.RemoveAssistantHandler)
+	r.GET("/TA", assistantController.GetAssistantListHandler)
+
+	r.POST("/student", studentController.AddStudentHandler)
+	r.DELETE("/student", studentController.DeleteStudentHandler)
+	r.PATCH("/student", studentController.PatchStudentHandler)
+	r.GET("/student", studentController.GetStudentsHandler)
+
 }
