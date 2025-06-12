@@ -16,12 +16,11 @@ func (cc *ClassController) GetSemesterHandler(c *gin.Context) {
 
 	// TODO: Validate the token
 
-	// TODO: Implement this
-	// semesters, err := cc.Service.Model.GetSemstersByUserId()
-	// if err != nil {
-	// 	c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to retrieve semesters"})
-	// 	return
-	// }
-	semesters := []string{"2023-1", "2023-2", "2024-1"} // Example data, replace with actual logic
+	semesters, err := cc.Service.GetAllSemesters()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to retrieve semesters"})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{"semesters": semesters})
 }
