@@ -29,9 +29,9 @@ import ProgressBar from "./progressBar";
 export default function ProflieTab() {
   return (
     <>
-      <div className="w-full h-full mt-4">
+      <div className="w-full h-full mt-5">
         <div className="w-full h-[45%] flex flex-col pl-20 pr-8">
-          <h1 className="px-4 mb-1">Score Summary</h1>
+          <h1 className="px-4 mb-3">Score Summary</h1>
           <div className="h-full w-full flex flex-row">
             <div className="h-full w-1/2 flex flex-col gap-y-3 justify-start item-center">
               <ProgressBar barName="Total" />
@@ -47,8 +47,8 @@ export default function ProflieTab() {
           </div>
         </div>
 
-        <div className="w-full h-1/2 flex flex-col pl-20 pr-8 ">
-          <h1 className="px-4 mb-1">Ranking</h1>
+        <div className="w-full h-1/2 flex flex-col pl-20 pr-8 mt-7">
+          <h1 className="px-4 mb-3">Ranking</h1>
           <div className="h-full w-full flex-row flex justify-center items-center">
             <div className="h-full w-1/3 flex flex-col items-center justify-center gap-y-5">
               <div className="w-1/3 h-15 border border-solid rounded-md flex flex-col justify-center items-center">
