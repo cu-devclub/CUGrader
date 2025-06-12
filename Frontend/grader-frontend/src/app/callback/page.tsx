@@ -8,12 +8,14 @@ export default function Callback() {
     const searchParams = useSearchParams()
     const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
     const [error, setError] = useState<string>('')
+    const [Credential, setCredential] = useState<string>('')
 
     useEffect(() => {
         const handleCallback = async () => {
             try {
                 // Get authorization credential from URL params
                 const credential = searchParams.get('credential')
+                setCredential(credential || '')
 
                 if (!credential) {
                     throw new Error('Authorization credential not found')
@@ -105,6 +107,7 @@ export default function Callback() {
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
                     <h2 className="text-xl font-semibold">Authenticating...</h2>
                     <p className="text-muted-foreground">Please wait while we log you in</p>
+                    <p className="text-sm text-muted-foreground">logging in as {Credential}</p>
                 </div>
             </div>
         )
@@ -117,6 +120,7 @@ export default function Callback() {
                     <div className="text-green-500 text-5xl mb-4">✓</div>
                     <h2 className="text-xl font-semibold text-green-600">Login Successful!</h2>
                     <p className="text-muted-foreground">Redirecting to dashboard...</p>
+                    <p className="text-sm text-muted-foreground">logging in as {Credential}</p>
                 </div>
             </div>
         )
@@ -130,6 +134,7 @@ export default function Callback() {
                     <h2 className="text-xl font-semibold text-red-600">Authentication Failed</h2>
                     <p className="text-muted-foreground mb-4">{error}</p>
                     <p className="text-sm text-muted-foreground">Redirecting to login page...</p>
+                    <p className="text-sm text-muted-foreground mt-2">Attempted logging in as {Credential}</p>
                 </div>
             </div>
         )
