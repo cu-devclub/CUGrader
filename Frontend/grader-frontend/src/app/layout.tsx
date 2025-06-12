@@ -48,7 +48,6 @@ export default async function RootLayout({
               {children}
             </NextIntlClientProvider>
           </AntdRegistry>
-          <AntdRegistry>{children}</AntdRegistry>
         </Providers>
         <Toaster />
       </body>
