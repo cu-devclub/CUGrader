@@ -1,6 +1,6 @@
 package class
 
-func (s *ClassService) GetSections(classId int) ([]int, error) {
+func (s *ClassService) GetAllSections(classId int) ([]int, error) {
 	return s.Model.GetAllSections(classId)
 }
 
