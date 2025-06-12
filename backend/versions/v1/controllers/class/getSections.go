@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (cc *ClassController) GetSections(c *gin.Context) {
+func (cc *ClassController) GetSectionsHandler(c *gin.Context) {
 	authHeader := c.GetHeader("Authentication")
 	if !strings.HasPrefix(authHeader, "Bearer ") || len(authHeader) <= 7 {
 		c.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
