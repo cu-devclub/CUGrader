@@ -1,12 +1,17 @@
 import { getRequestConfig } from 'next-intl/server';
+import { cookies } from 'next/headers';
 
 export default getRequestConfig(async () => {
-    // Provide a static locale, fetch a user setting,
-    // read from `cookies()`, `headers()`, etc.
-    const locale = 'en';
+    // Read locale from cookies, fallback to 'en'
+    const cookieStore = await cookies();
+    const locale = cookieStore.get('locale')?.value || 'en';
+
+    // Ensure locale is supported
+    const supportedLocales = ['en', 'th'];
+    const validLocale = supportedLocales.includes(locale) ? locale : 'en';
 
     return {
-        locale,
-        messages: (await import(`../../messages/${locale}.json`)).default
+        locale: validLocale,
+        messages: (await import(`../../messages/${validLocale}.json`)).default
     };
 });
