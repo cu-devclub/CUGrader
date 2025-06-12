@@ -1,31 +1,14 @@
-# Use Go 1.24.3 as base image for building
-FROM golang:1.24.3 AS builder
+FROM golang:1.21
 
-WORKDIR /app
+WORKDIR /usr/src/app
 
-# Copy Go mod files
 COPY go.mod go.sum ./
+RUN go mod download && go mod verify
 
-# Download dependencies
-RUN go mod download
-
-# Copy rest of the application
 COPY . .
 
-# Build the application
-RUN go build -o main .
+RUN go build -v -o /usr/local/bin/app ./...
 
-# Use a minimal image for the final container
-FROM debian:bookworm-slim
+EXPOSE 5050
 
-WORKDIR /root/
-
-# Copy binary from builder
-COPY --from=builder /app/main .
-COPY --from=builder /app/.env .
-COPY --from=builder /app/client_secrets.json .
-
-# Expose the port (adjust if needed)
-EXPOSE 6000
-
-CMD ["./main"]
+CMD ["app"]
