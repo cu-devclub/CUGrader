@@ -3,7 +3,6 @@ package class
 import (
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 
@@ -16,11 +15,21 @@ type ClassController struct {
 
 func (cc *ClassController) CreateClassHandler(c *gin.Context) {
 	authHeader := c.GetHeader("Authentication")
-	if !strings.HasPrefix(authHeader, "Bearer ") || len(authHeader) <= 7 {
+
+	claims, err := cc.Service.Utils.GetJWTClaims(authHeader)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid or missing authentication token"})
+		return
+	}
+	if claims == nil || claims.UserID == 0 {
 		c.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
 		return
 	}
-	// You may want to validate the token here
+
+	if claims.Role != "admin" && claims.Role != "instructor" {
+		c.JSON(http.StatusForbidden, gin.H{"message": "You do not have permission to create a class"})
+		return
+	}
 
 	courseIDStr := c.PostForm("course_id")
 	name := c.PostForm("name")
@@ -47,6 +56,7 @@ func (cc *ClassController) CreateClassHandler(c *gin.Context) {
 	var pictureID *int
 
 	// imageFile, err := c.FormFile("image")
+	// TODO: file upload handling
 	_, err = c.FormFile("image")
 
 	if err == nil {
@@ -59,7 +69,7 @@ func (cc *ClassController) CreateClassHandler(c *gin.Context) {
 	_, _ = c.FormFile("students") // You can process this as needed
 
 	// Dummy creatorUserID, replace with actual user ID from token
-	creatorUserID := 1
+	creatorUserID := claims.UserID
 
 	classID, err := cc.Service.CreateClass(courseID, name, semester, 0, pictureID, creatorUserID)
 	if err != nil {
