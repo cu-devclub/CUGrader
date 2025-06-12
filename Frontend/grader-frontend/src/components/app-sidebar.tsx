@@ -16,6 +16,7 @@ import {
 import { Home, Bell, LogOut, BookOpen } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { LocaleSwitcher } from "@/components/locale-switcher"
 import { api } from "@/lib/api"
 import { useSuspenseQuery } from "@tanstack/react-query"
 import { useState } from "react"
@@ -99,7 +100,8 @@ export function AppSidebar() {
                 </SidebarGroup>
             </SidebarContent>
 
-            <SidebarFooter className="border-t p-4 flex ">
+            <SidebarFooter className="border-t p-4 space-y-2">
+                <LocaleSwitcher variant="sidebar" />
                 <Button
                     variant="outline"
                     onClick={handleSignOut}

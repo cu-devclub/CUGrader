@@ -4,7 +4,11 @@ import { Button } from "@/components/ui/button"
 import { useLocale } from "next-intl"
 import { Languages } from "lucide-react"
 
-export function LocaleSwitcher() {
+interface LocaleSwitcherProps {
+    variant?: 'default' | 'sidebar'
+}
+
+export function LocaleSwitcher({ variant = 'default' }: LocaleSwitcherProps) {
     const locale = useLocale()
 
     const toggleLocale = () => {
@@ -15,6 +19,22 @@ export function LocaleSwitcher() {
 
         // Force a hard refresh to apply new locale
         window.location.reload()
+    }
+
+    if (variant === 'sidebar') {
+        return (
+            <Button
+                variant="outline"
+                onClick={toggleLocale}
+                className="w-full justify-center"
+                title={`Switch to ${locale === 'en' ? 'Thai' : 'English'}`}
+            >
+                <Languages className="h-4 w-4 mr-2 group-data-[collapsible=icon]:mr-0" />
+                <span className="group-data-[collapsible=icon]:hidden">
+                    {locale === 'en' ? 'ไทย' : 'EN'}
+                </span>
+            </Button>
+        )
     }
 
     return (
