@@ -245,12 +245,12 @@ const persistence = new Persistence<Database>("default", {
   classes: []
 });
 
+const preserveMockState = process.env.NEXT_PUBLIC_MOCK_PRESERVE_STATE === "true";
 export function createMockClient() {
   const client = createClient(persistence);
 
   // to make hydration error less painful
-  if (persistence.fresh || !globalThis.window) {
-    console.log("Reinit");
+  if (persistence.fresh || !globalThis.window || !preserveMockState) {
     init(client);
   }
 
