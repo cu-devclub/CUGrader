@@ -12,6 +12,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
     SidebarTrigger,
+    useSidebar,
 } from "@/components/ui/sidebar"
 import { Home, Bell, LogOut, BookOpen } from "lucide-react"
 import Link from "next/link"
@@ -22,6 +23,8 @@ import { useSuspenseQuery } from "@tanstack/react-query"
 import { useState } from "react"
 
 export function AppSidebar() {
+    const { open, setOpen } = useSidebar()
+
     const handleSignOut = () => {
         // TODO : When the backend is ready, make an API call to sign out + handle middleware for auth
         // For now, just clear local storage and redirect to login page
@@ -85,16 +88,27 @@ export function AppSidebar() {
                     <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden">Classes</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
-                            {classes.assisting.map((classItem) => (
-                                <SidebarMenuItem key={classItem.classId}>
-                                    <SidebarMenuButton asChild tooltip={classItem.courseName}>
-                                        <Link href={`/instructor/class/${classItem.classId}/people`}>
-                                            <BookOpen className="h-4 w-4" />
-                                            <span className="truncate">{classItem.courseName}</span>
-                                        </Link>
+                            {open ? (
+                                classes.assisting.map((classItem) => (
+                                    <SidebarMenuItem key={classItem.classId}>
+                                        <SidebarMenuButton asChild tooltip={classItem.courseName}>
+                                            <Link href={`/instructor/class/${classItem.classId}/people`}>
+                                                <BookOpen className="h-4 w-4" />
+                                                <span className="truncate">{classItem.courseName}</span>
+                                            </Link>
+                                        </SidebarMenuButton>
+                                    </SidebarMenuItem>
+                                ))
+                            ) : (
+                                <SidebarMenuItem>
+                                    <SidebarMenuButton
+                                        tooltip="Instructor Classes"
+                                        onClick={() => setOpen(true)}
+                                    >
+                                        <BookOpen className="h-4 w-4" />
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
-                            ))}
+                            )}
                         </SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>
