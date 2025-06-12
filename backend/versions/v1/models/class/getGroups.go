@@ -1,6 +1,6 @@
 package class
 
-func (m *ClassModel) GetGroups(classId int) ([]string, error) {
+func (m *ClassModel) GetAllGroups(classId int) ([]string, error) {
 	query := `
 		SELECT
 			group_name

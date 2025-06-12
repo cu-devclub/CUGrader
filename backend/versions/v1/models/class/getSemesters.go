@@ -1,6 +1,33 @@
 package class
 
-func (m *ClassModel) GetSemstersByUserId(userId int) ([]SemesterModel, error) {
+func (m *ClassModel) GetAllSemesters() ([]SemesterModel, error) {
+	var semesters []SemesterModel
+	rows, err := m.DB.Query(`
+	  SELECT DISTINCT
+		  year,
+			semester
+		FROM
+			class
+		ORDER BY year ASC, semester ASC;
+		`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var s SemesterModel
+		if err := rows.Scan(&s.Year, &s.Semester); err != nil {
+			return nil, err
+		}
+		semesters = append(semesters, s)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return semesters, nil
+}
+
+func (m *ClassModel) GetSemstersForUser(userId int) ([]SemesterModel, error) {
 	var semester []SemesterModel
 	rows, err := m.DB.Query(`
 		SELECT DISTINCT
@@ -33,31 +60,4 @@ func (m *ClassModel) GetSemstersByUserId(userId int) ([]SemesterModel, error) {
 	}
 
 	return semester, nil
-}
-
-func (m *ClassModel) GetAllSemesters() ([]SemesterModel, error) {
-	var semesters []SemesterModel
-	rows, err := m.DB.Query(`
-	  SELECT DISTINCT
-		  year,
-			semester
-		FROM
-			class
-		ORDER BY year ASC, semester ASC;
-		`)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	for rows.Next() {
-		var s SemesterModel
-		if err := rows.Scan(&s.Year, &s.Semester); err != nil {
-			return nil, err
-		}
-		semesters = append(semesters, s)
-	}
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
-	return semesters, nil
 }
