@@ -2,14 +2,13 @@ package assistant
 
 import (
 	"net/http"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
 func (ac *AssistantController) RemoveAssistantHandler(c *gin.Context) {
 	authHeader := c.GetHeader("Authentication")
-	if !strings.HasPrefix(authHeader, "Bearer ") {
+	if err := ac.Utils.Verify_JWT(authHeader); err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}

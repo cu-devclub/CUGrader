@@ -3,14 +3,13 @@ package student
 import (
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
 func (sc *StudentController) GetStudentsHandler(c *gin.Context) {
 	authHeader := c.GetHeader("Authentication")
-	if !strings.HasPrefix(authHeader, "Bearer ") || len(authHeader) <= 7 {
+	if err := sc.Utils.Verify_JWT(authHeader); err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}

@@ -12,6 +12,12 @@ type deleteStudentRequest struct {
 }
 
 func (sc *StudentController) DeleteStudentHandler(c *gin.Context) {
+	authHeader := c.GetHeader("Authentication")
+	if err := sc.Utils.Verify_JWT(authHeader); err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
 	var req deleteStudentRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil || req.ClassID <= 0 || req.UserID <= 0 {

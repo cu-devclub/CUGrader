@@ -3,18 +3,16 @@ package class
 import (
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
 func (cc *ClassController) EditClassHandler(c *gin.Context) {
 	authHeader := c.GetHeader("Authentication")
-	if !strings.HasPrefix(authHeader, "Bearer ") || len(authHeader) <= 7 {
+	if err := cc.Utils.Verify_JWT(authHeader); err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
-	// TODO: Validate JWT token และดึง userID
 
 	classIDStr := c.PostForm("class_id")
 	if classIDStr == "" {

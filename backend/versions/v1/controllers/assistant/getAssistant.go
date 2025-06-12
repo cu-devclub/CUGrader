@@ -3,14 +3,13 @@ package assistant
 import (
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
-func (ctrl *AssistantController) GetAssistantListHandler(c *gin.Context) {
+func (ac *AssistantController) GetAssistantListHandler(c *gin.Context) {
 	authHeader := c.GetHeader("Authentication")
-	if !strings.HasPrefix(authHeader, "Bearer ") {
+	if err := ac.Utils.Verify_JWT(authHeader); err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
@@ -27,7 +26,7 @@ func (ctrl *AssistantController) GetAssistantListHandler(c *gin.Context) {
 		return
 	}
 
-	assistants, instructors, err := ctrl.Service.GetAssistantList(classID)
+	assistants, instructors, err := ac.Service.GetAssistantList(classID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

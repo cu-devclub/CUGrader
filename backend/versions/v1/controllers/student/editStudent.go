@@ -15,6 +15,12 @@ type EditStudentRequest struct {
 }
 
 func (sc *StudentController) PatchStudentHandler(c *gin.Context) {
+	authHeader := c.GetHeader("Authentication")
+	if err := sc.Utils.Verify_JWT(authHeader); err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
 	var req EditStudentRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})

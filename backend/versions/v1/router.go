@@ -93,14 +93,14 @@ func RegisterRoutes(r *gin.RouterGroup) {
 	studentService := &studentService.StudentService{Model: studentModel, Utils: utilsModel}
 	studentController := &studentController.StudentController{Service: studentService}
 
-	r.POST("/class", classController.CreateClassHandler)
-
 	r.POST("/callback", userController.Callback)
+
+	r.POST("/class", classController.CreateClassHandler)
 	r.PATCH("/class", classController.EditClassHandler)
 
-	r.POST("/assistant", assistantController.InsertAssistantHandler)
-	r.DELETE("/assistant", assistantController.RemoveAssistantHandler)
-	r.GET("/assistant", assistantController.GetAssistantListHandler)
+	r.POST("/TA", assistantController.InsertAssistantHandler)
+	r.DELETE("/TA", assistantController.RemoveAssistantHandler)
+	r.GET("/TA", assistantController.GetAssistantListHandler)
 
 	r.POST("/student", studentController.AddStudentHandler)
 	r.DELETE("/student", studentController.DeleteStudentHandler)

@@ -2,7 +2,6 @@ package student
 
 import (
 	"net/http"
-	"strings"
 
 	studentService "CUGrader/backend/versions/v1/services/student"
 
@@ -11,7 +10,7 @@ import (
 
 func (sc *StudentController) AddStudentHandler(c *gin.Context) {
 	authHeader := c.GetHeader("Authentication")
-	if !strings.HasPrefix(authHeader, "Bearer ") || len(authHeader) <= 7 {
+	if err := sc.Utils.Verify_JWT(authHeader); err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}

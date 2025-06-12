@@ -10,11 +10,10 @@ import (
 
 func (cc *ClassController) CreateClassHandler(c *gin.Context) {
 	authHeader := c.GetHeader("Authentication")
-	if !strings.HasPrefix(authHeader, "Bearer ") || len(authHeader) <= 7 {
+	if err := cc.Utils.Verify_JWT(authHeader); err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
-	// TODO: Validate the JWT token here
 
 	courseIDStr := c.PostForm("course_id")
 	name := c.PostForm("name")
