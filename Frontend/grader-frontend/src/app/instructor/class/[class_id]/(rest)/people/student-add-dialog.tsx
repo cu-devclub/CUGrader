@@ -170,11 +170,11 @@ export function StudentAddDialog({ state: { mode, setMode, open, setOpen }, clas
 
           <Tabs className="mt-1 h-96" value={mode} onValueChange={it => setMode(it as Mode)}>
             <TabsList className="w-full grid-cols-4">
-              <TabsTrigger value="manual" className="flex-1 gap-3">
+              <TabsTrigger value="manual" className="flex-1 gap-3 data-[state=inactive]:text-muted-foreground">
                 <TableOfContents />
                 Manual
               </TabsTrigger>
-              <TabsTrigger value="file" className="flex-1 gap-3">
+              <TabsTrigger value="file" className="flex-1 gap-3 data-[state=inactive]:text-muted-foreground">
                 <Upload />
                 Upload file
               </TabsTrigger>

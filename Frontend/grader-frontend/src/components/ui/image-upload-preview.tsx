@@ -29,7 +29,6 @@ export function ImageUploadPreview({ onFileChange, initialPreviewUrl }: ImageUpl
 
   return (
     <div className="space-y-2">
-      <Label htmlFor="image-upload">Class Image</Label>
       <Input id="image-upload" type="file" accept="image/*" onChange={handleFileChange} />
       {preview && (
         <div className="mt-2">

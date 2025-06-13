@@ -1,105 +1,67 @@
-import { APIClient, Class, Instructor, Semester, Student, TeachingAssistant } from "./type";
+import { APIClient } from "../type";
+import { generateName } from "./name";
+import { DbClass, Persistence } from "./persistence";
 
-type DbClass = Omit<Class, "imageUrl"> & {
-  students: DbStudent[];
-  semester: Semester; // TODO: move this to normal api response later
-  assistants: DbAssistant[];
-  instructors: DbInstructor[];
-
-  imageFileId?: number;
-};
-
-type DbStudent = Omit<Student, "maxScore" | "imageUrl"> & {
-  imageFileId?: number;
-};
-type DbInstructor = Omit<Instructor, ""> & {
-  email: string;
-  imageFileId?: number;
-};
-type DbAssistant = TeachingAssistant & {
-  email: string;
-  imageFileId?: number;
-};
-
-function choice<T>(elements: T[]): T {
-  const index = Math.floor(Math.random() * elements.length);
-  return elements[index];
+interface Database {
+  classes: DbClass[];
 }
 
-export function generateName() {
-  const firstNames = ["Arjun", "Ryan", "Shah", "May", "Thomas", "Erdogan", "Taylor", "Muhammad", "Martin", "Azhar", "Thaksin", "Ivan", "Francis", "Leo", "Evan", "Satya",];
-  const lastNames = ["Smith", "Brown", "Williams", "Shinawatra", "Miller", "Wang", "Kowalski", "Anderson", "Adolf", "Singh", "Watson", "Yoisaki", "Doe", "Li", "Kim", "Nguyen"];
-  return `${choice(firstNames)} ${choice(lastNames)}`;
+async function init(client: APIClient) {
+  await client.classes.create({
+    courseId: "1",
+    name: "Programming",
+    semester: "2025/1",
+  });
+
+  await client.classes.create({
+    courseId: "758",
+    name: "sone",
+    semester: "2024/2",
+  });
+
+  await client.instructorsAndTAs.addToClass(420, "ame@student.chula.ac.th");
+  await client.instructorsAndTAs.addToClass(420, "suisei@student.chula.ac.th");
+  await client.instructorsAndTAs.addToClass(420, "mark45@chula.ac.th");
+
+  await client.instructorsAndTAs.addToClass(421, "71382213@student.chula.ac.th");
+  await client.instructorsAndTAs.addToClass(421, "wave@chula.ac.th");
+  await client.instructorsAndTAs.addToClass(421, "ajarn@chula.ac.th");
+
+  await client.students.addToClass(420, {
+    email: "12@student.chula.ac.th",
+    section: 0,
+  });
+
+  await client.students.addToClass(420, {
+    email: "45@student.chula.ac.th",
+    section: 0,
+  });
+
+  await client.students.addToClass(420, {
+    email: "2223@student.chula.ac.th",
+    section: 0,
+  });
+
+  await client.students.addToClass(420, {
+    email: "12313@student.chula.ac.th",
+    section: 0,
+  });
 }
 
-export const files: Map<number, File> = new Map();
-
-// TODO: env
-export const useMockServer = process.env.NEXT_PUBLIC_MOCK_PRESERVE_STATE === "true";
-function getImageUrl(id: number | undefined) {
-  if (!id) {
-    return "";
-  }
-  if (useMockServer) {
-    return `/api/dev/file?fileId=${id}`;
-  } else {
-    return URL.createObjectURL(files.get(id)!);
-  }
-}
-
-function createClient(): APIClient {
-  const classes: DbClass[] = [];
-
+function createClient(persistence: Persistence<Database>): APIClient {
   let currentClassId = 420;
+  const classes = persistence.data.classes;
 
   function getClassById(id: number) {
-    const target = classes.find(it => it.classId === id);
+    const target = persistence.data.classes.find(it => it.classId === id);
     if (!target) {
       throw new Error(`${id} class not found`);
     }
     return target;
   }
 
-  async function init() {
-    await client.classes.create({
-      courseId: "1",
-      name: "Programming",
-      semester: "2025/1",
-    });
-
-    await client.classes.create({
-      courseId: "758",
-      name: "sone",
-      semester: "2024/2",
-    });
-
-    await client.instructorsAndTAs.addToClass(420, "ame@student.chula.ac.th");
-    await client.instructorsAndTAs.addToClass(420, "suisei@student.chula.ac.th");
-    await client.instructorsAndTAs.addToClass(420, "mark45@chula.ac.th");
-
-    await client.instructorsAndTAs.addToClass(421, "71382213@student.chula.ac.th");
-    await client.instructorsAndTAs.addToClass(421, "wave@chula.ac.th");
-    await client.instructorsAndTAs.addToClass(421, "ajarn@chula.ac.th");
-
-    await client.students.addToClass(420, {
-      email: "12@student.chula.ac.th",
-      section: 0,
-    });
-
-    await client.students.addToClass(420, {
-      email: "45@student.chula.ac.th",
-      section: 0,
-    });
-
-    await client.students.addToClass(420, {
-      email: "2223@student.chula.ac.th",
-      section: 0,
-    });
-
-    await client.students.addToClass(420, {
-      email: "12313@student.chula.ac.th",
-      section: 0,
-    });
+  async function getUrl(id: string | undefined) {
+    return id ? await persistence.getFileUrl(id) : undefined;
   }
 
   const client: APIClient = {
@@ -115,17 +77,20 @@ function createClient(): APIClient {
           score: 0,
           withdrawed: false,
         });
+        persistence.persist();
       },
       async listByClass(classId) {
-        return getClassById(classId).students.map(it => ({
+        const students = getClassById(classId).students;
+        return Promise.all(students.map(async (it) => ({
           ...it,
-          imageUrl: getImageUrl(it.imageFileId),
+          imageUrl: await getUrl(it.imageFileId),
           maxScore: 100,
-        }));
+        })));
       },
       async removeFromClass(classId, studentId) {
         const target = getClassById(classId);
         target.students = target.students.filter(it => it.studentId !== studentId);
+        persistence.persist();
       },
       async update(classId, studentId, { group, section, withdrawed }) {
         const target = getClassById(classId);
@@ -143,6 +108,7 @@ function createClient(): APIClient {
         if (withdrawed) {
           student.withdrawed = withdrawed;
         }
+        persistence.persist();
       },
       async updateMany(classId, studentIds, { group, section, withdrawed }) {
         const target = getClassById(classId);
@@ -162,6 +128,7 @@ function createClient(): APIClient {
             student.withdrawed = withdrawed;
           }
         }
+        persistence.persist();
       },
     },
     classes: {
@@ -169,9 +136,9 @@ function createClient(): APIClient {
         if (students) {
           console.warn("[mock] Ignoring students csv file");
         }
-        const fileId = image ? Date.now() : undefined;
+        let fileId: string | undefined = undefined;
         if (image) {
-          files.set(fileId!, image);
+          fileId = await persistence.saveFile(image);
         }
         classes.push({
           courseId: String(courseId),
@@ -184,14 +151,28 @@ function createClient(): APIClient {
           assistants: [],
           instructors: []
         });
+        persistence.persist();
       },
       async getById(classId) {
-        return getClassById(classId);
+        const c = getClassById(classId);
+        console.log(c);
+        return {
+          ...c,
+          imageUrl: await getUrl(c.imageFileId)
+        };
       },
       async listParticipatingBySemester(semester) {
+        const classesInSemester = classes.filter(it => it.semester === semester);
+        const classesWithImages = await Promise.all(
+          classesInSemester.map(async it => ({
+            ...it,
+            imageUrl: await getUrl(it.imageFileId)
+          }))
+        );
+
         return {
-          assisting: classes.filter(it => it.semester === semester),
-          studying: classes.filter(it => it.semester === semester)
+          assisting: classesWithImages,
+          studying: classesWithImages
         };
       },
       async update(classId, payload) {
@@ -207,13 +188,13 @@ function createClient(): APIClient {
           target.semester = payload.semester;
         }
         if (payload.image) {
-          const id = Date.now();
-          files.set(id, payload.image);
+          const id = await persistence.saveFile(payload.image);
           target.imageFileId = id;
         }
         if (payload.students) {
           console.warn("[mock] Ignoring students csv file");
         }
+        persistence.persist();
       },
     },
     instructorsAndTAs: {
@@ -239,11 +220,13 @@ function createClient(): APIClient {
             email,
           });
         }
+        persistence.persist();
       },
       async removeFromClass(classId, email) {
         const target = getClassById(classId);
         target.instructors = target.instructors.filter(it => it.email !== email);
         target.assistants = target.assistants.filter(it => it.email !== email);
+        persistence.persist();
       },
     },
     semesters: {
@@ -254,32 +237,22 @@ function createClient(): APIClient {
     }
   };
 
-  init();
   return client;
 }
 
 
-// TODO: handle file upload
+const persistence = new Persistence<Database>("default", {
+  classes: []
+});
 
-type Leaves<T> = T extends object
-  ? {
-    [K in keyof T]: `${Exclude<K, symbol>}${Leaves<T[K]> extends never ? "" : `.${Leaves<T[K]>}`}`;
-  }[keyof T]
-  : never;
+const preserveMockState = process.env.NEXT_PUBLIC_MOCK_PRESERVE_STATE === "true";
+export function createMockClient() {
+  const client = createClient(persistence);
 
-export interface MockRPCCommand {
-  command: Leaves<APIClient>,
-  params: any[];
-}
-
-export const api = createClient();
-
-export async function dispatch({ command, params }: MockRPCCommand) {
-  const path = command.split(".");
-  // console.log({ api, path });
-  let fn = api as any;
-  while (path.length !== 0) {
-    fn = fn[path.shift()!];
+  // to make hydration error less painful
+  if (persistence.fresh || !globalThis.window || !preserveMockState) {
+    init(client);
   }
-  return await fn(...params);
+
+  return client;
 }
