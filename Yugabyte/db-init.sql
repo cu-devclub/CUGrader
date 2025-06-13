@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS "class" (
     semester INT NOT NULL,
     year INT NOT NULL,
     picture_id INT REFERENCES "picture"(id) ON DELETE SET NULL,
-    creater_user_id INT NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+    creator_user_id INT NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
