@@ -3,7 +3,7 @@ package class
 func (m *ClassModel) Insert(courseID int, name string, semester int, year int, pictureID int, creatorUserID int) (int, error) {
 	var classID int
 	query := `
-		INSERT INTO "class" (course_id, name, semester, year, picture_id, creater_user_id)
+		INSERT INTO "class" (course_id, name, semester, year, picture_id, creator_user_id)
 		VALUES ($1, $2, $3, $4, $5, $6)
 		RETURNING id`
 	var picID interface{}

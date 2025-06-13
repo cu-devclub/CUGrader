@@ -1,6 +1,7 @@
 package class
 
 import (
+	"database/sql"
 	"fmt"
 	"strconv"
 	"strings"
@@ -23,24 +24,29 @@ func (m *ClassModel) Edit(id int, updates map[string]interface{}) error {
 
 	args = append(args, id)
 	query := fmt.Sprintf("UPDATE class SET %s WHERE id = $%d", strings.Join(setClauses, ", "), i)
-	fmt.Println("Executing query:", query, "with args:", args)
 	_, err := m.DB.Exec(query, args...)
 	return err
 }
 
 func (m *ClassModel) GetPicturePathByClassID(classID int) (string, int, error) {
-	var path string
-	var pictureID int
-	query := "SELECT picture.path, picture.id FROM picture JOIN class ON class.picture_id = picture.id WHERE class.id = ?"
+	var path sql.NullString
+	var pictureID sql.NullInt64
+	query := "SELECT picture.path, picture.id FROM class LEFT JOIN picture ON class.picture_id = picture.id WHERE class.id = $1"
 	err := m.DB.QueryRow(query, classID).Scan(&path, &pictureID)
 	if err != nil {
 		return "", 0, err
 	}
-	return path, pictureID, nil
+	if !pictureID.Valid {
+		return "", 0, nil
+	}
+	if !path.Valid {
+		return "", int(pictureID.Int64), nil
+	}
+	return path.String, int(pictureID.Int64), nil
 }
 
 func (m *ClassModel) UpdatePicturePath(pictureID int, path string) error {
-	query := "UPDATE picture SET path = ? WHERE id = ?"
+	query := "UPDATE picture SET path = $1 WHERE id = $2"
 	_, err := m.DB.Exec(query, path, pictureID)
 	return err
 }

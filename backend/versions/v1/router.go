@@ -3,15 +3,18 @@ package v1
 import (
 	assistantController "CUGrader/backend/versions/v1/controllers/assistant"
 	classController "CUGrader/backend/versions/v1/controllers/class"
+	pictureController "CUGrader/backend/versions/v1/controllers/picture"
 	studentController "CUGrader/backend/versions/v1/controllers/student"
 	userController "CUGrader/backend/versions/v1/controllers/user"
 	assistantModel "CUGrader/backend/versions/v1/models/assistant"
 	classModel "CUGrader/backend/versions/v1/models/class"
+	pictureModel "CUGrader/backend/versions/v1/models/picture"
 	studentModel "CUGrader/backend/versions/v1/models/student"
 	userModel "CUGrader/backend/versions/v1/models/user"
 	utilsModel "CUGrader/backend/versions/v1/models/utils"
 	assistantService "CUGrader/backend/versions/v1/services/assistant"
 	classService "CUGrader/backend/versions/v1/services/class"
+	pictureService "CUGrader/backend/versions/v1/services/picture"
 	studentService "CUGrader/backend/versions/v1/services/student"
 	userService "CUGrader/backend/versions/v1/services/user"
 	"crypto/rsa"
@@ -92,10 +95,18 @@ func RegisterRoutes(r *gin.RouterGroup) {
 	studentService := &studentService.StudentService{Model: studentModel, Utils: utilsModel}
 	studentController := &studentController.StudentController{Service: studentService}
 
+	pictureModel := &pictureModel.PictureModel{DB: db}
+	pictureService := &pictureService.PictureService{Model: pictureModel}
+	pictureController := &pictureController.PictureController{Service: pictureService}
+
 	r.POST("/callback", userController.Callback)
 
 	r.POST("/class", classController.CreateClassHandler)
 	r.PATCH("/class", classController.EditClassHandler)
+	r.GET("/classes/semesters", classController.GetSemesterHandler)
+	r.GET("/classes/classes/:yearSemester", classController.GetClassByYearSemesterHandler)
+	r.GET("/section/:classId", classController.GetSectionsHandler)
+	r.GET("/group/:classId", classController.GetGroupsHandler)
 
 	r.POST("/TA", assistantController.InsertAssistantHandler)
 	r.DELETE("/TA", assistantController.RemoveAssistantHandler)
@@ -105,5 +116,7 @@ func RegisterRoutes(r *gin.RouterGroup) {
 	r.DELETE("/student", studentController.DeleteStudentHandler)
 	r.PATCH("/student", studentController.PatchStudentHandler)
 	r.GET("/student", studentController.GetStudentsHandler)
+
+	r.GET("/picture/:pictureId", pictureController.GetPicture)
 
 }

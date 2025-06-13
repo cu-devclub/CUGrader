@@ -27,38 +27,66 @@ func (s *ClassService) EditClass(id int, pictureFile *multipart.FileHeader, csvF
 		if err != nil {
 			return fmt.Errorf("failed to load picture path from DB: %s", err)
 		}
-
-		oldExt := filepath.Ext(path)
-		uuidName := filepath.Base(path[:len(path)-len(filepath.Ext(path))])
-
-		filesPath := os.Getenv("FILES_PATH")
-		var savePath string
-
-		if ext == oldExt {
-			savePath = filepath.Join(filesPath, uuidName+ext)
-		} else {
-			oldFilePath := filepath.Join(filesPath, uuidName+oldExt)
-			os.Remove(oldFilePath)
-			savePath = filepath.Join(filesPath, uuidName+ext)
-			if err := s.Model.UpdatePicturePath(picture_id, uuidName+ext); err != nil {
-				return fmt.Errorf("failed to update picture path in DB: %v", err)
+		if picture_id == 0 {
+			uuidName := fmt.Sprintf("%s%s", generateUUID(), ext)
+			savePath := filepath.Join(os.Getenv("FILES_PATH"), uuidName)
+			src, err := pictureFile.Open()
+			if err != nil {
+				return fmt.Errorf("failed to open uploaded file: %v", err)
 			}
-		}
+			defer src.Close()
 
-		src, err := pictureFile.Open()
-		if err != nil {
-			return fmt.Errorf("failed to open uploaded file: %v", err)
-		}
-		defer src.Close()
+			dst, err := os.Create(savePath)
+			if err != nil {
+				return fmt.Errorf("failed to create file: %v", err)
+			}
+			defer dst.Close()
 
-		dst, err := os.Create(savePath)
-		if err != nil {
-			return fmt.Errorf("failed to create file: %v", err)
-		}
-		defer dst.Close()
+			if _, err := io.Copy(dst, src); err != nil {
+				return fmt.Errorf("failed to save file: %v", err)
+			}
 
-		if _, err := io.Copy(dst, src); err != nil {
-			return fmt.Errorf("failed to save file: %v", err)
+			picture_id, err = s.Model.InsertPicture(uuidName)
+			if err != nil {
+				return fmt.Errorf("failed to insert picture to db")
+			}
+			updates := map[string]interface{}{"picture_id": picture_id}
+			if err := s.Model.Edit(id, updates); err != nil {
+				return fmt.Errorf("failed to update class with new picture_id: %v", err)
+			}
+		} else {
+			oldExt := filepath.Ext(path)
+			uuidName := filepath.Base(path[:len(path)-len(filepath.Ext(path))])
+
+			filesPath := os.Getenv("FILES_PATH")
+			var savePath string
+
+			if ext == oldExt {
+				savePath = filepath.Join(filesPath, uuidName+ext)
+			} else {
+				oldFilePath := filepath.Join(filesPath, uuidName+oldExt)
+				os.Remove(oldFilePath)
+				savePath = filepath.Join(filesPath, uuidName+ext)
+				if err := s.Model.UpdatePicturePath(picture_id, uuidName+ext); err != nil {
+					return fmt.Errorf("failed to update picture path in DB: %v", err)
+				}
+			}
+
+			src, err := pictureFile.Open()
+			if err != nil {
+				return fmt.Errorf("failed to open uploaded file: %v", err)
+			}
+			defer src.Close()
+
+			dst, err := os.Create(savePath)
+			if err != nil {
+				return fmt.Errorf("failed to create file: %v", err)
+			}
+			defer dst.Close()
+
+			if _, err := io.Copy(dst, src); err != nil {
+				return fmt.Errorf("failed to save file: %v", err)
+			}
 		}
 	}
 
