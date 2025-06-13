@@ -1,7 +1,10 @@
 package utils
 
-import "database/sql"
+import (
+	"database/sql"
+)
 
 type UtilsModel struct {
-	DB *sql.DB
+	DB      *sql.DB
+	JWT_KEY []byte
 }
