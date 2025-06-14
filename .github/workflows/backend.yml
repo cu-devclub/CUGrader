@@ -28,9 +28,9 @@ jobs:
           path: |
             ~/go/pkg/mod
             ~/.cache/go-build
-          key: ${{ runner.os }}-go-${{ hashFiles('backend/go.sum') }}
+          key: ${{ runner.os }}-go-v2-${{ hashFiles('backend/go.sum') }}
           restore-keys: |
-            ${{ runner.os }}-go-
+            ${{ runner.os }}-go-v2-
 
       - name: Tidy Go Modules
         working-directory: ./backend
