@@ -48,6 +48,15 @@ jobs:
       - name: Generate .env from template
         working-directory: ./Auth
         run: cp .env.template .env
+      
+      - name: create-json (TESTING)
+        if: github.ref_name == 'testing'
+        id: create-json-testing
+        uses: jsdaniell/create-json@v1.2.2
+        with:
+          name: "client_secrets.json"
+          json: ${{ secrets.TEST_CLIENT_SECRETS }}
+          dir: 'Auth/'
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2

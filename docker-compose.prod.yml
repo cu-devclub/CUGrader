@@ -1,0 +1,53 @@
+version: "3.8"
+
+services:
+  authenticator:
+    image: ghcr.io/cu-devclub/cugrader/auth:latest
+    container_name: authenticator
+    ports:
+      - "6000:6000"
+    environment:
+      - SERVICE_ENV=production
+      - CERT_PATH=/etc/ssl/auth/fullchain.pem
+      - KEY_PATH=/etc/ssl/auth/privkey.pem
+    volumes:
+      - /home/ubuntu/ssl/auth:/etc/ssl/auth:ro
+
+  backend:
+    image: ghcr.io/cu-devclub/cugrader/backend:latest
+    container_name: backend
+    ports:
+      - "5000:5000"
+    environment:
+      - SERVICE_ENV=production
+    depends_on:
+      - yugabytedb
+
+  frontend:
+    image: ghcr.io/cu-devclub/cugrader/frontend:latest
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+
+  yugabytedb:
+    image: yugabytedb/yugabyte
+    container_name: yugabyte
+    ports:
+      - "7000:7000"
+      - "9000:9000"
+      - "15433:15433"
+      - "5433:5433"
+    environment:
+      YSQL_USER: yugabyte
+      YSQL_PASSWORD: yugabyte
+    volumes:
+      - yugabyte_data:/home/yugabyte/yb_data
+    command: >
+      bin/yugabyted start
+      --base_dir=/home/yugabyte/yb_data
+      --background=false
+
+volumes:
+  yugabyte_data:
