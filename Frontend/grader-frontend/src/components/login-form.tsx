@@ -69,13 +69,13 @@ export function LoginForm({
               </div>
             </div>
           </div>
-          <div className="bg-muted relative hidden md:block">
-            <img
-              src="/placeholder.svg"
-              alt="Image"
-              className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-            />
-          </div>
+            <div className="bg-muted relative hidden md:flex items-center justify-center">
+              <img
+                src="/logo.svg"
+                alt="Image"
+                className="object-contain h-1/2 w-1/2 dark:brightness-[0.2] dark:grayscale"
+              />
+            </div>
         </CardContent>
       </Card>
       <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
