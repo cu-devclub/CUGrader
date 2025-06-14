@@ -22,10 +22,6 @@ jobs:
         with:
           go-version: '1.24'
 
-      - name: Tidy Go Modules
-        working-directory: ./backend
-        run: go mod tidy
-
       - name: Restore Go module cache
         uses: actions/cache@v3
         with:
@@ -35,6 +31,10 @@ jobs:
           key: ${{ runner.os }}-go-v2-${{ hashFiles('backend/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-v2-
+
+      - name: Tidy Go Modules
+        working-directory: ./backend
+        run: go mod tidy
 
       - name: Build Go App
         working-directory: ./backend
