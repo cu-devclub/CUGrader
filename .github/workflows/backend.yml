@@ -60,16 +60,6 @@ jobs:
         working-directory: ./backend
         run: cp .env.template .env
 
-      - name: Restore Go module cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/go/pkg/mod
-            ~/.cache/go-build
-          key: ${{ runner.os }}-go-${{ hashFiles('go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-              
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
