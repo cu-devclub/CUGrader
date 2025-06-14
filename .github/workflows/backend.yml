@@ -59,6 +59,9 @@ jobs:
       - name: Generate .env from template
         working-directory: ./backend
         run: cp .env.template .env
+      
+      - name: Debug check file exists
+        run: ls -l backend/go.sum
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
