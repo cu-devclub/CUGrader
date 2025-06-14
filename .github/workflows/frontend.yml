@@ -1,4 +1,4 @@
-name: Build & Push React App to GHCR
+name: Build & Push frontend to GHCR
 
 on:
   push:
