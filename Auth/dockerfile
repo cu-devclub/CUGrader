@@ -23,7 +23,7 @@ WORKDIR /root/
 # Copy binary from builder
 COPY --from=builder /app/main .
 COPY --from=builder /app/.env .
-COPY --from=builder /app/client_secrets.json .
+# COPY --from=builder /app/client_secrets.json .
 
 # Expose the port (adjust if needed)
 EXPOSE 6000
