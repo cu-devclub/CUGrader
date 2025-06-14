@@ -29,20 +29,20 @@ jobs:
           path: |
             ~/go/pkg/mod
             ~/.cache/go-build
-          key: ${{ runner.os }}-auth-go-${{ hashFiles('auth/go.sum') }}
+          key: ${{ runner.os }}-Auth-go-${{ hashFiles('Auth/go.sum') }}
           restore-keys: |
-            ${{ runner.os }}-auth-go-
+            ${{ runner.os }}-Auth-go-
 
       - name: Tidy Go Modules
-        working-directory: ./auth
+        working-directory: ./Auth
         run: go mod tidy
 
       - name: Build Go App
-        working-directory: ./auth
+        working-directory: ./Auth
         run: go build -o main .
 
       - name: Generate .env from template
-        working-directory: ./auth
+        working-directory: ./Auth
         run: cp .env.template .env
 
       - name: Set up Docker Buildx
@@ -64,8 +64,8 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./auth
-          file: ./auth/Dockerfile
+          context: ./Auth
+          file: ./Auth/Dockerfile
           push: true
           tags: |
             ghcr.io/${{ env.REPO_LOWER }}/auth:latest
