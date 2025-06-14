@@ -1,4 +1,4 @@
-name: Build & Push Go App to GHCR
+name: Build & Push backend to GHCR
 
 on:
   push:
