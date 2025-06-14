@@ -100,6 +100,7 @@ func RegisterRoutes(r *gin.RouterGroup) {
 	pictureController := &pictureController.PictureController{Service: pictureService}
 
 	r.POST("/callback", userController.Callback)
+	r.POST("/test/callback", userController.TestCallback)
 
 	r.POST("/class", classController.CreateClassHandler)
 	r.PATCH("/class", classController.EditClassHandler)
@@ -110,12 +111,12 @@ func RegisterRoutes(r *gin.RouterGroup) {
 
 	r.POST("/TA", assistantController.InsertAssistantHandler)
 	r.DELETE("/TA", assistantController.RemoveAssistantHandler)
-	r.GET("/TA", assistantController.GetAssistantListHandler)
+	r.GET("/TA/:classId", assistantController.GetAssistantListHandler)
 
 	r.POST("/student", studentController.AddStudentHandler)
 	r.DELETE("/student", studentController.DeleteStudentHandler)
 	r.PATCH("/student", studentController.PatchStudentHandler)
-	r.GET("/student", studentController.GetStudentsHandler)
+	r.GET("/student/:classId", studentController.GetStudentsHandler)
 
 	r.GET("/picture/:pictureId", pictureController.GetPicture)
 

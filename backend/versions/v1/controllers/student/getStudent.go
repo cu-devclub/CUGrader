@@ -15,7 +15,7 @@ func (sc *StudentController) GetStudentsHandler(c *gin.Context) {
 		return
 	}
 
-	classIDStr := c.Query("class_id")
+	classIDStr := c.Param("classId")
 	classID, err := strconv.Atoi(classIDStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid class_id"})
