@@ -50,7 +50,6 @@ jobs:
         run: cp .env.template .env
       
       - name: create-json (TESTING)
-        if: github.ref_name == 'testing'
         id: create-json-testing
         uses: jsdaniell/create-json@v1.2.2
         with:
