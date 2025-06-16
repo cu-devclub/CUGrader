@@ -1,6 +1,6 @@
 import { APIClient } from "../type";
 import { generateName } from "./name";
-import { DbClass, Persistence } from "./persistence";
+import { DbClass, InMemoryStorage, PersistenceStorage, Storage } from "./persistence";
 
 interface Database {
   classes: DbClass[];
@@ -48,7 +48,7 @@ async function init(client: APIClient) {
   });
 }
 
-function createClient(persistence: Persistence<Database>): APIClient {
+function createClient(persistence: Storage<Database>): APIClient {
   let currentClassId = 420;
   const classes = persistence.data.classes;
 
@@ -241,17 +241,20 @@ function createClient(persistence: Persistence<Database>): APIClient {
 }
 
 
-const persistence = new Persistence<Database>("default", {
-  classes: []
-});
-
 const preserveMockState = process.env.NEXT_PUBLIC_MOCK_PRESERVE_STATE === "true";
-export function createMockClient() {
-  const client = createClient(persistence);
 
-  // to make hydration error less painful
-  if (persistence.fresh || !globalThis.window || !preserveMockState) {
-    init(client);
+export async function createMockClient() {
+  const initialData: Database = {
+    classes: []
+  };
+  const storage = preserveMockState
+    ? new PersistenceStorage("default", initialData)
+    : new InMemoryStorage(initialData);
+
+  const client = createClient(storage);
+
+  if (storage.data.classes.length === 0 || !globalThis.window) {
+    await init(client);
   }
 
   return client;
