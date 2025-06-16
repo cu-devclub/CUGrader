@@ -3,7 +3,7 @@
 import { ClassCard } from "@/components/class-card";
 import { Bell, LogOut, Plus } from "lucide-react";
 import { useState } from "react";
-import { SemesterSelector } from "../instructor/semester-selector";
+import { SemesterSelector } from "../../components/semester-selector";
 import StudentCard from "./studentCard";
 
 import { Button } from "@/components/ui/button";
