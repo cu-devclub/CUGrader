@@ -1,0 +1,78 @@
+{
+    "HomePage": {
+        "title": "สวัสดีชาวโลก!"
+    },
+    "example": {
+        "title": "ตัวอย่างการใช้ Next-intl",
+        "description": "หน้านี้แสดงวิธีการใช้ next-intl สำหรับระบบหลายภาษาในแอปพลิเคชัน React/Next.js ลองเปลี่ยนระหว่างภาษาอังกฤษและไทยเพื่อดูการแปลภาษาในการทำงาน",
+        "currentLocale": "ภาษาปัจจุบัน",
+        "sections": {
+            "basicTranslation": {
+                "title": "การแปลพื้นฐาน",
+                "description": "การแปลข้อความง่ายๆ โดยใช้ useTranslations hook"
+            },
+            "interpolation": {
+                "title": "การใส่ตัวแปร",
+                "description": "การส่งตัวแปรเข้าไปในข้อความแปล"
+            },
+            "pluralization": {
+                "title": "รูปแบบพหูพจน์",
+                "description": "รูปแบบพหูพจน์อัตโนมัติตามจำนวน"
+            },
+            "formatting": {
+                "title": "การจัดรูปแบบวันที่และตัวเลข",
+                "description": "การจัดรูปแบบวันที่ ตัวเลข และสกุลเงินตามภาษา"
+            },
+            "usage": {
+                "title": "วิธีการใช้งาน",
+                "description": "ตัวอย่างโค้ดที่แสดงวิธีการใช้งานการแปลภาษาแบบต่างๆ"
+            },
+            "jsonStructure": {
+                "title": "โครงสร้างไฟล์แปล",
+                "description": "ตัวอย่างวิธีการจัดโครงสร้างไฟล์ JSON สำหรับการแปล"
+            }
+        },
+        "labels": {
+            "welcome": "ข้อความต้อนรับ:",
+            "goodbye": "ข้อความลาก่อน:",
+            "loading": "ข้อความกำลังโหลด:",
+            "userGreeting": "ข้อความทักทาย:",
+            "studentCount": "จำนวนนักเรียน:",
+            "gradeInfo": "ข้อมูลเกรด:",
+            "itemCount": "ตัวนับรายการ:",
+            "assignmentCount": "ตัวนับงาน:",
+            "todayDate": "วันที่วันนี้:",
+            "averageScore": "คะแนนเฉลี่ย:",
+            "currency": "รูปแบบสกุลเงิน:"
+        },
+        "messages": {
+            "welcome": "ยินดีต้อนรับสู่แพลตฟอร์ม GraderV.2!",
+            "goodbye": "ขอบคุณที่ใช้ระบบของเรา แล้วพบกันใหม่!",
+            "loading": "กำลังโหลดเนื้อหา กรุณารอสักครู่...",
+            "userGreeting": "สวัสดี {name} คุณเข้าสู่ระบบในฐานะ {role}",
+            "studentCount": "มีนักเรียน {count} คนลงทะเบียนในคลาสนี้",
+            "gradeInfo": "คะแนนเฉลี่ยของคลาส: {average}% ({total} คน)",
+            "itemCount": "{count, plural, =0 {ไม่มีรายการ} other {# รายการ}}",
+            "assignmentCount": "{count, plural, =0 {ไม่มีงาน} other {# งาน}}"
+        },
+        "buttons": {
+            "increment": "เพิ่มรายการ",
+            "decrement": "ลบรายการ",
+            "reset": "รีเซ็ตตัวนับ"
+        },
+        "usage": {
+            "basicHook": {
+                "title": "1. การใช้ useTranslations Hook พื้นฐาน"
+            },
+            "interpolation": {
+                "title": "2. การใส่ตัวแปร"
+            },
+            "pluralization": {
+                "title": "3. รูปแบบพหูพจน์"
+            },
+            "locale": {
+                "title": "4. การตรวจสอบภาษา"
+            }
+        }
+    }
+}

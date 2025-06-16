@@ -1,0 +1,78 @@
+{
+    "HomePage": {
+        "title": "Hello world!"
+    },
+    "example": {
+        "title": "Next-intl Example Page",
+        "description": "This page demonstrates how to use next-intl for internationalization in your React/Next.js application. Switch between English and Thai to see the translations in action.",
+        "currentLocale": "Current Locale",
+        "sections": {
+            "basicTranslation": {
+                "title": "Basic Translations",
+                "description": "Simple string translations using the useTranslations hook"
+            },
+            "interpolation": {
+                "title": "Variable Interpolation",
+                "description": "Passing variables into translation strings"
+            },
+            "pluralization": {
+                "title": "Pluralization",
+                "description": "Automatic plural forms based on count values"
+            },
+            "formatting": {
+                "title": "Date & Number Formatting",
+                "description": "Locale-aware formatting for dates, numbers, and currency"
+            },
+            "usage": {
+                "title": "How to Use",
+                "description": "Code examples showing different ways to implement translations"
+            },
+            "jsonStructure": {
+                "title": "Translation File Structure",
+                "description": "Example of how to structure your translation JSON files"
+            }
+        },
+        "labels": {
+            "welcome": "Welcome Message:",
+            "goodbye": "Goodbye Message:",
+            "loading": "Loading Message:",
+            "userGreeting": "User Greeting:",
+            "studentCount": "Student Count:",
+            "gradeInfo": "Grade Information:",
+            "itemCount": "Item Counter:",
+            "assignmentCount": "Assignment Counter:",
+            "todayDate": "Today's Date:",
+            "averageScore": "Average Score:",
+            "currency": "Currency Format:"
+        },
+        "messages": {
+            "welcome": "Welcome to the GraderV.2 platform!",
+            "goodbye": "Thank you for using our system. See you next time!",
+            "loading": "Loading content, please wait...",
+            "userGreeting": "Hello {name}, you are logged in as {role}",
+            "studentCount": "There are {count} students enrolled in this class",
+            "gradeInfo": "Class average: {average}% ({total} students)",
+            "itemCount": "{count, plural, =0 {No items} =1 {1 item} other {# items}}",
+            "assignmentCount": "{count, plural, =0 {No assignments} =1 {1 assignment} other {# assignments}}"
+        },
+        "buttons": {
+            "increment": "Add Item",
+            "decrement": "Remove Item",
+            "reset": "Reset Counter"
+        },
+        "usage": {
+            "basicHook": {
+                "title": "1. Basic useTranslations Hook"
+            },
+            "interpolation": {
+                "title": "2. Variable Interpolation"
+            },
+            "pluralization": {
+                "title": "3. Pluralization"
+            },
+            "locale": {
+                "title": "4. Locale Detection"
+            }
+        }
+    }
+}

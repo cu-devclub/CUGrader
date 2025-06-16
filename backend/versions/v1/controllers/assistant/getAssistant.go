@@ -16,7 +16,7 @@ func (ac *AssistantController) GetAssistantListHandler(c *gin.Context) {
 	}
 
 	// ดึง class_id จาก query string หรือ path param
-	classIDStr := c.Query("class_id")
+	classIDStr := c.Param("classId")
 	if classIDStr == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing class_id"})
 		return

@@ -63,35 +63,29 @@ func aesDecrypt(cipherTextBase64, keyBase64 string) ([]byte, error) {
 }
 
 func (us *UserService) Callback(key string, credential string) (string, int, error) {
-	email := credential
-	name := "Test User"
-	picture := ""
+	decryptedKey, err := rsaDecrypt(key, us.PrivKey)
+	if err != nil {
+		return "", 400, err
+	}
 
-	if !us.IsDev {
-		decryptedKey, err := rsaDecrypt(key, us.PrivKey)
-		if err != nil {
-			return "", 400, err
-		}
-
-		decryptedData, err := aesDecrypt(credential, base64.URLEncoding.EncodeToString(decryptedKey))
-		if err != nil {
-			return "", 400, err
-		}
-		parts := strings.SplitN(string(decryptedData), "_", 4)
-		if len(parts) != 4 {
-			return "", 400, errors.New("invalid decrypted data format")
-		}
-		email = parts[0]
-		name = parts[1]
-		picture = parts[2]
-		datetimeStr := parts[3]
-		dt, err := time.Parse("2006-01-02 15:04:05", datetimeStr)
-		if err != nil {
-			return "", 400, errors.New("invalid datetime format")
-		}
-		if time.Since(dt) > 5*time.Minute || time.Until(dt) > 5*time.Minute {
-			return "", 400, errors.New("credential expires")
-		}
+	decryptedData, err := aesDecrypt(credential, base64.URLEncoding.EncodeToString(decryptedKey))
+	if err != nil {
+		return "", 400, err
+	}
+	parts := strings.SplitN(string(decryptedData), "_", 4)
+	if len(parts) != 4 {
+		return "", 400, errors.New("invalid decrypted data format")
+	}
+	email := parts[0]
+	name := parts[1]
+	picture := parts[2]
+	datetimeStr := parts[3]
+	dt, err := time.Parse("2006-01-02 15:04:05", datetimeStr)
+	if err != nil {
+		return "", 400, errors.New("invalid datetime format")
+	}
+	if time.Since(dt) > 5*time.Minute || time.Until(dt) > 5*time.Minute {
+		return "", 400, errors.New("credential expires")
 	}
 
 	if !strings.HasSuffix(email, "chula.ac.th") {
