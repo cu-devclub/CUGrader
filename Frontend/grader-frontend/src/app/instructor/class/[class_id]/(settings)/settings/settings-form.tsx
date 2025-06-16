@@ -53,7 +53,7 @@ export function SettingsForm() {
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["class", classData.id]
+        queryKey: ["class"]
       });
       toast.success("Saved");
     },
