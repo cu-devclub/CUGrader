@@ -2,14 +2,13 @@ import { unimplemented } from "../utils";
 import { ClassObject, Configuration, DefaultApi } from "./generated";
 import { APIClient, Class, Instructor, Semester, Student } from "./type";
 
-
 export function createClient(): APIClient {
   const authToken = "TODO: get it, after auth is implemented";
   const config = new Configuration({
     headers: {
       "Authentication": `Bearer ${authToken}`,
     },
-    basePath: process.env.NEXT_PUBLIC_BACKEND_URL
+    basePath: process.env.NEXT_PUBLIC_BACKEND_URL,
   });
 
   const generatedClient = new DefaultApi(config);
@@ -17,7 +16,7 @@ export function createClient(): APIClient {
   return {
     students: {
       addToClass: async (classId, { email, section, group }) => {
-        await generatedClient.v1StudentPost({
+        await generatedClient.studentPost({
           createStudent: {
             classId,
             email,
@@ -27,7 +26,7 @@ export function createClient(): APIClient {
         });
       },
       listByClass: async (classId) => {
-        const { students } = await generatedClient.v1StudentClassIdGet({ classId });
+        const { students } = await generatedClient.studentClassIdGet({ classId });
         return students.map(it => ({
           ...it,
           // email: "",
@@ -35,7 +34,7 @@ export function createClient(): APIClient {
         } satisfies Student));
       },
       removeFromClass: async (classId, studentId) => {
-        await generatedClient.v1StudentDelete({
+        await generatedClient.studentDelete({
           deleteStudent: {
             classId,
             studentId
@@ -43,7 +42,7 @@ export function createClient(): APIClient {
         });
       },
       update: async (classId, studentId, { withdrawed, group, section }) => {
-        await generatedClient.v1StudentPatch({
+        await generatedClient.studentPatch({
           editStudent: {
             classId,
             studentId,
@@ -57,7 +56,7 @@ export function createClient(): APIClient {
         // TODO: async queue
         await Promise.all(
           studentIds.map(studentId => {
-            generatedClient.v1StudentPatch({
+            generatedClient.studentPatch({
               editStudent: {
                 classId,
                 studentId,
@@ -74,7 +73,7 @@ export function createClient(): APIClient {
         return unimplemented("[classes.getById] not exist yet");
       },
       listParticipatingBySemester: async (semester) => {
-        const { assistant, study } = await generatedClient.v1ClassesClassesYearSemesterGet({ yearSemester: semester });
+        const { assistant, study } = await generatedClient.classesClassesYearSemesterGet({ yearSemester: semester });
 
         function toClass(input: ClassObject): Class {
           return {
@@ -90,7 +89,7 @@ export function createClient(): APIClient {
         };
       },
       create: async ({ courseId, name, semester, image, students }) => {
-        await generatedClient.v1ClassPost({
+        await generatedClient.classPost({
           courseId: parseInt(courseId),
           name,
           semester,
@@ -99,7 +98,7 @@ export function createClient(): APIClient {
         });
       },
       update: async (classId, { courseId, image, name, semester, students }) => {
-        await generatedClient.v1ClassPatch({
+        await generatedClient.classPatch({
           classId,
           courseId: courseId ? parseInt(courseId) : undefined,
           image,
@@ -111,14 +110,14 @@ export function createClient(): APIClient {
     },
     semesters: {
       list: async () => {
-        const { semesters } = await generatedClient.v1ClassesSemestersGet();
+        const { semesters } = await generatedClient.classesSemestersGet();
         // TODO: validate formatting
         return semesters! as Semester[];
       },
     },
     instructorsAndTAs: {
       listByClass: async (classId) => {
-        const { assistant, instructor } = await generatedClient.v1TAClassIdGet({ classId });
+        const { assistant, instructor } = await generatedClient.tAClassIdGet({ classId });
 
         return {
           instructors: instructor.map(it => ({
@@ -135,7 +134,7 @@ export function createClient(): APIClient {
         };
       },
       addToClass: async (classId, email) => {
-        await generatedClient.v1TAPost({
+        await generatedClient.tAPost({
           tAeditBody: {
             classId,
             email
@@ -143,7 +142,7 @@ export function createClient(): APIClient {
         });
       },
       removeFromClass: async (classId, email) => {
-        await generatedClient.v1TADelete({
+        await generatedClient.tADelete({
           tAeditBody: {
             classId,
             email

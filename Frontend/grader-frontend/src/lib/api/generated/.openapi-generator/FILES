@@ -3,8 +3,12 @@ apis/DefaultApi.ts
 apis/index.ts
 index.ts
 models/Assistant.ts
+models/CallbackPost200Response.ts
+models/CallbackPostRequest.ts
 models/ClassList.ts
 models/ClassObject.ts
+models/ClassesClassesYearSemesterGet200Response.ts
+models/ClassesSemestersGet200Response.ts
 models/CreateStudent.ts
 models/DeleteStudent.ts
 models/EditStudent.ts
@@ -17,10 +21,6 @@ models/StudentInfo.ts
 models/Students.ts
 models/TAInfo.ts
 models/TAeditBody.ts
-models/V1CallbackPost200Response.ts
-models/V1CallbackPostRequest.ts
-models/V1ClassesClassesYearSemesterGet200Response.ts
-models/V1ClassesSemestersGet200Response.ts
-models/V1LoginGet200Response.ts
+models/TestCallbackPostRequest.ts
 models/index.ts
 runtime.ts
