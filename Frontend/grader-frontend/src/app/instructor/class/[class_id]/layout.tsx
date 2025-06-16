@@ -8,12 +8,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { api } from "@/lib/api";
-import { cn } from "@/lib/utils";
 import { useSuspenseQuery } from "@tanstack/react-query"; // Changed from useQuery
 import { Settings, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation"; // Import notFound
-import { use, useEffect, useRef, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { ClassData, ClassDataProvider } from "./class-data-context"; // Import context
 
 async function getClassDetails(classId: number): Promise<ClassData> {

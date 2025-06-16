@@ -70,7 +70,7 @@ export function createClient(): APIClient {
     classes: {
       // TODO: will soon exist
       getById: async (classId) => {
-        return unimplemented("[classes.getById] not exist yet");
+        return unimplemented("the api to get class by its id does not yet exist.");
       },
       listParticipatingBySemester: async (semester) => {
         const { assistant, study } = await generatedClient.classesClassesYearSemesterGet({ yearSemester: semester });
