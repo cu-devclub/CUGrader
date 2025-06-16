@@ -1,14 +1,15 @@
 openapi: "3.0.0"
 servers:
-  - url: 127.0.0.1
+  - url: https://authcugrader.sittha.net/v1
+  - url: https://apicugrader.sittha.net/v1
 info:
-  contact:
-    name: Jon
-  version: "1.0.0"
-  title: "Grader"
+  version: "2.0.0"
+  title: "CUGrader"
 
 paths:
-  /v1/student:
+  /student:
+    servers:
+      - url: https://apicugrader.sittha.net/v1
     post:
       summary: Insert student
       parameters:
@@ -105,28 +106,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-    get:
-      summary: get list of students
-      parameters:
-        - in: header
-          name: Authentication
-          description: "Bearer ..."
-          schema:
-            type: string
-      responses:
-        "200":
-          description: student object in array
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/students"
-        "500":
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-  /v1/student/{class_id}:
+
+  /student/{class_id}:
+    servers:
+      - url: https://apicugrader.sittha.net/v1
     get:
       summary: "list student by class"
       parameters:
@@ -143,13 +126,11 @@ paths:
             $ref: "#/components/schemas/class_id"
       responses:
         "200":
-          description: Array of students 
+          description: Array of students
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/students"
-                # NOTE: idk
-                # TODO: fix this
         "500":
           description: Unexpected error
           content:
@@ -157,7 +138,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /v1/class:
+  /class:
+    servers:
+      - url: https://apicugrader.sittha.net/v1
     post:
       summary: Create class
       parameters:
@@ -224,7 +207,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /v1/classes/semesters:
+  /classes/semesters:
+    servers:
+      - url: https://apicugrader.sittha.net/v1
     summary: List of year-semester
     get:
       parameters:
@@ -251,7 +236,9 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /v1/classes/classes/{year-semester}:
+  /classes/classes/{year-semester}:
+    servers:
+      - url: https://apicugrader.sittha.net/v1
     summary: List of class in year-semester
     get:
       parameters:
@@ -288,7 +275,9 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /v1/TA:
+  /TA:
+    servers:
+      - url: https://apicugrader.sittha.net/v1
     post:
       parameters:
         - in: header
@@ -354,29 +343,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-    get:
-      summary: get list of assistant and instructor
-      parameters:
-        - in: header
-          name: Authentication
-          description: "Bearer ..."
-          schema:
-            type: string
-      responses:
-        "200":
-          description: assistants array and instructor array
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Assistant"
-        "500":
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-  
-  /v1/TA/{class_id}:
+
+  /TA/{class_id}:
+    servers:
+      - url: https://apicugrader.sittha.net/v1
     get:
       summary: "list ta and instructor by class"
       parameters:
@@ -398,8 +368,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Assistant"
-                # NOTE: idk
-                # TODO: fix this
         "500":
           description: Unexpected error
           content:
@@ -407,8 +375,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-
-  /v1/section/{class_id}:
+  /section/{class_id}:
+    servers:
+      - url: https://apicugrader.sittha.net/v1
     get:
       parameters:
         - name: class_id
@@ -430,7 +399,9 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /v1/group/{class_id}:
+  /group/{class_id}:
+    servers:
+      - url: https://apicugrader.sittha.net/v1
     get:
       parameters:
         - name: class_id
@@ -452,7 +423,9 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /v1/picutre/{picture_id}:
+  /picutre/{picture_id}:
+    servers:
+      - url: https://apicugrader.sittha.net/v1
     summary: get
     get:
       summary: getting image with picture id
@@ -476,50 +449,81 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /v1/login:
-    summary: get google Authentication url for redirect
+  /login:
+    servers:
+      - url: https://authcugrader.sittha.net/v1
+    summary: redirect to google
     get:
       responses:
+        "307":
+          description: redirect to google
+  /callback:
+    summary: handle callback from google
+    get:
+      servers:
+        - url: https://authcugrader.sittha.net/v1
+      responses:
+        "307":
+          description: redirect back to frotnend
+    post:
+      servers:
+        - url: https://apicugrader.sittha.net/v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - "key"
+                - "credential"
+              properties:
+                key:
+                  type: string
+                  description: key for decrypt data
+                credential:
+                  type: string
+                  description: encrypted data
+      responses:
         "200":
-          description: success
+          description: get access token
           content:
             application/json:
               schema:
+                type: object
                 properties:
-                  url:
-                    description: google Oauth for redirect to google login page
+                  access-token:
                     type: string
-                  state:
-                    default: state to verify
-                    type: string
-                required:
-                  - "url"
-                  - "state"
-  /v1/callback:
-    summary: get token using credential from google callback
+                    description: JWT Token with "Bearer " prefix
+  /test/callback:
+    servers:
+      - url: https://apicugrader.sittha.net/v1
+    summary: for getting JWT Token custom email for testing
     post:
       requestBody:
         content:
           application/json:
             schema:
-              properties:
-                credential:
-                  description: Base64 CipherText
-                  type: string
+              type: object
               required:
                 - "credential"
+              properties:
+                key:
+                  type: string
+                  description: unused
+                credential:
+                  type: string
+                  description: email end with @chula.ac.th or @student chula.ac.th
       responses:
         "200":
-          description: success
+          description: get access token
           content:
             application/json:
               schema:
+                type: object
                 properties:
                   access-token:
-                    description: JWT Token with "Bearer " prefix
                     type: string
-                required:
-                  - "access-token"
+                    description: JWT Token with "Bearer " prefix
 
 components:
   schemas:
