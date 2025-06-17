@@ -14,30 +14,7 @@ export default function StudentLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen">
-      <div className="w-1/6 border-gray-300 flex flex-col items-center bg-primary">
-        <div className="min-w-full flex px-2 py-4 items-center">
-          <Button variant="ghost" className="mb-4 text-white">
-            ☰
-          </Button>
-        </div>
-
-        <div className="min-w-full flex px-2 pb-7 gap-y-3 items-start flex-col">
-          <Button
-            className="flex w-full h-1/2 text-white justify-start"
-            variant="ghost"
-          >
-            Notification
-          </Button>
-          <Button
-            className="flex w-full h-1/2 text-white justify-start"
-            variant="ghost"
-          >
-            Profile
-          </Button>
-        </div>
-      </div>
-
-      <div className="w-5/6 border-gray-300 flex flex-col items-center">
+      <div className="w-full border-gray-300 flex flex-col items-center">
         <div className="w-full h-full p-4">
           <div className="flex border-b mb-4 px-20">
             <Tabs>

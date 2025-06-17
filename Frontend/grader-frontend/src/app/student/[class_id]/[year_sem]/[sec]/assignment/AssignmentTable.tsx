@@ -63,7 +63,8 @@ export default function AssignmentTable({ data }: Props) {
         dataSource={data}
         pagination={false}
         size="middle"
-        className="text-xs leading-tight "
+        className="text-xs leading-tight"
+        scroll={{ x: "max-content" }}
       />
     </div>
   );
