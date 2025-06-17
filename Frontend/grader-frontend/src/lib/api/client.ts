@@ -1,5 +1,7 @@
-import { ClassObject, Configuration, DefaultApi } from "./generated";
-import { APIClient, Class, Instructor, Semester, Student } from "./type";
+import { unimplemented } from "../utils";
+import { ClassObject, Configuration, DefaultApi, LabLabIdGet200Response } from "./generated";
+import { APIClient, Class, Instructor, Assignment, Semester, Student, NearDueAssignment } from "./type";
+import { parseDateTime, parseZonedDateTime } from "@internationalized/date";
 
 function toClass(input: ClassObject): Class {
   return {
@@ -7,6 +9,14 @@ function toClass(input: ClassObject): Class {
     courseId: String(input.courseId),
     courseName: input.courseName,
     imageUrl: input.image
+  };
+}
+
+function toAssignment(input: LabLabIdGet200Response): Assignment {
+  return {
+    name: input.name!,
+    due: input.due, // TODO: think about date time
+    labId: unimplemented("not exist"),
   };
 }
 
@@ -123,6 +133,12 @@ export function createClient(): APIClient {
         });
       },
     },
+    sections: {
+      getByClass: async (classId) => {
+        const { sections } = await generatedClient.sectionClassIdGet({ classId });
+        return sections ?? [];
+      }
+    },
     semesters: {
       list: async () => {
         const { semesters } = await generatedClient.classesSemestersGet();
@@ -165,5 +181,56 @@ export function createClient(): APIClient {
         });
       },
     },
+    assignments: {
+      listNearDue: async () => {
+        const { labs } = await generatedClient.nearDueDateGet();
+
+        return labs!.map(it => ({
+          id: it.labId!,
+          due: parseDateTime(it.labDue!),
+          name: it.labName!,
+          courseName: it.courseName!,
+          courseId: String(it.courseId!),
+          // TODO: request classId for linking
+          maxScore: it.labMaxScore!,
+        } satisfies NearDueAssignment));
+      },
+
+      create: async (classId, p) => {
+        await generatedClient.labPost({
+          classId,
+          labData: {
+            addfiles: p.additionalFiles,
+            assignTo: p.assignedGroupIds,
+            closeOnDue: p.closeOnDue,
+
+            examMode: false,
+            examPin: 0, // TODO: might allow this to be set since creation?
+
+            due: p.due, // TODO: formatting RFC 3339,
+            publish: p.publish,
+
+            name: p.name,
+            number: p.number,
+            questions: p.questions,
+            showScoreOnLock: p.showScoreOnLock,
+            testcase: p.testCode,
+            secretTestcase: p.secretTestCode,
+          }
+        });
+      },
+      getById: async (labId) => {
+        // this will throw
+        // TODO: think about this
+        const lab = await generatedClient.labLabIdGet({ labId });
+        return toAssignment(lab);
+      }
+    },
+    notifications: {
+      list: async () => {
+        const { labs } = await generatedClient.nearDueDateGet();
+        return;
+      }
+    }
   } satisfies APIClient;
 };
