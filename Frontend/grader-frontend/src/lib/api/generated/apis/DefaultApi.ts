@@ -23,7 +23,11 @@ import type {
   CreateStudent,
   DeleteStudent,
   EditStudent,
-  GroupArray,
+  LabEdit,
+  LabLabIdGet200Response,
+  LabsClassIdGet200Response,
+  NearDueDateGet200Response,
+  QuestionQuestionIdGet200Response,
   SectionArray,
   Students,
   TAeditBody,
@@ -46,8 +50,16 @@ import {
     DeleteStudentToJSON,
     EditStudentFromJSON,
     EditStudentToJSON,
-    GroupArrayFromJSON,
-    GroupArrayToJSON,
+    LabEditFromJSON,
+    LabEditToJSON,
+    LabLabIdGet200ResponseFromJSON,
+    LabLabIdGet200ResponseToJSON,
+    LabsClassIdGet200ResponseFromJSON,
+    LabsClassIdGet200ResponseToJSON,
+    NearDueDateGet200ResponseFromJSON,
+    NearDueDateGet200ResponseToJSON,
+    QuestionQuestionIdGet200ResponseFromJSON,
+    QuestionQuestionIdGet200ResponseToJSON,
     SectionArrayFromJSON,
     SectionArrayToJSON,
     StudentsFromJSON,
@@ -92,14 +104,47 @@ export interface ClassesSemestersGetRequest {
 
 export interface GroupClassIdGetRequest {
     classId: number;
+    authentication?: string;
+}
+
+export interface LabLabIdGetRequest {
+    labId: number;
+    authentication?: string;
+}
+
+export interface LabPatchRequest {
+    authentication?: string;
+    labId?: number;
+    labData?: LabEdit;
+}
+
+export interface LabPostRequest {
+    authentication?: string;
+    classId?: number;
+    labData?: LabEdit;
+}
+
+export interface LabsClassIdGetRequest {
+    classId: number;
+    authentication?: string;
+}
+
+export interface NearDueDateGetRequest {
+    authentication?: string;
 }
 
 export interface PicutrePictureIdGetRequest {
     pictureId: number;
 }
 
+export interface QuestionQuestionIdGetRequest {
+    questionId: number;
+    authentication?: string;
+}
+
 export interface SectionClassIdGetRequest {
     classId: number;
+    authentication?: string;
 }
 
 export interface StudentClassIdGetRequest {
@@ -431,7 +476,7 @@ export class DefaultApi extends runtime.BaseAPI {
 
     /**
      */
-    async groupClassIdGetRaw(requestParameters: GroupClassIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GroupArray>> {
+    async groupClassIdGetRaw(requestParameters: GroupClassIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<string>>> {
         if (requestParameters['classId'] == null) {
             throw new runtime.RequiredError(
                 'classId',
@@ -443,6 +488,10 @@ export class DefaultApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (requestParameters['authentication'] != null) {
+            headerParameters['Authentication'] = String(requestParameters['authentication']);
+        }
+
         const response = await this.request({
             path: `/group/{class_id}`.replace(`{${"class_id"}}`, encodeURIComponent(String(requestParameters['classId']))),
             method: 'GET',
@@ -450,13 +499,199 @@ export class DefaultApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => GroupArrayFromJSON(jsonValue));
+        return new runtime.JSONApiResponse<any>(response);
     }
 
     /**
      */
-    async groupClassIdGet(requestParameters: GroupClassIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GroupArray> {
+    async groupClassIdGet(requestParameters: GroupClassIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<string>> {
         const response = await this.groupClassIdGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * getting image with picture id
+     */
+    async labLabIdGetRaw(requestParameters: LabLabIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<LabLabIdGet200Response>> {
+        if (requestParameters['labId'] == null) {
+            throw new runtime.RequiredError(
+                'labId',
+                'Required parameter "labId" was null or undefined when calling labLabIdGet().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters['authentication'] != null) {
+            headerParameters['Authentication'] = String(requestParameters['authentication']);
+        }
+
+        const response = await this.request({
+            path: `/lab/{lab_id}`.replace(`{${"lab_id"}}`, encodeURIComponent(String(requestParameters['labId']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => LabLabIdGet200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * getting image with picture id
+     */
+    async labLabIdGet(requestParameters: LabLabIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<LabLabIdGet200Response> {
+        const response = await this.labLabIdGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * edit lab
+     */
+    async labPatchRaw(requestParameters: LabPatchRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters['authentication'] != null) {
+            headerParameters['Authentication'] = String(requestParameters['authentication']);
+        }
+
+        const consumes: runtime.Consume[] = [
+            { contentType: 'multipart/form-data' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any };
+        let useForm = false;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters['labId'] != null) {
+            formParams.append('lab_id', requestParameters['labId'] as any);
+        }
+
+        if (requestParameters['labData'] != null) {
+            formParams.append('lab_data', new Blob([JSON.stringify(stringToJSON(requestParameters['labData']))], { type: "application/json", }));
+                    }
+
+        const response = await this.request({
+            path: `/lab`,
+            method: 'PATCH',
+            headers: headerParameters,
+            query: queryParameters,
+            body: formParams,
+        }, initOverrides);
+
+        if (this.isJsonMime(response.headers.get('content-type'))) {
+            return new runtime.JSONApiResponse<string>(response);
+        } else {
+            return new runtime.TextApiResponse(response) as any;
+        }
+    }
+
+    /**
+     * edit lab
+     */
+    async labPatch(requestParameters: LabPatchRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
+        const response = await this.labPatchRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * create lab
+     */
+    async labPostRaw(requestParameters: LabPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters['authentication'] != null) {
+            headerParameters['Authentication'] = String(requestParameters['authentication']);
+        }
+
+        const consumes: runtime.Consume[] = [
+            { contentType: 'multipart/form-data' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any };
+        let useForm = false;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters['classId'] != null) {
+            formParams.append('class_id', requestParameters['classId'] as any);
+        }
+
+        if (requestParameters['labData'] != null) {
+            formParams.append('lab_data', new Blob([JSON.stringify(stringToJSON(requestParameters['labData']))], { type: "application/json", }));
+                    }
+
+        const response = await this.request({
+            path: `/lab`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: formParams,
+        }, initOverrides);
+
+        if (this.isJsonMime(response.headers.get('content-type'))) {
+            return new runtime.JSONApiResponse<string>(response);
+        } else {
+            return new runtime.TextApiResponse(response) as any;
+        }
+    }
+
+    /**
+     * create lab
+     */
+    async labPost(requestParameters: LabPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
+        const response = await this.labPostRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async labsClassIdGetRaw(requestParameters: LabsClassIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<LabsClassIdGet200Response>> {
+        if (requestParameters['classId'] == null) {
+            throw new runtime.RequiredError(
+                'classId',
+                'Required parameter "classId" was null or undefined when calling labsClassIdGet().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters['authentication'] != null) {
+            headerParameters['Authentication'] = String(requestParameters['authentication']);
+        }
+
+        const response = await this.request({
+            path: `/labs/{class_id}`.replace(`{${"class_id"}}`, encodeURIComponent(String(requestParameters['classId']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => LabsClassIdGet200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async labsClassIdGet(requestParameters: LabsClassIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<LabsClassIdGet200Response> {
+        const response = await this.labsClassIdGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -481,6 +716,34 @@ export class DefaultApi extends runtime.BaseAPI {
      */
     async loginGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.loginGetRaw(initOverrides);
+    }
+
+    /**
+     */
+    async nearDueDateGetRaw(requestParameters: NearDueDateGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<NearDueDateGet200Response>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters['authentication'] != null) {
+            headerParameters['Authentication'] = String(requestParameters['authentication']);
+        }
+
+        const response = await this.request({
+            path: `/near_due_date`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => NearDueDateGet200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async nearDueDateGet(requestParameters: NearDueDateGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<NearDueDateGet200Response> {
+        const response = await this.nearDueDateGetRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**
@@ -517,6 +780,43 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
+     * getting image with picture id
+     */
+    async questionQuestionIdGetRaw(requestParameters: QuestionQuestionIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<QuestionQuestionIdGet200Response>> {
+        if (requestParameters['questionId'] == null) {
+            throw new runtime.RequiredError(
+                'questionId',
+                'Required parameter "questionId" was null or undefined when calling questionQuestionIdGet().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters['authentication'] != null) {
+            headerParameters['Authentication'] = String(requestParameters['authentication']);
+        }
+
+        const response = await this.request({
+            path: `/question/{question_id}`.replace(`{${"question_id"}}`, encodeURIComponent(String(requestParameters['questionId']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => QuestionQuestionIdGet200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * getting image with picture id
+     */
+    async questionQuestionIdGet(requestParameters: QuestionQuestionIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<QuestionQuestionIdGet200Response> {
+        const response = await this.questionQuestionIdGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
      */
     async sectionClassIdGetRaw(requestParameters: SectionClassIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SectionArray>> {
         if (requestParameters['classId'] == null) {
@@ -529,6 +829,10 @@ export class DefaultApi extends runtime.BaseAPI {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters['authentication'] != null) {
+            headerParameters['Authentication'] = String(requestParameters['authentication']);
+        }
 
         const response = await this.request({
             path: `/section/{class_id}`.replace(`{${"class_id"}}`, encodeURIComponent(String(requestParameters['classId']))),
