@@ -1,3 +1,5 @@
+import { CalendarDateTime } from "@internationalized/date";
+
 export type Semester = `${number}/${string}`;
 
 export interface Class {
@@ -65,8 +67,10 @@ export interface Question {
   answer: string;
   template: string;
   score: number;
+
   testCode: string; // wtf is the differences
   secretTestCode: string;
+
   testcases: Testcase[];
   secretTestCases: Testcase[];
 }
@@ -77,19 +81,25 @@ type SupportedLanguage = typeof supportedLanguages[number];
 
 export type LabStatus = "new" | "partially-completed" | "completed" | "lated" | "due-soon";
 
-export interface Lab {
-  labId: number;
+export interface Assignment {
+  id: number;
   number: number;
   name: string;
-  publish: Date;
-  due: Date;
-
-  score: number;
-  maxScore: number;
-  status: LabStatus;
-
+  publish: CalendarDateTime; // @internationalized/date maybe
+  due: CalendarDateTime; // RFC3339: 1996-12-19T16:39:57+07:00
   questionIds: number[];
+  maxScore: number;
 }
+
+export interface StudentAssignment extends Assignment {
+  score: number;
+  status: LabStatus;
+}
+
+export type NearDueAssignment = Omit<Assignment, "number" | "publish" | "questionIds"> & {
+  courseName: string;
+  courseId: string;
+};
 
 // ===========
 
@@ -128,7 +138,7 @@ export interface CreateClassPayload {
 
 export type UpdateClassPayload = Partial<CreateClassPayload>;
 
-export type CreateLabPayload = Omit<Lab, "labId" | "languages" | "questionIds"> & {
+export type CreateLabPayload = Omit<Assignment, "id" | "languages" | "questionIds" | "maxScore"> & {
   closeOnDue: boolean;
   showScoreOnLock: boolean; // hideOnClose ??? -> which mean we have some kind of state `isLocked` from the api
 
@@ -136,23 +146,20 @@ export type CreateLabPayload = Omit<Lab, "labId" | "languages" | "questionIds"> 
 
   languages: SupportedLanguage[]; // select at least one
 
+  assignedGroupIds: string[];
+
   testCode: string; // code, like in 2024 class
   secretTestCode: string;
 
-  // only for multilanguage?, for now yes
-  testcases: Testcase;
-  secretTestcases: Testcase;
-
   questions: Question[];
-
-  examMode: boolean;
-  examPin: string; // 6 digit num
-
   additionalFiles: File[];
 };
 
 // TODO: think about file removal
-export type UpdateLabPayload = CreateLabPayload;
+export type UpdateLabPayload = CreateLabPayload & {
+  examMode: boolean;
+  examPin: string; // 6 digit num
+};
 
 export interface APIClient {
   students: {
@@ -181,17 +188,16 @@ export interface APIClient {
     addToClass: (classId: number, email: string) => Promise<void>,
     removeFromClass: (classId: number, email: string) => Promise<void>,
   },
-  lab: {
-    listByClass: (classId: number) => Promise<Lab[]>;
+  assignments: {
+    // studentLab or not, cast it or seperate method?
+    listNearDue: () => Promise<NearDueAssignment[]>;
+    listByClass: (classId: number) => Promise<Assignment[]>;
     create: (classId: number, payload: CreateLabPayload) => Promise<void>;
     update: (labId: number, payload: UpdateLabPayload) => Promise<void>;
-    getById: (labId: number) => Promise<Lab>;
+    getById: (labId: number) => Promise<Assignment>;
   };
   questions: {
     getById: (questionId: number) => Promise<never>;
 
-  };
-  notifications: {
-    list: () => Promise<LabNotification[]>;
   };
 };
