@@ -1,6 +1,14 @@
-import { unimplemented } from "../utils";
 import { ClassObject, Configuration, DefaultApi } from "./generated";
 import { APIClient, Class, Instructor, Semester, Student } from "./type";
+
+function toClass(input: ClassObject): Class {
+  return {
+    classId: input.classId,
+    courseId: String(input.courseId),
+    courseName: input.courseName,
+    imageUrl: input.image
+  };
+}
 
 export function createClient(): APIClient {
   const authToken = "TODO: get it, after auth is implemented";
@@ -53,7 +61,7 @@ export function createClient(): APIClient {
         });
       },
       updateMany: async (classId, studentIds, data) => {
-        // TODO: async queue
+        // TODO: async queue maybe
         await Promise.all(
           studentIds.map(studentId => {
             generatedClient.studentPatch({
@@ -68,21 +76,28 @@ export function createClient(): APIClient {
       },
     },
     classes: {
-      // TODO: will soon exist
+      // TODO: fix this
       getById: async (classId) => {
-        return unimplemented("the api to get class by its id does not yet exist.");
+        const { semesters } = await generatedClient.classesSemestersGet();
+
+        const promises = (semesters ?? []).map(async s => {
+          const { assistant, study } = await generatedClient.classesClassesYearSemesterGet({ yearSemester: s });
+          const classes = [...assistant ?? [], ...study ?? []];
+
+          const target = classes.find(it => it.classId === classId);
+          if (!target) {
+            throw new Error("not this semester");
+          }
+
+          return toClass(target);
+        });
+
+        return await Promise.any(promises);
+        // return unimplemented("the api to get class by its id does not yet exist.");
       },
       listParticipatingBySemester: async (semester) => {
         const { assistant, study } = await generatedClient.classesClassesYearSemesterGet({ yearSemester: semester });
 
-        function toClass(input: ClassObject): Class {
-          return {
-            classId: input.classId,
-            courseId: String(input.courseId),
-            courseName: input.courseName,
-            imageUrl: input.image
-          };
-        }
         return {
           assisting: assistant!.map(toClass),
           studying: study!.map(toClass)

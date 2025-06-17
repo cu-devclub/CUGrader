@@ -24,7 +24,7 @@ export interface TAeditBody {
      * @type {number}
      * @memberof TAeditBody
      */
-    classId?: number;
+    classId: number;
     /**
      * TA's email
      * @type {string}
@@ -37,6 +37,7 @@ export interface TAeditBody {
  * Check if a given object implements the TAeditBody interface.
  */
 export function instanceOfTAeditBody(value: object): value is TAeditBody {
+    if (!('classId' in value) || value['classId'] === undefined) return false;
     if (!('email' in value) || value['email'] === undefined) return false;
     return true;
 }
@@ -51,7 +52,7 @@ export function TAeditBodyFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     }
     return {
         
-        'classId': json['class_id'] == null ? undefined : json['class_id'],
+        'classId': json['class_id'],
         'email': json['email'],
     };
 }
