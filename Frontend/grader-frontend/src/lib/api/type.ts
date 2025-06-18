@@ -237,4 +237,7 @@ export interface APIClient {
   supportedLanguages: {
     list: () => Promise<string[]>;
   };
+  groups: {
+    listByClassId: (classId: number) => Promise<string[]>;
+  };
 };
