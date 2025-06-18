@@ -389,6 +389,11 @@ function createClient(persistence: Storage<Database>): APIClient {
         return [...new Set(c.students.map(it => it.section))];
       },
     },
+    supportedLanguages: {
+      list: async () => {
+        return ["Rust", "Swift"];
+      },
+    },
   };
 
   return client;

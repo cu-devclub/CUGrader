@@ -248,22 +248,22 @@ export function createClient(): APIClient {
           number: lab.number!,
           questionIds: lab.questionIds!,
           additionalFileIds: lab.addfiles!,
-          
+
           get id() {
             return unimplemented("id not yet exist");
           },
           set id(_) { },
-          
+
           get maxScore() {
             return unimplemented("maxScore not yet exist");
           },
           set maxScore(_) { },
-          
+
           get score() {
             return unimplemented("score not yet exist");
           },
           set score(_) { },
-          
+
           get status() {
             return unimplemented("status not yet exist");
           },
@@ -305,6 +305,12 @@ export function createClient(): APIClient {
       },
       getByIdI: async (questionId) => {
         return unimplemented();
+      },
+    },
+    supportedLanguages: {
+      list: async () => {
+        const response = await generatedClient.languageGet();
+        return response.languages?.map(lang => lang.name!) || [];
       },
     }
   } satisfies APIClient;

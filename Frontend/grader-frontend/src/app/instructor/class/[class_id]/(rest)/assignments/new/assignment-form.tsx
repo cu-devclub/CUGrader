@@ -1,5 +1,7 @@
 'use client';
 
+// 99% of this is by sonnet 4
+
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -9,13 +11,14 @@ import { api } from "@/lib/api";
 import { CreateAssignmentPayload } from "@/lib/api/type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { parseDateTime } from "@internationalized/date";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { Plus, Save, Trash2, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { useMemo, useEffect } from "react";
 
 const createSchemas = (t: any) => {
   const testcaseSchema = z.object({
@@ -31,8 +34,8 @@ const createSchemas = (t: any) => {
     answer: z.string().min(1, t('assignment.form.validation.question.answer.required')),
     testCode: z.string().min(1, t('assignment.form.validation.question.testCode.required')),
     secretTestCode: z.string().min(1, t('assignment.form.validation.question.secretTestCode.required')),
-    testcases: z.array(testcaseSchema).min(1, t('assignment.form.validation.question.testcases.min')),
-    secretTestCases: z.array(testcaseSchema).min(1, t('assignment.form.validation.question.secretTestcases.min')),
+    testcases: z.array(testcaseSchema),
+    secretTestCases: z.array(testcaseSchema),
   });
 
   const assignmentSchema = z.object({
@@ -47,15 +50,13 @@ const createSchemas = (t: any) => {
     showScoreOnLock: z.boolean(),
     examPin: z.string(),
     assignedGroupIds: z.array(z.string()),
-    testCode: z.string().min(1, t('assignment.form.validation.testCode.required')),
-    secretTestCode: z.string().min(1, t('assignment.form.validation.secretTestCode.required')),
+    testCode: z.string(),
+    secretTestCode: z.string(),
     questions: z.array(questionSchema).min(1, t('assignment.form.validation.questions.min')),
   });
 
   return { assignmentSchema, questionSchema, testcaseSchema };
 };
-
-const supportedLanguages = ["C", "C++", "Java", "Python", "JavaScript", "Go", "Rust"];
 
 // Define the form data type using the schema inference from createSchemas
 type AssignmentFormData = z.infer<ReturnType<typeof createSchemas>['assignmentSchema']>;
@@ -66,11 +67,16 @@ export interface AssignmentFormProps {
 
 export function AssignmentForm({ classId }: AssignmentFormProps) {
   const router = useRouter();
-  const queryClient = useQueryClient();
   const t = useTranslations();
-
-  const { assignmentSchema } = createSchemas(t);
-
+  
+  // Query for supported languages
+  const { data: supportedLanguages = [] } = useSuspenseQuery({
+    queryKey: ['supportedLanguages'],
+    queryFn: () => api.supportedLanguages.list(),
+  });
+  
+  const { assignmentSchema } = useMemo(() => createSchemas(t), [t]);
+  
   const form = useForm<AssignmentFormData>({
     resolver: zodResolver(assignmentSchema),
     defaultValues: {
@@ -102,6 +108,17 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
       ],
     },
   });
+
+  const selectedLanguages = form.watch("languages");
+  const isMultipleLanguages = selectedLanguages.length > 1;
+
+  // Clear global test code fields when multiple languages are selected
+  useEffect(() => {
+    if (isMultipleLanguages) {
+      form.setValue("testCode", "");
+      form.setValue("secretTestCode", "");
+    }
+  }, [isMultipleLanguages, form]);
 
   const {
     fields: questionFields,
@@ -282,7 +299,7 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
                   Select which programming languages students can use for this assignment.
                 </FormDescription>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                  {supportedLanguages.map((language) => (
+                  {supportedLanguages.map((language: string) => (
                     <FormField
                       key={language}
                       control={form.control}
@@ -431,11 +448,15 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
                     placeholder="// Global test code that will be used for all questions"
                     className="font-mono"
                     rows={6}
+                    disabled={isMultipleLanguages}
                     {...field} 
                   />
                 </FormControl>
                 <FormDescription>
-                  Test code that will be visible to students
+                  {isMultipleLanguages 
+                    ? t('assignment.form.fields.testCode.disabledMultipleLanguages')
+                    : t('assignment.form.fields.testCode.description')
+                  }
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -453,11 +474,15 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
                     placeholder="// Secret test code that will not be visible to students"
                     className="font-mono"
                     rows={6}
+                    disabled={isMultipleLanguages}
                     {...field} 
                   />
                 </FormControl>
                 <FormDescription>
-                  Secret test code that will not be visible to students
+                  {isMultipleLanguages 
+                    ? t('assignment.form.fields.secretTestCode.disabledMultipleLanguages')
+                    : t('assignment.form.fields.secretTestCode.description')
+                  }
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -692,16 +717,14 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove }: QuestionForm
           <div key={testcase.id} className="border rounded p-3 space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Test Case {testcaseIndex + 1}</span>
-              {testcaseFields.length > 1 && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => removeTestcase(testcaseIndex)}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              )}
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => removeTestcase(testcaseIndex)}
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               <FormField
@@ -764,16 +787,14 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove }: QuestionForm
           <div key={testcase.id} className="border rounded p-3 space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Secret Test Case {testcaseIndex + 1}</span>
-              {secretTestcaseFields.length > 1 && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => removeSecretTestcase(testcaseIndex)}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              )}
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => removeSecretTestcase(testcaseIndex)}
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               <FormField
