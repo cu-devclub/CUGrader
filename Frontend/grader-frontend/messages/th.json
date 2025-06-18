@@ -11,7 +11,8 @@
                 "testing": "การกำหนดค่าการทดสอบ",
                 "globalTestCode": "โค้ดทดสอบส่วนกลาง",
                 "questions": "คำถาม",
-                "assignedGroups": "กลุ่มที่มอบหมาย"
+                "assignedGroups": "กลุ่มที่มอบหมาย",
+                "attachments": "ไฟล์แนบ"
             },
             "fields": {
                 "name": {
@@ -37,6 +38,9 @@
                 },
                 "assignedGroups": {
                     "description": "เลือกกลุ่มที่จะรับงานนี้ หากไม่เลือกจะมอบหมายให้กลุ่มทั้งหมด"
+                },
+                "attachedFiles": {
+                    "label": "ไฟล์แนบ"
                 },
                 "examMode": {
                     "label": "โหมดสอบ",
@@ -125,7 +129,8 @@
                 "removeTestcase": "ลบ",
                 "cancel": "ยกเลิก",
                 "save": "สร้างงาน",
-                "creating": "กำลังสร้าง..."
+                "creating": "กำลังสร้าง...",
+                "selectFiles": "เลือกไฟล์"
             },
             "validation": {
                 "name": {

@@ -11,7 +11,8 @@
                 "testing": "Testing Configuration",
                 "globalTestCode": "Global Test Code",
                 "questions": "Questions",
-                "assignedGroups": "Assigned Groups"
+                "assignedGroups": "Assigned Groups",
+                "attachments": "File Attachments"
             },
             "fields": {
                 "name": {
@@ -37,6 +38,9 @@
                 },
                 "assignedGroups": {
                     "description": "Select which groups should receive this assignment. Leave empty to assign to all groups."
+                },
+                "attachedFiles": {
+                    "label": "Attached Files"
                 },
                 "examMode": {
                     "label": "Exam Mode",
@@ -125,7 +129,8 @@
                 "removeTestcase": "Remove",
                 "cancel": "Cancel",
                 "save": "Create Assignment",
-                "creating": "Creating..."
+                "creating": "Creating...",
+                "selectFiles": "Select Files"
             },
             "validation": {
                 "name": {
