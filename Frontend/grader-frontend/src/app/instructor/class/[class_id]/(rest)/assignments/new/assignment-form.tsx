@@ -560,15 +560,23 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove, t }: QuestionF
   });
 
   return (
-    <div className="border rounded-lg p-4 space-y-4">
-      <div className="flex items-center justify-between">
-        <h3 className="font-medium">{t('assignment.form.question.title', { number: questionIndex + 1 })}</h3>
+    <div className="bg-card border rounded-xl p-6 space-y-6 shadow-sm">
+      <div className="flex items-center justify-between pb-4 border-b">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-semibold">
+            {questionIndex + 1}
+          </div>
+          <h3 className="text-xl font-semibold">
+            {t('assignment.form.question.title', { number: questionIndex + 1 })}
+          </h3>
+        </div>
         {canRemove && (
           <Button
             type="button"
             variant="ghost"
             size="sm"
             onClick={onRemove}
+            className="text-destructive hover:text-destructive hover:bg-destructive/10"
           >
             <X className="w-4 h-4" />
           </Button>
@@ -704,7 +712,7 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove, t }: QuestionF
       {/* Testcases */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h4 className="font-medium">{t('assignment.form.question.testCases.title')}</h4>
+          <h4 className="text-lg font-semibold text-foreground">{t('assignment.form.question.testCases.title')}</h4>
           <Button
             type="button"
             size="sm"
@@ -717,14 +725,15 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove, t }: QuestionF
         </div>
 
         {testcaseFields.map((testcase, testcaseIndex) => (
-          <div key={testcase.id} className="border rounded p-3 space-y-2">
+          <div key={testcase.id} className="bg-muted/30 border rounded-lg p-4 space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">{t('assignment.form.question.testCases.testCase', { number: testcaseIndex + 1 })}</span>
+              <span className="text-sm font-medium text-muted-foreground">{t('assignment.form.question.testCases.testCase', { number: testcaseIndex + 1 })}</span>
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
                 onClick={() => removeTestcase(testcaseIndex)}
+                className="text-destructive hover:text-destructive hover:bg-destructive/10"
               >
                 <Trash2 className="w-4 h-4" />
               </Button>
@@ -774,7 +783,7 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove, t }: QuestionF
       {/* Secret Testcases */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h4 className="font-medium">{t('assignment.form.question.secretTestCases.title')}</h4>
+          <h4 className="text-lg font-semibold text-foreground">{t('assignment.form.question.secretTestCases.title')}</h4>
           <Button
             type="button"
             size="sm"
@@ -787,14 +796,15 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove, t }: QuestionF
         </div>
 
         {secretTestcaseFields.map((testcase, testcaseIndex) => (
-          <div key={testcase.id} className="border rounded p-3 space-y-2">
+          <div key={testcase.id} className="bg-muted/30 border rounded-lg p-4 space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">{t('assignment.form.question.secretTestCases.testCase', { number: testcaseIndex + 1 })}</span>
+              <span className="text-sm font-medium text-muted-foreground">{t('assignment.form.question.secretTestCases.testCase', { number: testcaseIndex + 1 })}</span>
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
                 onClick={() => removeSecretTestcase(testcaseIndex)}
+                className="text-destructive hover:text-destructive hover:bg-destructive/10"
               >
                 <Trash2 className="w-4 h-4" />
               </Button>
