@@ -79,7 +79,7 @@ export interface StudentQuestion extends Question {
 
 export interface InstructorQuestion extends Question {
   answer: string;
-  
+
   testCode: string; // wtf is the differences
   secretTestCode: string;
 
@@ -233,5 +233,8 @@ export interface APIClient {
   questions: {
     getById: (questionId: number) => Promise<StudentQuestion>;
     getByIdI: (questionId: number) => Promise<InstructorQuestion>;
+  };
+  supportedLanguages: {
+    list: () => Promise<string[]>;
   };
 };

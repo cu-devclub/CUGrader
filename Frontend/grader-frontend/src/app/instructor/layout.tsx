@@ -11,7 +11,7 @@ export default function InstructorLayout({
     <>
       <SidebarProvider defaultOpen={false}>
         <AppSidebar />
-        <main className="flex-1 h-screen overflow-auto">
+        <main className="flex-1 h-screen">
           {children}
         </main>
       </SidebarProvider>
