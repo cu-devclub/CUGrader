@@ -20,7 +20,7 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-const createSchemas = (t: any) => {
+const createSchemas = (t: ReturnType<typeof useTranslations>) => {
   const testcaseSchema = z.object({
     input: z.string(),
     output: z.string(),
