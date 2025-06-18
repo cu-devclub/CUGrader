@@ -28,12 +28,12 @@ const createSchemas = (t: any) => {
 
   const questionSchema = z.object({
     name: z.string().min(1, t('assignment.form.validation.question.name.required')),
-    description: z.string().min(1, t('assignment.form.validation.question.description.required')),
-    template: z.string().min(1, t('assignment.form.validation.question.template.required')),
+    description: z.string(),
+    template: z.string(),
     maxScore: z.coerce.number().min(0, t('assignment.form.validation.question.maxScore.min')),
-    answer: z.string().min(1, t('assignment.form.validation.question.answer.required')),
-    testCode: z.string().min(1, t('assignment.form.validation.question.testCode.required')),
-    secretTestCode: z.string().min(1, t('assignment.form.validation.question.secretTestCode.required')),
+    answer: z.string(),
+    testCode: z.string(),
+    secretTestCode: z.string(),
     testcases: z.array(testcaseSchema),
     secretTestCases: z.array(testcaseSchema),
   });
@@ -161,15 +161,16 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
         additionalFileIds: [],
       };
 
-      await api.assignments.create(classId, payload);
+      console.log(payload);
+      // await api.assignments.create(classId, payload);
     },
     onSuccess: () => {
-      toast.success("Assignment created successfully");
+      toast.success(t('assignment.form.messages.createSuccess'));
       router.push(`/instructor/class/${classId}/assignments`);
     },
     onError: (error) => {
       console.error(error);
-      toast.error("Failed to create assignment", {
+      toast.error(t('assignment.form.messages.createError'), {
         description: error.message,
       });
     },
@@ -198,7 +199,7 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6">
         {/* Basic Information */}
         <div className="space-y-4">
-          <h2 className="text-lg font-medium">Basic Information</h2>
+          <h2 className="text-lg font-medium">{t('assignment.form.sections.basicInfo')}</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
@@ -206,9 +207,9 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Assignment Name</FormLabel>
+                  <FormLabel>{t('assignment.form.fields.name.label')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="Lab 1: Hello World" {...field} />
+                    <Input placeholder={t('assignment.form.fields.name.placeholder')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -220,7 +221,7 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
               name="number"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Assignment Number</FormLabel>
+                  <FormLabel>{t('assignment.form.fields.number.label')}</FormLabel>
                   <FormControl>
                     <Input type="number" min="1" {...field} />
                   </FormControl>
@@ -236,7 +237,7 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
               name="publish"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Publish Date & Time</FormLabel>
+                  <FormLabel>{t('assignment.form.fields.publish.label')}</FormLabel>
                   <FormControl>
                     <Input
                       type="datetime-local"
@@ -244,7 +245,7 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
                     />
                   </FormControl>
                   <FormDescription>
-                    When students can start seeing this assignment
+                    {t('assignment.form.fields.publish.description')}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -256,7 +257,7 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
               name="due"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Due Date & Time</FormLabel>
+                  <FormLabel>{t('assignment.form.fields.due.label')}</FormLabel>
                   <FormControl>
                     <Input
                       type="datetime-local"
@@ -264,7 +265,7 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
                     />
                   </FormControl>
                   <FormDescription>
-                    When the assignment is due
+                    {t('assignment.form.fields.due.description')}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -277,7 +278,7 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
             name="maxScore"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Maximum Score</FormLabel>
+                <FormLabel>{t('assignment.form.fields.maxScore.label')}</FormLabel>
                 <FormControl>
                   <Input type="number" min="0" {...field} />
                 </FormControl>
@@ -289,14 +290,14 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
 
         {/* Languages */}
         <div className="space-y-4">
-          <h2 className="text-lg font-medium">Supported Languages</h2>
+          <h2 className="text-lg font-medium">{t('assignment.form.sections.languages')}</h2>
           <FormField
             control={form.control}
             name="languages"
             render={() => (
               <FormItem>
                 <FormDescription>
-                  Select which programming languages students can use for this assignment.
+                  {t('assignment.form.fields.languages.description')}
                 </FormDescription>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                   {supportedLanguages.map((language: string) => (
@@ -341,7 +342,7 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
 
         {/* Settings */}
         <div className="space-y-4">
-          <h2 className="text-lg font-medium">Assignment Settings</h2>
+          <h2 className="text-lg font-medium">{t('assignment.form.sections.settings')}</h2>
 
           <div className="space-y-3">
             <FormField
@@ -356,9 +357,9 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
                     />
                   </FormControl>
                   <div className="space-y-1 leading-none">
-                    <FormLabel>Exam Mode</FormLabel>
+                    <FormLabel>{t('assignment.form.fields.examMode.label')}</FormLabel>
                     <FormDescription>
-                      Enable exam mode for this assignment
+                      {t('assignment.form.fields.examMode.description')}
                     </FormDescription>
                   </div>
                 </FormItem>
@@ -377,9 +378,9 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
                     />
                   </FormControl>
                   <div className="space-y-1 leading-none">
-                    <FormLabel>Close on Due</FormLabel>
+                    <FormLabel>{t('assignment.form.fields.closeOnDue.label')}</FormLabel>
                     <FormDescription>
-                      Automatically close the assignment when due date is reached
+                      {t('assignment.form.fields.closeOnDue.description')}
                     </FormDescription>
                   </div>
                 </FormItem>
@@ -398,9 +399,9 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
                     />
                   </FormControl>
                   <div className="space-y-1 leading-none">
-                    <FormLabel>Show Score on Lock</FormLabel>
+                    <FormLabel>{t('assignment.form.fields.showScoreOnLock.label')}</FormLabel>
                     <FormDescription>
-                      Show scores to students when the assignment is locked
+                      {t('assignment.form.fields.showScoreOnLock.description')}
                     </FormDescription>
                   </div>
                 </FormItem>
@@ -414,17 +415,17 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
               name="examPin"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Exam PIN</FormLabel>
+                  <FormLabel>{t('assignment.form.fields.examPin.label')}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="123456"
+                      placeholder={t('assignment.form.fields.examPin.placeholder')}
                       maxLength={6}
                       pattern="[0-9]{6}"
                       {...field}
                     />
                   </FormControl>
                   <FormDescription>
-                    6-digit PIN for exam mode access
+                    {t('assignment.form.fields.examPin.description')}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -435,17 +436,17 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
 
         {/* Test Code */}
         <div className="space-y-4">
-          <h2 className="text-lg font-medium">Global Test Code</h2>
+          <h2 className="text-lg font-medium">{t('assignment.form.sections.globalTestCode')}</h2>
 
           <FormField
             control={form.control}
             name="testCode"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Test Code</FormLabel>
+                <FormLabel>{t('assignment.form.fields.testCode.label')}</FormLabel>
                 <FormControl>
                   <Textarea
-                    placeholder="// Global test code that will be used for all questions"
+                    placeholder={t('assignment.form.fields.testCode.placeholder')}
                     className="font-mono"
                     rows={6}
                     disabled={isMultipleLanguages}
@@ -468,10 +469,10 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
             name="secretTestCode"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Secret Test Code</FormLabel>
+                <FormLabel>{t('assignment.form.fields.secretTestCode.label')}</FormLabel>
                 <FormControl>
                   <Textarea
-                    placeholder="// Secret test code that will not be visible to students"
+                    placeholder={t('assignment.form.fields.secretTestCode.placeholder')}
                     className="font-mono"
                     rows={6}
                     disabled={isMultipleLanguages}
@@ -493,10 +494,10 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
         {/* Questions */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-medium">Questions</h2>
+            <h2 className="text-lg font-medium">{t('assignment.form.sections.questions')}</h2>
             <Button type="button" onClick={addQuestion} variant="outline">
               <Plus className="w-4 h-4 mr-2" />
-              Add Question
+              {t('assignment.form.buttons.addQuestion')}
             </Button>
           </div>
 
@@ -507,6 +508,7 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
               form={form}
               onRemove={() => removeQuestion(questionIndex)}
               canRemove={questionFields.length > 1}
+              t={t}
             />
           ))}
         </div>
@@ -515,14 +517,14 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
         <div className="flex gap-2 pt-4">
           <Button type="submit" disabled={mutation.isPending}>
             <Save className="w-4 h-4 mr-2" />
-            {mutation.isPending ? "Creating..." : "Create Assignment"}
+            {mutation.isPending ? t('assignment.form.buttons.creating') : t('assignment.form.buttons.save')}
           </Button>
           <Button
             type="button"
             variant="outline"
             onClick={() => router.back()}
           >
-            Cancel
+            {t('assignment.form.buttons.cancel')}
           </Button>
         </div>
       </form>
@@ -535,9 +537,10 @@ interface QuestionFormProps {
   form: ReturnType<typeof useForm<AssignmentFormData>>;
   onRemove: () => void;
   canRemove: boolean;
+  t: any;
 }
 
-function QuestionForm({ questionIndex, form, onRemove, canRemove }: QuestionFormProps) {
+function QuestionForm({ questionIndex, form, onRemove, canRemove, t }: QuestionFormProps) {
   const {
     fields: testcaseFields,
     append: appendTestcase,
@@ -559,7 +562,7 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove }: QuestionForm
   return (
     <div className="border rounded-lg p-4 space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="font-medium">Question {questionIndex + 1}</h3>
+        <h3 className="font-medium">{t('assignment.form.question.title', { number: questionIndex + 1 })}</h3>
         {canRemove && (
           <Button
             type="button"
@@ -578,9 +581,9 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove }: QuestionForm
           name={`questions.${questionIndex}.name`}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Question Name</FormLabel>
+              <FormLabel>{t('assignment.form.question.fields.name.label')}</FormLabel>
               <FormControl>
-                <Input placeholder="Problem A: Sum" {...field} />
+                <Input placeholder={t('assignment.form.question.fields.name.placeholder')} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -592,7 +595,7 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove }: QuestionForm
           name={`questions.${questionIndex}.maxScore`}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Max Score</FormLabel>
+              <FormLabel>{t('assignment.form.question.fields.maxScore.label')}</FormLabel>
               <FormControl>
                 <Input type="number" min="0" {...field} />
               </FormControl>
@@ -607,10 +610,10 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove }: QuestionForm
         name={`questions.${questionIndex}.description`}
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Description</FormLabel>
+            <FormLabel>{t('assignment.form.question.fields.description.label')}</FormLabel>
             <FormControl>
               <Textarea
-                placeholder="Describe the problem..."
+                placeholder={t('assignment.form.question.fields.description.placeholder')}
                 rows={4}
                 {...field}
               />
@@ -625,10 +628,10 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove }: QuestionForm
         name={`questions.${questionIndex}.template`}
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Code Template</FormLabel>
+            <FormLabel>{t('assignment.form.question.fields.template.label')}</FormLabel>
             <FormControl>
               <Textarea
-                placeholder="// Starter code for students"
+                placeholder={t('assignment.form.question.fields.template.placeholder')}
                 className="font-mono"
                 rows={4}
                 {...field}
@@ -644,10 +647,10 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove }: QuestionForm
         name={`questions.${questionIndex}.answer`}
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Model Answer</FormLabel>
+            <FormLabel>{t('assignment.form.question.fields.answer.label')}</FormLabel>
             <FormControl>
               <Textarea
-                placeholder="// Model solution"
+                placeholder={t('assignment.form.question.fields.answer.placeholder')}
                 className="font-mono"
                 rows={4}
                 {...field}
@@ -664,10 +667,10 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove }: QuestionForm
           name={`questions.${questionIndex}.testCode`}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Test Code</FormLabel>
+              <FormLabel>{t('assignment.form.question.fields.testCode.label')}</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="// Test code visible to students"
+                  placeholder={t('assignment.form.question.fields.testCode.placeholder')}
                   className="font-mono"
                   rows={4}
                   {...field}
@@ -683,10 +686,10 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove }: QuestionForm
           name={`questions.${questionIndex}.secretTestCode`}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Secret Test Code</FormLabel>
+              <FormLabel>{t('assignment.form.question.fields.secretTestCode.label')}</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="// Secret test code"
+                  placeholder={t('assignment.form.question.fields.secretTestCode.placeholder')}
                   className="font-mono"
                   rows={4}
                   {...field}
@@ -701,7 +704,7 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove }: QuestionForm
       {/* Testcases */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h4 className="font-medium">Test Cases</h4>
+          <h4 className="font-medium">{t('assignment.form.question.testCases.title')}</h4>
           <Button
             type="button"
             size="sm"
@@ -709,14 +712,14 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove }: QuestionForm
             onClick={() => appendTestcase({ input: "", output: "" })}
           >
             <Plus className="w-4 h-4 mr-2" />
-            Add Test Case
+            {t('assignment.form.question.testCases.add')}
           </Button>
         </div>
 
         {testcaseFields.map((testcase, testcaseIndex) => (
           <div key={testcase.id} className="border rounded p-3 space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Test Case {testcaseIndex + 1}</span>
+              <span className="text-sm font-medium">{t('assignment.form.question.testCases.testCase', { number: testcaseIndex + 1 })}</span>
               <Button
                 type="button"
                 variant="ghost"
@@ -732,10 +735,10 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove }: QuestionForm
                 name={`questions.${questionIndex}.testcases.${testcaseIndex}.input`}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Input</FormLabel>
+                    <FormLabel>{t('assignment.form.question.testCases.input')}</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="Input data"
+                        placeholder={t('assignment.form.question.testCases.inputPlaceholder')}
                         className="font-mono"
                         rows={2}
                         {...field}
@@ -750,10 +753,10 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove }: QuestionForm
                 name={`questions.${questionIndex}.testcases.${testcaseIndex}.output`}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Expected Output</FormLabel>
+                    <FormLabel>{t('assignment.form.question.testCases.output')}</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="Expected output"
+                        placeholder={t('assignment.form.question.testCases.outputPlaceholder')}
                         className="font-mono"
                         rows={2}
                         {...field}
@@ -771,7 +774,7 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove }: QuestionForm
       {/* Secret Testcases */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h4 className="font-medium">Secret Test Cases</h4>
+          <h4 className="font-medium">{t('assignment.form.question.secretTestCases.title')}</h4>
           <Button
             type="button"
             size="sm"
@@ -779,14 +782,14 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove }: QuestionForm
             onClick={() => appendSecretTestcase({ input: "", output: "" })}
           >
             <Plus className="w-4 h-4 mr-2" />
-            Add Secret Test Case
+            {t('assignment.form.question.secretTestCases.add')}
           </Button>
         </div>
 
         {secretTestcaseFields.map((testcase, testcaseIndex) => (
           <div key={testcase.id} className="border rounded p-3 space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Secret Test Case {testcaseIndex + 1}</span>
+              <span className="text-sm font-medium">{t('assignment.form.question.secretTestCases.testCase', { number: testcaseIndex + 1 })}</span>
               <Button
                 type="button"
                 variant="ghost"
@@ -802,10 +805,10 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove }: QuestionForm
                 name={`questions.${questionIndex}.secretTestCases.${testcaseIndex}.input`}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Input</FormLabel>
+                    <FormLabel>{t('assignment.form.question.secretTestCases.input')}</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="Input data"
+                        placeholder={t('assignment.form.question.secretTestCases.inputPlaceholder')}
                         className="font-mono"
                         rows={2}
                         {...field}
@@ -820,10 +823,10 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove }: QuestionForm
                 name={`questions.${questionIndex}.secretTestCases.${testcaseIndex}.output`}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Expected Output</FormLabel>
+                    <FormLabel>{t('assignment.form.question.secretTestCases.output')}</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="Expected output"
+                        placeholder={t('assignment.form.question.secretTestCases.outputPlaceholder')}
                         className="font-mono"
                         rows={2}
                         {...field}
