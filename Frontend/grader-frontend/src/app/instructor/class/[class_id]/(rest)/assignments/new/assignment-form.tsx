@@ -11,7 +11,7 @@ import { api } from "@/lib/api";
 import { CreateAssignmentPayload } from "@/lib/api/type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { parseDateTime } from "@internationalized/date";
-import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
+import { useMutation, useSuspenseQueries } from "@tanstack/react-query";
 import { Plus, Save, Trash2, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -69,16 +69,21 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
   const router = useRouter();
   const t = useTranslations();
 
-  // Query for supported languages
-  const { data: supportedLanguages } = useSuspenseQuery({
-    queryKey: ['supportedLanguages'],
-    queryFn: () => api.supportedLanguages.list(),
-  });
-
-  // Query for groups
-  const { data: availableGroups } = useSuspenseQuery({
-    queryKey: ['groups', classId],
-    queryFn: () => api.groups.listByClassId(classId),
+  // Parallel queries for supported languages and groups
+  const [
+    { data: supportedLanguages = [] },
+    { data: availableGroups = [] }
+  ] = useSuspenseQueries({
+    queries: [
+      {
+        queryKey: ['supportedLanguages'],
+        queryFn: () => api.supportedLanguages.list(),
+      },
+      {
+        queryKey: ['groups', classId],
+        queryFn: () => api.groups.listByClassId(classId),
+      }
+    ]
   });
 
   const { assignmentSchema } = useMemo(() => createSchemas(t), [t]);
