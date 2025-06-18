@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-=======
-// student/[class_id]/[year_sem]/[sec]/layout.tsx
->>>>>>> 628a7dc (Rework on ClassManagement Page)
 "use client";
 
 import Link from "next/link";

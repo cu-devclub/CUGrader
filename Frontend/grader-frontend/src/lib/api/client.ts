@@ -12,29 +12,6 @@ function toClass(input: ClassObject): Class {
   };
 }
 
-function toAssignment(input: LabLabIdGet200Response): Assignment {
-  // TODO: request this
-  return {
-    name: input.name!,
-    languages: input.language!,
-    assignedGroupIds: input.assignTo!,
-    closeOnDue: input.closeOnDue!,
-    examMode: input.examMode!,
-    due: parseDateTime(input.due!),
-    publish: parseDateTime(input.publish!),
-    get id() {
-      return unimplemented("id not exist");
-    },
-    set id(_) { },
-    get maxScore() {
-      return unimplemented("maxScore not yet exist");
-    },
-    set maxScore(_) { },
-    number: input.number!,
-    questionIds: input.questionIds!,
-  };
-}
-
 export function createClient(): APIClient {
   const authToken = "TODO: get it, after auth is implemented";
   const config = new Configuration({
@@ -197,11 +174,15 @@ export function createClient(): APIClient {
 
       listByClass: async (classId) => {
         return unimplemented("TODO: this should be array");
-        // type Value = Awaited<ReturnType<typeof generatedClient.labsClassIdGet>>;
         // const { raw } = await generatedClient.labsClassIdGetRaw({ classId });
         // technically we can parse this but not now
         // const value = JSON.parse(await raw.json()) as Value[];
       },
+
+      listByClassI: async (classId) => {
+        return unimplemented("TODO: this should be array");
+      },
+
 
       create: async (classId, p) => {
         await generatedClient.labPost({
@@ -256,7 +237,42 @@ export function createClient(): APIClient {
         // this will throw
         // TODO: think about this
         const lab = await generatedClient.labLabIdGet({ labId });
-        return toAssignment(lab);
+        return {
+          name: lab.name!,
+          languages: lab.language!,
+          assignedGroupIds: lab.assignTo!,
+          closeOnDue: lab.closeOnDue!,
+          examMode: lab.examMode!,
+          due: parseDateTime(lab.due!),
+          publish: parseDateTime(lab.publish!),
+          number: lab.number!,
+          questionIds: lab.questionIds!,
+          additionalFileIds: lab.addfiles!,
+          
+          get id() {
+            return unimplemented("id not yet exist");
+          },
+          set id(_) { },
+          
+          get maxScore() {
+            return unimplemented("maxScore not yet exist");
+          },
+          set maxScore(_) { },
+          
+          get score() {
+            return unimplemented("score not yet exist");
+          },
+          set score(_) { },
+          
+          get status() {
+            return unimplemented("status not yet exist");
+          },
+          set status(_) { },
+        };
+      },
+
+      getByIdI: async (labId) => {
+        return unimplemented();
       },
 
       downloadFile: async (fileId) => {
@@ -286,6 +302,9 @@ export function createClient(): APIClient {
             submittedAt: parseDateTime(q.submission.timestamp!)
           }
         };
+      },
+      getByIdI: async (questionId) => {
+        return unimplemented();
       },
     }
   } satisfies APIClient;

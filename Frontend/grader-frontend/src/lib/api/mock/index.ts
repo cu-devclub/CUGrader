@@ -266,11 +266,67 @@ function createClient(persistence: Storage<Database>): APIClient {
           closeOnDue: false,
           examMode: false,
           languages: ["rust"],
+          additionalFileIds: [1],
+          score: 12312,
+          status: "completed"
         };
       },
 
+      getByIdI: async (labId) => {
+        const c = classes[0];
+
+        return {
+          id: 10,
+          number: 19,
+          courseId: c.courseId,
+          courseName: c.courseName,
+          publish: parseDateTime('2025-06-01T09:15'),
+          due: parseDateTime('2025-06-22T09:15'),
+          maxScore: 100,
+          name: "Swift Basics",
+          questionIds: [0, 1],
+          assignedGroupIds: ["default"],
+          closeOnDue: false,
+          examMode: false,
+          languages: ["swift"],
+          additionalFileIds: [1],
+          examPin: "12133",
+          secretTestCode: "",
+          showScoreOnLock: true,
+          testCode: ""
+        };
+      },
+
+
       listByClass: async (classId) => {
         return [];
+      },
+
+      listByClassI: async (classId) => {
+        const c = classes[0];
+
+        return [
+          {
+            id: 10,
+            number: 19,
+            courseId: c.courseId,
+            courseName: c.courseName,
+            publish: parseDateTime('2025-06-01T09:15'),
+            due: parseDateTime('2025-06-22T09:15'),
+            maxScore: 100,
+            name: "Swift Basics",
+            questionIds: [0, 1],
+            assignedGroupIds: ["default"],
+            closeOnDue: false,
+            examMode: false,
+            languages: ["swift"],
+            additionalFileIds: [1],
+            examPin: "12133",
+            secretTestCode: "",
+            showScoreOnLock: true,
+            testCode: ""
+          }
+        ];
       },
 
       create: async (classId, payload) => {
@@ -281,12 +337,14 @@ function createClient(persistence: Storage<Database>): APIClient {
 
       },
 
-      removeFile: async (labId, fileId) => {
+      removeFile: async (fileId) => {
 
       },
 
-      downloadFile: async (labId, fileId) => {
-
+      downloadFile: async (fileId) => {
+        return new Blob([`This is file ${fileId}`], {
+          type: "text/plain"
+        });
       },
     },
     questions: {
@@ -299,7 +357,29 @@ function createClient(persistence: Storage<Database>): APIClient {
           number: 1,
           template: `fn main() {
     println!("Hello world");
-}`
+}`,
+        };
+      },
+
+      getByIdI: async (questionId) => {
+        return {
+          answer: "as",
+          description: "",
+          maxScore: 12,
+          name: "sdfsf",
+          number: 1,
+          template: `fn main() {
+    println!("Hello world");
+}`,
+          secretTestCode: String.raw`func sum(_ a: Int, _ b: Int) -> Int {
+  return a + b
+  }
+  
+  let result = sum(5, 3)
+  print("Sum: \(result)")`,
+          testCode: `expect(isPrime(7013)).toBeTruthy()`,
+          testcases: [],
+          secretTestCases: [],
         };
       },
     },
