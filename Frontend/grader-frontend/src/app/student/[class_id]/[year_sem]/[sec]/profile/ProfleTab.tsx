@@ -21,7 +21,7 @@ ChartJS.register(
   Legend
 );
 
-import { Bar } from "react-chartjs-2";
+import ScoreCard from "./scoreCard";
 
 import RankingBarChart from "./rankingBarChart";
 import ProgressBar from "./progressBar";
@@ -33,17 +33,7 @@ export default function ProflieTab() {
         <div className="w-full h-[45%] flex flex-col pl-20 pr-8">
           <h1 className="px-4 mb-3">Score Summary</h1>
           <div className="h-full w-full flex flex-row">
-            <div className="h-full w-1/2 flex flex-col gap-y-3 justify-start item-center">
-              <ProgressBar barName="Total" />
-              <ProgressBar barName="Midterm" />
-              <ProgressBar barName="Final" />
-            </div>
-            <div className="h-full w-1/2 flex flex-col gap-y-3 justify-start item-center">
-              {/* TODO: Add Pagination or Scroller */}
-              <ProgressBar barName="Lab 1" />
-              <ProgressBar barName="Lab 2" />
-              <ProgressBar barName="Lab 3" />
-            </div>
+            <ScoreCard />
           </div>
         </div>
 
