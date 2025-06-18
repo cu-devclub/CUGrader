@@ -312,6 +312,12 @@ export function createClient(): APIClient {
         const response = await generatedClient.languageGet();
         return response.languages?.map(lang => lang.name!) || [];
       },
+    },
+    groups: {
+      listByClassId: async (classId) => {
+        const response = await generatedClient.groupClassIdGet({ classId });
+        return response || [];
+      },
     }
   } satisfies APIClient;
 };

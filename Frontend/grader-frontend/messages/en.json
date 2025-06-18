@@ -10,7 +10,8 @@
                 "settings": "Assignment Settings",
                 "testing": "Testing Configuration",
                 "globalTestCode": "Global Test Code",
-                "questions": "Questions"
+                "questions": "Questions",
+                "assignedGroups": "Assigned Groups"
             },
             "fields": {
                 "name": {
@@ -33,6 +34,9 @@
                 },
                 "languages": {
                     "description": "Select which programming languages students can use for this assignment."
+                },
+                "assignedGroups": {
+                    "description": "Select which groups should receive this assignment. Leave empty to assign to all groups."
                 },
                 "examMode": {
                     "label": "Exam Mode",

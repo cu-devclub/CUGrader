@@ -394,6 +394,12 @@ function createClient(persistence: Storage<Database>): APIClient {
         return ["Rust", "Swift"];
       },
     },
+    groups: {
+      listByClassId: async (classId) => {
+        const c = getClassById(classId);
+        return [...new Set(c.students.map(it => it.group))];
+      },
+    },
   };
 
   return client;

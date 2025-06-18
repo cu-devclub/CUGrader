@@ -70,9 +70,15 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
   const t = useTranslations();
 
   // Query for supported languages
-  const { data: supportedLanguages = [] } = useSuspenseQuery({
+  const { data: supportedLanguages } = useSuspenseQuery({
     queryKey: ['supportedLanguages'],
     queryFn: () => api.supportedLanguages.list(),
+  });
+
+  // Query for groups
+  const { data: availableGroups } = useSuspenseQuery({
+    queryKey: ['groups', classId],
+    queryFn: () => api.groups.listByClassId(classId),
   });
 
   const { assignmentSchema } = useMemo(() => createSchemas(t), [t]);
@@ -142,7 +148,7 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
         closeOnDue: data.closeOnDue,
         showScoreOnLock: data.showScoreOnLock,
         examPin: data.examPin,
-        assignedGroupIds: data.assignedGroupIds,
+        assignedGroupIds: data.assignedGroupIds, // TODO: get groups
         testCode: data.testCode,
         secretTestCode: data.secretTestCode,
         questions: data.questions.map((q, index) => ({
@@ -327,6 +333,58 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
                             </FormControl>
                             <FormLabel className="font-normal">
                               {language}
+                            </FormLabel>
+                          </FormItem>
+                        );
+                      }}
+                    />
+                  ))}
+                </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {/* Assigned Groups */}
+        <div className="space-y-4">
+          <h2 className="text-lg font-medium">{t('assignment.form.sections.assignedGroups')}</h2>
+          <FormField
+            control={form.control}
+            name="assignedGroupIds"
+            render={() => (
+              <FormItem>
+                <FormDescription>
+                  {t('assignment.form.fields.assignedGroups.description')}
+                </FormDescription>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  {availableGroups.map((group: string) => (
+                    <FormField
+                      key={group}
+                      control={form.control}
+                      name="assignedGroupIds"
+                      render={({ field }) => {
+                        return (
+                          <FormItem
+                            key={group}
+                            className="flex flex-row items-start space-x-3 space-y-0"
+                          >
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value?.includes(group)}
+                                onCheckedChange={(checked) => {
+                                  return checked
+                                    ? field.onChange([...field.value, group])
+                                    : field.onChange(
+                                      field.value?.filter(
+                                        (value) => value !== group
+                                      )
+                                    );
+                                }}
+                              />
+                            </FormControl>
+                            <FormLabel className="font-normal">
+                              {group}
                             </FormLabel>
                           </FormItem>
                         );
