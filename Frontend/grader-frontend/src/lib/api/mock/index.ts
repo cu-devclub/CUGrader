@@ -145,7 +145,6 @@ function createClient(persistence: Storage<Database>): APIClient {
           courseId: String(courseId),
           courseName: name,
           classId: currentClassId++,
-          // TODO: this wont work on the server
           imageFileId: fileId,
           students: [],
           semester,

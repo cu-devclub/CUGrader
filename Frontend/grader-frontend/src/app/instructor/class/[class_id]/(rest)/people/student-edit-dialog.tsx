@@ -193,7 +193,6 @@ export function StudentEditDialog({ state }: StudentEditDialogProps) {
                           <SelectValue {...field} placeholder="Select one" />
                         </SelectTrigger>
                         <SelectContent>
-                          {/* TODO: dynamic border color like the design */}
                           <SelectItem value="false">In class</SelectItem>
                           <SelectItem value="true">Withdrawed</SelectItem>
                         </SelectContent>

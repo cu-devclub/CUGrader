@@ -139,13 +139,13 @@ export function createClient(): APIClient {
           instructors: instructor.map(it => ({
             name: it.name,
             imageUrl: it.picture,
-            email: "not-exist",
+            email: it.email,
           }) satisfies Instructor),
           teachingAssistant: assistant.map(it => ({
             leader: it.leader,
             name: it.name,
             imageUrl: it.picture,
-            email: "not-exist",
+            email: it.email,
           }))
         };
       },

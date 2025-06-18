@@ -74,13 +74,11 @@ export function StudentAddDialog({ state: { mode, setMode, open, setOpen }, clas
   const uploadFileMutation = useMutation({
     mutationFn: async () => {
       if (files.length === 0) return;
-      // TODO: make devalue handle file serialization 
       await api.classes.update(classId, {
         students: files[0]
       });
     },
     onError(error, variables, context) {
-      console.log("TODO: make devalue handle file serialization");
       toast.error("Upload error", { description: error.message });
     },
     async onSuccess() {
@@ -94,9 +92,8 @@ export function StudentAddDialog({ state: { mode, setMode, open, setOpen }, clas
     mutationFn: async (value: z.infer<typeof studentFormSchema>) => {
       // console.log(value.students);
       for (const { group, id, section } of value.students) {
-        // TODO: add many
         await api.students.addToClass(classId, {
-          email: id + "@student.chula.ac.th", // TODO: email id 
+          email: id + "@student.chula.ac.th", 
           section: parseInt(section),
           group
         });
