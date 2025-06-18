@@ -1,6 +1,179 @@
 {
     "HomePage": {
         "title": "Hello world!"
+    },    "assignment": {
+        "form": {
+            "sections": {
+                "basicInfo": "Basic Information",
+                "languages": "Supported Languages",
+                "settings": "Assignment Settings",
+                "testing": "Testing Configuration",
+                "questions": "Questions"
+            },
+            "fields": {
+                "name": {
+                    "label": "Assignment Name",
+                    "placeholder": "Lab 1: Hello World"
+                },
+                "number": {
+                    "label": "Assignment Number"
+                },
+                "publish": {
+                    "label": "Publish Date & Time",
+                    "description": "When students can start seeing this assignment"
+                },
+                "due": {
+                    "label": "Due Date & Time",
+                    "description": "When the assignment is due"
+                },
+                "maxScore": {
+                    "label": "Maximum Score"
+                },
+                "languages": {
+                    "description": "Select which programming languages students can use for this assignment."
+                },
+                "examMode": {
+                    "label": "Exam Mode",
+                    "description": "Enable exam mode for stricter security"
+                },
+                "closeOnDue": {
+                    "label": "Close on Due Date",
+                    "description": "Automatically close submissions when due date passes"
+                },
+                "showScoreOnLock": {
+                    "label": "Show Score on Lock",
+                    "description": "Show scores to students after submission is locked"
+                },
+                "examPin": {
+                    "label": "Exam PIN",
+                    "description": "PIN required for students to access the assignment"
+                },
+                "testCode": {
+                    "label": "Test Code",
+                    "description": "Code that will be run to test submissions"
+                },
+                "secretTestCode": {
+                    "label": "Secret Test Code",
+                    "description": "Hidden test code that students cannot see"
+                }
+            },
+            "question": {
+                "title": "Question {number}",
+                "fields": {
+                    "name": {
+                        "label": "Question Name",
+                        "placeholder": "Problem 1"
+                    },
+                    "description": {
+                        "label": "Description",
+                        "placeholder": "Describe what the student needs to do..."
+                    },
+                    "template": {
+                        "label": "Code Template",
+                        "placeholder": "Initial code that students will see..."
+                    },
+                    "maxScore": {
+                        "label": "Maximum Score"
+                    },
+                    "answer": {
+                        "label": "Solution",
+                        "placeholder": "Reference solution..."
+                    },
+                    "testCode": {
+                        "label": "Test Code",
+                        "placeholder": "Code to test student solutions..."
+                    },
+                    "secretTestCode": {
+                        "label": "Secret Test Code",
+                        "placeholder": "Hidden tests..."
+                    }
+                },
+                "testcases": {
+                    "title": "Public Test Cases",
+                    "description": "Test cases that students can see",
+                    "input": "Input",
+                    "output": "Expected Output",
+                    "addButton": "Add Test Case"
+                },
+                "secretTestcases": {
+                    "title": "Secret Test Cases",
+                    "description": "Hidden test cases for grading",
+                    "input": "Input",
+                    "output": "Expected Output",
+                    "addButton": "Add Secret Test Case"
+                }
+            },
+            "buttons": {
+                "addQuestion": "Add Question",
+                "removeQuestion": "Remove Question",
+                "addTestcase": "Add Test Case",
+                "removeTestcase": "Remove",
+                "cancel": "Cancel",
+                "save": "Create Assignment"
+            },
+            "validation": {
+                "name": {
+                    "required": "Assignment name is required"
+                },
+                "number": {
+                    "min": "Assignment number must be at least 1"
+                },
+                "publish": {
+                    "required": "Publish date is required"
+                },
+                "due": {
+                    "required": "Due date is required"
+                },
+                "maxScore": {
+                    "min": "Max score must be at least 0"
+                },
+                "languages": {
+                    "min": "At least one language must be selected"
+                },
+                "testCode": {
+                    "required": "Test code is required"
+                },
+                "secretTestCode": {
+                    "required": "Secret test code is required"
+                },
+                "questions": {
+                    "min": "At least one question is required"
+                },
+                "question": {
+                    "name": {
+                        "required": "Question name is required"
+                    },
+                    "description": {
+                        "required": "Description is required"
+                    },
+                    "template": {
+                        "required": "Template is required"
+                    },
+                    "maxScore": {
+                        "min": "Max score must be at least 0"
+                    },
+                    "answer": {
+                        "required": "Answer is required"
+                    },
+                    "testCode": {
+                        "required": "Test code is required"
+                    },
+                    "secretTestCode": {
+                        "required": "Secret test code is required"
+                    },
+                    "testcases": {
+                        "min": "At least one testcase is required"
+                    },
+                    "secretTestcases": {
+                        "min": "At least one secret testcase is required"
+                    }
+                }
+            },
+            "messages": {
+                "createSuccess": "Assignment created successfully",
+                "createError": "Failed to create assignment"
+            }
+        }
     },
     "example": {
         "title": "Next-intl Example Page",
