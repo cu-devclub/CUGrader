@@ -1,7 +1,7 @@
+import { parseDateTime } from "@internationalized/date";
 import { unimplemented } from "../utils";
 import { ClassObject, Configuration, DefaultApi, LabLabIdGet200Response } from "./generated";
-import { APIClient, Class, Instructor, Assignment, Semester, Student, NearDueAssignment } from "./type";
-import { parseDateTime, parseZonedDateTime } from "@internationalized/date";
+import { APIClient, Assignment, Class, Instructor, NearDueAssignment, Semester, Student } from "./type";
 
 function toClass(input: ClassObject): Class {
   return {
@@ -15,8 +15,8 @@ function toClass(input: ClassObject): Class {
 function toAssignment(input: LabLabIdGet200Response): Assignment {
   return {
     name: input.name!,
-    due: input.due, // TODO: think about date time
-    labId: unimplemented("not exist"),
+    due: parseDateTime(input.due!), // TODO: think about date time
+    id: unimplemented("not exist"),
   };
 }
 
@@ -86,24 +86,9 @@ export function createClient(): APIClient {
       },
     },
     classes: {
-      // TODO: fix this
       getById: async (classId) => {
-        const { semesters } = await generatedClient.classesSemestersGet();
-
-        const promises = (semesters ?? []).map(async s => {
-          const { assistant, study } = await generatedClient.classesClassesYearSemesterGet({ yearSemester: s });
-          const classes = [...assistant ?? [], ...study ?? []];
-
-          const target = classes.find(it => it.classId === classId);
-          if (!target) {
-            throw new Error("not this semester");
-          }
-
-          return toClass(target);
-        });
-
-        return await Promise.any(promises);
-        // return unimplemented("the api to get class by its id does not yet exist.");
+        const c = await generatedClient.classClassIdGet({ classId });
+        return toClass(c);
       },
       listParticipatingBySemester: async (semester) => {
         const { assistant, study } = await generatedClient.classesClassesYearSemesterGet({ yearSemester: semester });
@@ -196,6 +181,14 @@ export function createClient(): APIClient {
         } satisfies NearDueAssignment));
       },
 
+      listByClass: async (classId) => {
+        return unimplemented("TODO: this should be array");
+        // type Value = Awaited<ReturnType<typeof generatedClient.labsClassIdGet>>;
+        // const { raw } = await generatedClient.labsClassIdGetRaw({ classId });
+        // technically we can parse this but not now
+        // const value = JSON.parse(await raw.json()) as Value[];
+      },
+
       create: async (classId, p) => {
         await generatedClient.labPost({
           classId,
@@ -207,8 +200,8 @@ export function createClient(): APIClient {
             examMode: false,
             examPin: 0, // TODO: might allow this to be set since creation?
 
-            due: p.due, // TODO: formatting RFC 3339,
-            publish: p.publish,
+            due: p.due.toString(), // ISO 8601 should be compatatible with RFC 3339,
+            publish: p.publish.toString(),
 
             name: p.name,
             number: p.number,
@@ -219,6 +212,33 @@ export function createClient(): APIClient {
           }
         });
       },
+
+      update: async (labId, p) => {
+        // return unimplemented("assignments.update: i shuold think about this");
+        await generatedClient.labPatch({
+          labId,
+          labData: {
+            // THIS IS ONLY FOR APPENDING FILES 
+            addfiles: p.filesToAdd,
+            assignTo: p.assignedGroupIds,
+            closeOnDue: p.closeOnDue,
+
+            examMode: false,
+            examPin: 0,
+
+            due: p.due.toString(),
+            publish: p.publish.toString(),
+
+            name: p.name,
+            number: p.number,
+            questions: p.questions,
+            showScoreOnLock: p.showScoreOnLock,
+            testcase: p.testCode,
+            secretTestcase: p.secretTestCode,
+          }
+        });
+      },
+
       getById: async (labId) => {
         // this will throw
         // TODO: think about this
@@ -226,11 +246,10 @@ export function createClient(): APIClient {
         return toAssignment(lab);
       }
     },
-    notifications: {
-      list: async () => {
-        const { labs } = await generatedClient.nearDueDateGet();
-        return;
-      }
+    questions: {
+      getById: async (questionId) => {
+
+      },
     }
   } satisfies APIClient;
 };

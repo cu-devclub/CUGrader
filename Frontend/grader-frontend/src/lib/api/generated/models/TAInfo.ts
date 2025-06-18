@@ -37,6 +37,12 @@ export interface TAInfo {
      * @memberof TAInfo
      */
     leader: boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof TAInfo
+     */
+    email: string;
 }
 
 /**
@@ -46,6 +52,7 @@ export function instanceOfTAInfo(value: object): value is TAInfo {
     if (!('name' in value) || value['name'] === undefined) return false;
     if (!('picture' in value) || value['picture'] === undefined) return false;
     if (!('leader' in value) || value['leader'] === undefined) return false;
+    if (!('email' in value) || value['email'] === undefined) return false;
     return true;
 }
 
@@ -62,6 +69,7 @@ export function TAInfoFromJSONTyped(json: any, ignoreDiscriminator: boolean): TA
         'name': json['name'],
         'picture': json['picture'],
         'leader': json['leader'],
+        'email': json['email'],
     };
 }
 
@@ -79,6 +87,7 @@ export function TAInfoToJSONTyped(value?: TAInfo | null, ignoreDiscriminator: bo
         'name': value['name'],
         'picture': value['picture'],
         'leader': value['leader'],
+        'email': value['email'],
     };
 }
 

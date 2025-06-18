@@ -15,6 +15,8 @@ export * from './LabEditQuestionsInner';
 export * from './LabEditQuestionsInnerMultilangTestcaseInner';
 export * from './LabLabIdGet200Response';
 export * from './LabsClassIdGet200Response';
+export * from './LanguageGet200Response';
+export * from './LanguageGet200ResponseLanguagesInner';
 export * from './ModelError';
 export * from './NearDueDateGet200Response';
 export * from './NearDueDateGet200ResponseLabsInner';

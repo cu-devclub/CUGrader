@@ -191,6 +191,31 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+  /class/{class_id}:
+    parameters:
+      - in: header
+        name: Authentication
+        description: "Bearer ..."
+        schema:
+          type: string
+    servers:
+      - url: https://apicugrader.sittha.net/v1
+    get:
+      parameters:
+        - name: class_id
+          description: The unique identifier of the class
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/class_id"
+      responses:
+        '200':
+          description: get specific class info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClassObject"
+
   /classes/semesters:
     parameters:
       - in: header
@@ -687,7 +712,7 @@ paths:
           in: path
           required: true
           schema:
-            $ref: "#/components/schemas/lab_id"
+            $ref: "#/components/schemas/question_id"
       responses:
         "200":
           description: question detail
@@ -770,7 +795,62 @@ paths:
                       - "late"
                       - "due_soon"
 
-                  
+  /addfile/{addfile_id}:
+    summary: operation about additional files
+    servers:
+      - url: https://apicugrader.sittha.net/v1
+    parameters:
+      - in: header
+        name: Authentication
+        description: "Bearer ..."
+        schema:
+          type: string
+      - name: addfile_id
+        description: The unique identifier of the additional file
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/addfile_id"
+    get:
+      responses:
+        "200":
+          description: download file
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+    delete:
+      responses:
+        "200":
+          description: delete success
+              
+
+
+  /language:
+    summary: get system support language
+    servers:
+      - url: https://apicugrader.sittha.net/v1
+    get:
+      responses:
+        "200":
+          description: get list of language that system support
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  languages:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: language primary key
+                        name:
+                          type: string
+                          description: language name
 
 
                     
@@ -814,10 +894,13 @@ components:
           type: string
         leader:
           type: boolean
+        email:
+          type: string
       required:
         - "name"
         - "picture"
         - "leader"
+        - "email"
     InstructorInfo:
       type: object
       properties:
@@ -826,9 +909,12 @@ components:
         picture:
           description: url
           type: string
+        email:
+          type: string
       required:
         - "name"
         - "picture"
+        - "email"
     Assistant:
       type: object
       properties:
@@ -1107,3 +1193,4 @@ components:
           items:
             type: string
             format: binary
+
