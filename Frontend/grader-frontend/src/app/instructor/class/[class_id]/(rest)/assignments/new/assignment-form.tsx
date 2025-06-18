@@ -11,14 +11,14 @@ import { api } from "@/lib/api";
 import { CreateAssignmentPayload } from "@/lib/api/type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { parseDateTime } from "@internationalized/date";
-import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { Plus, Save, Trash2, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import { useEffect, useMemo } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { useMemo, useEffect } from "react";
 
 const createSchemas = (t: any) => {
   const testcaseSchema = z.object({
@@ -68,15 +68,15 @@ export interface AssignmentFormProps {
 export function AssignmentForm({ classId }: AssignmentFormProps) {
   const router = useRouter();
   const t = useTranslations();
-  
+
   // Query for supported languages
   const { data: supportedLanguages = [] } = useSuspenseQuery({
     queryKey: ['supportedLanguages'],
     queryFn: () => api.supportedLanguages.list(),
   });
-  
+
   const { assignmentSchema } = useMemo(() => createSchemas(t), [t]);
-  
+
   const form = useForm<AssignmentFormData>({
     resolver: zodResolver(assignmentSchema),
     defaultValues: {
@@ -199,7 +199,7 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
         {/* Basic Information */}
         <div className="space-y-4">
           <h2 className="text-lg font-medium">Basic Information</h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
               control={form.control}
@@ -238,9 +238,9 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
                 <FormItem>
                   <FormLabel>Publish Date & Time</FormLabel>
                   <FormControl>
-                    <Input 
-                      type="datetime-local" 
-                      {...field} 
+                    <Input
+                      type="datetime-local"
+                      {...field}
                     />
                   </FormControl>
                   <FormDescription>
@@ -258,9 +258,9 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
                 <FormItem>
                   <FormLabel>Due Date & Time</FormLabel>
                   <FormControl>
-                    <Input 
-                      type="datetime-local" 
-                      {...field} 
+                    <Input
+                      type="datetime-local"
+                      {...field}
                     />
                   </FormControl>
                   <FormDescription>
@@ -317,10 +317,10 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
                                   return checked
                                     ? field.onChange([...field.value, language])
                                     : field.onChange(
-                                        field.value?.filter(
-                                          (value) => value !== language
-                                        )
-                                      );
+                                      field.value?.filter(
+                                        (value) => value !== language
+                                      )
+                                    );
                                 }}
                               />
                             </FormControl>
@@ -342,7 +342,7 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
         {/* Settings */}
         <div className="space-y-4">
           <h2 className="text-lg font-medium">Assignment Settings</h2>
-          
+
           <div className="space-y-3">
             <FormField
               control={form.control}
@@ -416,11 +416,11 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
                 <FormItem>
                   <FormLabel>Exam PIN</FormLabel>
                   <FormControl>
-                    <Input 
-                      placeholder="123456" 
+                    <Input
+                      placeholder="123456"
                       maxLength={6}
                       pattern="[0-9]{6}"
-                      {...field} 
+                      {...field}
                     />
                   </FormControl>
                   <FormDescription>
@@ -436,7 +436,7 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
         {/* Test Code */}
         <div className="space-y-4">
           <h2 className="text-lg font-medium">Global Test Code</h2>
-          
+
           <FormField
             control={form.control}
             name="testCode"
@@ -444,16 +444,16 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
               <FormItem>
                 <FormLabel>Test Code</FormLabel>
                 <FormControl>
-                  <Textarea 
+                  <Textarea
                     placeholder="// Global test code that will be used for all questions"
                     className="font-mono"
                     rows={6}
                     disabled={isMultipleLanguages}
-                    {...field} 
+                    {...field}
                   />
                 </FormControl>
                 <FormDescription>
-                  {isMultipleLanguages 
+                  {isMultipleLanguages
                     ? t('assignment.form.fields.testCode.disabledMultipleLanguages')
                     : t('assignment.form.fields.testCode.description')
                   }
@@ -470,16 +470,16 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
               <FormItem>
                 <FormLabel>Secret Test Code</FormLabel>
                 <FormControl>
-                  <Textarea 
+                  <Textarea
                     placeholder="// Secret test code that will not be visible to students"
                     className="font-mono"
                     rows={6}
                     disabled={isMultipleLanguages}
-                    {...field} 
+                    {...field}
                   />
                 </FormControl>
                 <FormDescription>
-                  {isMultipleLanguages 
+                  {isMultipleLanguages
                     ? t('assignment.form.fields.secretTestCode.disabledMultipleLanguages')
                     : t('assignment.form.fields.secretTestCode.description')
                   }
@@ -609,10 +609,10 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove }: QuestionForm
           <FormItem>
             <FormLabel>Description</FormLabel>
             <FormControl>
-              <Textarea 
+              <Textarea
                 placeholder="Describe the problem..."
                 rows={4}
-                {...field} 
+                {...field}
               />
             </FormControl>
             <FormMessage />
@@ -627,11 +627,11 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove }: QuestionForm
           <FormItem>
             <FormLabel>Code Template</FormLabel>
             <FormControl>
-              <Textarea 
+              <Textarea
                 placeholder="// Starter code for students"
                 className="font-mono"
                 rows={4}
-                {...field} 
+                {...field}
               />
             </FormControl>
             <FormMessage />
@@ -646,11 +646,11 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove }: QuestionForm
           <FormItem>
             <FormLabel>Model Answer</FormLabel>
             <FormControl>
-              <Textarea 
+              <Textarea
                 placeholder="// Model solution"
                 className="font-mono"
                 rows={4}
-                {...field} 
+                {...field}
               />
             </FormControl>
             <FormMessage />
@@ -666,11 +666,11 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove }: QuestionForm
             <FormItem>
               <FormLabel>Test Code</FormLabel>
               <FormControl>
-                <Textarea 
+                <Textarea
                   placeholder="// Test code visible to students"
                   className="font-mono"
                   rows={4}
-                  {...field} 
+                  {...field}
                 />
               </FormControl>
               <FormMessage />
@@ -685,11 +685,11 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove }: QuestionForm
             <FormItem>
               <FormLabel>Secret Test Code</FormLabel>
               <FormControl>
-                <Textarea 
+                <Textarea
                   placeholder="// Secret test code"
                   className="font-mono"
                   rows={4}
-                  {...field} 
+                  {...field}
                 />
               </FormControl>
               <FormMessage />
@@ -734,11 +734,11 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove }: QuestionForm
                   <FormItem>
                     <FormLabel>Input</FormLabel>
                     <FormControl>
-                      <Textarea 
+                      <Textarea
                         placeholder="Input data"
                         className="font-mono"
                         rows={2}
-                        {...field} 
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />
@@ -752,11 +752,11 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove }: QuestionForm
                   <FormItem>
                     <FormLabel>Expected Output</FormLabel>
                     <FormControl>
-                      <Textarea 
+                      <Textarea
                         placeholder="Expected output"
                         className="font-mono"
                         rows={2}
-                        {...field} 
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />
@@ -804,11 +804,11 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove }: QuestionForm
                   <FormItem>
                     <FormLabel>Input</FormLabel>
                     <FormControl>
-                      <Textarea 
+                      <Textarea
                         placeholder="Input data"
                         className="font-mono"
                         rows={2}
-                        {...field} 
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />
@@ -822,11 +822,11 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove }: QuestionForm
                   <FormItem>
                     <FormLabel>Expected Output</FormLabel>
                     <FormControl>
-                      <Textarea 
+                      <Textarea
                         placeholder="Expected output"
                         className="font-mono"
                         rows={2}
-                        {...field} 
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />
