@@ -176,7 +176,7 @@ export interface InstructorAssignment extends Assignment {
   questionIds: number[];
 }
 
-export type CreateAssignmentPayload = Omit<InstructorAssignment, "id" | "questionIds"> & {
+export type CreateAssignmentPayload = Omit<InstructorAssignment, "id" | "questionIds" | "additionalFileIds"> & {
   questions: InstructorQuestion[];
   additionalFiles: File[];
 };

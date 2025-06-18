@@ -12,10 +12,10 @@ import { CreateAssignmentPayload } from "@/lib/api/type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { parseDateTime } from "@internationalized/date";
 import { useMutation, useSuspenseQueries } from "@tanstack/react-query";
-import { Plus, Save, Trash2, X } from "lucide-react";
+import { Plus, Save, Trash2, X, Upload, File } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -120,6 +120,10 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
     },
   });
 
+  // File attachment state
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const selectedLanguages = form.watch("languages");
   const isMultipleLanguages = selectedLanguages.length > 1;
 
@@ -168,8 +172,7 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
           testcases: q.testcases,
           secretTestCases: q.secretTestCases,
         })),
-        additionalFiles: [],
-        additionalFileIds: [],
+        additionalFiles: attachedFiles,
       };
 
       console.log(payload);
@@ -203,6 +206,27 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
       testcases: [{ input: "", output: "" }],
       secretTestCases: [{ input: "", output: "" }],
     });
+  };
+
+  // File handling functions
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files) {
+      const c = [...attachedFiles, ...Array.from(files)];
+      setAttachedFiles(c);
+    }
+    // Reset input value to allow selecting the same file again
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const removeFile = (index: number) => {
+    setAttachedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const triggerFileSelect = () => {
+    fileInputRef.current?.click();
   };
 
   return (
@@ -552,6 +576,66 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
               </FormItem>
             )}
           />
+        </div>
+
+        {/* File Attachments */}
+        <div className="space-y-4">
+          <h2 className="text-lg font-medium">{t('assignment.form.sections.attachments')}</h2>
+
+          <div className="space-y-4">
+            <div className="flex items-center gap-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={triggerFileSelect}
+                className="flex items-center gap-2"
+              >
+                <Upload className="w-4 h-4" />
+                {t('assignment.form.buttons.selectFiles')}
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                onChange={handleFileSelect}
+                className="hidden"
+                accept="*/*"
+              />
+            </div>
+
+            {attachedFiles.length > 0 && (
+              <div className="space-y-2">
+                <h3 className="text-sm font-medium text-muted-foreground">
+                  {t('assignment.form.fields.attachedFiles.label')} ({attachedFiles.length})
+                </h3>
+                <div className="grid gap-2">
+                  {attachedFiles.map((file, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-3 bg-muted/30 border rounded-lg"
+                    >
+                      <div className="flex items-center gap-2">
+                        <File className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-sm font-medium">{file.name}</span>
+                        <span className="text-xs text-muted-foreground">
+                          ({(file.size / 1024).toFixed(1)} KB)
+                        </span>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeFile(index)}
+                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Questions */}
