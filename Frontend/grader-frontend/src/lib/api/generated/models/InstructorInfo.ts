@@ -31,6 +31,12 @@ export interface InstructorInfo {
      * @memberof InstructorInfo
      */
     picture: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof InstructorInfo
+     */
+    email: string;
 }
 
 /**
@@ -39,6 +45,7 @@ export interface InstructorInfo {
 export function instanceOfInstructorInfo(value: object): value is InstructorInfo {
     if (!('name' in value) || value['name'] === undefined) return false;
     if (!('picture' in value) || value['picture'] === undefined) return false;
+    if (!('email' in value) || value['email'] === undefined) return false;
     return true;
 }
 
@@ -54,6 +61,7 @@ export function InstructorInfoFromJSONTyped(json: any, ignoreDiscriminator: bool
         
         'name': json['name'],
         'picture': json['picture'],
+        'email': json['email'],
     };
 }
 
@@ -70,6 +78,7 @@ export function InstructorInfoToJSONTyped(value?: InstructorInfo | null, ignoreD
         
         'name': value['name'],
         'picture': value['picture'],
+        'email': value['email'],
     };
 }
 

@@ -17,6 +17,8 @@ models/LabEditQuestionsInner.ts
 models/LabEditQuestionsInnerMultilangTestcaseInner.ts
 models/LabLabIdGet200Response.ts
 models/LabsClassIdGet200Response.ts
+models/LanguageGet200Response.ts
+models/LanguageGet200ResponseLanguagesInner.ts
 models/ModelError.ts
 models/NearDueDateGet200Response.ts
 models/NearDueDateGet200ResponseLabsInner.ts

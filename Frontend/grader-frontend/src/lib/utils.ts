@@ -5,7 +5,6 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-
 export function unimplemented(message = ""): never {
   throw new Error(`Unimplemented: ${message}`);
 }

@@ -155,8 +155,9 @@ export type CreateLabPayload = Omit<Assignment, "id" | "languages" | "questionId
   additionalFiles: File[];
 };
 
-// TODO: think about file removal
-export type UpdateLabPayload = CreateLabPayload & {
+export type UpdateLabPayload = Omit<CreateLabPayload, "additionalFiles"> & {
+  // WE CANT REMOVE FILE USING THIS REQ
+  filesToAdd: File[];
   examMode: boolean;
   examPin: string; // 6 digit num
 };
@@ -195,6 +196,9 @@ export interface APIClient {
     create: (classId: number, payload: CreateLabPayload) => Promise<void>;
     update: (labId: number, payload: UpdateLabPayload) => Promise<void>;
     getById: (labId: number) => Promise<Assignment>;
+
+    removeFile: (labId: number, fileId: number) => Promise<void>;
+    downloadFile: (labId: number, fileId: number) => Promise<void>;
   };
   questions: {
     getById: (questionId: number) => Promise<never>;

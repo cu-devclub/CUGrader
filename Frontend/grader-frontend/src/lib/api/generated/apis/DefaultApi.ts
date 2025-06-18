@@ -18,6 +18,7 @@ import type {
   Assistant,
   CallbackPost200Response,
   CallbackPostRequest,
+  ClassObject,
   ClassesClassesYearSemesterGet200Response,
   ClassesSemestersGet200Response,
   CreateStudent,
@@ -26,6 +27,7 @@ import type {
   LabEdit,
   LabLabIdGet200Response,
   LabsClassIdGet200Response,
+  LanguageGet200Response,
   NearDueDateGet200Response,
   QuestionQuestionIdGet200Response,
   SectionArray,
@@ -40,6 +42,8 @@ import {
     CallbackPost200ResponseToJSON,
     CallbackPostRequestFromJSON,
     CallbackPostRequestToJSON,
+    ClassObjectFromJSON,
+    ClassObjectToJSON,
     ClassesClassesYearSemesterGet200ResponseFromJSON,
     ClassesClassesYearSemesterGet200ResponseToJSON,
     ClassesSemestersGet200ResponseFromJSON,
@@ -56,6 +60,8 @@ import {
     LabLabIdGet200ResponseToJSON,
     LabsClassIdGet200ResponseFromJSON,
     LabsClassIdGet200ResponseToJSON,
+    LanguageGet200ResponseFromJSON,
+    LanguageGet200ResponseToJSON,
     NearDueDateGet200ResponseFromJSON,
     NearDueDateGet200ResponseToJSON,
     QuestionQuestionIdGet200ResponseFromJSON,
@@ -70,8 +76,23 @@ import {
     TestCallbackPostRequestToJSON,
 } from '../models/index';
 
+export interface AddfileAddfileIdDeleteRequest {
+    addfileId: number;
+    authentication?: string;
+}
+
+export interface AddfileAddfileIdGetRequest {
+    addfileId: number;
+    authentication?: string;
+}
+
 export interface CallbackPostOperationRequest {
     callbackPostRequest?: CallbackPostRequest;
+}
+
+export interface ClassClassIdGetRequest {
+    classId: number;
+    authentication?: string;
 }
 
 export interface ClassPatchRequest {
@@ -133,7 +154,7 @@ export interface NearDueDateGetRequest {
     authentication?: string;
 }
 
-export interface PicutrePictureIdGetRequest {
+export interface PicturePictureIdGetRequest {
     pictureId: number;
 }
 
@@ -193,6 +214,75 @@ export class DefaultApi extends runtime.BaseAPI {
 
     /**
      */
+    async addfileAddfileIdDeleteRaw(requestParameters: AddfileAddfileIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['addfileId'] == null) {
+            throw new runtime.RequiredError(
+                'addfileId',
+                'Required parameter "addfileId" was null or undefined when calling addfileAddfileIdDelete().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters['authentication'] != null) {
+            headerParameters['Authentication'] = String(requestParameters['authentication']);
+        }
+
+        const response = await this.request({
+            path: `/addfile/{addfile_id}`.replace(`{${"addfile_id"}}`, encodeURIComponent(String(requestParameters['addfileId']))),
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async addfileAddfileIdDelete(requestParameters: AddfileAddfileIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.addfileAddfileIdDeleteRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async addfileAddfileIdGetRaw(requestParameters: AddfileAddfileIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Blob>> {
+        if (requestParameters['addfileId'] == null) {
+            throw new runtime.RequiredError(
+                'addfileId',
+                'Required parameter "addfileId" was null or undefined when calling addfileAddfileIdGet().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters['authentication'] != null) {
+            headerParameters['Authentication'] = String(requestParameters['authentication']);
+        }
+
+        const response = await this.request({
+            path: `/addfile/{addfile_id}`.replace(`{${"addfile_id"}}`, encodeURIComponent(String(requestParameters['addfileId']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.BlobApiResponse(response);
+    }
+
+    /**
+     */
+    async addfileAddfileIdGet(requestParameters: AddfileAddfileIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Blob> {
+        const response = await this.addfileAddfileIdGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
     async callbackGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         const queryParameters: any = {};
 
@@ -238,6 +328,41 @@ export class DefaultApi extends runtime.BaseAPI {
      */
     async callbackPost(requestParameters: CallbackPostOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CallbackPost200Response> {
         const response = await this.callbackPostRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async classClassIdGetRaw(requestParameters: ClassClassIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ClassObject>> {
+        if (requestParameters['classId'] == null) {
+            throw new runtime.RequiredError(
+                'classId',
+                'Required parameter "classId" was null or undefined when calling classClassIdGet().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters['authentication'] != null) {
+            headerParameters['Authentication'] = String(requestParameters['authentication']);
+        }
+
+        const response = await this.request({
+            path: `/class/{class_id}`.replace(`{${"class_id"}}`, encodeURIComponent(String(requestParameters['classId']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ClassObjectFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async classClassIdGet(requestParameters: ClassClassIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ClassObject> {
+        const response = await this.classClassIdGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -697,6 +822,30 @@ export class DefaultApi extends runtime.BaseAPI {
 
     /**
      */
+    async languageGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<LanguageGet200Response>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/language`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => LanguageGet200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async languageGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<LanguageGet200Response> {
+        const response = await this.languageGetRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
     async loginGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         const queryParameters: any = {};
 
@@ -749,11 +898,11 @@ export class DefaultApi extends runtime.BaseAPI {
     /**
      * getting image with picture id
      */
-    async picutrePictureIdGetRaw(requestParameters: PicutrePictureIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
+    async picturePictureIdGetRaw(requestParameters: PicturePictureIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
         if (requestParameters['pictureId'] == null) {
             throw new runtime.RequiredError(
                 'pictureId',
-                'Required parameter "pictureId" was null or undefined when calling picutrePictureIdGet().'
+                'Required parameter "pictureId" was null or undefined when calling picturePictureIdGet().'
             );
         }
 
@@ -762,7 +911,7 @@ export class DefaultApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/picutre/{picture_id}`.replace(`{${"picture_id"}}`, encodeURIComponent(String(requestParameters['pictureId']))),
+            path: `/picture/{picture_id}`.replace(`{${"picture_id"}}`, encodeURIComponent(String(requestParameters['pictureId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -774,8 +923,8 @@ export class DefaultApi extends runtime.BaseAPI {
     /**
      * getting image with picture id
      */
-    async picutrePictureIdGet(requestParameters: PicutrePictureIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.picutrePictureIdGetRaw(requestParameters, initOverrides);
+    async picturePictureIdGet(requestParameters: PicturePictureIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+        const response = await this.picturePictureIdGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

@@ -1,3 +1,4 @@
+import { CalendarDateTime, parseDateTime } from "@internationalized/date";
 import { APIClient } from "../type";
 import { generateName } from "./name";
 import { DbClass, InMemoryStorage, PersistenceStorage, Storage } from "./persistence";
@@ -234,6 +235,21 @@ function createClient(persistence: Storage<Database>): APIClient {
         const s = classes.map(it => it.semester);
         return [...new Set(s)]; // remove duplicated
       }
+    },
+    assignments: {
+      listNearDue: async () => {
+        const c = classes[0];
+        return [
+          {
+            id: 10,
+            courseId: c.courseId,
+            courseName: c.courseName,
+            due: parseDateTime('2025-06-22T09:15'),
+            maxScore: 100,
+            name: "Generic Types, Traits, and Lifetimes"
+          }
+        ];
+      },
     }
   };
 
