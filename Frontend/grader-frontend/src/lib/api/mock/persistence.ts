@@ -120,7 +120,7 @@ export class PersistenceStorage<Data> implements Storage<Data> {
   }
 
   async saveFile(file: File): Promise<string> {
-    console.log("Saving file " + file.name);
+    // console.log("Saving file " + file.name);
     try {
       const id = `${Date.now()}-${crypto.randomUUID()}`;
       const persistenceDir = await this.getOPFSDirectory();

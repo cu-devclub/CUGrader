@@ -13,10 +13,25 @@ function toClass(input: ClassObject): Class {
 }
 
 function toAssignment(input: LabLabIdGet200Response): Assignment {
+  // TODO: request this
   return {
     name: input.name!,
-    due: parseDateTime(input.due!), // TODO: think about date time
-    id: unimplemented("not exist"),
+    languages: input.language!,
+    assignedGroupIds: input.assignTo!,
+    closeOnDue: input.closeOnDue!,
+    examMode: input.examMode!,
+    due: parseDateTime(input.due!),
+    publish: parseDateTime(input.publish!),
+    get id() {
+      return unimplemented("id not exist");
+    },
+    set id(_) { },
+    get maxScore() {
+      return unimplemented("maxScore not yet exist");
+    },
+    set maxScore(_) { },
+    number: input.number!,
+    questionIds: input.questionIds!,
   };
 }
 
@@ -47,7 +62,6 @@ export function createClient(): APIClient {
         const { students } = await generatedClient.studentClassIdGet({ classId });
         return students.map(it => ({
           ...it,
-          // email: "",
           withdrawed: it.withdrawal
         } satisfies Student));
       },
@@ -214,7 +228,6 @@ export function createClient(): APIClient {
       },
 
       update: async (labId, p) => {
-        // return unimplemented("assignments.update: i shuold think about this");
         await generatedClient.labPatch({
           labId,
           labData: {
@@ -244,11 +257,35 @@ export function createClient(): APIClient {
         // TODO: think about this
         const lab = await generatedClient.labLabIdGet({ labId });
         return toAssignment(lab);
-      }
+      },
+
+      downloadFile: async (fileId) => {
+        const c = await generatedClient.addfileAddfileIdGet({ addfileId: fileId });
+        return c;
+      },
+
+      removeFile: async (fileId) => {
+        await generatedClient.addfileAddfileIdDelete({
+          addfileId: fileId
+        });
+      },
     },
     questions: {
       getById: async (questionId) => {
+        const q = await generatedClient.questionQuestionIdGet({ questionId });
 
+        return {
+          description: q.description!,
+          maxScore: q.maxScore!,
+          name: q.name!,
+          number: q.number!,
+          template: q.predefine!,
+          submission: q.submission && {
+            id: q.submission.submissionId!,
+            score: q.submission.score!,
+            submittedAt: parseDateTime(q.submission.timestamp!)
+          }
+        };
       },
     }
   } satisfies APIClient;
