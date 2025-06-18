@@ -29,7 +29,7 @@ export interface Student {
 export interface Instructor {
   name: string;
   imageUrl?: string;
-  email: string; // TODO: tell backend to add this
+  email: string;
 }
 
 export interface ClassParticipants {
@@ -40,7 +40,7 @@ export interface ClassParticipants {
 
 export interface TeachingAssistant {
   name: string;
-  email: string;  // TODO: tell backend to add this
+  email: string;
   imageUrl?: string;
   leader: boolean;
 }

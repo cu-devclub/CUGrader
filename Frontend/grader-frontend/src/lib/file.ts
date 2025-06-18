@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
 
 // useDropzone dont provide a method to remove files, so i wrap it
-// TODO: rename this
 export function useDropzoneFrFr() {
   const { acceptedFiles, inputRef, ...rest } = useDropzone({});
 

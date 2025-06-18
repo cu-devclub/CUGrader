@@ -70,7 +70,6 @@ export function SettingsForm() {
   const selectedImageFileUrl = useMemo(() => formValues.image ? URL.createObjectURL(formValues.image) : classData.headerImageUrl, [formValues.image]);
 
   function onSubmit(value: z.infer<typeof settingsSchema>) {
-    // TODO: tanstack
     mutation.mutate(value);
   }
 

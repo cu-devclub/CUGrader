@@ -62,8 +62,6 @@ export default function Layout({
 }: LayoutProps) {
   const { class_id } = use(params);
   const prefix = `/instructor/class/${class_id}/`;
-  // const scrollPosition = useScrollPosition();
-  // const isAtTop = scrollPosition <= 54;
   // TODO: fix header later
 
   const classId = parseInt(class_id);

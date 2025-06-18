@@ -120,8 +120,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/students"
-                # NOTE: idk
-                # TODO: fix this
         "500":
           description: Unexpected error
           content:
