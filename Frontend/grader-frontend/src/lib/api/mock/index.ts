@@ -2,6 +2,7 @@ import { CalendarDateTime, parseDateTime } from "@internationalized/date";
 import { APIClient } from "../type";
 import { generateName } from "./name";
 import { DbClass, InMemoryStorage, PersistenceStorage, Storage } from "./persistence";
+import { unimplemented } from "@/lib/utils";
 
 interface Database {
   classes: DbClass[];
@@ -69,7 +70,6 @@ function createClient(persistence: Storage<Database>): APIClient {
     students: {
       async addToClass(classId, { email, section, group }) {
         const c = getClassById(classId);
-        console.log({ email });
         c.students.push({
           group: group ?? "Default",
           section,
@@ -155,7 +155,6 @@ function createClient(persistence: Storage<Database>): APIClient {
       },
       async getById(classId) {
         const c = getClassById(classId);
-        console.log(c);
         return {
           ...c,
           imageUrl: await getUrl(c.imageFileId)
@@ -249,7 +248,67 @@ function createClient(persistence: Storage<Database>): APIClient {
           }
         ];
       },
-    }
+
+      getById: async (labId) => {
+        const c = classes[0];
+
+        return {
+          id: 10,
+          number: 19,
+          courseId: c.courseId,
+          courseName: c.courseName,
+          publish: parseDateTime('2025-06-01T09:15'),
+          due: parseDateTime('2025-06-22T09:15'),
+          maxScore: 100,
+          name: "Generic Types, Traits, and Lifetimes",
+          questionIds: [0, 1],
+          assignedGroupIds: ["default"],
+          closeOnDue: false,
+          examMode: false,
+          languages: ["rust"],
+        };
+      },
+
+      listByClass: async (classId) => {
+        return [];
+      },
+
+      create: async (classId, payload) => {
+        // TODO: implement these when i want to
+      },
+
+      update: async (labId, payload) => {
+
+      },
+
+      removeFile: async (labId, fileId) => {
+
+      },
+
+      downloadFile: async (labId, fileId) => {
+
+      },
+    },
+    questions: {
+      getById: async (questionId) => {
+        return {
+          answer: "as",
+          description: "",
+          maxScore: 12,
+          name: "sdfsf",
+          number: 1,
+          template: `fn main() {
+    println!("Hello world");
+}`
+        };
+      },
+    },
+    sections: {
+      getByClass: async (classId) => {
+        const c = getClassById(classId);
+        return [...new Set(c.students.map(it => it.section))];
+      },
+    },
   };
 
   return client;
