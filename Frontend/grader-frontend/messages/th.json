@@ -6,9 +6,10 @@
         "form": {
             "sections": {
                 "basicInfo": "ข้อมูลพื้นฐาน",
-                "languages": "ภาษาที่รองรับ",
+                "languages": "ภาษาโปรแกรมที่รองรับ",
                 "settings": "การตั้งค่างาน",
                 "testing": "การกำหนดค่าการทดสอบ",
+                "globalTestCode": "โค้ดทดสอบส่วนกลาง",
                 "questions": "คำถาม"
             },
             "fields": {
@@ -47,16 +48,19 @@
                 },
                 "examPin": {
                     "label": "รหัส PIN สอบ",
-                    "description": "รหัส PIN ที่นักเรียนต้องใส่เพื่อเข้าถึงงาน"
+                    "description": "รหัส PIN ที่นักเรียนต้องใส่เพื่อเข้าถึงงาน",
+                    "placeholder": "123456"
                 },
                 "testCode": {
                     "label": "โค้ดทดสอบ",
                     "description": "โค้ดที่จะใช้ทดสอบการส่งงาน",
+                    "placeholder": "// โค้ดทดสอบส่วนกลางที่จะใช้สำหรับคำถามทั้งหมด",
                     "disabledMultipleLanguages": "โค้ดทดสอบส่วนกลางถูกปิดใช้งานเมื่อเลือกหลายภาษา"
                 },
                 "secretTestCode": {
                     "label": "โค้ดทดสอบลับ",
                     "description": "โค้ดทดสอบที่ซ่อนจากนักเรียน",
+                    "placeholder": "// โค้ดทดสอบลับที่นักเรียนจะไม่เห็น",
                     "disabledMultipleLanguages": "โค้ดทดสอบลับส่วนกลางถูกปิดใช้งานเมื่อเลือกหลายภาษา"
                 }
             },
@@ -91,19 +95,23 @@
                         "placeholder": "การทดสอบที่ซ่อน..."
                     }
                 },
-                "testcases": {
-                    "title": "ชุดทดสอบสาธารณะ",
-                    "description": "ชุดทดสอบที่นักเรียนสามารถเห็นได้",
+                "testCases": {
+                    "title": "ชุดทดสอบ",
+                    "add": "เพิ่มชุดทดสอบ",
+                    "testCase": "ชุดทดสอบ {number}",
                     "input": "ข้อมูลนำเข้า",
+                    "inputPlaceholder": "ข้อมูลนำเข้า",
                     "output": "ผลลัพธ์ที่คาดหวัง",
-                    "addButton": "เพิ่มชุดทดสอบ"
+                    "outputPlaceholder": "ผลลัพธ์ที่คาดหวัง"
                 },
-                "secretTestcases": {
+                "secretTestCases": {
                     "title": "ชุดทดสอบลับ",
-                    "description": "ชุดทดสอบที่ซ่อนสำหรับการให้คะแนน",
+                    "add": "เพิ่มชุดทดสอบลับ",
+                    "testCase": "ชุดทดสอบลับ {number}",
                     "input": "ข้อมูลนำเข้า",
+                    "inputPlaceholder": "ข้อมูลนำเข้า",
                     "output": "ผลลัพธ์ที่คาดหวัง",
-                    "addButton": "เพิ่มชุดทดสอบลับ"
+                    "outputPlaceholder": "ผลลัพธ์ที่คาดหวัง"
                 }
             },
             "buttons": {
@@ -112,7 +120,8 @@
                 "addTestcase": "เพิ่มชุดทดสอบ",
                 "removeTestcase": "ลบ",
                 "cancel": "ยกเลิก",
-                "save": "สร้างงาน"
+                "save": "สร้างงาน",
+                "creating": "กำลังสร้าง..."
             },
             "validation": {
                 "name": {
