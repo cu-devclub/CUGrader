@@ -79,6 +79,7 @@ export interface StudentQuestion extends Question {
 
 export interface InstructorQuestion extends Question {
   answer: string;
+  
   testCode: string; // wtf is the differences
   secretTestCode: string;
 
@@ -127,6 +128,8 @@ export type UpdateClassPayload = Partial<CreateClassPayload>;
 
 
 
+
+
 export type AssignmentStatus = "new" | "partially-completed" | "completed" | "lated" | "due-soon";
 
 export type NearDueAssignment = {
@@ -139,11 +142,14 @@ export type NearDueAssignment = {
 };
 
 export interface Assignment {
-  id: number;
+  id: number; // not exist yet
+
+  additionalFileIds: number[];
   number: number;
   name: string;
   publish: CalendarDateTime; // @internationalized/date maybe
   due: CalendarDateTime; // RFC3339: 1996-12-19T16:39:57+07:00
+
   questionIds: number[];
   maxScore: number;
   languages: SupportedLanguage[]; // select at least one
@@ -163,16 +169,14 @@ export interface StudentAssignment extends Assignment {
 export interface InstructorAssignment extends Assignment {
   // how do i get this?
   examPin: string; // 6 digit num
-}
-
-export type CreateAssignmentPayload = Omit<InstructorAssignment, "id" | "languages" | "questionIds" | "maxScore"> & {
   showScoreOnLock: boolean; // hideOnClose ??? -> which mean we have some kind of state `isLocked` from the api
 
-  template: string; // code that you give to the student
-
-  testCode: string; // code, like in 2024 class
+  testCode: string; // aka `testcase` | its like the one in 2024 class
   secretTestCode: string;
+  questionIds: number[];
+}
 
+export type CreateAssignmentPayload = Omit<InstructorAssignment, "id" | "questionIds"> & {
   questions: InstructorQuestion[];
   additionalFiles: File[];
 };
@@ -210,12 +214,17 @@ export interface APIClient {
     removeFromClass: (classId: number, email: string) => Promise<void>,
   },
   assignments: {
-    // TODO: think about student
     listNearDue: () => Promise<NearDueAssignment[]>;
-    listByClass: (classId: number) => Promise<Assignment[]>;
+    listByClass: (classId: number) => Promise<StudentAssignment[]>;
+    listByClassI: (classId: number) => Promise<InstructorAssignment[]>;
+
+    // TODO: seperate this
+    getById: (labId: number) => Promise<StudentAssignment>;
+    getByIdI: (labId: number) => Promise<InstructorAssignment>;
+
     create: (classId: number, payload: CreateAssignmentPayload) => Promise<void>;
     update: (labId: number, payload: UpdateAssignmentPayload) => Promise<void>;
-    getById: (labId: number) => Promise<Assignment>;
+    // 
 
     removeFile: (fileId: number) => Promise<void>;
     // TODO: download it fr
@@ -223,5 +232,6 @@ export interface APIClient {
   };
   questions: {
     getById: (questionId: number) => Promise<StudentQuestion>;
+    getByIdI: (questionId: number) => Promise<InstructorQuestion>;
   };
 };

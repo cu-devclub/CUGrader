@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { useClassData } from "../../class-data-context";
 
-// TODO: really thing about number and string
+// TODO: really think about number and string
 const settingsSchema = z.object({
   courseId: z.string().min(1),
   year: z.coerce.number(),
