@@ -51,11 +51,13 @@
                 },
                 "testCode": {
                     "label": "โค้ดทดสอบ",
-                    "description": "โค้ดที่จะใช้ทดสอบการส่งงาน"
+                    "description": "โค้ดที่จะใช้ทดสอบการส่งงาน",
+                    "disabledMultipleLanguages": "โค้ดทดสอบส่วนกลางถูกปิดใช้งานเมื่อเลือกหลายภาษา"
                 },
                 "secretTestCode": {
                     "label": "โค้ดทดสอบลับ",
-                    "description": "โค้ดทดสอบที่ซ่อนจากนักเรียน"
+                    "description": "โค้ดทดสอบที่ซ่อนจากนักเรียน",
+                    "disabledMultipleLanguages": "โค้ดทดสอบลับส่วนกลางถูกปิดใช้งานเมื่อเลือกหลายภาษา"
                 }
             },
             "question": {

@@ -1,7 +1,8 @@
 {
     "HomePage": {
         "title": "Hello world!"
-    },    "assignment": {
+    },
+    "assignment": {
         "form": {
             "sections": {
                 "basicInfo": "Basic Information",
@@ -50,11 +51,13 @@
                 },
                 "testCode": {
                     "label": "Test Code",
-                    "description": "Code that will be run to test submissions"
+                    "description": "Code that will be run to test submissions",
+                    "disabledMultipleLanguages": "Global test code is disabled when multiple languages are selected"
                 },
                 "secretTestCode": {
                     "label": "Secret Test Code",
-                    "description": "Hidden test code that students cannot see"
+                    "description": "Hidden test code that students cannot see",
+                    "disabledMultipleLanguages": "Global secret test code is disabled when multiple languages are selected"
                 }
             },
             "question": {
