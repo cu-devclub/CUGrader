@@ -151,7 +151,7 @@ export interface Assignment {
   due: CalendarDateTime; // RFC3339: 1996-12-19T16:39:57+07:00
 
   questionIds: number[];
-  maxScore: number;
+  // maxScore: number; // This is computed property now
   languages: SupportedLanguage[]; // select at least one
 
   // should this be in StudentAssignment

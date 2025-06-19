@@ -10,18 +10,13 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/api";
-import { CreateAssignmentPayload } from "@/lib/api/type";
 import { useDropzoneFrFr } from "@/lib/file";
-import { unimplemented } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { parseDateTime } from "@internationalized/date";
-import { useMutation, useSuspenseQueries } from "@tanstack/react-query";
-import { Plus, Save, Trash2, X, Upload, File, Link, Link2, Paperclip } from "lucide-react";
+import { useSuspenseQueries } from "@tanstack/react-query";
+import { FileIcon, Paperclip, Plus, Save, Trash2, X } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useFieldArray, useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { useEffect, useMemo, useState } from "react";
+import { Control, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
 const createSchemas = (t: ReturnType<typeof useTranslations>) => {
@@ -64,12 +59,49 @@ const createSchemas = (t: ReturnType<typeof useTranslations>) => {
 // Define the form data type using the schema inference from createSchemas
 type AssignmentFormData = z.infer<ReturnType<typeof createSchemas>['assignmentSchema']>;
 
-export interface AssignmentFormProps {
-  classId: number;
+function AssignmentName({ control }: { control: Control<AssignmentFormData> }) {
+  const name = useWatch({
+    control,
+    name: 'name',
+    defaultValue: ""
+  });
+
+  return <h2 className="font-medium">{name.length === 0 ? "Name" : name}</h2>;
 }
 
-export function AssignmentForm({ classId }: AssignmentFormProps) {
-  const router = useRouter();
+function AssignmentNumber({ control }: { control: Control<AssignmentFormData> }) {
+    const number = useWatch({
+        control,
+        name: 'number',
+        defaultValue: 1
+    });
+
+    return <p className="text-sm">Lab {number}</p>;
+}
+
+export interface AssignmentFormProps {
+  classId: number;
+  prefill?: AssignmentFormData;
+  existingFiles?: AttachmentMetadata[];
+
+  isPending: boolean;
+  submit: (result: AssignmentFormResult) => any;
+  cancel: () => any;
+}
+
+export type AssignmentFormResult = AssignmentFormData & {
+  toRemoveExistingFileIds: number[];
+  readonly additionalFiles: File[];
+};
+
+export interface AttachmentMetadata {
+  id: number;
+  name: string;
+  // TODO: request an api for this...
+  // size maybe
+}
+
+export function AssignmentForm({ submit, cancel, classId, prefill, existingFiles = [], isPending }: AssignmentFormProps) {
   const t = useTranslations();
 
   // Parallel queries for supported languages and groups
@@ -93,7 +125,7 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
 
   const form = useForm<AssignmentFormData>({
     resolver: zodResolver(assignmentSchema),
-    defaultValues: {
+    defaultValues: prefill ?? {
       name: "",
       number: 1,
       publish: "",
@@ -122,7 +154,6 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
     },
   });
 
-
   const selectedLanguages = form.watch("languages");
   const isMultipleLanguages = selectedLanguages.length > 1;
 
@@ -145,54 +176,14 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
 
   const attachmentDropzone = useDropzoneFrFr();
 
-  const mutation = useMutation({
-    mutationFn: async (data: AssignmentFormData) => {
-      const payload: CreateAssignmentPayload = {
-        name: data.name,
-        number: data.number,
-        publish: parseDateTime(data.publish),
-        due: parseDateTime(data.due),
-        maxScore: unimplemented("max score"),
-        languages: data.languages,
-        examMode: data.examMode,
-        closeOnDue: data.closeOnDue,
-        showScoreOnLock: data.showScoreOnLock,
-        examPin: data.examPin,
-        assignedGroupIds: data.assignedGroupIds, // TODO: get groups
-        testCode: data.testCode,
-        secretTestCode: data.secretTestCode,
-        questions: data.questions.map((q, index) => ({
-          number: index + 1,
-          name: q.name,
-          description: q.description,
-          template: q.template,
-          maxScore: q.maxScore,
-          answer: q.answer,
-          testCode: q.testCode,
-          secretTestCode: q.secretTestCode,
-          testcases: q.testcases,
-          secretTestCases: q.secretTestCases,
-        })),
-        additionalFiles: [...attachmentDropzone.files],
-      };
-
-      console.log(payload);
-      // await api.assignments.create(classId, payload);
-    },
-    onSuccess: () => {
-      toast.success(t('assignment.form.messages.createSuccess'));
-      router.push(`/instructor/class/${classId}/assignments`);
-    },
-    onError: (error) => {
-      console.error(error);
-      toast.error(t('assignment.form.messages.createError'), {
-        description: error.message,
-      });
-    },
-  });
+  // we shuold move this out
 
   function onSubmit(data: AssignmentFormData) {
-    mutation.mutate(data);
+    submit({
+      ...data,
+      toRemoveExistingFileIds,
+      additionalFiles: [...attachmentDropzone.files] as File[]
+    });
   }
 
   const addQuestion = () => {
@@ -209,9 +200,41 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
     });
   };
 
+  const [toRemoveExistingFileIds, setToRemoveExistingFileIds] = useState([] as number[]);
+  const filteredExistingFiles = existingFiles.filter(it => !toRemoveExistingFileIds.includes(it.id));
+  function removeExistingFile(fileId: number) {
+    setToRemoveExistingFileIds([...toRemoveExistingFileIds, fileId]);
+  }
+
+  // This run like shit,
+  // const name = form.watch("name");
 
   return (
     <>
+      <nav className="sticky top-0 bg-background flex flex-col shadow">
+        <div className="flex justify-between items-center flex-1 py-3 px-12">
+          <div className="flex flex-col leading-5">
+            <AssignmentNumber control={form.control} />
+            <AssignmentName control={form.control} />
+          </div>
+
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => cancel()}
+            >
+              {t('assignment.form.buttons.cancel')}
+            </Button>
+            <Button onClick={form.handleSubmit(onSubmit)} disabled={isPending}>
+              <Save className="w-4 h-4 mr-2" />
+              {isPending ? t('assignment.form.buttons.creating') : t('assignment.form.buttons.save')}
+            </Button>
+          </div>
+        </div>
+        <div className="h-2 bg-primary border-b">
+        </div>
+      </nav>
       <Form {...form} >
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6 p-12">
           {/* Basic Information */}
@@ -253,7 +276,7 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
                 />
 
                 {/* Date: due, publish */}
-                <div className="flex gap-2">
+                <div className="flex gap-2 items-start">
                   <FormField
                     control={form.control}
                     name="publish"
@@ -271,7 +294,7 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
                     )}
                   />
 
-                  <div className="self-end mb-2">
+                  <div className="self-start mt-7">
                     dots
                   </div>
 
@@ -356,7 +379,7 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
                                 return (
                                   <FormItem
                                     key={group}
-                                    className="flex flex-row items-start space-x-3 space-y-0"
+                                    className="flex flex-row gap-3"
                                   >
                                     <FormControl>
                                       <Checkbox
@@ -405,7 +428,7 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
                                 return (
                                   <FormItem
                                     key={language}
-                                    className="flex flex-row items-start space-x-3 space-y-0"
+                                    className="flex flex-row gap-3"
                                   >
                                     <FormControl>
                                       <Checkbox
@@ -557,28 +580,21 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
                 <div className="space-y-4">
                   {attachmentDropzone.files.length > 0 && (
                     <div className="grid gap-2">
-                      {attachmentDropzone.files.map((file, index) => (
-                        <div
+                      {filteredExistingFiles.map((file, index) => (
+                        <FileCard
+                          name={file.name}
+                          remove={() => removeExistingFile(file.id)}
                           key={index}
-                          className="flex items-center justify-between p-3 bg-muted/30 border rounded-lg"
-                        >
-                          <div className="flex items-center gap-2">
-                            <File className="w-4 h-4 text-muted-foreground" />
-                            <span className="text-sm font-medium">{file.name}</span>
-                            <span className="text-xs text-muted-foreground">
-                              ({(file.size / 1024).toFixed(1)} KB)
-                            </span>
-                          </div>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => attachmentDropzone.removeFile(index)}
-                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                          >
-                            <X className="w-4 h-4" />
-                          </Button>
-                        </div>
+                        />
+                      ))}
+
+                      {attachmentDropzone.files.map((file, index) => (
+                        <FileCard
+                          name={file.name}
+                          remove={() => attachmentDropzone.removeFile(index)}
+                          size={file.size}
+                          key={index}
+                        />
                       ))}
                     </div>
                   )}
@@ -603,21 +619,21 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
                 />
               ))}
 
-              <Button onClick={() => addQuestion()}>
+              <Button onClick={() => addQuestion()} type="button">
                 Add question (todo: style this)
               </Button>
             </div>
 
             {/* Submit */}
             <div className="flex gap-2 pt-4">
-              <Button type="submit" disabled={mutation.isPending}>
+              <Button type="submit" disabled={isPending}>
                 <Save className="w-4 h-4 mr-2" />
-                {mutation.isPending ? t('assignment.form.buttons.creating') : t('assignment.form.buttons.save')}
+                {isPending ? t('assignment.form.buttons.creating') : t('assignment.form.buttons.save')}
               </Button>
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => router.back()}
+                onClick={() => cancel()}
               >
                 {t('assignment.form.buttons.cancel')}
               </Button>
@@ -636,6 +652,7 @@ interface QuestionFormProps {
   canRemove: boolean;
   t: any;
 }
+
 
 function QuestionForm({ questionIndex, form, onRemove, canRemove, t }: QuestionFormProps) {
   const {
@@ -962,4 +979,36 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove, t }: QuestionF
       </div>
     </section>
   );
+}
+
+interface FileCardProps {
+  name: string;
+  size?: number;
+  remove: () => any;
+}
+
+function FileCard({ name, remove, size }: FileCardProps) {
+  return <div
+    className="flex items-center justify-between p-3 bg-muted/30 border rounded-lg"
+  >
+    <div className="flex items-center gap-2">
+      <FileIcon className="w-4 h-4 text-muted-foreground" />
+      <span className="text-sm font-medium">{name}</span>
+      {
+        size &&
+        <span className="text-xs text-muted-foreground">
+          ({(size / 1024).toFixed(1)} KB)
+        </span>
+      }
+    </div>
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      onClick={() => remove()}
+      className="text-destructive hover:text-destructive hover:bg-destructive/10"
+    >
+      <X className="w-4 h-4" />
+    </Button>
+  </div>;
 }

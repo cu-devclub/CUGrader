@@ -91,7 +91,7 @@
                         "label": "Maximum Score"
                     },
                     "answer": {
-                        "label": "Solution",
+                        "label": "Answer",
                         "placeholder": "Reference solution..."
                     },
                     "testCode": {
