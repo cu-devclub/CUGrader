@@ -5,6 +5,7 @@ import { cookies } from 'next/headers';
 // This URL should be the one registered with your OAuth provider
 // AND the one your backend expects to complete the auth flow.
 const USE_TEST_CALLBACK = process.env.NEXT_PUBLIC_AUTH_USE_TEST_API
+// if USE_TEST_CALLBACK is true, it will use the test callback URL
 const BACKEND_CALLBACK_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/${USE_TEST_CALLBACK ? 'test' : ''}/callback`;
 
 
