@@ -6,15 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/api";
 import { CreateAssignmentPayload } from "@/lib/api/type";
+import { useDropzoneFrFr } from "@/lib/file";
 import { unimplemented } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { parseDateTime } from "@internationalized/date";
 import { useMutation, useSuspenseQueries } from "@tanstack/react-query";
-import { Plus, Save, Trash2, X, Upload, File, Link, Link2 } from "lucide-react";
+import { Plus, Save, Trash2, X, Upload, File, Link, Link2, Paperclip } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -120,9 +122,6 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
     },
   });
 
-  // File attachment state
-  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const selectedLanguages = form.watch("languages");
   const isMultipleLanguages = selectedLanguages.length > 1;
@@ -143,6 +142,8 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
     control: form.control,
     name: "questions",
   });
+
+  const attachmentDropzone = useDropzoneFrFr();
 
   const mutation = useMutation({
     mutationFn: async (data: AssignmentFormData) => {
@@ -172,7 +173,7 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
           testcases: q.testcases,
           secretTestCases: q.secretTestCases,
         })),
-        additionalFiles: attachedFiles,
+        additionalFiles: [...attachmentDropzone.files],
       };
 
       console.log(payload);
@@ -208,43 +209,23 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
     });
   };
 
-  // File handling functions
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files) {
-      const c = [...attachedFiles, ...Array.from(files)];
-      setAttachedFiles(c);
-    }
-    // Reset input value to allow selecting the same file again
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
-
-  const removeFile = (index: number) => {
-    setAttachedFiles(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const triggerFileSelect = () => {
-    fileInputRef.current?.click();
-  };
 
   return (
     <>
       <Form {...form} >
-        <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6 p-8">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6 p-12">
           {/* Basic Information */}
           <section className="border rounded-xl overflow-clip flex flex-col gap-8">
-            <div className="h-4 bg-primary border-b">
-            </div>
 
             {/* Lab name */}
-            <div className="border-b p-8">
+            <div className="border-b">
+              <div className="h-4 bg-primary border-b">
+              </div>
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="p-8">
                     <FormLabel>{t('assignment.form.fields.name.label')}</FormLabel>
                     <FormControl>
                       <input className="text-3xl outline-offset-8 placeholder:text-muted-foreground/50" placeholder={t('assignment.form.fields.name.placeholder')} {...field} />
@@ -501,7 +482,7 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
             <div className="space-y-4 px-12">
               <h2 className="text-lg font-medium">{t('assignment.form.sections.globalTestCode')}</h2>
 
-              <div className="flex gap-6 items-start">
+              <div className="grid grid-cols-2 gap-6 items-start">
                 <FormField
                   control={form.control}
                   name="testCode"
@@ -560,59 +541,45 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
             {/* File Attachments */}
             <div className="px-12 pb-12 flex flex-col gap-4">
               <h2 className="text-lg font-medium">{t('assignment.form.sections.attachments')}</h2>
-              <div className="grid grid-cols-2">
+
+              <div className="grid grid-cols-2 gap-6">
+
+                <div className="rounded-lg p-4 border-dashed border-2 cursor-pointer flex items-center justify-center min-h-48" {...attachmentDropzone.getRootProps()}>
+                  <div className="flex flex-col items-center text-muted-foreground gap-3 text-sm">
+                    <Paperclip />
+                    <p className="text-center leading-4">
+                      t.drop_files_here <br />
+                    </p>
+                    <input {...attachmentDropzone.getInputProps()} />
+                  </div>
+                </div>
 
                 <div className="space-y-4">
-                  <div className="flex items-center gap-4">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={triggerFileSelect}
-                      className="flex items-center gap-2"
-                    >
-                      <Upload className="w-4 h-4" />
-                      {t('assignment.form.buttons.selectFiles')}
-                    </Button>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      multiple
-                      onChange={handleFileSelect}
-                      className="hidden"
-                      accept="*/*"
-                    />
-                  </div>
-
-                  {attachedFiles.length > 0 && (
-                    <div className="space-y-2">
-                      <h3 className="text-sm font-medium text-muted-foreground">
-                        {t('assignment.form.fields.attachedFiles.label')} ({attachedFiles.length})
-                      </h3>
-                      <div className="grid gap-2">
-                        {attachedFiles.map((file, index) => (
-                          <div
-                            key={index}
-                            className="flex items-center justify-between p-3 bg-muted/30 border rounded-lg"
-                          >
-                            <div className="flex items-center gap-2">
-                              <File className="w-4 h-4 text-muted-foreground" />
-                              <span className="text-sm font-medium">{file.name}</span>
-                              <span className="text-xs text-muted-foreground">
-                                ({(file.size / 1024).toFixed(1)} KB)
-                              </span>
-                            </div>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => removeFile(index)}
-                              className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                            >
-                              <X className="w-4 h-4" />
-                            </Button>
+                  {attachmentDropzone.files.length > 0 && (
+                    <div className="grid gap-2">
+                      {attachmentDropzone.files.map((file, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center justify-between p-3 bg-muted/30 border rounded-lg"
+                        >
+                          <div className="flex items-center gap-2">
+                            <File className="w-4 h-4 text-muted-foreground" />
+                            <span className="text-sm font-medium">{file.name}</span>
+                            <span className="text-xs text-muted-foreground">
+                              ({(file.size / 1024).toFixed(1)} KB)
+                            </span>
                           </div>
-                        ))}
-                      </div>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => attachmentDropzone.removeFile(index)}
+                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
@@ -625,14 +592,6 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
 
             {/* Questions */}
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-medium">{t('assignment.form.sections.questions')}</h2>
-                <Button type="button" onClick={addQuestion} variant="outline">
-                  <Plus className="w-4 h-4 mr-2" />
-                  {t('assignment.form.buttons.addQuestion')}
-                </Button>
-              </div>
-
               {questionFields.map((question, questionIndex) => (
                 <QuestionForm
                   key={question.id}
@@ -643,6 +602,10 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
                   t={t}
                 />
               ))}
+
+              <Button onClick={() => addQuestion()}>
+                Add question (todo: style this)
+              </Button>
             </div>
 
             {/* Submit */}
@@ -694,39 +657,68 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove, t }: QuestionF
   });
 
   return (
-    <div className="bg-card border rounded-xl p-6 space-y-6 shadow-sm">
-      <div className="flex items-center justify-between pb-4 border-b">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-semibold">
-            {questionIndex + 1}
-          </div>
-          <h3 className="text-xl font-semibold">
-            {t('assignment.form.question.title', { number: questionIndex + 1 })}
-          </h3>
+    <section className="border rounded-xl overflow-clip flex flex-col gap-8">
+      {/* Question name */}
+      <div className="border-b">
+        <div className="h-4 bg-muted-foreground/50 border-b">
         </div>
-        {canRemove && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={onRemove}
-            className="text-destructive hover:text-destructive hover:bg-destructive/10"
-          >
-            <X className="w-4 h-4" />
-          </Button>
-        )}
+
+        <div className="flex">
+          <div className="p-8">
+            <Label>
+              {t('assignment.form.question.no')}
+            </Label>
+            <div className="text-center text-3xl mt-4">
+              {questionIndex + 1}.
+            </div>
+          </div>
+
+          <FormField
+            control={form.control}
+            name={`questions.${questionIndex}.name`}
+            render={({ field }) => (
+              <FormItem className="p-8 flex-1">
+                <FormLabel>{t('assignment.form.question.title')}</FormLabel>
+                <FormControl>
+                  <input className="text-3xl outline-offset-8 placeholder:text-muted-foreground/50" placeholder={t('assignment.form.question.title.placeholder')} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {canRemove && (
+            <div className="flex items-center justify-between p-3 ">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={onRemove}
+                className="size-fit p-3 text-destructive hover:text-destructive hover:bg-destructive/10"
+              >
+                <X className="size-6" />
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-3 gap-6 px-12 items-start">
         <FormField
           control={form.control}
-          name={`questions.${questionIndex}.name`}
+          name={`questions.${questionIndex}.description`}
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t('assignment.form.question.fields.name.label')}</FormLabel>
+            <FormItem className="col-span-2">
+              <FormLabel>{t('assignment.form.question.fields.description.label')}</FormLabel>
               <FormControl>
-                <Input placeholder={t('assignment.form.question.fields.name.placeholder')} {...field} />
+                <Textarea
+                  className="min-h-24 resize-y"
+                  placeholder={t('assignment.form.question.fields.description.placeholder')}
+                  rows={6}
+                  {...field}
+                />
               </FormControl>
+              <p>todo: md editor</p>
               <FormMessage />
             </FormItem>
           )}
@@ -747,63 +739,47 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove, t }: QuestionF
         />
       </div>
 
-      <FormField
-        control={form.control}
-        name={`questions.${questionIndex}.description`}
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>{t('assignment.form.question.fields.description.label')}</FormLabel>
-            <FormControl>
-              <Textarea
-                placeholder={t('assignment.form.question.fields.description.placeholder')}
-                rows={4}
-                {...field}
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+      <div className="px-12 flex flex-col gap-8">
+        <FormField
+          control={form.control}
+          name={`questions.${questionIndex}.answer`}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t('assignment.form.question.fields.answer.label')}</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder={t('assignment.form.question.fields.answer.placeholder')}
+                  className="font-mono resize-y min-h-24"
+                  rows={4}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-      <FormField
-        control={form.control}
-        name={`questions.${questionIndex}.template`}
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>{t('assignment.form.question.fields.template.label')}</FormLabel>
-            <FormControl>
-              <Textarea
-                placeholder={t('assignment.form.question.fields.template.placeholder')}
-                className="font-mono"
-                rows={4}
-                {...field}
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+        <FormField
+          control={form.control}
+          name={`questions.${questionIndex}.template`}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t('assignment.form.question.fields.template.label')}</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder={t('assignment.form.question.fields.template.placeholder')}
+                  className="font-mono resize-y min-h-24"
+                  rows={4}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
 
-      <FormField
-        control={form.control}
-        name={`questions.${questionIndex}.answer`}
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>{t('assignment.form.question.fields.answer.label')}</FormLabel>
-            <FormControl>
-              <Textarea
-                placeholder={t('assignment.form.question.fields.answer.placeholder')}
-                className="font-mono"
-                rows={4}
-                {...field}
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="px-12 grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormField
           control={form.control}
           name={`questions.${questionIndex}.testCode`}
@@ -813,7 +789,7 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove, t }: QuestionF
               <FormControl>
                 <Textarea
                   placeholder={t('assignment.form.question.fields.testCode.placeholder')}
-                  className="font-mono"
+                  className="font-mono resize-y min-h-24"
                   rows={4}
                   {...field}
                 />
@@ -832,7 +808,7 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove, t }: QuestionF
               <FormControl>
                 <Textarea
                   placeholder={t('assignment.form.question.fields.secretTestCode.placeholder')}
-                  className="font-mono"
+                  className="font-mono resize-y min-h-24"
                   rows={4}
                   {...field}
                 />
@@ -844,7 +820,7 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove, t }: QuestionF
       </div>
 
       {/* Testcases */}
-      <div className="space-y-4">
+      <div className="px-12 space-y-4">
         <div className="flex items-center justify-between">
           <h4 className="text-lg font-semibold text-foreground">{t('assignment.form.question.testCases.title')}</h4>
           <Button
@@ -882,7 +858,7 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove, t }: QuestionF
                     <FormControl>
                       <Textarea
                         placeholder={t('assignment.form.question.testCases.inputPlaceholder')}
-                        className="font-mono"
+                        className="font-mono resize-y min-h-24"
                         rows={2}
                         {...field}
                       />
@@ -900,7 +876,7 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove, t }: QuestionF
                     <FormControl>
                       <Textarea
                         placeholder={t('assignment.form.question.testCases.outputPlaceholder')}
-                        className="font-mono"
+                        className="font-mono resize-y min-h-24"
                         rows={2}
                         {...field}
                       />
@@ -915,7 +891,7 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove, t }: QuestionF
       </div>
 
       {/* Secret Testcases */}
-      <div className="space-y-4">
+      <div className="px-12 pb-12 space-y-4">
         <div className="flex items-center justify-between">
           <h4 className="text-lg font-semibold text-foreground">{t('assignment.form.question.secretTestCases.title')}</h4>
           <Button
@@ -953,7 +929,7 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove, t }: QuestionF
                     <FormControl>
                       <Textarea
                         placeholder={t('assignment.form.question.secretTestCases.inputPlaceholder')}
-                        className="font-mono"
+                        className="font-mono resize-y min-h-24"
                         rows={2}
                         {...field}
                       />
@@ -971,7 +947,7 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove, t }: QuestionF
                     <FormControl>
                       <Textarea
                         placeholder={t('assignment.form.question.secretTestCases.outputPlaceholder')}
-                        className="font-mono"
+                        className="font-mono resize-y min-h-24"
                         rows={2}
                         {...field}
                       />
@@ -984,6 +960,6 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove, t }: QuestionF
           </div>
         ))}
       </div>
-    </div>
+    </section>
   );
 }

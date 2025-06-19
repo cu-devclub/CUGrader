@@ -1,3 +1,5 @@
+'use client'
+
 import { use } from "react";
 import { AssignmentForm } from "./assignment-form";
 
@@ -11,7 +13,6 @@ export default function Page({ params }: PageProps) {
 
   return (
     <main className="space-y-6">
-      <h1 className="text-2xl font-medium">Create New Assignment</h1>
       <AssignmentForm classId={classId} />
     </main>
   );
