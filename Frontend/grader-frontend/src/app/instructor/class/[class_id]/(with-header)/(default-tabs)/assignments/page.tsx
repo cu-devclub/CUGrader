@@ -2,7 +2,7 @@
 
 import { api } from "@/lib/api";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { useClassData } from "../../class-data-context";
+import { useClassData } from "../../../class-data-context";
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDateTime } from "@/lib/datetime";
 import Link from "next/link";
@@ -21,9 +21,10 @@ export default function Page() {
   return (
     <main className="space-y-4">
       <h1 className="text-xl"> Assignments </h1>
-      <p> it's either i polish this later or we have the design </p>      <Button asChild>
+      <p> it's either i polish this later or we have the design </p>
+      <Button asChild>
         <Link href="./assignments/new">
-          <Plus /> New
+          <Plus /> New Assignment
         </Link>
       </Button>
       <div className="mt-6 md:grid grid-cols-2">

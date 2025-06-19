@@ -6,13 +6,15 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/api";
 import { CreateAssignmentPayload } from "@/lib/api/type";
+import { unimplemented } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { parseDateTime } from "@internationalized/date";
 import { useMutation, useSuspenseQueries } from "@tanstack/react-query";
-import { Plus, Save, Trash2, X, Upload, File } from "lucide-react";
+import { Plus, Save, Trash2, X, Upload, File, Link, Link2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -43,7 +45,6 @@ const createSchemas = (t: ReturnType<typeof useTranslations>) => {
     number: z.coerce.number().min(1, t('assignment.form.validation.number.min')),
     publish: z.string().min(1, t('assignment.form.validation.publish.required')),
     due: z.string().min(1, t('assignment.form.validation.due.required')),
-    maxScore: z.coerce.number().min(0, t('assignment.form.validation.maxScore.min')),
     languages: z.array(z.string()).min(1, t('assignment.form.validation.languages.min')),
     examMode: z.boolean(),
     closeOnDue: z.boolean(),
@@ -95,7 +96,6 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
       number: 1,
       publish: "",
       due: "",
-      maxScore: 100,
       languages: [],
       examMode: false,
       closeOnDue: false,
@@ -151,7 +151,7 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
         number: data.number,
         publish: parseDateTime(data.publish),
         due: parseDateTime(data.due),
-        maxScore: data.maxScore,
+        maxScore: unimplemented("max score"),
         languages: data.languages,
         examMode: data.examMode,
         closeOnDue: data.closeOnDue,
@@ -230,452 +230,439 @@ export function AssignmentForm({ classId }: AssignmentFormProps) {
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6">
-        {/* Basic Information */}
-        <div className="space-y-4">
-          <h2 className="text-lg font-medium">{t('assignment.form.sections.basicInfo')}</h2>
+    <>
+      <Form {...form} >
+        <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6 p-8">
+          {/* Basic Information */}
+          <section className="border rounded-xl overflow-clip flex flex-col gap-8">
+            <div className="h-4 bg-primary border-b">
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('assignment.form.fields.name.label')}</FormLabel>
-                  <FormControl>
-                    <Input placeholder={t('assignment.form.fields.name.placeholder')} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="number"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('assignment.form.fields.number.label')}</FormLabel>
-                  <FormControl>
-                    <Input type="number" min="1" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="publish"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('assignment.form.fields.publish.label')}</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="datetime-local"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    {t('assignment.form.fields.publish.description')}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="due"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('assignment.form.fields.due.label')}</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="datetime-local"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    {t('assignment.form.fields.due.description')}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <FormField
-            control={form.control}
-            name="maxScore"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('assignment.form.fields.maxScore.label')}</FormLabel>
-                <FormControl>
-                  <Input type="number" min="0" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        {/* Languages */}
-        <div className="space-y-4">
-          <h2 className="text-lg font-medium">{t('assignment.form.sections.languages')}</h2>
-          <FormField
-            control={form.control}
-            name="languages"
-            render={() => (
-              <FormItem>
-                <FormDescription>
-                  {t('assignment.form.fields.languages.description')}
-                </FormDescription>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                  {supportedLanguages.map((language: string) => (
-                    <FormField
-                      key={language}
-                      control={form.control}
-                      name="languages"
-                      render={({ field }) => {
-                        return (
-                          <FormItem
-                            key={language}
-                            className="flex flex-row items-start space-x-3 space-y-0"
-                          >
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value?.includes(language)}
-                                onCheckedChange={(checked) => {
-                                  return checked
-                                    ? field.onChange([...field.value, language])
-                                    : field.onChange(
-                                      field.value?.filter(
-                                        (value) => value !== language
-                                      )
-                                    );
-                                }}
-                              />
-                            </FormControl>
-                            <FormLabel className="font-normal">
-                              {language}
-                            </FormLabel>
-                          </FormItem>
-                        );
-                      }}
-                    />
-                  ))}
-                </div>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        {/* Assigned Groups */}
-        <div className="space-y-4">
-          <h2 className="text-lg font-medium">{t('assignment.form.sections.assignedGroups')}</h2>
-          <FormField
-            control={form.control}
-            name="assignedGroupIds"
-            render={() => (
-              <FormItem>
-                <FormDescription>
-                  {t('assignment.form.fields.assignedGroups.description')}
-                </FormDescription>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                  {availableGroups.map((group: string) => (
-                    <FormField
-                      key={group}
-                      control={form.control}
-                      name="assignedGroupIds"
-                      render={({ field }) => {
-                        return (
-                          <FormItem
-                            key={group}
-                            className="flex flex-row items-start space-x-3 space-y-0"
-                          >
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value?.includes(group)}
-                                onCheckedChange={(checked) => {
-                                  return checked
-                                    ? field.onChange([...field.value, group])
-                                    : field.onChange(
-                                      field.value?.filter(
-                                        (value) => value !== group
-                                      )
-                                    );
-                                }}
-                              />
-                            </FormControl>
-                            <FormLabel className="font-normal">
-                              {group}
-                            </FormLabel>
-                          </FormItem>
-                        );
-                      }}
-                    />
-                  ))}
-                </div>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        {/* Settings */}
-        <div className="space-y-4">
-          <h2 className="text-lg font-medium">{t('assignment.form.sections.settings')}</h2>
-
-          <div className="space-y-3">
-            <FormField
-              control={form.control}
-              name="examMode"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>{t('assignment.form.fields.examMode.label')}</FormLabel>
-                    <FormDescription>
-                      {t('assignment.form.fields.examMode.description')}
-                    </FormDescription>
-                  </div>
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="closeOnDue"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>{t('assignment.form.fields.closeOnDue.label')}</FormLabel>
-                    <FormDescription>
-                      {t('assignment.form.fields.closeOnDue.description')}
-                    </FormDescription>
-                  </div>
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="showScoreOnLock"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>{t('assignment.form.fields.showScoreOnLock.label')}</FormLabel>
-                    <FormDescription>
-                      {t('assignment.form.fields.showScoreOnLock.description')}
-                    </FormDescription>
-                  </div>
-                </FormItem>
-              )}
-            />
-          </div>
-
-          {form.watch("examMode") && (
-            <FormField
-              control={form.control}
-              name="examPin"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('assignment.form.fields.examPin.label')}</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder={t('assignment.form.fields.examPin.placeholder')}
-                      maxLength={6}
-                      pattern="[0-9]{6}"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    {t('assignment.form.fields.examPin.description')}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          )}
-        </div>
-
-        {/* Test Code */}
-        <div className="space-y-4">
-          <h2 className="text-lg font-medium">{t('assignment.form.sections.globalTestCode')}</h2>
-
-          <FormField
-            control={form.control}
-            name="testCode"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('assignment.form.fields.testCode.label')}</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder={t('assignment.form.fields.testCode.placeholder')}
-                    className="font-mono"
-                    rows={6}
-                    disabled={isMultipleLanguages}
-                    {...field}
-                  />
-                </FormControl>
-                <FormDescription>
-                  {isMultipleLanguages
-                    ? t('assignment.form.fields.testCode.disabledMultipleLanguages')
-                    : t('assignment.form.fields.testCode.description')
-                  }
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="secretTestCode"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('assignment.form.fields.secretTestCode.label')}</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder={t('assignment.form.fields.secretTestCode.placeholder')}
-                    className="font-mono"
-                    rows={6}
-                    disabled={isMultipleLanguages}
-                    {...field}
-                  />
-                </FormControl>
-                <FormDescription>
-                  {isMultipleLanguages
-                    ? t('assignment.form.fields.secretTestCode.disabledMultipleLanguages')
-                    : t('assignment.form.fields.secretTestCode.description')
-                  }
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        {/* File Attachments */}
-        <div className="space-y-4">
-          <h2 className="text-lg font-medium">{t('assignment.form.sections.attachments')}</h2>
-
-          <div className="space-y-4">
-            <div className="flex items-center gap-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={triggerFileSelect}
-                className="flex items-center gap-2"
-              >
-                <Upload className="w-4 h-4" />
-                {t('assignment.form.buttons.selectFiles')}
-              </Button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                onChange={handleFileSelect}
-                className="hidden"
-                accept="*/*"
+            {/* Lab name */}
+            <div className="border-b p-8">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('assignment.form.fields.name.label')}</FormLabel>
+                    <FormControl>
+                      <input className="text-3xl outline-offset-8 placeholder:text-muted-foreground/50" placeholder={t('assignment.form.fields.name.placeholder')} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
             </div>
 
-            {attachedFiles.length > 0 && (
-              <div className="space-y-2">
-                <h3 className="text-sm font-medium text-muted-foreground">
-                  {t('assignment.form.fields.attachedFiles.label')} ({attachedFiles.length})
-                </h3>
-                <div className="grid gap-2">
-                  {attachedFiles.map((file, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-3 bg-muted/30 border rounded-lg"
-                    >
-                      <div className="flex items-center gap-2">
-                        <File className="w-4 h-4 text-muted-foreground" />
-                        <span className="text-sm font-medium">{file.name}</span>
-                        <span className="text-xs text-muted-foreground">
-                          ({(file.size / 1024).toFixed(1)} KB)
-                        </span>
-                      </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeFile(index)}
-                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                      >
-                        <X className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  ))}
+            <div className="grid grid-cols-4 px-12 gap-6 gap-y-8">
+              <div className="flex flex-wrap col-span-3 gap-6">
+                <FormField
+                  control={form.control}
+                  name="number"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('assignment.form.fields.number.label')}</FormLabel>
+                      <FormControl>
+                        <Input className="w-36" type="number" min="1" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Date: due, publish */}
+                <div className="flex gap-2">
+                  <FormField
+                    control={form.control}
+                    name="publish"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('assignment.form.fields.publish.label')}</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="datetime-local"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="self-end mb-2">
+                    dots
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="due"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('assignment.form.fields.due.label')}</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="datetime-local"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
               </div>
-            )}
+
+              {/* Exam mode */}
+              <div className="border-l px-6 flex flex-col gap-6 row-span-2">
+                <FormField
+                  control={form.control}
+                  name="examMode"
+                  render={({ field }) => (
+                    <FormItem className="flex gap-3">
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormLabel>{t('assignment.form.fields.examMode.label')}</FormLabel>
+                    </FormItem>
+                  )}
+                />
+
+                {form.watch("examMode") && (
+                  <FormField
+                    control={form.control}
+                    name="examPin"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('assignment.form.fields.examPin.label')}</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder={t('assignment.form.fields.examPin.placeholder')}
+                            maxLength={6}
+                            pattern="[0-9]{6}"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          {t('assignment.form.fields.examPin.description')}
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+              </div>
+
+              <div className="col-span-3 flex flex-col gap-8">
+                {/* Assigned Groups */}
+                <div className="space-y-4">
+                  <h2 className="text-lg font-medium">{t('assignment.form.sections.assignedGroups')}</h2>
+                  <FormField
+                    control={form.control}
+                    name="assignedGroupIds"
+                    render={() => (
+                      <FormItem>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                          {availableGroups.map((group: string) => (
+                            <FormField
+                              key={group}
+                              control={form.control}
+                              name="assignedGroupIds"
+                              render={({ field }) => {
+                                return (
+                                  <FormItem
+                                    key={group}
+                                    className="flex flex-row items-start space-x-3 space-y-0"
+                                  >
+                                    <FormControl>
+                                      <Checkbox
+                                        checked={field.value?.includes(group)}
+                                        onCheckedChange={(checked) => {
+                                          return checked
+                                            ? field.onChange([...field.value, group])
+                                            : field.onChange(
+                                              field.value?.filter(
+                                                (value) => value !== group
+                                              )
+                                            );
+                                        }}
+                                      />
+                                    </FormControl>
+                                    <FormLabel className="font-normal">
+                                      {group}
+                                    </FormLabel>
+                                  </FormItem>
+                                );
+                              }}
+                            />
+                          ))}
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Languages */}
+                <div className="space-y-4">
+                  <h2 className="text-lg font-medium">{t('assignment.form.sections.languages')}</h2>
+                  <FormField
+                    control={form.control}
+                    name="languages"
+                    render={() => (
+                      <FormItem>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                          {supportedLanguages.map((language: string) => (
+                            <FormField
+                              key={language}
+                              control={form.control}
+                              name="languages"
+                              render={({ field }) => {
+                                return (
+                                  <FormItem
+                                    key={language}
+                                    className="flex flex-row items-start space-x-3 space-y-0"
+                                  >
+                                    <FormControl>
+                                      <Checkbox
+                                        checked={field.value?.includes(language)}
+                                        onCheckedChange={(checked) => {
+                                          return checked
+                                            ? field.onChange([...field.value, language])
+                                            : field.onChange(
+                                              field.value?.filter(
+                                                (value) => value !== language
+                                              )
+                                            );
+                                        }}
+                                      />
+                                    </FormControl>
+                                    <FormLabel className="font-normal">
+                                      {language}
+                                    </FormLabel>
+                                  </FormItem>
+                                );
+                              }}
+                            />
+                          ))}
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Settings */}
+                <div className="space-y-4">
+                  <div className="space-y-3">
+                    <FormField
+                      control={form.control}
+                      name="closeOnDue"
+                      render={({ field }) => (
+                        <FormItem className="flex gap-3">
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <FormLabel>{t('assignment.form.fields.closeOnDue.label')}</FormLabel>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="showScoreOnLock"
+                      render={({ field }) => (
+                        <FormItem className="flex gap-3">
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <FormLabel>{t('assignment.form.fields.showScoreOnLock.label')}</FormLabel>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+            {/* Test Code */}
+            <div className="space-y-4 px-12">
+              <h2 className="text-lg font-medium">{t('assignment.form.sections.globalTestCode')}</h2>
+
+              <div className="flex gap-6 items-start">
+                <FormField
+                  control={form.control}
+                  name="testCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('assignment.form.fields.testCode.label')}</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder={t('assignment.form.fields.testCode.placeholder')}
+                          className="font-mono h-36 resize-y"
+                          rows={6}
+                          disabled={isMultipleLanguages}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        {isMultipleLanguages
+                          ? t('assignment.form.fields.testCode.disabledMultipleLanguages')
+                          : t('assignment.form.fields.testCode.description')
+                        }
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="secretTestCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('assignment.form.fields.secretTestCode.label')}</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder={t('assignment.form.fields.secretTestCode.placeholder')}
+                          className="font-mono h-36 resize-y"
+                          rows={6}
+                          disabled={isMultipleLanguages}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        {isMultipleLanguages
+                          ? t('assignment.form.fields.secretTestCode.disabledMultipleLanguages')
+                          : t('assignment.form.fields.secretTestCode.description')
+                        }
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+            </div>
+
+            {/* File Attachments */}
+            <div className="px-12 pb-12 flex flex-col gap-4">
+              <h2 className="text-lg font-medium">{t('assignment.form.sections.attachments')}</h2>
+              <div className="grid grid-cols-2">
+
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={triggerFileSelect}
+                      className="flex items-center gap-2"
+                    >
+                      <Upload className="w-4 h-4" />
+                      {t('assignment.form.buttons.selectFiles')}
+                    </Button>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      multiple
+                      onChange={handleFileSelect}
+                      className="hidden"
+                      accept="*/*"
+                    />
+                  </div>
+
+                  {attachedFiles.length > 0 && (
+                    <div className="space-y-2">
+                      <h3 className="text-sm font-medium text-muted-foreground">
+                        {t('assignment.form.fields.attachedFiles.label')} ({attachedFiles.length})
+                      </h3>
+                      <div className="grid gap-2">
+                        {attachedFiles.map((file, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center justify-between p-3 bg-muted/30 border rounded-lg"
+                          >
+                            <div className="flex items-center gap-2">
+                              <File className="w-4 h-4 text-muted-foreground" />
+                              <span className="text-sm font-medium">{file.name}</span>
+                              <span className="text-xs text-muted-foreground">
+                                ({(file.size / 1024).toFixed(1)} KB)
+                              </span>
+                            </div>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeFile(index)}
+                              className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+          </section>
+
+          <div className="space-y-4">
+
+            {/* Questions */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-medium">{t('assignment.form.sections.questions')}</h2>
+                <Button type="button" onClick={addQuestion} variant="outline">
+                  <Plus className="w-4 h-4 mr-2" />
+                  {t('assignment.form.buttons.addQuestion')}
+                </Button>
+              </div>
+
+              {questionFields.map((question, questionIndex) => (
+                <QuestionForm
+                  key={question.id}
+                  questionIndex={questionIndex}
+                  form={form}
+                  onRemove={() => removeQuestion(questionIndex)}
+                  canRemove={questionFields.length > 1}
+                  t={t}
+                />
+              ))}
+            </div>
+
+            {/* Submit */}
+            <div className="flex gap-2 pt-4">
+              <Button type="submit" disabled={mutation.isPending}>
+                <Save className="w-4 h-4 mr-2" />
+                {mutation.isPending ? t('assignment.form.buttons.creating') : t('assignment.form.buttons.save')}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => router.back()}
+              >
+                {t('assignment.form.buttons.cancel')}
+              </Button>
+            </div>
           </div>
-        </div>
-
-        {/* Questions */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-medium">{t('assignment.form.sections.questions')}</h2>
-            <Button type="button" onClick={addQuestion} variant="outline">
-              <Plus className="w-4 h-4 mr-2" />
-              {t('assignment.form.buttons.addQuestion')}
-            </Button>
-          </div>
-
-          {questionFields.map((question, questionIndex) => (
-            <QuestionForm
-              key={question.id}
-              questionIndex={questionIndex}
-              form={form}
-              onRemove={() => removeQuestion(questionIndex)}
-              canRemove={questionFields.length > 1}
-              t={t}
-            />
-          ))}
-        </div>
-
-        {/* Submit */}
-        <div className="flex gap-2 pt-4">
-          <Button type="submit" disabled={mutation.isPending}>
-            <Save className="w-4 h-4 mr-2" />
-            {mutation.isPending ? t('assignment.form.buttons.creating') : t('assignment.form.buttons.save')}
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => router.back()}
-          >
-            {t('assignment.form.buttons.cancel')}
-          </Button>
-        </div>
-      </form>
-    </Form>
+        </form>
+      </Form >
+    </>
   );
 }
 

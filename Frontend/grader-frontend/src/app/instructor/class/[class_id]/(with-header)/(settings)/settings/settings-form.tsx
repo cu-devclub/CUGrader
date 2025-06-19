@@ -12,7 +12,7 @@ import { useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { useClassData } from "../../class-data-context";
+import { useClassData } from "../../../class-data-context";
 
 // TODO: really think about number and string
 const settingsSchema = z.object({
