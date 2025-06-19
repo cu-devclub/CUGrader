@@ -14,7 +14,7 @@ export function useDropzoneFrFr(options?: DropzoneOptions) {
     }
 
     if (inputRef.current) {
-      inputRef.current.value = '';
+      inputRef.current.value = ''
     }
 
   }, [acceptedFiles.length]);
