@@ -22,7 +22,7 @@ func (s *LabService) GetLabByIdForStudent(labId int) (*lab.LabStudentDetailModel
 		return nil, err
 	}
 
-	assignedGroups, err := s.Model.GetLabAssignedGroups(labId)
+	assignedGroups, err := s.Model.GetLabAssignedGroupNames(labId)
 	if err != nil {
 		return nil, err
 	}
