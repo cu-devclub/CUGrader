@@ -2,9 +2,9 @@
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Settings, Users } from "lucide-react";
-import { useClassData } from "../class-data-context";
+import { useClassData } from "../../class-data-context";
 import Link from "next/link";
-import { useActiveTab } from "../use-active-tab";
+import { useActiveTab } from "../../use-active-tab";
 
 interface LayoutProps {
   children: React.ReactNode;
