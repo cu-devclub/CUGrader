@@ -39,23 +39,23 @@ func (m *LabModel) GetLab(labId int) (*LabFullModel, error) {
 }
 
 // GetLabStudentDetail retrieves detailed information about a lab for students, including questions, languages, and assigned groups.
-func (m *LabModel) GetLabAssignedGroups(labId int) ([]string, error) {
-	query := `SELECT DISTINCT group_name FROM assigned_to WHERE lab_id = ?`
+func (m *LabModel) GetLabAssignedGroupNames(labId int) ([]string, error) {
+	query := `SELECT DISTINCT g.name FROM group g LEFT JOIN assign_to at ON g.id = at.group_id WHERE at.lab_id = ?`
 	rows, err := m.DB.Query(query, labId)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var groups []string
+	var groupNames []string
 	for rows.Next() {
-		var group string
-		if err := rows.Scan(&group); err != nil {
+		var groupName string
+		if err := rows.Scan(&groupName); err != nil {
 			return nil, err
 		}
-		groups = append(groups, group)
+		groupNames = append(groupNames, groupName)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
-	return groups, nil
+	return groupNames, nil
 }
