@@ -1,6 +1,7 @@
 package v1
 
 import (
+	// Controllers
 	assistantController "CUGrader/backend/versions/v1/controllers/assistant"
 	classController "CUGrader/backend/versions/v1/controllers/class"
 	additionalFileController "CUGrader/backend/versions/v1/controllers/file"
@@ -9,15 +10,20 @@ import (
 	questionController "CUGrader/backend/versions/v1/controllers/question"
 	studentController "CUGrader/backend/versions/v1/controllers/student"
 	userController "CUGrader/backend/versions/v1/controllers/user"
+
+	// Models
 	assistantModel "CUGrader/backend/versions/v1/models/assistant"
 	classModel "CUGrader/backend/versions/v1/models/class"
 	additionalFileModel "CUGrader/backend/versions/v1/models/file"
 	labModel "CUGrader/backend/versions/v1/models/lab"
+	languageModel "CUGrader/backend/versions/v1/models/language"
 	pictureModel "CUGrader/backend/versions/v1/models/picture"
 	questionModel "CUGrader/backend/versions/v1/models/question"
 	studentModel "CUGrader/backend/versions/v1/models/student"
 	userModel "CUGrader/backend/versions/v1/models/user"
 	utilsModel "CUGrader/backend/versions/v1/models/utils"
+
+	// Services
 	assistantService "CUGrader/backend/versions/v1/services/assistant"
 	classService "CUGrader/backend/versions/v1/services/class"
 	additionalFileService "CUGrader/backend/versions/v1/services/file"
@@ -109,6 +115,8 @@ func RegisterRoutes(r *gin.RouterGroup) {
 	pictureService := &pictureService.PictureService{Model: pictureModel}
 	pictureController := &pictureController.PictureController{Service: pictureService}
 
+	languageModel := &languageModel.LanguageModel{DB: db}
+
 	questionModel := &questionModel.QuestionModel{DB: db}
 	questionService := &questionService.QuestionService{Model: questionModel, Utils: utilsModel}
 	questionController := &questionController.QuestionController{Service: questionService}
@@ -118,7 +126,13 @@ func RegisterRoutes(r *gin.RouterGroup) {
 	additionalFileController := &additionalFileController.AdditionalFileController{Service: additionalFileService}
 
 	labModel := &labModel.LabModel{DB: db}
-	labService := &labService.LabService{Model: labModel, Utils: utilsModel}
+	labService := &labService.LabService{
+		Model:               labModel,
+		Utils:               utilsModel,
+		QuestionModel:       questionModel,
+		LanguageModel:       languageModel,
+		AdditionalFileModel: additionalFileModel,
+	}
 	labController := &labController.LabController{Service: labService}
 
 	r.POST("/callback", userController.Callback)
@@ -141,6 +155,8 @@ func RegisterRoutes(r *gin.RouterGroup) {
 	r.GET("/student/:classId", studentController.GetStudentsHandler)
 
 	r.GET("/picture/:pictureId", pictureController.GetPicture)
+
+	r.GET("/lab/:lab_id", labController.GetLabByIdForStudent)
 
 	r.GET("/question/:questionId", questionController.GetQuestionForStudentController)
 
