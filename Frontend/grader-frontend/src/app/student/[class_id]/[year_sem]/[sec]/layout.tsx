@@ -8,9 +8,12 @@ import clsx from "clsx";
 import { Button } from "@/components/ui/button";
 import { ChartNoAxesColumn } from "lucide-react";
 import { FileText } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export default function StudentLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+
+  const t = useTranslations("student");
 
   return (
     <div className="flex min-h-screen">
@@ -30,7 +33,7 @@ export default function StudentLayout({ children }: { children: ReactNode }) {
                     )}
                   >
                     <FileText className="w-4 h-4" />
-                    Assignment
+                    {t("assignment")}
                   </Link>
                 </TabsTrigger>
 
@@ -45,7 +48,7 @@ export default function StudentLayout({ children }: { children: ReactNode }) {
                     )}
                   >
                     <ChartNoAxesColumn className="w-4 h-4" />
-                    Profile
+                    {t("profile-text")}
                   </Link>
                 </TabsTrigger>
               </TabsList>

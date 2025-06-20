@@ -268,5 +268,38 @@
                 "title": "4. Locale Detection"
             }
         }
+    },
+
+    "student": {
+        "allClass": "All Classes",
+        "ta": "Teacher Assistant",
+        "student": "Student",
+        "assignment": "Assignment",
+        "profile-text": "Profile"
+    },
+
+    "assignment-page": {
+        "assign-title": "Assigned",
+        "done-title": "Done",
+        "assign": "Assignment",
+        "labNum": "Lab No.",
+        "publish": "Publish Date",
+        "due": "Due Date",
+        "score": "Score"
+    },
+
+    "profile-page": {
+        "scoreSum": "Score Summary",
+        "midterm": "midterm",
+        "final": "final",
+        "ranking": "Ranking",
+        "avg": "Average",
+        "max": "Max Score",
+        "sd": "S.D."
+    },
+
+    "notification-page": {
+        "noti-title": "Notification",
+        "notification": "Course Notification"
     }
 }

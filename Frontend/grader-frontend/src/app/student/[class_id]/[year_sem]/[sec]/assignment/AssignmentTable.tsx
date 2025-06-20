@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Table, TableProps, Tag, Space } from "antd";
+import { useTranslations } from "next-intl";
 
 interface DataType {
   key: number;
@@ -13,49 +14,51 @@ interface DataType {
   maxScore: number;
 }
 
-const columns: TableProps<DataType>["columns"] = [
-  {
-    title: "Assign",
-    dataIndex: "name",
-    key: "name",
-  },
-  {
-    title: "Lab NO.",
-    dataIndex: "labNumber",
-    key: "labNumber",
-    sorter: (a, b) => a.labNumber - b.labNumber,
-  },
-  {
-    title: "Publish Date",
-    dataIndex: "publishDate",
-    key: "publishDate",
-    sorter: (a, b) =>
-      new Date(a.publishDate).getTime() - new Date(b.publishDate).getTime(),
-  },
-  {
-    title: "Due Date",
-    dataIndex: "dueDate",
-    key: "dueDate",
-    sorter: (a, b) =>
-      new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime(),
-  },
-  {
-    title: "Score",
-    dataIndex: "score",
-    key: "score",
-    render: (_, record) => (
-      <span>
-        {record.curScore} / {record.maxScore}
-      </span>
-    ),
-  },
-];
-
 interface Props {
   data: DataType[];
 }
 
 export default function AssignmentTable({ data }: Props) {
+  const t = useTranslations("assignment-page");
+
+  const columns: TableProps<DataType>["columns"] = [
+    {
+      title: t("assign"),
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: t("labNum"),
+      dataIndex: "labNumber",
+      key: "labNumber",
+      sorter: (a, b) => a.labNumber - b.labNumber,
+    },
+    {
+      title: t("publish"),
+      dataIndex: "publishDate",
+      key: "publishDate",
+      sorter: (a, b) =>
+        new Date(a.publishDate).getTime() - new Date(b.publishDate).getTime(),
+    },
+    {
+      title: t("due"),
+      dataIndex: "dueDate",
+      key: "dueDate",
+      sorter: (a, b) =>
+        new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime(),
+    },
+    {
+      title: t("score"),
+      dataIndex: "score",
+      key: "score",
+      render: (_, record) => (
+        <span>
+          {record.curScore} / {record.maxScore}
+        </span>
+      ),
+    },
+  ];
+
   return (
     <div>
       <Table<DataType>

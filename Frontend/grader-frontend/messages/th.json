@@ -268,5 +268,40 @@
                 "title": "4. การตรวจสอบภาษา"
             }
         }
+    },
+
+    "student": {
+        "allClass": "เนื้อหาบทเรียน",
+        "ta": "Teacher Assistant",
+        "student": "นักเรียน",
+        "assignment": "งานของชั้นเรียน",
+        "profile-text": "โปรไฟล์ของคุณ"
+
+    },
+
+    "assignment-page": {
+
+        "assign-title": "งานของชั้นเรียน",
+        "done-title": "งานที่เสร็จสิ้น",
+        "assign": "ชื่องาน",
+        "labNum": "Lab NO.",
+        "publish": "วันที่ประกาศ",
+        "due": "กำหนดส่ง",
+        "score": "ตะแนนที่ได้รับ"
+    },
+
+    "profile-page": {
+        "scoreSum": "คะแนนรวม",
+        "midterm": "คะแนนกลางภาค",
+        "final": "คะแนนปลายภาค",
+        "ranking": "การจัดอันดับ",
+        "avg": "คะแนนมาตราฐาน",
+        "max": "คะแนนสูงสุด",
+        "sd": "ค่าเบี่ยงเบนมาตราฐาน"
+    },
+
+    "notification-page": {
+        "noti-title": "การแจ้งเตือน",
+        "notification": "การแจ้งเตือน"
     }
 }

@@ -8,6 +8,10 @@ import { FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
+import AssignContent from "./assignContent";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api";
+
 import {
   Popover,
   PopoverContent,
@@ -16,13 +20,18 @@ import {
 
 interface Props {
   id: number;
-  class_id: string;
+  class_id: number;
   class_name: string;
   image?: string;
   semester: string;
 }
 
-function statPopOver() {
+function statPopOver(class_id: number) {
+  const { data: assigmentsList } = useSuspenseQuery({
+    queryKey: ["assigment-popover"],
+    queryFn: () => api.assignments.listNearDue(),
+  });
+  console.log(JSON.stringify(assigmentsList, null, 2));
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -38,41 +47,13 @@ function statPopOver() {
           <h1 className="font-bold text-md">Assigned</h1>
         </div>
         <div className="flex flex-col w-full">
-          <div className="flex justify-between border-b pb-1 mt-1">
-            <div className="flex flex-col gap-y-1">
-              <h1 className="text-md">Assignment 1</h1>
-              <span className="text-xs text-primary">Due: 21/06/2025</span>
-            </div>
-            <div>
-              <Badge className="w-20 h-6 bg-gray-300 border-solid border-gray-600">
-                <p className="text-xs text-gray-600"> Not Started</p>
-              </Badge>
-            </div>
-          </div>
-
-          <div className="flex justify-between border-b pb-1 mt-1">
-            <div className="flex flex-col gap-y-1">
-              <h1 className="text-md">Assignment 1</h1>
-              <span className="text-xs text-primary">Due: 21/06/2025</span>
-            </div>
-            <div>
-              <Badge className="w-20 h-6 bg-gray-300 border-solid border-gray-600">
-                <p className="text-xs text-gray-600"> Not Started</p>
-              </Badge>
-            </div>
-          </div>
-
-          <div className="flex justify-between border-b pb-1 mt-1">
-            <div className="flex flex-col gap-y-1">
-              <h1 className="text-md">Assignment 1</h1>
-              <span className="text-xs text-primary">Due: 21/06/2025</span>
-            </div>
-            <div>
-              <Badge className="w-20 h-6 bg-gray-300 border-solid border-gray-600">
-                <p className="text-xs text-gray-600"> Not Started</p>
-              </Badge>
-            </div>
-          </div>
+          {assigmentsList.map((assign, index) => (
+            <AssignContent
+              key={index}
+              name={assign.name}
+              due={assign.due.toString()}
+            />
+          ))}
         </div>
       </PopoverContent>
     </Popover>
@@ -121,7 +102,7 @@ function studentCard({ class_id, class_name, image, semester }: Props) {
               >
                 {class_name} ({semester})
               </h1>
-              {statPopOver()}
+              {statPopOver(class_id)}
             </div>
 
             <div className="px-4 flex flex-col gap-y-3">
