@@ -4,8 +4,10 @@ import { Geist, Geist_Mono, Rubik } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
 import { Toaster } from "@/components/ui/sonner";
+
 import { NextIntlClientProvider } from 'next-intl';
-import { getLocale, getMessages } from 'next-intl/server';
+import { getLocale, getMessages } from 'next-intl/server'
+  ;
 
 // TODO: get thai font
 const rubik = Rubik({
@@ -42,14 +44,15 @@ export default async function RootLayout({
       <body
         className={`${geistMono.variable} ${rubik.variable} antialiased font-sans text-foreground`}
       >
+
         <Providers>
           <AntdRegistry>
             <NextIntlClientProvider locale={locale} messages={messages}>
               {children}
+              <Toaster richColors />
             </NextIntlClientProvider>
           </AntdRegistry>
         </Providers>
-        <Toaster />
       </body>
     </html>
   );

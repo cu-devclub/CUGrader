@@ -41,6 +41,7 @@ export default function Callback() {
                     // Check if we got a redirect response (including opaque redirects)
                     if (response.type === 'opaqueredirect' || response.status === 307 || response.status === 302 || response.status === 301) {
                         console.log('Redirect detected, checking location header')
+
                         const redirectUrl = response.headers.get('location')
                         if (redirectUrl) {
                             console.log('API route redirected to:', redirectUrl)
@@ -74,6 +75,7 @@ export default function Callback() {
 
                 } catch (fetchError) {
                     console.error('Fetch error:', fetchError)
+
                     // If manual redirect fails, try with normal redirect handling
                     console.log('Retrying with normal redirect handling')
                     const response = await fetch(`/api/auth/callback?credential=${encodeURIComponent(credential)}&key=${encodeURIComponent(key || '')}`, {
