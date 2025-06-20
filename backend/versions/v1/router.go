@@ -6,6 +6,7 @@ import (
 	additionalFileController "CUGrader/backend/versions/v1/controllers/file"
 	labController "CUGrader/backend/versions/v1/controllers/lab"
 	pictureController "CUGrader/backend/versions/v1/controllers/picture"
+	questionController "CUGrader/backend/versions/v1/controllers/question"
 	studentController "CUGrader/backend/versions/v1/controllers/student"
 	userController "CUGrader/backend/versions/v1/controllers/user"
 	assistantModel "CUGrader/backend/versions/v1/models/assistant"
@@ -13,6 +14,7 @@ import (
 	additionalFileModel "CUGrader/backend/versions/v1/models/file"
 	labModel "CUGrader/backend/versions/v1/models/lab"
 	pictureModel "CUGrader/backend/versions/v1/models/picture"
+	questionModel "CUGrader/backend/versions/v1/models/question"
 	studentModel "CUGrader/backend/versions/v1/models/student"
 	userModel "CUGrader/backend/versions/v1/models/user"
 	utilsModel "CUGrader/backend/versions/v1/models/utils"
@@ -21,6 +23,7 @@ import (
 	additionalFileService "CUGrader/backend/versions/v1/services/file"
 	labService "CUGrader/backend/versions/v1/services/lab"
 	pictureService "CUGrader/backend/versions/v1/services/picture"
+	questionService "CUGrader/backend/versions/v1/services/question"
 	studentService "CUGrader/backend/versions/v1/services/student"
 	userService "CUGrader/backend/versions/v1/services/user"
 
@@ -106,6 +109,10 @@ func RegisterRoutes(r *gin.RouterGroup) {
 	pictureService := &pictureService.PictureService{Model: pictureModel}
 	pictureController := &pictureController.PictureController{Service: pictureService}
 
+	questionModel := &questionModel.QuestionModel{DB: db}
+	questionService := &questionService.QuestionService{Model: questionModel, Utils: utilsModel}
+	questionController := &questionController.QuestionController{Service: questionService}
+
 	additionalFileModel := &additionalFileModel.AdditionalFileModel{DB: db}
 	additionalFileService := &additionalFileService.AdditionalFileService{Model: additionalFileModel, Utils: utilsModel}
 	additionalFileController := &additionalFileController.AdditionalFileController{Service: additionalFileService}
@@ -134,6 +141,8 @@ func RegisterRoutes(r *gin.RouterGroup) {
 	r.GET("/student/:classId", studentController.GetStudentsHandler)
 
 	r.GET("/picture/:pictureId", pictureController.GetPicture)
+
+	r.GET("/question/:questionId", questionController.GetQuestionForStudentController)
 
 	r.GET("/addfile/:addfile_id", additionalFileController.GetAdditionalFileByIDHandler)
 	r.DELETE("/addfile/:addfile_id", additionalFileController.DeleteAdditionalFileByIDHandler)
