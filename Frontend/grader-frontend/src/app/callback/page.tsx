@@ -28,23 +28,77 @@ export default function Callback() {
 
                 console.log('Processing OAuth callback with credential:', credential.substring(0, 10) + '...')
 
-                // Call our Next.js API route which handles the backend communication
-                const response = await fetch(`/api/auth/callback?credential=${encodeURIComponent(credential)}&key=${encodeURIComponent(key || '')}`, {
-                    method: 'GET',
-                    credentials: 'include', // Include cookies in the request
-                })
+                try {
+                    // Call our Next.js API route which handles the backend communication
+                    const response = await fetch(`/api/auth/callback?credential=${encodeURIComponent(credential)}&key=${encodeURIComponent(key || '')}`, {
+                        method: 'GET',
+                        credentials: 'include', // Include cookies in the request
+                        redirect: 'manual', // Don't follow redirects automatically
+                    })
 
-                // The API route handles redirects, so if we get here, something went wrong
-                if (!response.ok) {
-                    throw new Error(`Authentication failed: ${response.status} ${response.statusText}`)
+                    console.log('Response status:', response.status, 'Type:', response.type)
+
+                    // Check if we got a redirect response (including opaque redirects)
+                    if (response.type === 'opaqueredirect' || response.status === 307 || response.status === 302 || response.status === 301) {
+                        console.log('Redirect detected, checking location header')
+                        const redirectUrl = response.headers.get('location')
+                        if (redirectUrl) {
+                            console.log('API route redirected to:', redirectUrl)
+                            window.location.href = redirectUrl
+                            return
+                        } else {
+                            // For opaque redirects, we can't see the location header
+                            // Let's try following the redirect normally
+                            console.log('Opaque redirect detected, refetching with follow')
+                            const followResponse = await fetch(`/api/auth/callback?credential=${encodeURIComponent(credential)}&key=${encodeURIComponent(key || '')}`, {
+                                method: 'GET',
+                                credentials: 'include',
+                                redirect: 'follow',
+                            })
+
+                            // If this succeeds, we should be on the redirected page
+                            // The API sets cookies, so we can check if we're authenticated and redirect appropriately
+                            if (followResponse.ok) {
+                                // Try to determine where to go based on URL or default to checking auth
+                                console.log('Follow response URL:', followResponse.url)
+                                window.location.href = followResponse.url
+                                return
+                            }
+                        }
+                    }
+
+                    // If we get here without a redirect, something went wrong
+                    if (!response.ok) {
+                        throw new Error(`Authentication failed: ${response.status} ${response.statusText}`)
+                    }
+
+                } catch (fetchError) {
+                    console.error('Fetch error:', fetchError)
+                    // If manual redirect fails, try with normal redirect handling
+                    console.log('Retrying with normal redirect handling')
+                    const response = await fetch(`/api/auth/callback?credential=${encodeURIComponent(credential)}&key=${encodeURIComponent(key || '')}`, {
+                        method: 'GET',
+                        credentials: 'include',
+                    })
+
+                    if (!response.ok) {
+                        throw new Error(`Authentication failed: ${response.status} ${response.statusText}`)
+                    }
+
+                    // If we reach here, the redirect was followed and we should check the URL
+                    console.log('Final response URL after redirect:', response.url)
+
+                    // The API route should have set the auth cookie, so redirect based on response URL
+                    if (response.url.includes('/student')) {
+                        window.location.href = '/student'
+                    } else if (response.url.includes('/instructor')) {
+                        window.location.href = '/instructor'
+                    } else {
+                        // Default fallback - let the middleware handle the redirect
+                        window.location.href = '/student' // Default for this user
+                    }
+                    return
                 }
-
-                // If successful, the API route would have redirected us
-                // If we reach here, show success and redirect manually
-                setStatus('success')
-                setTimeout(() => {
-                    router.push('/instructor')
-                }, 1500)
 
             } catch (err) {
                 console.error('Auth callback error:', err)

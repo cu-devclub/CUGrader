@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     }
 
     try {
-        console.log('Sending to backend:', { key: key, credential: credential });
+        console.log('Sending to backend:', BACKEND_CALLBACK_URL, { key: key, credential: credential });
 
         // 1. Send the key and credential to your backend
         const backendResponse = await fetch(BACKEND_CALLBACK_URL, {
@@ -90,10 +90,34 @@ export async function GET(request: NextRequest) {
             sameSite: 'lax',
         });
 
-        // 3. Redirect to the desired page after login
-        // You might get this from 'state' or have a default
-        const redirectTo = searchParams.get('redirect_to') || '/instructor';
-        return NextResponse.redirect(new URL(redirectTo, request.url));
+        // 3. Decode token to get user role for smart redirection
+        let redirectTo = '/instructor'; // default
+        try {
+            // Remove "Bearer " prefix and decode JWT
+            const cleanToken = token.replace(/^Bearer\s+/, '');
+            const parts = cleanToken.split('.');
+            if (parts.length === 3) {
+                const payload = parts[1];
+                const decodedPayload = Buffer.from(payload, 'base64url').toString('utf-8');
+                const claims = JSON.parse(decodedPayload);
+                console.log('Decoded claims:', claims);
+
+                // Redirect based on user role
+                if (claims.role === 'student') {
+                    redirectTo = '/student';
+                } else if (claims.role === 'teacher') {
+                    redirectTo = '/instructor';
+                }
+            }
+        } catch {
+            console.log('Could not decode token for redirect, using default');
+        }
+
+        // You might get this from 'state' or use role-based redirect
+        const finalRedirect = searchParams.get('redirect_to') || redirectTo;
+        console.log('redirect URL:', finalRedirect);
+        const response = NextResponse.redirect(new URL(finalRedirect, request.url));
+        return response;
 
     } catch (error) {
         console.error('Callback handler error:', error);
