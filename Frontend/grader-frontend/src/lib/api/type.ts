@@ -240,4 +240,13 @@ export interface APIClient {
   groups: {
     listByClassId: (classId: number) => Promise<string[]>;
   };
+  examPin: {
+    getByClassId: (classId: number) => Promise<string>;
+  };
+  testCode: { // TODO: rename this
+    getById: (testCodeId: number) => Promise<string>;
+  };
+  testcase: { // TODO: rename this
+    getById: (testCodeId: number) => Promise<{ public: Testcase[], secret: Testcase[]; }>;
+  };
 };

@@ -58,6 +58,18 @@ export interface QuestionQuestionIdGet200Response {
      */
     maxScore?: number;
     /**
+     * testcase_id primary key. null if multilanguage
+     * @type {number}
+     * @memberof QuestionQuestionIdGet200Response
+     */
+    testcase?: number;
+    /**
+     * testcase_id primary key. null if multilanguage
+     * @type {number}
+     * @memberof QuestionQuestionIdGet200Response
+     */
+    secretTestcase?: number;
+    /**
      * 
      * @type {QuestionQuestionIdGet200ResponseSubmission}
      * @memberof QuestionQuestionIdGet200Response
@@ -87,6 +99,8 @@ export function QuestionQuestionIdGet200ResponseFromJSONTyped(json: any, ignoreD
         'description': json['description'] == null ? undefined : json['description'],
         'predefine': json['predefine'] == null ? undefined : json['predefine'],
         'maxScore': json['max_score'] == null ? undefined : json['max_score'],
+        'testcase': json['testcase'] == null ? undefined : json['testcase'],
+        'secretTestcase': json['secret_testcase'] == null ? undefined : json['secret_testcase'],
         'submission': json['submission'] == null ? undefined : QuestionQuestionIdGet200ResponseSubmissionFromJSON(json['submission']),
     };
 }
@@ -107,6 +121,8 @@ export function QuestionQuestionIdGet200ResponseToJSONTyped(value?: QuestionQues
         'description': value['description'],
         'predefine': value['predefine'],
         'max_score': value['maxScore'],
+        'testcase': value['testcase'],
+        'secret_testcase': value['secretTestcase'],
         'submission': QuestionQuestionIdGet200ResponseSubmissionToJSON(value['submission']),
     };
 }

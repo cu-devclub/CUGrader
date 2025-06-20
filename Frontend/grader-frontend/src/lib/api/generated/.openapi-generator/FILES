@@ -11,15 +11,18 @@ models/ClassesSemestersGet200Response.ts
 models/CreateStudent.ts
 models/DeleteStudent.ts
 models/EditStudent.ts
+models/ExamPinLabIdGet200Response.ts
 models/InstructorInfo.ts
 models/LabEdit.ts
 models/LabEditQuestionsInner.ts
-models/LabEditQuestionsInnerMultilangTestcaseInner.ts
 models/LabLabIdGet200Response.ts
-models/LabsClassIdGet200Response.ts
+models/LabsClassIdGet200ResponseInner.ts
 models/LanguageGet200Response.ts
 models/LanguageGet200ResponseLanguagesInner.ts
 models/ModelError.ts
+models/MultilangTestcaseQuestionIdGet200Response.ts
+models/MultilangTestcaseQuestionIdGet200ResponseSecretTestcaseInner.ts
+models/MultilangTestcaseQuestionIdGet200ResponseTestcaseInner.ts
 models/NearDueDateGet200Response.ts
 models/NearDueDateGet200ResponseLabsInner.ts
 models/QuestionQuestionIdGet200Response.ts
@@ -31,5 +34,6 @@ models/Students.ts
 models/TAInfo.ts
 models/TAeditBody.ts
 models/TestCallbackPostRequest.ts
+models/TestcaseTestcaseIdGet200Response.ts
 models/index.ts
 runtime.ts

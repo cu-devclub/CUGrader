@@ -79,6 +79,18 @@ export interface LabLabIdGet200Response {
      * @memberof LabLabIdGet200Response
      */
     assignTo?: Array<string>;
+    /**
+     * testcase_id primary key. null if multilanguage
+     * @type {number}
+     * @memberof LabLabIdGet200Response
+     */
+    testcase?: number;
+    /**
+     * testcase_id primary key. null if multilanguage
+     * @type {number}
+     * @memberof LabLabIdGet200Response
+     */
+    secretTestcase?: number;
 }
 
 /**
@@ -108,6 +120,8 @@ export function LabLabIdGet200ResponseFromJSONTyped(json: any, ignoreDiscriminat
         'examMode': json['exam_mode'] == null ? undefined : json['exam_mode'],
         'closeOnDue': json['close_on_due'] == null ? undefined : json['close_on_due'],
         'assignTo': json['assign_to'] == null ? undefined : json['assign_to'],
+        'testcase': json['testcase'] == null ? undefined : json['testcase'],
+        'secretTestcase': json['secret_testcase'] == null ? undefined : json['secret_testcase'],
     };
 }
 
@@ -132,6 +146,8 @@ export function LabLabIdGet200ResponseToJSONTyped(value?: LabLabIdGet200Response
         'exam_mode': value['examMode'],
         'close_on_due': value['closeOnDue'],
         'assign_to': value['assignTo'],
+        'testcase': value['testcase'],
+        'secret_testcase': value['secretTestcase'],
     };
 }
 

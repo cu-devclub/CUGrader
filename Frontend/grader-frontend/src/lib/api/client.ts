@@ -1,7 +1,7 @@
 import { parseDateTime } from "@internationalized/date";
 import { unimplemented } from "../utils";
-import { ClassObject, Configuration, DefaultApi, LabLabIdGet200Response } from "./generated";
-import { APIClient, Assignment, Class, Instructor, NearDueAssignment, Semester, Student } from "./type";
+import { ClassObject, Configuration, DefaultApi } from "./generated";
+import { APIClient, Class, CreateAssignmentPayload, CreateClassPayload, CreateStudentPayload, Instructor, NearDueAssignment, Semester, Student, UpdateAssignmentPayload, UpdateClassPayload, UpdateStudentPayload } from "./type";
 
 function toClass(input: ClassObject): Class {
   return {
@@ -12,7 +12,7 @@ function toClass(input: ClassObject): Class {
   };
 }
 
-export function createClient(): APIClient {
+export function createClient() {
   const authToken = "TODO: get it, after auth is implemented";
   const config = new Configuration({
     headers: {
@@ -25,7 +25,7 @@ export function createClient(): APIClient {
 
   return {
     students: {
-      addToClass: async (classId, { email, section, group }) => {
+      addToClass: async (classId: number, { email, section, group }: CreateStudentPayload) => {
         await generatedClient.studentPost({
           createStudent: {
             classId,
@@ -35,14 +35,14 @@ export function createClient(): APIClient {
           }
         });
       },
-      listByClass: async (classId) => {
+      listByClass: async (classId: number) => {
         const { students } = await generatedClient.studentClassIdGet({ classId });
         return students.map(it => ({
           ...it,
           withdrawed: it.withdrawal
         } satisfies Student));
       },
-      removeFromClass: async (classId, studentId) => {
+      removeFromClass: async (classId: number, studentId: string) => {
         await generatedClient.studentDelete({
           deleteStudent: {
             classId,
@@ -50,7 +50,7 @@ export function createClient(): APIClient {
           }
         });
       },
-      update: async (classId, studentId, { withdrawed, group, section }) => {
+      update: async (classId: number, studentId: string, { withdrawed, group, section }: UpdateStudentPayload) => {
         await generatedClient.studentPatch({
           editStudent: {
             classId,
@@ -61,7 +61,7 @@ export function createClient(): APIClient {
           }
         });
       },
-      updateMany: async (classId, studentIds, data) => {
+      updateMany: async (classId: number, studentIds: string[], data: UpdateStudentPayload) => {
         // TODO: async queue maybe
         await Promise.all(
           studentIds.map(studentId => {
@@ -77,11 +77,11 @@ export function createClient(): APIClient {
       },
     },
     classes: {
-      getById: async (classId) => {
+      getById: async (classId: number) => {
         const c = await generatedClient.classClassIdGet({ classId });
         return toClass(c);
       },
-      listParticipatingBySemester: async (semester) => {
+      listParticipatingBySemester: async (semester: Semester) => {
         const { assistant, study } = await generatedClient.classesClassesYearSemesterGet({ yearSemester: semester });
 
         return {
@@ -89,7 +89,7 @@ export function createClient(): APIClient {
           studying: study!.map(toClass)
         };
       },
-      create: async ({ courseId, name, semester, image, students }) => {
+      create: async ({ courseId, name, semester, image, students }: CreateClassPayload) => {
         await generatedClient.classPost({
           courseId: parseInt(courseId),
           name,
@@ -98,7 +98,7 @@ export function createClient(): APIClient {
           students
         });
       },
-      update: async (classId, { courseId, image, name, semester, students }) => {
+      update: async (classId: number, { courseId, image, name, semester, students }: UpdateClassPayload) => {
         await generatedClient.classPatch({
           classId,
           courseId: courseId ? parseInt(courseId) : undefined,
@@ -110,7 +110,7 @@ export function createClient(): APIClient {
       },
     },
     sections: {
-      getByClass: async (classId) => {
+      getByClass: async (classId: number) => {
         const { sections } = await generatedClient.sectionClassIdGet({ classId });
         return sections ?? [];
       }
@@ -123,7 +123,7 @@ export function createClient(): APIClient {
       },
     },
     instructorsAndTAs: {
-      listByClass: async (classId) => {
+      listByClass: async (classId: number) => {
         const { assistant, instructor } = await generatedClient.tAClassIdGet({ classId });
 
         return {
@@ -140,7 +140,7 @@ export function createClient(): APIClient {
           }))
         };
       },
-      addToClass: async (classId, email) => {
+      addToClass: async (classId: number, email: string) => {
         await generatedClient.tAPost({
           tAeditBody: {
             classId,
@@ -148,7 +148,7 @@ export function createClient(): APIClient {
           }
         });
       },
-      removeFromClass: async (classId, email) => {
+      removeFromClass: async (classId: number, email: string) => {
         await generatedClient.tADelete({
           tAeditBody: {
             classId,
@@ -172,19 +172,19 @@ export function createClient(): APIClient {
         } satisfies NearDueAssignment));
       },
 
-      listByClass: async (classId) => {
+      listByClass: async (classId: number) => {
         return unimplemented("TODO: this should be array");
         // const { raw } = await generatedClient.labsClassIdGetRaw({ classId });
         // technically we can parse this but not now
         // const value = JSON.parse(await raw.json()) as Value[];
       },
 
-      listByClassI: async (classId) => {
+      listByClassI: async (classId: number) => {
         return unimplemented("TODO: this should be array");
       },
 
 
-      create: async (classId, p) => {
+      create: async (classId: number, p: CreateAssignmentPayload) => {
         await generatedClient.labPost({
           classId,
           labData: {
@@ -208,7 +208,7 @@ export function createClient(): APIClient {
         });
       },
 
-      update: async (labId, p) => {
+      update: async (labId: number, p: UpdateAssignmentPayload) => {
         await generatedClient.labPatch({
           labId,
           labData: {
@@ -233,7 +233,7 @@ export function createClient(): APIClient {
         });
       },
 
-      getById: async (labId) => {
+      getById: async (labId: number) => {
         // this will throw
         // TODO: think about this
         const lab = await generatedClient.labLabIdGet({ labId });
@@ -271,23 +271,23 @@ export function createClient(): APIClient {
         };
       },
 
-      getByIdI: async (labId) => {
+      getByIdI: async (labId: number) => {
         return unimplemented();
       },
 
-      downloadFile: async (fileId) => {
+      downloadFile: async (fileId: number) => {
         const c = await generatedClient.addfileAddfileIdGet({ addfileId: fileId });
         return c;
       },
 
-      removeFile: async (fileId) => {
+      removeFile: async (fileId: number) => {
         await generatedClient.addfileAddfileIdDelete({
           addfileId: fileId
         });
       },
     },
     questions: {
-      getById: async (questionId) => {
+      getById: async (questionId: number) => {
         const q = await generatedClient.questionQuestionIdGet({ questionId });
 
         return {
@@ -303,7 +303,7 @@ export function createClient(): APIClient {
           }
         };
       },
-      getByIdI: async (questionId) => {
+      getByIdI: async (questionId: number) => {
         return unimplemented();
       },
     },
@@ -314,7 +314,7 @@ export function createClient(): APIClient {
       },
     },
     groups: {
-      listByClassId: async (classId) => {
+      listByClassId: async (classId: number) => {
         const response = await generatedClient.groupClassIdGet({ classId });
         return response || [];
       },
