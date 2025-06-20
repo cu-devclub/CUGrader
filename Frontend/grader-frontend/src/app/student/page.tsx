@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 type Assistant = {
   name: string;
@@ -28,6 +29,8 @@ type ClassType = {
 };
 
 export default function Page() {
+  const t = useTranslations("student");
+
   const router = useRouter();
 
   const { data: semesterList } = useSuspenseQuery({
@@ -46,7 +49,7 @@ export default function Page() {
   return (
     <div className="flex-col flex min-h-screen items-center">
       <div className="flex w-[90%] h-25 justify-between items-end border-b pb-4 pl-5">
-        <h1 className="text-3xl font-bold text-primary">All Classes</h1>
+        <h1 className="text-3xl font-bold text-primary">{t("allClass")}</h1>
 
         <div className="flex items-center space-x-2 pb-2">
           <Button variant="ghost" className="text-xl mr-8">
@@ -63,7 +66,7 @@ export default function Page() {
 
       <div className="w-[90%] flex flex-col pb-5 border-b">
         <div className="flex h-16 space-x-4 items-center px-4 py-5">
-          <h1 className="font-bold">Teacher Assistant</h1>
+          <h1 className="font-bold">{t("ta")}</h1>
           <SemesterSelector
             semester={selectedSemester}
             onSemesterChange={setSelectedSemester}
@@ -90,7 +93,7 @@ export default function Page() {
       {/* Student Section */}
       <div className="flex w-[90%] flex-col">
         <div className="flex h-16 items-center px-4 pt-3 space-x-4">
-          <h1 className="font-bold">Student</h1>
+          <h1 className="font-bold">{t("student")}</h1>
           <SemesterSelector
             semester={selectedSemester}
             onSemesterChange={setSelectedSemester}
@@ -103,7 +106,7 @@ export default function Page() {
               key={index}
               id={studyClass.classId}
               class_name={studyClass.courseName}
-              class_id={studyClass.courseId}
+              class_id={Number(studyClass.courseId)}
               image={studyClass.imageUrl}
               semester={selectedSemester}
             />
