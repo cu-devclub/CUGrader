@@ -6,6 +6,24 @@ type QuestionModel struct {
 	DB *sql.DB
 }
 
+type MultilangTestcase struct {
+	Input  string `json:"input"`  // Input for the test case
+	Output string `json:"output"` // Expected output for the test case
+}
+
+type QuestionEditModel struct {
+	Number                  int                 `json:"number"`                    // Number of the question, used for ordering and identification
+	Name                    string              `json:"name"`                      // Name of the question
+	Description             string              `json:"description"`               // Description of the question
+	Answer                  string              `json:"answer"`                    // Correct answer for the question
+	Predefine               string              `json:"predefine"`                 // Predefined code or setup for the question
+	Score                   int                 `json:"score"`                     // Score for the question
+	Testcase                string              `json:"testcase"`                  // Test case for the question
+	SecretTestcase          string              `json:"secret_testcase"`           // Secret test case for the question
+	MultiLangTestcase       []MultilangTestcase `json:"multilang_testcase"`        // Multilingual test cases for the question
+	SecretMultiLangTestcase []MultilangTestcase `json:"multilang_secret_testcase"` // Secret multilingual test cases for the question
+}
+
 type QuestionStudentSubmissionModel struct {
 	Score        int    `json:"score"`         // score for the submission
 	Timestamp    string `json:"timestamp"`     // timestamp of the submission in RFC3339 format (e.g., "2023-10-01T12:00:00+00:00")
