@@ -2,6 +2,7 @@ package lab
 
 import (
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -43,10 +44,10 @@ func (lc *LabController) AddLabHandler(c *gin.Context) {
 		return
 	}
 
-	labID, err := lc.Service.AddLab(
+	_, err = lc.Service.AddLab(
 		req.ClassID,
 		req.LabData.QuestionNumber,
-		"Lab "+string(req.LabData.QuestionNumber), // TODO(ptsgrn): seem like the spec didn't require name but we need to add it?
+		"Lab "+strconv.Itoa(req.LabData.QuestionNumber), // TODO(ptsgrn): seem like the spec didn't require name but we need to add it?      // TODO(ptsgrn): seem like the spec didn't require name but we need to add it?
 		req.LabData.PublishDate,
 		req.LabData.DueDate,
 		req.LabData.CloseOnDueDate,
