@@ -158,6 +158,7 @@ func RegisterRoutes(r *gin.RouterGroup) {
 
 	r.GET("/lab/:lab_id", labController.GetLabByIdForStudent)
 	r.POST("/lab", labController.AddLabHandler)
+	r.PATCH("/lab", labController.EditLabHandler)
 
 	r.GET("/question/:questionId", questionController.GetQuestionForStudentController)
 
