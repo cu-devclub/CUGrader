@@ -302,6 +302,7 @@
 
     "notification-page": {
         "noti-title": "การแจ้งเตือน",
-        "notification": "การแจ้งเตือน"
+        "notification": "การแจ้งเตือน",
+        "max": "คะแนนเต็ม"
     }
 }

@@ -29,9 +29,9 @@ interface Props {
 function statPopOver(class_id: number) {
   const { data: assigmentsList } = useSuspenseQuery({
     queryKey: ["assigment-popover"],
-    queryFn: () => api.assignments.listNearDue(),
+    queryFn: () => api.assignments.listByClass(class_id),
   });
-  console.log(JSON.stringify(assigmentsList, null, 2));
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -51,7 +51,11 @@ function statPopOver(class_id: number) {
             <AssignContent
               key={index}
               name={assign.name}
-              due={assign.due.toString()}
+              due={assign.due
+                .toString()
+                .replace("T09:", " ")
+                .replaceAll("-", "/")}
+              status={assign.status}
             />
           ))}
         </div>
