@@ -299,7 +299,29 @@ function createClient(persistence: Storage<Database>): APIClient {
 
 
       listByClass: async (classId) => {
-        return [];
+        const c = classes[0];
+
+        return [
+          {
+            id: 10,
+            number: 19,
+            courseId: c.courseId,
+            courseName: c.courseName,
+            publish: parseDateTime('2025-06-01T09:15'),
+            due: parseDateTime('2025-06-22T09:15'),
+            maxScore: 100,
+            name: "Swift Basics",
+            questionIds: [0, 1],
+            assignedGroupIds: ["default"],
+            closeOnDue: false,
+            examMode: false,
+            languages: ["swift"],
+            additionalFileIds: [1],
+            showScoreOnLock: true,
+            score: 32,
+            status: "due-soon"
+          }
+        ];
       },
 
       listByClassI: async (classId) => {
