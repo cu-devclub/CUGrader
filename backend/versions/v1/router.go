@@ -3,17 +3,20 @@ package v1
 import (
 	assistantController "CUGrader/backend/versions/v1/controllers/assistant"
 	classController "CUGrader/backend/versions/v1/controllers/class"
+	additionalFileController "CUGrader/backend/versions/v1/controllers/file"
 	pictureController "CUGrader/backend/versions/v1/controllers/picture"
 	studentController "CUGrader/backend/versions/v1/controllers/student"
 	userController "CUGrader/backend/versions/v1/controllers/user"
 	assistantModel "CUGrader/backend/versions/v1/models/assistant"
 	classModel "CUGrader/backend/versions/v1/models/class"
+	additionalFileModel "CUGrader/backend/versions/v1/models/file"
 	pictureModel "CUGrader/backend/versions/v1/models/picture"
 	studentModel "CUGrader/backend/versions/v1/models/student"
 	userModel "CUGrader/backend/versions/v1/models/user"
 	utilsModel "CUGrader/backend/versions/v1/models/utils"
 	assistantService "CUGrader/backend/versions/v1/services/assistant"
 	classService "CUGrader/backend/versions/v1/services/class"
+	additionalFileService "CUGrader/backend/versions/v1/services/file"
 	pictureService "CUGrader/backend/versions/v1/services/picture"
 	studentService "CUGrader/backend/versions/v1/services/student"
 	userService "CUGrader/backend/versions/v1/services/user"
@@ -99,6 +102,10 @@ func RegisterRoutes(r *gin.RouterGroup) {
 	pictureService := &pictureService.PictureService{Model: pictureModel}
 	pictureController := &pictureController.PictureController{Service: pictureService}
 
+	additionalFileModel := &additionalFileModel.AdditionalFileModel{DB: db}
+	additionalFileService := &additionalFileService.AdditionalFileService{Model: additionalFileModel, Utils: utilsModel}
+	additionalFileController := &additionalFileController.AdditionalFileController{Service: additionalFileService}
+
 	r.POST("/callback", userController.Callback)
 	r.POST("/test/callback", userController.TestCallback)
 
@@ -120,4 +127,6 @@ func RegisterRoutes(r *gin.RouterGroup) {
 
 	r.GET("/picture/:pictureId", pictureController.GetPicture)
 
+	r.GET("/addfile/:addfile_id", additionalFileController.GetAdditionalFileByIDHandler)
+	r.DELETE("/addfile/:addfile_id", additionalFileController.DeleteAdditionalFileByIDHandler)
 }
