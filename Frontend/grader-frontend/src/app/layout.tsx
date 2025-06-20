@@ -49,7 +49,7 @@ export default async function RootLayout({
           <AntdRegistry>
             <NextIntlClientProvider locale={locale} messages={messages}>
               {children}
-              <Toaster richColors />
+              <Toaster />
             </NextIntlClientProvider>
           </AntdRegistry>
         </Providers>
