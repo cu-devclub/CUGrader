@@ -38,6 +38,7 @@ export default function page() {
                     .toString()
                     .replace("T09:", " ")
                     .replaceAll("-", "/")}
+                  maxScore={assign.maxScore}
                 />
               ))}
             </div>

@@ -3,9 +3,10 @@ import { Badge } from "@/components/ui/badge";
 interface Props {
   name: string;
   due: string;
+  status: string;
 }
 
-export default function assignContent({ name, due }: Props) {
+export default function assignContent({ name, due, status }: Props) {
   return (
     <div className="flex justify-between border-b pb-1 mt-1">
       <div className="flex flex-col gap-y-1">
@@ -13,8 +14,10 @@ export default function assignContent({ name, due }: Props) {
         <span className="text-xs text-primary">Due: {due}</span>
       </div>
       <div>
-        <Badge className="w-20 h-6 bg-gray-300 border-solid border-gray-600">
-          <p className="text-xs text-gray-600"> Not Started</p>
+        <Badge className="w-18 h-6 bg-gray-300 border-solid border-gray-600">
+          <p className="text-xs text-gray-600">
+            {status == "due-soon" ? status : "Not Started"}
+          </p>
         </Badge>
       </div>
     </div>
