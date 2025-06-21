@@ -54,16 +54,16 @@ type LabStudentDetailModel struct {
 }
 
 type LabEditModel struct {
-	Number          int                               `json:"number"`             // Number of the lab, used for ordering and identification
-	Name            string                            `json:"name"`               // Name of the lab
-	Publish         string                            `json:"publish"`            // Publish date for the lab in RFC3339 format (e.g., "1996-12-19T16:39:57+07:00")
-	Due             string                            `json:"due"`                // Due date for the lab in RFC3339 format (e.g., "1996-12-19T16:39:57+07:00")
-	CloseOnDue      bool                              `json:"close_on_due"`       // Whether to close (not allow submissions) the lab when it is due
-	ExamMode        bool                              `json:"exam_mode"`          // Whether this lab is in exam mode
-	ShowScoreOnLock bool                              `json:"show_score_on_lock"` // ? idk no idea lmao
+	Number          *int                              `json:"number"`             // Number of the lab, used for ordering and identification
+	Name            *string                           `json:"name"`               // Name of the lab
+	Publish         *string                           `json:"publish"`            // Publish date for the lab in RFC3339 format (e.g., "1996-12-19T16:39:57+07:00")
+	Due             *string                           `json:"due"`                // Due date for the lab in RFC3339 format (e.g., "1996-12-19T16:39:57+07:00")
+	CloseOnDue      *bool                             `json:"close_on_due"`       // Whether to close (not allow submissions) the lab when it is due
+	ExamMode        *bool                             `json:"exam_mode"`          // Whether this lab is in exam mode
+	ShowScoreOnLock *bool                             `json:"show_score_on_lock"` // ? idk no idea lmao
 	AssignTo        []string                          `json:"assign_to"`          // List of groups assigned this lab to
-	ExamPin         string                            `json:"exam_pin,omitempty"` // Optional, only used in exam mode
-	Testcase        string                            `json:"testcase"`           // Object ID for the main test cases
-	SecretTestcase  string                            `json:"secret_testcase"`    // Object ID for the secret test cases
+	ExamPin         *string                           `json:"exam_pin,omitempty"` // Optional, only used in exam mode
+	Testcase        *string                           `json:"testcase"`           // Object ID for the main test cases
+	SecretTestcase  *string                           `json:"secret_testcase"`    // Object ID for the secret test cases
 	Questions       []questionModel.QuestionEditModel `json:"questions"`          // List of questions associated with this lab
 }
