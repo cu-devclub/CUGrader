@@ -97,7 +97,7 @@ export default function Callback() {
                         window.location.href = '/instructor'
                     } else {
                         // Default fallback - let the middleware handle the redirect
-                        window.location.href = '/student' // Default for this user
+                        window.location.href = '/student' 
                     }
                     return
                 }
