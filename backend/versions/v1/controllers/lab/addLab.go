@@ -15,11 +15,6 @@ func (lc *LabController) AddLabHandler(c *gin.Context) {
 		return
 	}
 
-	if claims.Role != "teacher" && claims.Role != "admin" {
-		c.JSON(http.StatusUnauthorized, gin.H{"message": "No permission"})
-		return
-	}
-
 	type AddLabLabData struct {
 		QuestionNumber  int       `json:"number" binding:"required"`
 		Name            string    `json:"name" binding:"required"`
@@ -54,6 +49,12 @@ func (lc *LabController) AddLabHandler(c *gin.Context) {
 	}
 	if req.LabData.QuestionNumber < 1 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Question number must be greater than 0"})
+		return
+	}
+
+	allowed := lc.Service.Utils.IsUserTeacherAdminOrAssistant(req.ClassID, claims.UserID)
+	if !allowed {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "You don't have permission to add lab"})
 		return
 	}
 
