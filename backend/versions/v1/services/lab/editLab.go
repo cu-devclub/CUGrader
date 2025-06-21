@@ -9,15 +9,36 @@ import (
 // exam mode, exam pin, and whether to show score on lock.
 // The function returns an error if the update fails.
 func (s *LabService) EditLab(labID int, labData labModel.LabEditModel) error {
-	// TODO(ptsgrn): Fix on how we manage the testcase and question submission within the lab edit request
-	return s.Model.UpdateLab(labID, map[string]interface{}{
-		"number":             labData.Number,
-		"name":               labData.Name,
-		"publish":            labData.Publish,
-		"due":                labData.Due,
-		"close_on_due":       labData.CloseOnDue,
-		"exam_mode":          labData.ExamMode,
-		"exam_pin":           labData.ExamPin,
-		"show_score_on_lock": labData.ShowScoreOnLock,
-	})
+	updateFields := make(map[string]any)
+
+	if labData.Number != nil {
+		updateFields["number"] = *labData.Number
+	}
+	if labData.Name != nil {
+		updateFields["name"] = *labData.Name
+	}
+	if labData.Publish != nil {
+		updateFields["publish"] = *labData.Publish
+	}
+	if labData.Due != nil {
+		updateFields["due"] = *labData.Due
+	}
+	if labData.CloseOnDue != nil {
+		updateFields["close_on_due"] = *labData.CloseOnDue
+	}
+	if labData.ExamMode != nil {
+		updateFields["exam_mode"] = *labData.ExamMode
+	}
+	if labData.ExamPin != nil {
+		updateFields["exam_pin"] = *labData.ExamPin
+	}
+	if labData.ShowScoreOnLock != nil {
+		updateFields["show_score_on_lock"] = *labData.ShowScoreOnLock
+	}
+
+	if len(updateFields) == 0 {
+		return nil // nothing to update
+	}
+
+	return s.Model.UpdateLab(labID, updateFields)
 }
