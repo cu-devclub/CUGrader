@@ -2,7 +2,6 @@ package lab
 
 import (
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -23,9 +22,10 @@ func (lc *LabController) AddLabHandler(c *gin.Context) {
 
 	type AddLabLabData struct {
 		QuestionNumber  int       `json:"number" binding:"required"`
+		Name            string    `json:"name" binding:"required"`
 		PublishDate     time.Time `json:"publish" binding:"required"`
 		DueDate         time.Time `json:"due" binding:"required"`
-		CloseOnDueDate  bool      `json:"close_on_due" binding:"required"`
+		CloseOnDue      bool      `json:"close_on_due" binding:"required"`
 		ExamMode        bool      `json:"exam_mode" binding:"required"`
 		ShowScoreOnLock bool      `json:"show_score_on_lock" binding:"required"`
 		ExamPin         int       `json:"exam_pin" binding:"required"` // 6 digits with leading zeroes
@@ -60,10 +60,10 @@ func (lc *LabController) AddLabHandler(c *gin.Context) {
 	_, err = lc.Service.AddLab(
 		req.ClassID,
 		req.LabData.QuestionNumber,
-		"Lab "+strconv.Itoa(req.LabData.QuestionNumber), // TODO(ptsgrn): seem like the spec didn't require name but we need to add it?      // TODO(ptsgrn): seem like the spec didn't require name but we need to add it?
+		req.LabData.Name,
 		req.LabData.PublishDate,
 		req.LabData.DueDate,
-		req.LabData.CloseOnDueDate,
+		req.LabData.CloseOnDue,
 		req.LabData.ExamMode,
 		req.LabData.ShowScoreOnLock,
 		req.LabData.ExamPin,
