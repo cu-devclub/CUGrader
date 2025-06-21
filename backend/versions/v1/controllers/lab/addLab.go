@@ -28,7 +28,7 @@ func (lc *LabController) AddLabHandler(c *gin.Context) {
 		CloseOnDueDate  bool      `json:"close_on_due" binding:"required"`
 		ExamMode        bool      `json:"exam_mode" binding:"required"`
 		ShowScoreOnLock bool      `json:"show_score_on_lock" binding:"required"`
-		ExamPin         string    `json:"exam_pin" binding:"required"`
+		ExamPin         int       `json:"exam_pin" binding:"required"` // 6 digits with leading zeroes
 		Testcase        string    `json:"testcase" binding:"required"`
 		SecretTestcase  string    `json:"secret_testcase" binding:"required"`
 	}

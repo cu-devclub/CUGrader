@@ -2,7 +2,7 @@ package lab
 
 import "time"
 
-func (m *LabModel) InsertLab(classID int, questionNumber int, name string, publishDate time.Time, dueDate time.Time, closeOnDueDate bool, examMode bool, showScoreOnLock bool, examPin string, testcaseID int) (int, error) {
+func (m *LabModel) InsertLab(classID int, questionNumber int, name string, publishDate time.Time, dueDate time.Time, closeOnDueDate bool, examMode bool, showScoreOnLock bool, examPin int, testcaseID int) (int, error) {
 	query := `INSERT INTO lab (
 		class_id,
 		number,
