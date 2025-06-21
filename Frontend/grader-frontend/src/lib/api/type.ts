@@ -187,7 +187,6 @@ export type CreateAssignmentPayload = Omit<InstructorAssignment, "id"> & {
   showScoreOnLock: boolean;
   testCode: string;
   secretTestCode: string;
-  additionalFileIds: number[];
   languages: SupportedLanguage[];
   examMode: boolean;
   closeOnDue: boolean;
