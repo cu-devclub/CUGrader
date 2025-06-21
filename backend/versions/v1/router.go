@@ -6,6 +6,7 @@ import (
 	classController "CUGrader/backend/versions/v1/controllers/class"
 	additionalFileController "CUGrader/backend/versions/v1/controllers/file"
 	labController "CUGrader/backend/versions/v1/controllers/lab"
+	languageController "CUGrader/backend/versions/v1/controllers/language"
 	pictureController "CUGrader/backend/versions/v1/controllers/picture"
 	questionController "CUGrader/backend/versions/v1/controllers/question"
 	studentController "CUGrader/backend/versions/v1/controllers/student"
@@ -28,6 +29,7 @@ import (
 	classService "CUGrader/backend/versions/v1/services/class"
 	additionalFileService "CUGrader/backend/versions/v1/services/file"
 	labService "CUGrader/backend/versions/v1/services/lab"
+	languageService "CUGrader/backend/versions/v1/services/language"
 	pictureService "CUGrader/backend/versions/v1/services/picture"
 	questionService "CUGrader/backend/versions/v1/services/question"
 	studentService "CUGrader/backend/versions/v1/services/student"
@@ -141,6 +143,8 @@ func RegisterRoutes(r *gin.RouterGroup) {
 	pictureController := &pictureController.PictureController{Service: pictureService}
 
 	languageModel := &languageModel.LanguageModel{DB: db}
+	languageService := &languageService.LanguageService{Model: languageModel}
+	languageController := &languageController.LanguageController{Service: languageService}
 
 	questionModel := &questionModel.QuestionModel{DB: db, MongoDB: mongoClient}
 	questionService := &questionService.QuestionService{Model: questionModel, Utils: utilsModel}
@@ -190,5 +194,7 @@ func RegisterRoutes(r *gin.RouterGroup) {
 	r.GET("/addfile/:addfile_id", additionalFileController.GetAdditionalFileByIDHandler)
 	r.DELETE("/addfile/:addfile_id", additionalFileController.DeleteAdditionalFileByIDHandler)
 
-	r.GET("/lab/:classId", labController.GetLabsByClassIDHandler)
+	r.GET("/language", languageController.GetLanguagesHandler)
+
+	r.GET("/labs/:classId", labController.GetLabsByClassIDHandler)
 }
