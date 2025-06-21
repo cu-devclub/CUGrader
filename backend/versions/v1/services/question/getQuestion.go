@@ -39,3 +39,7 @@ func (s *QuestionService) GetQuestionByIDForStudent(questionId int) (*questionMo
 
 	return questionResponse, nil
 }
+
+func (s *QuestionService) GetQuestionByIDForInstructor(questionId int) (*questionModel.QuestionFullModel, error) {
+	return s.Model.GetQuestionByID(questionId)
+}
