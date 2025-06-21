@@ -21,3 +21,23 @@ func (c *QuestionModel) IsStudentAssignedToQuestion(questionID int, userID int) 
 	}
 	return exists, nil
 }
+
+func (c *QuestionModel) IsUserAnAssistantToQuestion(questionID int, userID int) (bool, error) {
+	// user_id -> class_assistant.user_id
+	// class_assistant.class_id -> lab.class_id
+	// lab.id -> question.lab_id
+	// if there exists a question with the given questionID that is assigned to a class that the user is part of, return true
+	// if not, return false
+	query := `SELECT EXISTS (
+		SELECT 1 FROM class_assistant ca
+		INNER JOIN lab ON ca.class_id = lab.class_id
+		INNER JOIN question q ON lab.id = q.lab_id
+		WHERE q.id = ? AND ca.user_id = ?
+	)`
+	var exists bool
+	err := c.DB.QueryRow(query, questionID, userID).Scan(&exists)
+	if err != nil {
+		return false, err
+	}
+	return exists, nil
+}
