@@ -53,6 +53,16 @@ type LabStudentDetailModel struct {
 	AdditionalFiles []int    `json:"addfiles"`     // Other files associated with this lab (eg. Text file or Image), represented by their IDs
 }
 
+type LabInstructorDetailModel struct {
+	LabStudentDetailModel // Embedding LabStudentDetailModel to inherit its fields
+
+	ClassID                int    `json:"class_id"`                  // ID of the class this lab belongs to
+	ExamPin                string `json:"exam_pin,omitempty"`        // Optional, only used in exam mode
+	ShowScoreOnLock        bool   `json:"show_score_on_lock"`        // ? idk no idea lmao
+	TestcaseObjectID       string `json:"testcase_object_id"`        // Object ID for the main test cases
+	SecretTestcaseObjectID string `json:"secret_testcase_object_id"` // Object ID for the secret test cases
+}
+
 type LabEditModel struct {
 	Number          *int                              `json:"number"`             // Number of the lab, used for ordering and identification
 	Name            *string                           `json:"name"`               // Name of the lab
