@@ -4,13 +4,64 @@ import * as React from "react";
 import { Progress } from "@/components/ui/progress";
 import { Card } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
+import { FileText } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+
+import AssignContent from "./assignContent";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api";
+
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface Props {
   id: number;
-  class_id: string;
+  class_id: number;
   class_name: string;
   image?: string;
   semester: string;
+}
+
+function statPopOver(class_id: number) {
+  const { data: assigmentsList } = useSuspenseQuery({
+    queryKey: ["assigment-popover"],
+    queryFn: () => api.assignments.listByClass(class_id),
+  });
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="ghost" size="icon">
+          <FileText />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent
+        side="right"
+        className="ml-2 mb-8 w-60 h-50 overflow-hidden relative flex-col"
+      >
+        <div>
+          <h1 className="font-bold text-md">Assigned</h1>
+        </div>
+        <div className="flex flex-col w-full">
+          {assigmentsList.map((assign, index) => (
+            <AssignContent
+              key={index}
+              name={assign.name}
+              due={assign.due
+                .toString()
+                .replace("T09:", " ")
+                .replaceAll("-", "/")}
+              status={assign.status}
+            />
+          ))}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
 }
 
 function studentCard({ class_id, class_name, image, semester }: Props) {
@@ -33,7 +84,7 @@ function studentCard({ class_id, class_name, image, semester }: Props) {
     <>
       <Card
         className="w-80 h-50 p-0 m-0 overflow-hidden relative"
-        onClick={() => toAssignmentPage()}
+        // onClick={() => toAssignmentPage()}
       >
         <div className="h-full w-full">
           <div className="flex h-[45%] w-full m-0 p-0 items-center justify-center border border-solid bg-blue-500 overflow-hidden">
@@ -48,10 +99,14 @@ function studentCard({ class_id, class_name, image, semester }: Props) {
             )}
           </div>
           <div className="flex h-[55%] w-full m-0 p-0 flex-col">
-            <div className="flex items-end min-w-full space-x-5 px-4 pt-2">
-              <h1 className="text-md py-1 font-bold">
+            <div className="flex flex-row items-end min-w-full space-x-19 pl-4 pt-2">
+              <h1
+                className="text-md py-1 font-bold"
+                onClick={() => toAssignmentPage()} // Temporary Change to test the Popover
+              >
                 {class_name} ({semester})
               </h1>
+              {statPopOver(class_id)}
             </div>
 
             <div className="px-4 flex flex-col gap-y-3">

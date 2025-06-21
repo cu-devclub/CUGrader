@@ -3,28 +3,8 @@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ClipboardList, FileText, Users } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useClassData } from "../class-data-context";
-
-const pages = [
-  "assignments",
-  "people",
-  "exam-mode",
-  "settings",
-  "teacher-management"
-] as const;
-
-function useActiveTab() {
-  const path = usePathname();
-  for (const page of pages) {
-    if (path.endsWith(page)) {
-      return page;
-    }
-  }
-
-  return null;
-}
-
+import { useClassData } from "../../class-data-context";
+import { useActiveTab } from "../../use-active-tab";
 
 interface LayoutProps {
   children: React.ReactNode;
