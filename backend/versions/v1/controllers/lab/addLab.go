@@ -73,6 +73,6 @@ func (lc *LabController) AddLabHandler(c *gin.Context) {
 		return
 	}
 
-	// TODO(ptsgrn): spec expect to return some string (?) here (type: string, no schema?)
+	// Seem like the message is unnecessary, but keeping it for consistency
 	c.JSON(http.StatusOK, gin.H{"message": "Lab added successfully"})
 }
