@@ -11,7 +11,7 @@ func formatSemesters(semesters []classModel.SemesterModel) ([]string, error) {
 	}
 	result := make([]string, len(semesters))
 	for i, semester := range semesters {
-		result[i] = fmt.Sprintf("%d/%d", semester.Year, semester.Semester)
+		result[i] = fmt.Sprintf("%d-%d", semester.Year, semester.Semester)
 	}
 	return result, nil
 }
