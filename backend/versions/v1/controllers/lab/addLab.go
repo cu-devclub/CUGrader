@@ -44,6 +44,19 @@ func (lc *LabController) AddLabHandler(c *gin.Context) {
 		return
 	}
 
+	if req.LabData.ExamPin < 0 || req.LabData.ExamPin > 999999 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Exam pin must be a 6-digit number"})
+		return
+	}
+	if req.LabData.PublishDate.After(req.LabData.DueDate) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Publish date must be before due date"})
+		return
+	}
+	if req.LabData.QuestionNumber < 1 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Question number must be greater than 0"})
+		return
+	}
+
 	_, err = lc.Service.AddLab(
 		req.ClassID,
 		req.LabData.QuestionNumber,
