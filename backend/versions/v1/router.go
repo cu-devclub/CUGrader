@@ -4,12 +4,14 @@ import (
 	assistantController "CUGrader/backend/versions/v1/controllers/assistant"
 	classController "CUGrader/backend/versions/v1/controllers/class"
 	additionalFileController "CUGrader/backend/versions/v1/controllers/file"
+	languageController "CUGrader/backend/versions/v1/controllers/language"
 	pictureController "CUGrader/backend/versions/v1/controllers/picture"
 	studentController "CUGrader/backend/versions/v1/controllers/student"
 	userController "CUGrader/backend/versions/v1/controllers/user"
 	assistantModel "CUGrader/backend/versions/v1/models/assistant"
 	classModel "CUGrader/backend/versions/v1/models/class"
 	additionalFileModel "CUGrader/backend/versions/v1/models/file"
+	languageModel "CUGrader/backend/versions/v1/models/language"
 	pictureModel "CUGrader/backend/versions/v1/models/picture"
 	studentModel "CUGrader/backend/versions/v1/models/student"
 	userModel "CUGrader/backend/versions/v1/models/user"
@@ -17,6 +19,7 @@ import (
 	assistantService "CUGrader/backend/versions/v1/services/assistant"
 	classService "CUGrader/backend/versions/v1/services/class"
 	additionalFileService "CUGrader/backend/versions/v1/services/file"
+	languageService "CUGrader/backend/versions/v1/services/language"
 	pictureService "CUGrader/backend/versions/v1/services/picture"
 	studentService "CUGrader/backend/versions/v1/services/student"
 	userService "CUGrader/backend/versions/v1/services/user"
@@ -106,6 +109,10 @@ func RegisterRoutes(r *gin.RouterGroup) {
 	additionalFileService := &additionalFileService.AdditionalFileService{Model: additionalFileModel, Utils: utilsModel}
 	additionalFileController := &additionalFileController.AdditionalFileController{Service: additionalFileService}
 
+	languageModel := &languageModel.LanguageModel{DB: db}
+	languageService := &languageService.LanguageService{Model: languageModel}
+	languageController := &languageController.LanguageController{Service: languageService}
+
 	r.POST("/callback", userController.Callback)
 	r.POST("/test/callback", userController.TestCallback)
 
@@ -129,4 +136,6 @@ func RegisterRoutes(r *gin.RouterGroup) {
 
 	r.GET("/addfile/:addfile_id", additionalFileController.GetAdditionalFileByIDHandler)
 	r.DELETE("/addfile/:addfile_id", additionalFileController.DeleteAdditionalFileByIDHandler)
+
+	r.GET("/language", languageController.GetLanguagesHandler)
 }
