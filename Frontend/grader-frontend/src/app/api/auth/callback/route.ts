@@ -68,10 +68,21 @@ function getUserRedirectUrl(claims: JWTClaims | null): string {
     return claims.role === 'student' ? '/student' : '/instructor';
 }
 
+// Function to set authentication cookie --> Bearer token
 async function setAuthCookie(token: string): Promise<void> {
     const cookieStore = await cookies();
     cookieStore.set('auth_token', token, {
         httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 60 * 60 * 24, // 24 hours
+        path: '/',
+        sameSite: 'lax',
+    });
+}
+// Function to set user info cookie -> {email,firstname,lastname,profile,role,user_id}
+async function setUserInfoCookie(claims: JWTClaims): Promise<void> {
+    const cookieStore = await cookies();
+    cookieStore.set('user_info', JSON.stringify(claims), {
         secure: process.env.NODE_ENV === 'production',
         maxAge: 60 * 60 * 24, // 24 hours
         path: '/',
@@ -113,11 +124,17 @@ export async function GET(request: NextRequest) {
             return createErrorResponse('No token received from backend');
         }
 
-        // Set authentication cookie
+        // Decode JWT to get user claims
+        const claims = decodeJWTClaims(responseData.token);
+        if (!claims) {
+            return createErrorResponse('Invalid authentication token received', 400);
+        }
+
+        // Set authentication and user info cookies
         await setAuthCookie(responseData.token);
+        await setUserInfoCookie(claims);
 
         // Determine redirect URL based on user role
-        const claims = decodeJWTClaims(responseData.token);
         const defaultRedirect = getUserRedirectUrl(claims);
         const finalRedirect = searchParams.get('redirect_to') || defaultRedirect;
 
