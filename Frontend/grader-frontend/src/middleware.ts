@@ -10,14 +10,10 @@ const PROTECTED_ROUTES = {
 
 // Public routes that don't require authentication
 const PUBLIC_ROUTES = [
-    '',
     '/login',
     '/callback',
     '/api/auth/callback',
     '/example',
-    '/_next',
-    '/favicon.ico',
-    '/placeholder.svg'
 ]
 
 // Function to decode JWT and extract user info
@@ -82,57 +78,49 @@ function hasRouteAccess(pathname: string, userRole: string): boolean {
 
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl
-    console.log('Middleware triggered for:', pathname)
-    // Skip middleware for static files and Next.js internals
-    if (
-        pathname.startsWith('/_next/') ||
-        pathname.startsWith('/api/') ||
-        pathname.includes('.') ||
-        pathname === '/favicon.ico'
-    ) {
-        return NextResponse.next()
-    }
+    console.log('🚀 MIDDLEWARE running for:', pathname)
 
-    // Allow access to public routes
-    if (isPublicRoute(pathname)) {
-        return NextResponse.next()
-    }
+    const authToken = request.cookies.get('auth_token')?.value
+    const user = authToken ? decodeJWT(authToken) : null
 
-    // Get auth token from cookies
-    const cookieStore = await cookies()
-    const authToken = cookieStore.get('auth_token')
-
-    // If no token, redirect to login
-    if (!authToken) {
-        const loginUrl = new URL('/login', request.url)
-        loginUrl.searchParams.set('redirect', pathname)
-        return NextResponse.redirect(loginUrl)
-    }
-
-    // Decode and validate the token
-    const user = decodeJWT(authToken.value)
-
-    if (!user) {
-        // Invalid or expired token, clear cookie and redirect to login
-        const response = NextResponse.redirect(new URL('/login?error=invalid_token', request.url))
-        response.cookies.delete('auth_token')
-        return response
-    }
-
-    // Check if user has access to the requested route
-    if (!hasRouteAccess(pathname, user.role)) {
-        // Redirect to appropriate dashboard based on role
+    // 1. Redirect authenticated users away from login page
+    if (user && pathname === '/login') {
         const redirectUrl = user.role === 'student' ? '/student' : '/instructor'
+        console.log(`↩️ Authenticated user on /login, redirecting to ${redirectUrl}`)
         return NextResponse.redirect(new URL(redirectUrl, request.url))
     }
 
-    // Add user info to request headers for use in components
+    // 2. Allow access to public routes
+    if (isPublicRoute(pathname)) {
+        console.log('✅ Allowing access to public route:', pathname)
+        return NextResponse.next()
+    }
+
+    // 3. If no token and not a public route, redirect to login
+    if (!user) {
+        console.log('❌ No auth token, redirecting to login from:', pathname)
+        const loginUrl = new URL('/login', request.url)
+        if (pathname !== '/') {
+            loginUrl.searchParams.set('redirect', pathname)
+        }
+        return NextResponse.redirect(loginUrl)
+    }
+
+    // 4. User is authenticated, check role-based access
+    console.log('👤 User authenticated:', user.email, 'role:', user.role, 'accessing:', pathname)
+    if (!hasRouteAccess(pathname, user.role)) {
+        const redirectUrl = user.role === 'student' ? '/student' : '/instructor'
+        console.log('🔄 User lacks access to', pathname, 'redirecting to:', redirectUrl)
+        return NextResponse.redirect(new URL(redirectUrl, request.url))
+    }
+
+    // 5. Access granted
+    console.log('✅ User has access, proceeding to:', pathname)
     const response = NextResponse.next()
     response.headers.set('x-user-id', user.userId.toString())
     response.headers.set('x-user-email', user.email)
     response.headers.set('x-user-role', user.role)
     response.headers.set('x-user-name', `${user.firstname} ${user.lastname}`)
-
     return response
 }
 
