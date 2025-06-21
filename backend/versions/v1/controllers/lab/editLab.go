@@ -16,11 +16,6 @@ func (lc *LabController) EditLabHandler(c *gin.Context) {
 		return
 	}
 
-	if claims.Role != "teacher" && claims.Role != "admin" {
-		c.JSON(http.StatusUnauthorized, gin.H{"message": "No permission"})
-		return
-	}
-
 	type EditLabRequest struct {
 		LabID   int                   `json:"lab_id" binding:"required"`
 		LabData labModel.LabEditModel `json:"lab_data" binding:"required"`
@@ -29,6 +24,12 @@ func (lc *LabController) EditLabHandler(c *gin.Context) {
 	var req EditLabRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid request data: " + err.Error()})
+		return
+	}
+
+	allowed := lc.Service.Utils.IsUserTeacherAdminOrAssistantByLabID(req.LabID, claims.UserID)
+	if !allowed {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "You don't have permission to edit this lab"})
 		return
 	}
 
