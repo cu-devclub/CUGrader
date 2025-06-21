@@ -4,12 +4,14 @@ import (
 	assistantController "CUGrader/backend/versions/v1/controllers/assistant"
 	classController "CUGrader/backend/versions/v1/controllers/class"
 	additionalFileController "CUGrader/backend/versions/v1/controllers/file"
+	labController "CUGrader/backend/versions/v1/controllers/lab"
 	pictureController "CUGrader/backend/versions/v1/controllers/picture"
 	studentController "CUGrader/backend/versions/v1/controllers/student"
 	userController "CUGrader/backend/versions/v1/controllers/user"
 	assistantModel "CUGrader/backend/versions/v1/models/assistant"
 	classModel "CUGrader/backend/versions/v1/models/class"
 	additionalFileModel "CUGrader/backend/versions/v1/models/file"
+	labModel "CUGrader/backend/versions/v1/models/lab"
 	pictureModel "CUGrader/backend/versions/v1/models/picture"
 	studentModel "CUGrader/backend/versions/v1/models/student"
 	userModel "CUGrader/backend/versions/v1/models/user"
@@ -17,9 +19,11 @@ import (
 	assistantService "CUGrader/backend/versions/v1/services/assistant"
 	classService "CUGrader/backend/versions/v1/services/class"
 	additionalFileService "CUGrader/backend/versions/v1/services/file"
+	labService "CUGrader/backend/versions/v1/services/lab"
 	pictureService "CUGrader/backend/versions/v1/services/picture"
 	studentService "CUGrader/backend/versions/v1/services/student"
 	userService "CUGrader/backend/versions/v1/services/user"
+
 	"crypto/rsa"
 	"crypto/x509"
 	"database/sql"
@@ -106,6 +110,10 @@ func RegisterRoutes(r *gin.RouterGroup) {
 	additionalFileService := &additionalFileService.AdditionalFileService{Model: additionalFileModel, Utils: utilsModel}
 	additionalFileController := &additionalFileController.AdditionalFileController{Service: additionalFileService}
 
+	labModel := &labModel.LabModel{DB: db}
+	labService := &labService.LabService{Model: labModel, Utils: utilsModel}
+	labController := &labController.LabController{Service: labService}
+
 	r.POST("/callback", userController.Callback)
 	r.POST("/test/callback", userController.TestCallback)
 
@@ -129,4 +137,6 @@ func RegisterRoutes(r *gin.RouterGroup) {
 
 	r.GET("/addfile/:addfile_id", additionalFileController.GetAdditionalFileByIDHandler)
 	r.DELETE("/addfile/:addfile_id", additionalFileController.DeleteAdditionalFileByIDHandler)
+
+	r.GET("/lab/:classId", labController.GetLabsByClassIDHandler)
 }
