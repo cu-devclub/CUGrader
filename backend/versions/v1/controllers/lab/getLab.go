@@ -31,14 +31,15 @@ func (lc *LabController) GetLabByIdForStudent(c *gin.Context) {
 		return
 	}
 
-	allowed, err := lc.Service.Model.CanStudentAccessLab(labIdInt, claims.UserID)
+	isEnrolledStudent, err := lc.Service.Model.CanStudentAccessLab(labIdInt, claims.UserID)
+	isClassAssistant := lc.Service.Utils.IsUserTeacherAdminOrAssistantByLabID(labIdInt, claims.UserID)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to check lab access"})
 		return
 	}
 
-	if !allowed {
+	if !isEnrolledStudent && !isClassAssistant {
 		c.JSON(http.StatusForbidden, gin.H{"message": "You do not have access to this lab"})
 		return
 	}
