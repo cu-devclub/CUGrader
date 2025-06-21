@@ -156,7 +156,7 @@ func RegisterRoutes(r *gin.RouterGroup) {
 
 	r.GET("/picture/:pictureId", pictureController.GetPicture)
 
-	r.GET("/lab/:lab_id", labController.GetLabByIdForStudent)
+	r.GET("/lab/:lab_id", labController.GetLabByIDHandler)
 	r.POST("/lab", labController.AddLabHandler)
 	r.PATCH("/lab", labController.EditLabHandler)
 
