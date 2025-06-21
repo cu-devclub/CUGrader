@@ -3,162 +3,133 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
+// Types
+type CallbackStatus = 'loading' | 'success' | 'error';
+
+// Components
+function LoadingState() {
+    return (
+        <div className="flex items-center justify-center min-h-screen">
+            <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                <h2 className="text-xl font-semibold">Authenticating...</h2>
+                <p className="text-muted-foreground">Please wait while we process your login</p>
+            </div>
+        </div>
+    );
+}
+
+function SuccessState() {
+    return (
+        <div className="flex items-center justify-center min-h-screen">
+            <div className="text-center">
+                <div className="text-green-500 text-5xl mb-4">✓</div>
+                <h2 className="text-xl font-semibold text-green-600">Login Successful!</h2>
+                <p className="text-muted-foreground">Redirecting to dashboard...</p>
+            </div>
+        </div>
+    );
+}
+
+function ErrorState({ error }: { error: string }) {
+    return (
+        <div className="flex items-center justify-center min-h-screen">
+            <div className="text-center">
+                <div className="text-red-500 text-5xl mb-4">✗</div>
+                <h2 className="text-xl font-semibold text-red-600">Authentication Failed</h2>
+                <p className="text-muted-foreground mb-4">{error}</p>
+                <p className="text-sm text-muted-foreground">Redirecting to login page...</p>
+            </div>
+        </div>
+    );
+}
+
+// Helper functions
+function validateCallbackParams(searchParams: URLSearchParams) {
+    const errorParam = searchParams.get('error');
+    if (errorParam) {
+        throw new Error(`OAuth error: ${errorParam}`);
+    }
+
+    const credential = searchParams.get('credential');
+    if (!credential) {
+        throw new Error('Authorization credential not found in callback URL');
+    }
+
+    return {
+        credential,
+        key: searchParams.get('key')
+    };
+}
+
+async function callAuthAPI(credential: string, key: string | null): Promise<Response> {
+    const params = new URLSearchParams({
+        credential,
+        ...(key && { key })
+    });
+
+    return fetch(`/api/auth/callback?${params}`, {
+        method: 'GET',
+        credentials: 'include',
+    });
+}
+
 export default function Callback() {
-    const router = useRouter()
-    const searchParams = useSearchParams()
-    const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
-    const [error, setError] = useState<string>('')
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const [status, setStatus] = useState<CallbackStatus>('loading');
+    const [error, setError] = useState<string>('');
 
     useEffect(() => {
         const handleCallback = async () => {
             try {
-                // Get the authorization code from URL params
-                const credential = searchParams.get('credential')
-                const key = searchParams.get('key')
-                const errorParam = searchParams.get('error')
+                // Validate URL parameters
+                const { credential, key } = validateCallbackParams(searchParams);
 
-                // Check for OAuth errors first
-                if (errorParam) {
-                    throw new Error(`OAuth error: ${errorParam}`)
+                console.log('Processing OAuth callback...');
+
+                // Call authentication API
+                const response = await callAuthAPI(credential, key);
+                const data = await response.json();
+
+                console.log('Auth API response:', response.status, data);
+
+                if (!response.ok || !data.success) {
+                    throw new Error(data.error || `Authentication failed: ${response.status}`);
                 }
 
-                if (!credential) {
-                    throw new Error('Authorization credential not found in callback URL')
-                }
+                // On success, redirect to the URL provided by the API
+                setStatus('success');
+                console.log('Redirecting to:', data.redirectTo);
+                router.push(data.redirectTo);
 
-                console.log('Processing OAuth callback with credential:', credential.substring(0, 10) + '...')
-
-                try {
-                    // Call our Next.js API route which handles the backend communication
-                    const response = await fetch(`/api/auth/callback?credential=${encodeURIComponent(credential)}&key=${encodeURIComponent(key || '')}`, {
-                        method: 'GET',
-                        credentials: 'include', // Include cookies in the request
-                        redirect: 'manual', // Don't follow redirects automatically
-                    })
-
-                    console.log('Response status:', response.status, 'Type:', response.type)
-
-                    // Check if we got a redirect response (including opaque redirects)
-                    if (response.type === 'opaqueredirect' || response.status === 307 || response.status === 302 || response.status === 301) {
-                        console.log('Redirect detected, checking location header')
-
-                        const redirectUrl = response.headers.get('location')
-                        if (redirectUrl) {
-                            console.log('API route redirected to:', redirectUrl)
-                            window.location.href = redirectUrl
-                            return
-                        } else {
-                            // For opaque redirects, we can't see the location header
-                            // Let's try following the redirect normally
-                            console.log('Opaque redirect detected, refetching with follow')
-                            const followResponse = await fetch(`/api/auth/callback?credential=${encodeURIComponent(credential)}&key=${encodeURIComponent(key || '')}`, {
-                                method: 'GET',
-                                credentials: 'include',
-                                redirect: 'follow',
-                            })
-
-                            // If this succeeds, we should be on the redirected page
-                            // The API sets cookies, so we can check if we're authenticated and redirect appropriately
-                            if (followResponse.ok) {
-                                // Try to determine where to go based on URL or default to checking auth
-                                console.log('Follow response URL:', followResponse.url)
-                                window.location.href = followResponse.url
-                                return
-                            }
-                        }
-                    }
-
-                    // If we get here without a redirect, something went wrong
-                    if (!response.ok) {
-                        throw new Error(`Authentication failed: ${response.status} ${response.statusText}`)
-                    }
-
-                } catch (fetchError) {
-                    console.error('Fetch error:', fetchError)
-
-                    // If manual redirect fails, try with normal redirect handling
-                    console.log('Retrying with normal redirect handling')
-                    const response = await fetch(`/api/auth/callback?credential=${encodeURIComponent(credential)}&key=${encodeURIComponent(key || '')}`, {
-                        method: 'GET',
-                        credentials: 'include',
-                    })
-
-                    if (!response.ok) {
-                        throw new Error(`Authentication failed: ${response.status} ${response.statusText}`)
-                    }
-
-                    // If we reach here, the redirect was followed and we should check the URL
-                    console.log('Final response URL after redirect:', response.url)
-
-                    // The API route should have set the auth cookie, so redirect based on response URL
-                    if (response.url.includes('/student')) {
-                        window.location.href = '/student'
-                    } else if (response.url.includes('/instructor')) {
-                        window.location.href = '/instructor'
-                    } else {
-                        // Default fallback - let the middleware handle the redirect
-                        window.location.href = '/student' 
-                    }
-                    return
-                }
 
             } catch (err) {
-                console.error('Auth callback error:', err)
+                console.error('Auth callback error:', err);
 
-                let errorMessage = 'Authentication failed'
-                if (err instanceof Error) {
-                    errorMessage = err.message
-                }
+                const errorMessage = err instanceof Error ? err.message : 'Authentication failed';
+                setError(errorMessage);
+                setStatus('error');
 
-                setError(errorMessage)
-                setStatus('error')
-
-                // Redirect to login page after error
+                // Redirect to login with error after delay
                 setTimeout(() => {
-                    router.push('/login?error=' + encodeURIComponent(errorMessage))
-                }, 3000)
+                    router.push(`/login?error=${encodeURIComponent(errorMessage)}`);
+                }, 3000);
             }
-        }
+        };
 
-        handleCallback()
-    }, [searchParams, router])
+        handleCallback();
+    }, [searchParams, router]);
 
-    if (status === 'loading') {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-                    <h2 className="text-xl font-semibold">Authenticating...</h2>
-                    <p className="text-muted-foreground">Please wait while we process your login</p>
-                </div>
-            </div>
-        )
+    // Render based on status
+    switch (status) {
+        case 'loading':
+            return <LoadingState />;
+        case 'success':
+            return <SuccessState />;
+        case 'error':
+            return <ErrorState error={error} />;
+        default:
+            return null;
     }
-
-    if (status === 'success') {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="text-center">
-                    <div className="text-green-500 text-5xl mb-4">✓</div>
-                    <h2 className="text-xl font-semibold text-green-600">Login Successful!</h2>
-                    <p className="text-muted-foreground">Redirecting to dashboard...</p>
-                </div>
-            </div>
-        )
-    }
-
-    if (status === 'error') {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="text-center">
-                    <div className="text-red-500 text-5xl mb-4">✗</div>
-                    <h2 className="text-xl font-semibold text-red-600">Authentication Failed</h2>
-                    <p className="text-muted-foreground mb-4">{error}</p>
-                    <p className="text-sm text-muted-foreground">Redirecting to login page...</p>
-                </div>
-            </div>
-        )
-    }
-
-    return null
 }
