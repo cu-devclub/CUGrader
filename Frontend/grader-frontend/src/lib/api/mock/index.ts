@@ -82,7 +82,6 @@ async function init(client: APIClient) {
     email: "12313@student.chula.ac.th",
     section: 0,
   });
-
   // Create advanced assignments
   await client.assignments.create(420, {
     number: 4,
@@ -91,9 +90,8 @@ async function init(client: APIClient) {
     due: parseDateTime('2025-07-05T23:59'),
     examPin: "456789",
     showScoreOnLock: true,
-    testCode: "haskell monad test",
-    secretTestCode: "haskell monad secret",
-    additionalFileIds: [6],
+    testCode: "describe \"Maybe Monad\" $ do\n  it \"handles safe division\" $ do\n    safeDivide 10 2 `shouldBe` Just 5.0\n    safeDivide 10 0 `shouldBe` Nothing\n  it \"chains operations\" $ do\n    chainDivisions 20 4 2 `shouldBe` Just 2.5",
+    secretTestCode: "describe \"IO Monad\" $ do\n  it \"processes input correctly\" $ do\n    result <- captureOutput processInput\n    result `shouldContain` \"10\"",
     languages: ["haskell"],
     examMode: true,
     closeOnDue: true,
@@ -105,9 +103,8 @@ async function init(client: APIClient) {
         description: "Implement safe division using Maybe monad",
         template: "-- Implement safe division that returns Nothing for division by zero\nsafeDivide :: Double -> Double -> Maybe Double\nsafeDivide x y = -- Your code here\n\n-- Chain safe divisions using monadic operations\nchainDivisions :: Double -> Double -> Double -> Maybe Double\nchainDivisions x y z = -- Your code here using >>= or do notation",
         maxScore: 80,
-        answer: "safeDivide :: Double -> Double -> Maybe Double\nsafeDivide x 0 = Nothing\nsafeDivide x y = Just (x / y)\n\nchainDivisions :: Double -> Double -> Maybe Double\nchainDivisions x y z = safeDivide x y >>= \\result -> safeDivide result z",
-        testCode: "haskell maybe monad test",
-        secretTestCode: "haskell maybe monad secret",
+        answer: "safeDivide :: Double -> Double -> Maybe Double\nsafeDivide x 0 = Nothing\nsafeDivide x y = Just (x / y)\n\nchainDivisions :: Double -> Double -> Maybe Double\nchainDivisions x y z = safeDivide x y >>= \\result -> safeDivide result z",        testCode: "describe \"Maybe Monad\" $ do\n  it \"handles safe division\" $ do\n    safeDivide 10 2 `shouldBe` Just 5.0\n    safeDivide 10 0 `shouldBe` Nothing",
+        secretTestCode: "describe \"Maybe Monad Secret\" $ do\n  it \"handles complex chains\" $ do\n    chainDivisions 100 5 4 `shouldBe` Just 5.0",
         testcases: [{ input: "10 2 5", output: "Just 1.0" }, { input: "10 0 5", output: "Nothing" }],
         secretTestCases: [{ input: "20 4 2", output: "Just 2.5" }]
       },
@@ -117,16 +114,14 @@ async function init(client: APIClient) {
         description: "Create an IO action that reads and processes user input",
         template: "-- Create an IO action that reads a line, converts to Int, doubles it, and prints\nprocessInput :: IO ()\nprocessInput = -- Your code here using do notation\n\n-- Helper function to safely parse Int\nsafeRead :: String -> Maybe Int\nsafeRead s = -- Your code here",
         maxScore: 70,
-        answer: "processInput :: IO ()\nprocessInput = do\n  line <- getLine\n  case safeRead line of\n    Just n -> print (n * 2)\n    Nothing -> putStrLn \"Invalid input\"\n\nsafeRead :: String -> Maybe Int\nsafeRead s = case reads s of\n  [(n, \"\")] -> Just n\n  _ -> Nothing",
-        testCode: "haskell io monad test",
-        secretTestCode: "haskell io monad secret",
+        answer: "processInput :: IO ()\nprocessInput = do\n  line <- getLine\n  case safeRead line of\n    Just n -> print (n * 2)\n    Nothing -> putStrLn \"Invalid input\"\n\nsafeRead :: String -> Maybe Int\nsafeRead s = case reads s of\n  [(n, \"\")] -> Just n\n  _ -> Nothing",        testCode: "describe \"IO Monad\" $ do\n  it \"processes input safely\" $ do\n    result <- testProcessInput \"5\"\n    result `shouldBe` \"10\"",
+        secretTestCode: "describe \"IO Monad Secret\" $ do\n  it \"handles invalid input\" $ do\n    result <- testProcessInput \"abc\"\n    result `shouldBe` \"Invalid input\"",
         testcases: [{ input: "5", output: "10" }],
         secretTestCases: [{ input: "abc", output: "Invalid input" }]
       }
     ],
     additionalFiles: []
   });
-
   await client.assignments.create(421, {
     number: 3,
     name: "Swift Advanced Generics",
@@ -134,9 +129,8 @@ async function init(client: APIClient) {
     due: parseDateTime('2025-07-10T20:00'),
     examPin: "321654",
     showScoreOnLock: true,
-    testCode: "swift generics test",
-    secretTestCode: "swift generics secret",
-    additionalFileIds: [8],
+    testCode: "XCTAssertEqual(stack.isEmpty, true)\nstack.push(1)\nstack.push(2)\nXCTAssertEqual(stack.pop(), 2)\nXCTAssertEqual(stack.isEmpty, false)",
+    secretTestCode: "XCTAssertEqual(findCommon([1,2,3], [2,3,4]).sorted(), [2,3])\nXCTAssertEqual(sortedUnique([3,1,2,1,3]), [1,2,3])",
     languages: ["swift"],
     examMode: true,
     closeOnDue: true,
@@ -148,9 +142,8 @@ async function init(client: APIClient) {
         description: "Implement a generic Stack with associated types",
         template: "// Define a protocol for Stack behavior\nprotocol StackProtocol {\n    associatedtype Element\n    mutating func push(_ element: Element)\n    mutating func pop() -> Element?\n    var isEmpty: Bool { get }\n}\n\n// Implement a generic Stack\nstruct Stack<T>: StackProtocol {\n    // Your implementation here\n}",
         maxScore: 80,
-        answer: "protocol StackProtocol {\n    associatedtype Element\n    mutating func push(_ element: Element)\n    mutating func pop() -> Element?\n    var isEmpty: Bool { get }\n}\n\nstruct Stack<T>: StackProtocol {\n    typealias Element = T\n    private var items: [T] = []\n    \n    mutating func push(_ element: T) {\n        items.append(element)\n    }\n    \n    mutating func pop() -> T? {\n        return items.popLast()\n    }\n    \n    var isEmpty: Bool {\n        return items.isEmpty\n    }\n}",
-        testCode: "swift stack test",
-        secretTestCode: "swift stack secret",
+        answer: "protocol StackProtocol {\n    associatedtype Element\n    mutating func push(_ element: Element)\n    mutating func pop() -> Element?\n    var isEmpty: Bool { get }\n}\n\nstruct Stack<T>: StackProtocol {\n    typealias Element = T\n    private var items: [T] = []\n    \n    mutating func push(_ element: T) {\n        items.append(element)\n    }\n    \n    mutating func pop() -> T? {\n        return items.popLast()\n    }\n    \n    var isEmpty: Bool {\n        return items.isEmpty\n    }\n}",        testCode: "XCTAssertEqual(stack.isEmpty, true)\nvar stack = Stack<Int>()\nstack.push(1)\nstack.push(2)\nXCTAssertEqual(stack.pop(), 2)",
+        secretTestCode: "var emptyStack = Stack<String>()\nXCTAssertEqual(emptyStack.isEmpty, true)\nXCTAssertNil(emptyStack.pop())",
         testcases: [{ input: "push(1), push(2), pop()", output: "2" }],
         secretTestCases: [{ input: "isEmpty", output: "true" }]
       },
@@ -160,9 +153,8 @@ async function init(client: APIClient) {
         description: "Implement generic functions with where clauses",
         template: "// Generic function that finds common elements between two arrays\n// T must be Equatable and Hashable\nfunc findCommon<T>(_ array1: [T], _ array2: [T]) -> [T] where T: Equatable, T: Hashable {\n    // Your implementation here\n}\n\n// Generic function that sorts and returns unique elements\nfunc sortedUnique<T>(_ array: [T]) -> [T] where T: Comparable, T: Hashable {\n    // Your implementation here\n}",
         maxScore: 70,
-        answer: "func findCommon<T>(_ array1: [T], _ array2: [T]) -> [T] where T: Equatable, T: Hashable {\n    let set1 = Set(array1)\n    let set2 = Set(array2)\n    return Array(set1.intersection(set2))\n}\n\nfunc sortedUnique<T>(_ array: [T]) -> [T] where T: Comparable, T: Hashable {\n    return Array(Set(array)).sorted()\n}",
-        testCode: "swift generic constraints test",
-        secretTestCode: "swift generic constraints secret",
+        answer: "func findCommon<T>(_ array1: [T], _ array2: [T]) -> [T] where T: Equatable, T: Hashable {\n    let set1 = Set(array1)\n    let set2 = Set(array2)\n    return Array(set1.intersection(set2))\n}\n\nfunc sortedUnique<T>(_ array: [T]) -> [T] where T: Comparable, T: Hashable {\n    return Array(Set(array)).sorted()\n}",        testCode: "XCTAssertEqual(findCommon([1,2,3], [2,3,4]).sorted(), [2,3])\nXCTAssertEqual(findCommon([1,2], [3,4]), [])",
+        secretTestCode: "XCTAssertEqual(sortedUnique([3,1,2,1,3]), [1,2,3])\nXCTAssertEqual(sortedUnique([5,5,5]), [5])",
         testcases: [{ input: "[1,2,3], [2,3,4]", output: "[2,3]" }],
         secretTestCases: [{ input: "[3,1,2,1,3]", output: "[1,2,3]" }]
       }
@@ -176,10 +168,8 @@ async function init(client: APIClient) {
     publish: parseDateTime('2025-06-20T13:30'),
     due: parseDateTime('2025-07-12T16:00'),
     examPin: "987321",
-    showScoreOnLock: false,
-    testCode: "expect(isPrime(7)).toBeTruthy()",
-    secretTestCode: "expect(isPrime(97)).toBeTruthy()",
-    additionalFileIds: [9],
+    showScoreOnLock: false,    testCode: "expect(isPrime(7)).toBeTruthy();\nexpect(isPrime(4)).toBeFalsy();\nexpect(sieveOfEratosthenes(10)).toEqual([2, 3, 5, 7]);",
+    secretTestCode: "expect(isPrime(97)).toBeTruthy();\nexpect(isPrime(100)).toBeFalsy();\nexpect(sieveOfEratosthenes(20).length).toBe(8);",
     languages: ["typescript"],
     examMode: false,
     closeOnDue: false,
@@ -211,7 +201,6 @@ async function init(client: APIClient) {
       }],
     additionalFiles: []
   });
-
   await client.assignments.create(421, {
     number: 5,
     name: "Swift Virtualization & Hypervisor Framework",
@@ -219,9 +208,8 @@ async function init(client: APIClient) {
     due: parseDateTime('2025-07-15T23:59'),
     examPin: "654321",
     showScoreOnLock: true,
-    testCode: "swift virtualization test",
-    secretTestCode: "swift virtualization secret",
-    additionalFileIds: [10],
+    testCode: "let cpu = VirtualCPU(memorySize: 1024)\nXCTAssertEqual(cpu.registers[0], 0)\nXCTAssertFalse(cpu.isRunning)\ncpu.loadProgram([0x01, 0x00, 0x05, 0xFF])\ncpu.run()\nXCTAssertEqual(cpu.registers[0], 5)",
+    secretTestCode: "let jit = JITCompiler()\nlet bytecode: [UInt8] = [0x01, 0x00, 0x05]\nlet compiled = jit.compile(bytecode: bytecode)\nXCTAssertNotNil(compiled)",
     languages: ["swift"],
     examMode: true,
     closeOnDue: true,
@@ -232,9 +220,8 @@ async function init(client: APIClient) {
       description: "Implement a basic virtual machine with CPU, memory, and instruction execution",
       template: "import Virtualization\nimport Foundation\n\n// Define VM instruction set\nenum VMInstruction: UInt8 {\n    case load = 0x01    // Load value to register\n    case store = 0x02   // Store register to memory\n    case add = 0x03     // Add two registers\n    case sub = 0x04     // Subtract two registers\n    case jump = 0x05    // Jump to address\n    case halt = 0xFF    // Halt execution\n}\n\n// Virtual CPU implementation\nclass VirtualCPU {\n    var registers: [UInt32] = Array(repeating: 0, count: 16)\n    var programCounter: UInt32 = 0\n    var memory: [UInt8]\n    var isRunning: Bool = false\n    \n    init(memorySize: Int) {\n        memory = Array(repeating: 0, count: memorySize)\n    }\n    \n    // Execute a single instruction\n    func executeInstruction() -> Bool {\n        // Your implementation here\n        // Read instruction at PC, decode and execute\n        // Return false when halt instruction is encountered\n    }\n    \n    // Load program into memory\n    func loadProgram(_ program: [UInt8]) {\n        // Your implementation here\n    }\n    \n    // Run the virtual machine\n    func run() {\n        // Your implementation here\n    }\n}",
       maxScore: 100,
-      answer: "import Virtualization\nimport Foundation\n\nenum VMInstruction: UInt8 {\n    case load = 0x01\n    case store = 0x02\n    case add = 0x03\n    case sub = 0x04\n    case jump = 0x05\n    case halt = 0xFF\n}\n\nclass VirtualCPU {\n    var registers: [UInt32] = Array(repeating: 0, count: 16)\n    var programCounter: UInt32 = 0\n    var memory: [UInt8]\n    var isRunning: Bool = false\n    \n    init(memorySize: Int) {\n        memory = Array(repeating: 0, count: memorySize)\n    }\n    \n    func executeInstruction() -> Bool {\n        guard programCounter < memory.count else { return false }\n        \n        let instruction = VMInstruction(rawValue: memory[Int(programCounter)])\n        programCounter += 1\n        \n        switch instruction {\n        case .load:\n            let reg = memory[Int(programCounter)]\n            let value = UInt32(memory[Int(programCounter + 1)])\n            registers[Int(reg)] = value\n            programCounter += 2\n        case .add:\n            let reg1 = memory[Int(programCounter)]\n            let reg2 = memory[Int(programCounter + 1)]\n            let reg3 = memory[Int(programCounter + 2)]\n            registers[Int(reg3)] = registers[Int(reg1)] + registers[Int(reg2)]\n            programCounter += 3\n        case .halt:\n            return false\n        default:\n            break\n        }\n        return true\n    }\n    \n    func loadProgram(_ program: [UInt8]) {\n        for (index, byte) in program.enumerated() {\n            if index < memory.count {\n                memory[index] = byte\n            }\n        }\n    }\n    \n    func run() {\n        isRunning = true\n        while isRunning && executeInstruction() {\n            // Continue execution\n        }\n        isRunning = false\n    }\n}",
-      testCode: "swift vm implementation test",
-      secretTestCode: "swift vm implementation secret",
+      answer: "import Virtualization\nimport Foundation\n\nenum VMInstruction: UInt8 {\n    case load = 0x01\n    case store = 0x02\n    case add = 0x03\n    case sub = 0x04\n    case jump = 0x05\n    case halt = 0xFF\n}\n\nclass VirtualCPU {\n    var registers: [UInt32] = Array(repeating: 0, count: 16)\n    var programCounter: UInt32 = 0\n    var memory: [UInt8]\n    var isRunning: Bool = false\n    \n    init(memorySize: Int) {\n        memory = Array(repeating: 0, count: memorySize)\n    }\n    \n    func executeInstruction() -> Bool {\n        guard programCounter < memory.count else { return false }\n        \n        let instruction = VMInstruction(rawValue: memory[Int(programCounter)])\n        programCounter += 1\n        \n        switch instruction {\n        case .load:\n            let reg = memory[Int(programCounter)]\n            let value = UInt32(memory[Int(programCounter + 1)])\n            registers[Int(reg)] = value\n            programCounter += 2\n        case .add:\n            let reg1 = memory[Int(programCounter)]\n            let reg2 = memory[Int(programCounter + 1)]\n            let reg3 = memory[Int(programCounter + 2)]\n            registers[Int(reg3)] = registers[Int(reg1)] + registers[Int(reg2)]\n            programCounter += 3\n        case .halt:\n            return false\n        default:\n            break\n        }\n        return true\n    }\n    \n    func loadProgram(_ program: [UInt8]) {\n        for (index, byte) in program.enumerated() {\n            if index < memory.count {\n                memory[index] = byte\n            }\n        }\n    }\n    \n    func run() {\n        isRunning = true\n        while isRunning && executeInstruction() {\n            // Continue execution\n        }\n        isRunning = false\n    }\n}",      testCode: "let cpu = VirtualCPU(memorySize: 1024)\nXCTAssertEqual(cpu.registers.count, 16)\nXCTAssertEqual(cpu.programCounter, 0)\nXCTAssertFalse(cpu.isRunning)",
+      secretTestCode: "let cpu = VirtualCPU(memorySize: 2048)\ncpu.loadProgram([0x01, 0x01, 0x0A, 0x01, 0x02, 0x05, 0x03, 0x01, 0x02, 0x03, 0xFF])\ncpu.run()\nXCTAssertEqual(cpu.registers[3], 15)",
       testcases: [{ input: "VirtualCPU(memorySize: 1024)", output: "VirtualCPU instance" }],
       secretTestCases: [{ input: "cpu.run()", output: "execution complete" }]
     }, {
@@ -243,9 +230,8 @@ async function init(client: APIClient) {
       description: "Implement a Just-In-Time compiler for the virtual machine",
       template: "import Foundation\n\n// JIT Compiler for VM bytecode\nclass JITCompiler {\n    typealias CompiledFunction = () -> Void\n    \n    private var compiledCache: [String: CompiledFunction] = [:]\n    \n    // Compile bytecode to native Swift closures\n    func compile(bytecode: [UInt8]) -> CompiledFunction {\n        let key = bytecode.map { String($0, radix: 16) }.joined()\n        \n        if let cached = compiledCache[key] {\n            return cached\n        }\n        \n        // Your implementation here\n        // Parse bytecode and generate optimized Swift code\n        let compiled = compileToNative(bytecode)\n        compiledCache[key] = compiled\n        return compiled\n    }\n    \n    private func compileToNative(_ bytecode: [UInt8]) -> CompiledFunction {\n        // Your implementation here\n        // Convert VM instructions to native Swift operations\n    }\n    \n    // Hot path detection and optimization\n    func optimizeHotPath(_ bytecode: [UInt8], executionCount: Int) -> CompiledFunction {\n        // Your implementation here\n        // Implement hot path optimization\n    }\n}",
       maxScore: 90,
-      answer: "import Foundation\n\nclass JITCompiler {\n    typealias CompiledFunction = () -> Void\n    \n    private var compiledCache: [String: CompiledFunction] = [:]\n    private var executionCounts: [String: Int] = [:]\n    \n    func compile(bytecode: [UInt8]) -> CompiledFunction {\n        let key = bytecode.map { String($0, radix: 16) }.joined()\n        \n        if let cached = compiledCache[key] {\n            executionCounts[key, default: 0] += 1\n            return cached\n        }\n        \n        let compiled = compileToNative(bytecode)\n        compiledCache[key] = compiled\n        executionCounts[key] = 1\n        return compiled\n    }\n    \n    private func compileToNative(_ bytecode: [UInt8]) -> CompiledFunction {\n        return {\n            var pc = 0\n            var registers = Array(repeating: 0, count: 16)\n            \n            while pc < bytecode.count {\n                switch bytecode[pc] {\n                case 0x01: // load\n                    let reg = Int(bytecode[pc + 1])\n                    let value = Int(bytecode[pc + 2])\n                    registers[reg] = value\n                    pc += 3\n                case 0x03: // add\n                    let reg1 = Int(bytecode[pc + 1])\n                    let reg2 = Int(bytecode[pc + 2])\n                    let reg3 = Int(bytecode[pc + 3])\n                    registers[reg3] = registers[reg1] + registers[reg2]\n                    pc += 4\n                case 0xFF: // halt\n                    return\n                default:\n                    pc += 1\n                }\n            }\n        }\n    }\n    \n    func optimizeHotPath(_ bytecode: [UInt8], executionCount: Int) -> CompiledFunction {\n        if executionCount > 100 {\n            // Apply aggressive optimizations for hot paths\n            return compileOptimized(bytecode)\n        }\n        return compile(bytecode: bytecode)\n    }\n    \n    private func compileOptimized(_ bytecode: [UInt8]) -> CompiledFunction {\n        // Inline operations, constant folding, etc.\n        return compileToNative(bytecode)\n    }\n}",
-      testCode: "swift jit compiler test",
-      secretTestCode: "swift jit compiler secret",
+      answer: "import Foundation\n\nclass JITCompiler {\n    typealias CompiledFunction = () -> Void\n    \n    private var compiledCache: [String: CompiledFunction] = [:]\n    private var executionCounts: [String: Int] = [:]\n    \n    func compile(bytecode: [UInt8]) -> CompiledFunction {\n        let key = bytecode.map { String($0, radix: 16) }.joined()\n        \n        if let cached = compiledCache[key] {\n            executionCounts[key, default: 0] += 1\n            return cached\n        }\n        \n        let compiled = compileToNative(bytecode)\n        compiledCache[key] = compiled\n        executionCounts[key] = 1\n        return compiled\n    }\n    \n    private func compileToNative(_ bytecode: [UInt8]) -> CompiledFunction {\n        return {\n            var pc = 0\n            var registers = Array(repeating: 0, count: 16)\n            \n            while pc < bytecode.count {\n                switch bytecode[pc] {\n                case 0x01: // load\n                    let reg = Int(bytecode[pc + 1])\n                    let value = Int(bytecode[pc + 2])\n                    registers[reg] = value\n                    pc += 3\n                case 0x03: // add\n                    let reg1 = Int(bytecode[pc + 1])\n                    let reg2 = Int(bytecode[pc + 2])\n                    let reg3 = Int(bytecode[pc + 3])\n                    registers[reg3] = registers[reg1] + registers[reg2]\n                    pc += 4\n                case 0xFF: // halt\n                    return\n                default:\n                    pc += 1\n                }\n            }\n        }\n    }\n    \n    func optimizeHotPath(_ bytecode: [UInt8], executionCount: Int) -> CompiledFunction {\n        if executionCount > 100 {\n            // Apply aggressive optimizations for hot paths\n            return compileOptimized(bytecode)\n        }\n        return compile(bytecode: bytecode)\n    }\n    \n    private func compileOptimized(_ bytecode: [UInt8]) -> CompiledFunction {\n        // Inline operations, constant folding, etc.\n        return compileToNative(bytecode)\n    }\n}",      testCode: "let jit = JITCompiler()\nlet bytecode: [UInt8] = [0x01, 0x00, 0x05, 0xFF]\nlet compiled = jit.compile(bytecode: bytecode)\nXCTAssertNotNil(compiled)",
+      secretTestCode: "let jit = JITCompiler()\nlet hotBytecode: [UInt8] = [0x01, 0x00, 0x0A, 0x03, 0x00, 0x00, 0x01]\nlet optimized = jit.optimizeHotPath(hotBytecode, executionCount: 150)\nXCTAssertNotNil(optimized)",
       testcases: [{ input: "JITCompiler().compile(bytecode: [0x01, 0x00, 0x05])", output: "CompiledFunction" }],
       secretTestCases: [{ input: "compiler.optimizeHotPath(bytecode, executionCount: 150)", output: "optimized function" }]
     }, {
@@ -254,9 +240,8 @@ async function init(client: APIClient) {
       description: "Implement virtual memory management with paging and TLB",
       template: "import Foundation\n\n// Page table entry\nstruct PageTableEntry {\n    var physicalAddress: UInt32\n    var present: Bool\n    var writable: Bool\n    var userAccessible: Bool\n    \n    init(physicalAddress: UInt32, present: Bool = true, writable: Bool = true, userAccessible: Bool = true) {\n        self.physicalAddress = physicalAddress\n        self.present = present\n        self.writable = writable\n        self.userAccessible = userAccessible\n    }\n}\n\n// Translation Lookaside Buffer\nclass TLB {\n    private var entries: [UInt32: PageTableEntry] = [:]\n    private let maxEntries = 64\n    \n    func lookup(virtualAddress: UInt32) -> PageTableEntry? {\n        // Your implementation here\n    }\n    \n    func insert(virtualAddress: UInt32, entry: PageTableEntry) {\n        // Your implementation here - implement LRU eviction\n    }\n    \n    func flush() {\n        // Your implementation here\n    }\n}\n\n// Memory Management Unit\nclass MMU {\n    private var pageTable: [UInt32: PageTableEntry] = [:]\n    private var tlb = TLB()\n    private let pageSize: UInt32 = 4096\n    \n    // Translate virtual address to physical address\n    func translate(virtualAddress: UInt32) throws -> UInt32 {\n        // Your implementation here\n        // 1. Check TLB first\n        // 2. If miss, check page table\n        // 3. Handle page faults\n    }\n    \n    // Map virtual page to physical page\n    func mapPage(virtualPage: UInt32, physicalPage: UInt32, writable: Bool = true) {\n        // Your implementation here\n    }\n    \n    // Handle page fault\n    func handlePageFault(virtualAddress: UInt32) throws {\n        // Your implementation here\n    }\n}",
       maxScore: 95,
-      answer: "import Foundation\n\nstruct PageTableEntry {\n    var physicalAddress: UInt32\n    var present: Bool\n    var writable: Bool\n    var userAccessible: Bool\n    \n    init(physicalAddress: UInt32, present: Bool = true, writable: Bool = true, userAccessible: Bool = true) {\n        self.physicalAddress = physicalAddress\n        self.present = present\n        self.writable = writable\n        self.userAccessible = userAccessible\n    }\n}\n\nclass TLB {\n    private var entries: [UInt32: PageTableEntry] = [:]\n    private var accessOrder: [UInt32] = []\n    private let maxEntries = 64\n    \n    func lookup(virtualAddress: UInt32) -> PageTableEntry? {\n        let virtualPage = virtualAddress >> 12\n        if let entry = entries[virtualPage] {\n            // Move to front (LRU)\n            accessOrder.removeAll { $0 == virtualPage }\n            accessOrder.append(virtualPage)\n            return entry\n        }\n        return nil\n    }\n    \n    func insert(virtualAddress: UInt32, entry: PageTableEntry) {\n        let virtualPage = virtualAddress >> 12\n        \n        if entries.count >= maxEntries {\n            // Evict LRU entry\n            let lru = accessOrder.removeFirst()\n            entries.removeValue(forKey: lru)\n        }\n        \n        entries[virtualPage] = entry\n        accessOrder.append(virtualPage)\n    }\n    \n    func flush() {\n        entries.removeAll()\n        accessOrder.removeAll()\n    }\n}\n\nenum MMUError: Error {\n    case pageFault\n    case permissionDenied\n}\n\nclass MMU {\n    private var pageTable: [UInt32: PageTableEntry] = [:]\n    private var tlb = TLB()\n    private let pageSize: UInt32 = 4096\n    \n    func translate(virtualAddress: UInt32) throws -> UInt32 {\n        let virtualPage = virtualAddress >> 12\n        let offset = virtualAddress & 0xFFF\n        \n        // Check TLB first\n        if let entry = tlb.lookup(virtualAddress: virtualAddress) {\n            if entry.present {\n                return (entry.physicalAddress << 12) | offset\n            }\n        }\n        \n        // TLB miss, check page table\n        guard let entry = pageTable[virtualPage] else {\n            throw MMUError.pageFault\n        }\n        \n        if !entry.present {\n            throw MMUError.pageFault\n        }\n        \n        // Update TLB\n        tlb.insert(virtualAddress: virtualAddress, entry: entry)\n        \n        return (entry.physicalAddress << 12) | offset\n    }\n    \n    func mapPage(virtualPage: UInt32, physicalPage: UInt32, writable: Bool = true) {\n        let entry = PageTableEntry(\n            physicalAddress: physicalPage,\n            present: true,\n            writable: writable,\n            userAccessible: true\n        )\n        pageTable[virtualPage] = entry\n    }\n    \n    func handlePageFault(virtualAddress: UInt32) throws {\n        let virtualPage = virtualAddress >> 12\n        \n        // Allocate new physical page (simplified)\n        let physicalPage = UInt32.random(in: 0...0xFFFFF)\n        \n        mapPage(virtualPage: virtualPage, physicalPage: physicalPage)\n    }\n}",
-      testCode: "swift mmu test",
-      secretTestCode: "swift mmu secret",
+      answer: "import Foundation\n\nstruct PageTableEntry {\n    var physicalAddress: UInt32\n    var present: Bool\n    var writable: Bool\n    var userAccessible: Bool\n    \n    init(physicalAddress: UInt32, present: Bool = true, writable: Bool = true, userAccessible: Bool = true) {\n        self.physicalAddress = physicalAddress\n        self.present = present\n        self.writable = writable\n        self.userAccessible = userAccessible\n    }\n}\n\nclass TLB {\n    private var entries: [UInt32: PageTableEntry] = [:]\n    private var accessOrder: [UInt32] = []\n    private let maxEntries = 64\n    \n    func lookup(virtualAddress: UInt32) -> PageTableEntry? {\n        let virtualPage = virtualAddress >> 12\n        if let entry = entries[virtualPage] {\n            // Move to front (LRU)\n            accessOrder.removeAll { $0 == virtualPage }\n            accessOrder.append(virtualPage)\n            return entry\n        }\n        return nil\n    }\n    \n    func insert(virtualAddress: UInt32, entry: PageTableEntry) {\n        let virtualPage = virtualAddress >> 12\n        \n        if entries.count >= maxEntries {\n            // Evict LRU entry\n            let lru = accessOrder.removeFirst()\n            entries.removeValue(forKey: lru)\n        }\n        \n        entries[virtualPage] = entry\n        accessOrder.append(virtualPage)\n    }\n    \n    func flush() {\n        entries.removeAll()\n        accessOrder.removeAll()\n    }\n}\n\nenum MMUError: Error {\n    case pageFault\n    case permissionDenied\n}\n\nclass MMU {\n    private var pageTable: [UInt32: PageTableEntry] = [:]\n    private var tlb = TLB()\n    private let pageSize: UInt32 = 4096\n    \n    func translate(virtualAddress: UInt32) throws -> UInt32 {\n        let virtualPage = virtualAddress >> 12\n        let offset = virtualAddress & 0xFFF\n        \n        // Check TLB first\n        if let entry = tlb.lookup(virtualAddress: virtualAddress) {\n            if entry.present {\n                return (entry.physicalAddress << 12) | offset\n            }\n        }\n        \n        // TLB miss, check page table\n        guard let entry = pageTable[virtualPage] else {\n            throw MMUError.pageFault\n        }\n        \n        if !entry.present {\n            throw MMUError.pageFault\n        }\n        \n        // Update TLB\n        tlb.insert(virtualAddress: virtualAddress, entry: entry)\n        \n        return (entry.physicalAddress << 12) | offset\n    }\n    \n    func mapPage(virtualPage: UInt32, physicalPage: UInt32, writable: Bool = true) {\n        let entry = PageTableEntry(\n            physicalAddress: physicalPage,\n            present: true,\n            writable: writable,\n            userAccessible: true\n        )\n        pageTable[virtualPage] = entry\n    }\n    \n    func handlePageFault(virtualAddress: UInt32) throws {\n        let virtualPage = virtualAddress >> 12\n        \n        // Allocate new physical page (simplified)\n        let physicalPage = UInt32.random(in: 0...0xFFFFF)\n        \n        mapPage(virtualPage: virtualPage, physicalPage: physicalPage)\n    }\n}",      testCode: "let mmu = MMU()\nmmu.mapPage(virtualPage: 1, physicalPage: 100)\nlet translated = try mmu.translate(virtualAddress: 0x1000)\nXCTAssertEqual(translated, 0x64000)",
+      secretTestCode: "let mmu = MMU()\nXCTAssertThrowsError(try mmu.translate(virtualAddress: 0x2000))\nmmu.mapPage(virtualPage: 2, physicalPage: 200)\nXCTAssertNoThrow(try mmu.translate(virtualAddress: 0x2000))",
       testcases: [{ input: "MMU().translate(0x1000)", output: "physical address" }],
       secretTestCases: [{ input: "mmu.mapPage(1, 100)", output: "page mapped" }]
     }
@@ -274,7 +259,6 @@ async function init(client: APIClient) {
     showScoreOnLock: true,
     testCode: "generic linked list test",
     secretTestCode: "generic linked list secret",
-    additionalFileIds: [],
     languages: ["typescript", "python", "java", "cpp"],
     examMode: false,
     closeOnDue: true,
@@ -305,7 +289,6 @@ async function init(client: APIClient) {
     showScoreOnLock: true,
     testCode: "binary search tree test",
     secretTestCode: "binary search tree secret",
-    additionalFileIds: [],
     languages: ["typescript", "python", "java", "cpp"],
     examMode: false,
     closeOnDue: true,
@@ -336,7 +319,6 @@ async function init(client: APIClient) {
     showScoreOnLock: true,
     testCode: "graph algorithms test",
     secretTestCode: "graph algorithms secret",
-    additionalFileIds: [],
     languages: ["typescript", "python", "java", "cpp"],
     examMode: false,
     closeOnDue: true,
@@ -364,10 +346,9 @@ async function init(client: APIClient) {
     publish: parseDateTime('2025-07-15T09:00'),
     due: parseDateTime('2025-08-05T23:59'),
     examPin: "444444",
-    showScoreOnLock: true,
-    testCode: "dynamic programming test",
+    showScoreOnLock: true,    testCode: "dynamic programming test",
     secretTestCode: "dynamic programming secret",
-    additionalFileIds: [],
+    additionalFiles: [],
     languages: ["typescript", "python", "java", "cpp"],
     examMode: false,
     closeOnDue: true,
@@ -386,7 +367,6 @@ async function init(client: APIClient) {
         secretTestCases: [{ input: "knapsack([10,20,30], [60,100,120], 50)", output: "220" }]
       }
     ],
-    additionalFiles: []
   });
 
   await client.assignments.create(421, {
@@ -395,10 +375,9 @@ async function init(client: APIClient) {
     publish: parseDateTime('2025-07-20T09:00'),
     due: parseDateTime('2025-08-10T23:59'),
     examPin: "555555",
-    showScoreOnLock: true,
-    testCode: "advanced data structures test",
+    showScoreOnLock: true,    testCode: "advanced data structures test",
     secretTestCode: "advanced data structures secret",
-    additionalFileIds: [],
+    additionalFiles: [],
     languages: ["typescript", "python", "java", "cpp"],
     examMode: false,
     closeOnDue: true,
@@ -424,12 +403,10 @@ async function init(client: APIClient) {
         maxScore: 90,
         answer: "class DisjointSet<T> {\n  private parent: Map<T, T> = new Map();\n  private rank: Map<T, number> = new Map();\n  private componentSize: Map<T, number> = new Map();\n  \n  makeSet(element: T): void {\n    if (!this.parent.has(element)) {\n      this.parent.set(element, element);\n      this.rank.set(element, 0);\n      this.componentSize.set(element, 1);\n    }\n  }\n  \n  find(element: T): T | null {\n    if (!this.parent.has(element)) return null;\n    \n    // Path compression\n    if (this.parent.get(element) !== element) {\n      const root = this.find(this.parent.get(element)!);\n      if (root !== null) {\n        this.parent.set(element, root);\n      }\n    }\n    \n    return this.parent.get(element)!;\n  }\n  \n  union(element1: T, element2: T): boolean {\n    this.makeSet(element1);\n    this.makeSet(element2);\n    \n    const root1 = this.find(element1);\n    const root2 = this.find(element2);\n    \n    if (root1 === null || root2 === null || root1 === root2) {\n      return false; // Already in same set or invalid elements\n    }\n    \n    const rank1 = this.rank.get(root1)!;\n    const rank2 = this.rank.get(root2)!;\n    const size1 = this.componentSize.get(root1)!;\n    const size2 = this.componentSize.get(root2)!;\n    \n    // Union by rank\n    if (rank1 < rank2) {\n      this.parent.set(root1, root2);\n      this.componentSize.set(root2, size1 + size2);\n    } else if (rank1 > rank2) {\n      this.parent.set(root2, root1);\n      this.componentSize.set(root1, size1 + size2);\n    } else {\n      this.parent.set(root2, root1);\n      this.rank.set(root1, rank1 + 1);\n      this.componentSize.set(root1, size1 + size2);\n    }\n    \n    return true;\n  }\n  \n  connected(element1: T, element2: T): boolean {\n    const root1 = this.find(element1);\n    const root2 = this.find(element2);\n    return root1 !== null && root2 !== null && root1 === root2;\n  }\n  \n  getComponentSize(element: T): number {\n    const root = this.find(element);\n    return root ? this.componentSize.get(root) || 0 : 0;\n  }\n  \n  getNumberOfComponents(): number {\n    const roots = new Set<T>();\n    for (const element of this.parent.keys()) {\n      const root = this.find(element);\n      if (root) roots.add(root);\n    }\n    return roots.size;\n  }\n  \n  getComponent(element: T): T[] {\n    const targetRoot = this.find(element);\n    if (!targetRoot) return [];\n    \n    const component: T[] = [];\n    for (const elem of this.parent.keys()) {\n      if (this.find(elem) === targetRoot) {\n        component.push(elem);\n      }\n    }\n    return component;\n  }\n}",
         testCode: "const ds = new DisjointSet<number>();\nds.makeSet(1);\nds.makeSet(2);\nds.makeSet(3);\nexpect(ds.connected(1, 2)).toBe(false);\nds.union(1, 2);\nexpect(ds.connected(1, 2)).toBe(true);",
-        secretTestCode: "expect(ds.getComponentSize(1)).toBe(2);\nexpect(ds.getNumberOfComponents()).toBe(2);\nexpect(ds.getComponent(1)).toContain(2);",
-        testcases: [{ input: "union(1,2), connected(1,2)", output: "true" }],
+        secretTestCode: "expect(ds.getComponentSize(1)).toBe(2);\nexpect(ds.getNumberOfComponents()).toBe(2);\nexpect(ds.getComponent(1)).toContain(2);",        testcases: [{ input: "union(1,2), connected(1,2)", output: "true" }],
         secretTestCases: [{ input: "getComponentSize(1)", output: "2" }]
       }
-    ],
-    additionalFiles: []
+    ]
   });
 
 
@@ -717,8 +694,16 @@ function createClient(persistence: Storage<Database>): APIClient {
           name: a.name
         }));
       },
-
       create: async (classId, payload) => {
+        // Handle additional files
+        const additionalFileIds: number[] = [];
+        if (payload.additionalFiles) {
+          for (const file of payload.additionalFiles) {
+            const fileId = await persistence.saveFile(file);
+            additionalFileIds.push(parseInt(fileId));
+          }
+        }
+
         const newAssignment: DbAssignment = {
           id: currentAssignmentId++,
           classId,
@@ -731,7 +716,7 @@ function createClient(persistence: Storage<Database>): APIClient {
           closeOnDue: payload.closeOnDue,
           examMode: payload.examMode,
           languages: payload.languages,
-          additionalFileIds: payload.additionalFileIds,
+          additionalFileIds,
           examPin: payload.examPin,
           secretTestCode: payload.secretTestCode,
           showScoreOnLock: payload.showScoreOnLock,
@@ -740,10 +725,11 @@ function createClient(persistence: Storage<Database>): APIClient {
 
         // Create questions and link them
         const questionIds: number[] = [];
-        for (const q of payload.questions) {
+        for (let i = 0; i < payload.questions.length; i++) {
+          const q = payload.questions[i];
           const newQuestion: DbQuestion = {
             id: currentQuestionId++,
-            number: q.number,
+            number: i + 1,
             name: q.name,
             description: q.description,
             template: q.template,

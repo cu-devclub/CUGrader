@@ -73,7 +73,9 @@
                 }
             },
             "question": {
-                "title": "Question {number}",
+                "no": "Question No.",
+                "title": "Question Title",
+                "titlePlaceholder": "Enter question title...",
                 "fields": {
                     "name": {
                         "label": "Question Name",
@@ -128,7 +130,9 @@
                 "addTestcase": "Add Test Case",
                 "removeTestcase": "Remove",
                 "cancel": "Cancel",
-                "save": "Create Assignment",
+                "save": "Save Assignment",
+                "create": "Create Assignment",
+                "saving": "Saving...",
                 "creating": "Creating...",
                 "selectFiles": "Select Files"
             },

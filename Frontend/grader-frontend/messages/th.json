@@ -73,7 +73,9 @@
                 }
             },
             "question": {
-                "title": "คำถาม {number}",
+                "no": "คำถามที่",
+                "title": "หัวข้อคำถาม",
+                "titlePlaceholder": "กรอกหัวข้อคำถาม...",
                 "fields": {
                     "name": {
                         "label": "ชื่อคำถาม",
@@ -128,7 +130,9 @@
                 "addTestcase": "เพิ่มชุดทดสอบ",
                 "removeTestcase": "ลบ",
                 "cancel": "ยกเลิก",
-                "save": "สร้างงาน",
+                "save": "บันทึกงาน",
+                "create": "สร้างงาน",
+                "saving": "กำลังบันทึก...",
                 "creating": "กำลังสร้าง...",
                 "selectFiles": "เลือกไฟล์"
             },

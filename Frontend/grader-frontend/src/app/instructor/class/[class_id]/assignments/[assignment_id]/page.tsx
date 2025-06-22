@@ -4,19 +4,21 @@ import { AssignmentForm, AssignmentFormResult } from "@/components/assignment-fo
 import { api } from "@/lib/api";
 import { UpdateAssignmentPayload } from "@/lib/api/type";
 import { parseDateTime } from "@internationalized/date";
-import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { use } from "react";
 import { useClassData } from "../../class-data-context";
 
-export default function Page({ params }: { params: Promise<{ assignment_id: string }> }) {
+export default function Page({ params }: { params: Promise<{ assignment_id: string; }>; }) {
   const { assignment_id } = use(params);
   const { classData } = useClassData();
   const t = useTranslations();
   const router = useRouter();
   const assignmentId = parseInt(assignment_id);
+
+  const queryClient = useQueryClient();
 
   const { data: assignment } = useSuspenseQuery({
     queryKey: ['assignment', assignmentId],
@@ -55,18 +57,19 @@ export default function Page({ params }: { params: Promise<{ assignment_id: stri
 
       // Handle file removals and update assignment in parallel
       const promises: Promise<any>[] = [];
-      
+
       if (data.toRemoveExistingFileIds.length > 0) {
-        promises.push(...data.toRemoveExistingFileIds.map(fileId => 
+        promises.push(...data.toRemoveExistingFileIds.map(fileId =>
           api.assignments.removeFile(fileId)
         ));
       }
-      
+
       promises.push(api.assignments.update(assignmentId, payload));
-      
+
       await Promise.all(promises);
     },
-    onSuccess: () => {
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['class', classData.id, 'assignment'] });
       toast.success(t('assignment.form.messages.updateSuccess'));
       router.push(`/instructor/class/${classData.id}/assignments`);
     },
@@ -87,7 +90,7 @@ export default function Page({ params }: { params: Promise<{ assignment_id: stri
       <AssignmentForm
         classId={classData.id}
         isPending={mutation.isPending}
-        submit={res => mutation.mutate(res)}
+        submit={submit}
         cancel={() => router.push(`/instructor/class/${classData.id}/assignments`)}
         existingFiles={assignment.additionalFileIds?.map(id => ({ id, name: `File ${id}` })) || []}
         prefill={{

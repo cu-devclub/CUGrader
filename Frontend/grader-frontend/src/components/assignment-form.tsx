@@ -59,7 +59,7 @@ const createSchemas = (t: ReturnType<typeof useTranslations>) => {
 // Define the form data type using the schema inference from createSchemas
 type AssignmentFormData = z.infer<ReturnType<typeof createSchemas>['assignmentSchema']>;
 
-function AssignmentName({ control }: { control: Control<AssignmentFormData> }) {
+function AssignmentName({ control }: { control: Control<AssignmentFormData>; }) {
   const name = useWatch({
     control,
     name: 'name',
@@ -69,14 +69,14 @@ function AssignmentName({ control }: { control: Control<AssignmentFormData> }) {
   return <h2 className="font-medium">{name.length === 0 ? "Name" : name}</h2>;
 }
 
-function AssignmentNumber({ control }: { control: Control<AssignmentFormData> }) {
-    const number = useWatch({
-        control,
-        name: 'number',
-        defaultValue: 1
-    });
+function AssignmentNumber({ control }: { control: Control<AssignmentFormData>; }) {
+  const number = useWatch({
+    control,
+    name: 'number',
+    defaultValue: 1
+  });
 
-    return <p className="text-sm">Lab {number}</p>;
+  return <p className="text-sm">Lab {number}</p>;
 }
 
 export interface AssignmentFormProps {
@@ -104,7 +104,6 @@ export interface AttachmentMetadata {
 export function AssignmentForm({ submit, cancel, classId, prefill, existingFiles = [], isPending }: AssignmentFormProps) {
   const t = useTranslations();
 
-  // Parallel queries for supported languages and groups
   const [
     { data: supportedLanguages = [] },
     { data: availableGroups = [] }
@@ -228,7 +227,10 @@ export function AssignmentForm({ submit, cancel, classId, prefill, existingFiles
             </Button>
             <Button onClick={form.handleSubmit(onSubmit)} disabled={isPending}>
               <Save className="w-4 h-4 mr-2" />
-              {isPending ? t('assignment.form.buttons.creating') : t('assignment.form.buttons.save')}
+              {isPending
+                ? (prefill ? t('assignment.form.buttons.saving') : t('assignment.form.buttons.creating'))
+                : (prefill ? t('assignment.form.buttons.save') : t('assignment.form.buttons.create'))
+              }
             </Button>
           </div>
         </div>
@@ -628,7 +630,10 @@ export function AssignmentForm({ submit, cancel, classId, prefill, existingFiles
             <div className="flex gap-2 pt-4">
               <Button type="submit" disabled={isPending}>
                 <Save className="w-4 h-4 mr-2" />
-                {isPending ? t('assignment.form.buttons.creating') : t('assignment.form.buttons.save')}
+                {isPending
+                  ? (prefill ? t('assignment.form.buttons.saving') : t('assignment.form.buttons.creating'))
+                  : (prefill ? t('assignment.form.buttons.save') : t('assignment.form.buttons.create'))
+                }
               </Button>
               <Button
                 type="button"
@@ -697,7 +702,7 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove, t }: QuestionF
               <FormItem className="p-8 flex-1">
                 <FormLabel>{t('assignment.form.question.title')}</FormLabel>
                 <FormControl>
-                  <input className="text-3xl outline-offset-8 placeholder:text-muted-foreground/50" placeholder={t('assignment.form.question.title.placeholder')} {...field} />
+                  <input className="text-3xl outline-offset-8 placeholder:text-muted-foreground/50" placeholder={t('assignment.form.question.titlePlaceholder')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
