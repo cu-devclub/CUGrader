@@ -9,6 +9,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { api } from "@/lib/api";
 import { useDropzoneFrFr } from "@/lib/file";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -175,6 +185,9 @@ export function AssignmentForm({ submit, cancel, classId, prefill, existingFiles
 
   const attachmentDropzone = useDropzoneFrFr();
 
+  const [showDiscardDialog, setShowDiscardDialog] = useState(false);
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+
   // we shuold move this out
 
   function onSubmit(data: AssignmentFormData) {
@@ -184,6 +197,24 @@ export function AssignmentForm({ submit, cancel, classId, prefill, existingFiles
       additionalFiles: [...attachmentDropzone.files] as File[]
     });
   }
+
+  const handleSave = () => {
+    setShowSaveDialog(true);
+  };
+
+  const handleCancel = () => {
+    setShowDiscardDialog(true);
+  };
+
+  const confirmSave = () => {
+    setShowSaveDialog(false);
+    form.handleSubmit(onSubmit)();
+  };
+
+  const confirmDiscard = () => {
+    setShowDiscardDialog(false);
+    cancel();
+  };
 
   const addQuestion = () => {
     appendQuestion({
@@ -221,11 +252,11 @@ export function AssignmentForm({ submit, cancel, classId, prefill, existingFiles
             <Button
               type="button"
               variant="outline"
-              onClick={() => cancel()}
+              onClick={handleCancel}
             >
               {t('assignment.form.buttons.cancel')}
             </Button>
-            <Button onClick={form.handleSubmit(onSubmit)} disabled={isPending}>
+            <Button onClick={handleSave} disabled={isPending}>
               <Save className="w-4 h-4 mr-2" />
               {isPending
                 ? (prefill ? t('assignment.form.buttons.saving') : t('assignment.form.buttons.creating'))
@@ -638,7 +669,7 @@ export function AssignmentForm({ submit, cancel, classId, prefill, existingFiles
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => cancel()}
+                onClick={handleCancel}
               >
                 {t('assignment.form.buttons.cancel')}
               </Button>
@@ -646,6 +677,36 @@ export function AssignmentForm({ submit, cancel, classId, prefill, existingFiles
           </div>
         </form>
       </Form >
+
+      {/* Discard Changes Dialog */}
+      <AlertDialog open={showDiscardDialog} onOpenChange={setShowDiscardDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Discard changes?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You have unsaved changes.
+              Are you sure you want to discard them?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Keep Editing</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDiscard}>Discard</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Save Confirmation Dialog */}
+      <AlertDialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Lab saved!</AlertDialogTitle>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Keep editing</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmSave}>See lab list</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
