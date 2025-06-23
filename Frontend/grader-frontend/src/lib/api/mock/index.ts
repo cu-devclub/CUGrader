@@ -2,7 +2,6 @@ import { CalendarDateTime, parseDateTime } from "@internationalized/date";
 import { APIClient } from "../type";
 import { generateName } from "./name";
 import { DbClass, InMemoryStorage, PersistenceStorage, Storage } from "./persistence";
-import { unimplemented } from "@/lib/utils";
 
 interface Database {
   classes: DbClass[];
