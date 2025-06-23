@@ -21,7 +21,7 @@ export default function Page({ params }: { params: Promise<{ assignment_id: stri
   const queryClient = useQueryClient();
 
   const { data: assignment } = useSuspenseQuery({
-    queryKey: ['assignment', assignmentId],
+    queryKey: ['class', classData.id, 'assignment', assignmentId],
     queryFn: () => api.assignments.getByIdI(assignmentId),
   });
 
@@ -80,6 +80,11 @@ export default function Page({ params }: { params: Promise<{ assignment_id: stri
       });
     },
   });
+
+
+  function submit(data: AssignmentFormResult) {
+    mutation.mutate(data);
+  }
 
   if (!assignment) {
     return <div>Assignment not found</div>;

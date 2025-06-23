@@ -82,10 +82,10 @@ async function init(client: APIClient) {
     email: "12313@student.chula.ac.th",
     section: 0,
   });
-  // Create advanced assignments
+
   await client.assignments.create(420, {
     number: 4,
-    name: "Advanced Haskell Monads",
+    name: "Haskell Monads",
     publish: parseDateTime('2025-06-12T10:00'),
     due: parseDateTime('2025-07-05T23:59'),
     examPin: "456789",
@@ -122,9 +122,9 @@ async function init(client: APIClient) {
     ],
     additionalFiles: []
   });
-  await client.assignments.create(421, {
+  await client.assignments.create(420, {
     number: 3,
-    name: "Swift Advanced Generics",
+    name: "Swift Generics",
     publish: parseDateTime('2025-06-18T11:00'),
     due: parseDateTime('2025-07-10T20:00'),
     examPin: "321654",
@@ -162,7 +162,7 @@ async function init(client: APIClient) {
     additionalFiles: []
   });
 
-  await client.assignments.create(421, {
+  await client.assignments.create(420, {
     number: 4,
     name: "TypeScript with Vitest Testing",
     publish: parseDateTime('2025-06-20T13:30'),
@@ -201,7 +201,7 @@ async function init(client: APIClient) {
       }],
     additionalFiles: []
   });
-  await client.assignments.create(421, {
+  await client.assignments.create(420, {
     number: 5,
     name: "Swift Virtualization & Hypervisor Framework",
     publish: parseDateTime('2025-06-22T14:00'),
@@ -250,7 +250,7 @@ async function init(client: APIClient) {
   });
 
   // Add generic DSA problems
-  await client.assignments.create(421, {
+  await client.assignments.create(420, {
     number: 6,
     name: "Generic Linked List Implementation",
     publish: parseDateTime('2025-07-01T09:00'),
@@ -280,7 +280,7 @@ async function init(client: APIClient) {
     additionalFiles: []
   });
 
-  await client.assignments.create(421, {
+  await client.assignments.create(420, {
     number: 7,
     name: "Binary Search Tree Implementation",
     publish: parseDateTime('2025-07-05T09:00'),
@@ -310,7 +310,7 @@ async function init(client: APIClient) {
     additionalFiles: []
   });
 
-  await client.assignments.create(421, {
+  await client.assignments.create(420, {
     number: 8,
     name: "Graph Algorithms Implementation",
     publish: parseDateTime('2025-07-10T09:00'),
