@@ -13,14 +13,14 @@ import { Clock, Calendar, CheckCircle, AlertCircle, XCircle, ArrowLeft, FileText
 
 export default function Page() {
   const params = useParams();
+  // TODO: refactor this to use classId from context or props
+  const classData = { id: 420 };
   const assignmentId = parseInt(params.assignment_id as string);
 
   const assignmentQuery = useSuspenseQuery({
-    queryKey: ["student", "assignment", assignmentId],
+    queryKey: ["class", classData.id, "assignment"],
     queryFn: () => api.assignments.getById(assignmentId)
   });
-
-  console.log(assignmentQuery.data);
 
   return (
     <main className="space-y-6 p-6">

@@ -1,9 +1,8 @@
 'use client';
 
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { api } from "@/lib/api";
-import type { StudentAssignment } from "@/lib/api/type";
+import type { StudentAssignment, AssignmentStatus } from "@/lib/api/type";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { AlertCircle, Calendar, CheckCircle, Clock, XCircle } from "lucide-react";
 import { useLocale } from "next-intl";
@@ -36,8 +35,6 @@ function StudentAssignmentList({
 }: {
   assignments: StudentAssignment[];
 }) {
-  const locale = useLocale();
-
   const processedAssignments = useMemo(() => {
     const now = new Date();
 
@@ -64,9 +61,91 @@ function StudentAssignmentList({
         return a.isAvailable ? -1 : 1;
       }
       return a.dueDate.getTime() - b.dueDate.getTime();
-    });
-  }, [assignments]);
+    });  }, [assignments]);
 
+  const todoAssignments = processedAssignments.filter(a => a.isAvailable && a.status !== "completed");
+  const doneAssignments = processedAssignments.filter(a => a.status === "completed");
+
+  return (
+    <div className="space-y-8">
+      {/* Todo Assignments */}
+      {todoAssignments.length > 0 && (
+        <section>
+          <h2 className="text-xl font-semibold mb-4 text-blue-700">Todo</h2>
+          {/* Table Header */}
+          <div className="flex gap-4 text-sm font-medium text-gray-500 mb-2">
+            <div className="w-24">Lab #</div>
+            <div className="grid grid-cols-4 gap-4 flex-1">
+              <div>Assignment Name</div>
+              <div>Status</div>
+              <div>Dates</div>
+              <div>Score</div>
+            </div>
+          </div>          <div className="space-y-3">            {todoAssignments.map((assignment) => (
+              <StudentAssignmentCard
+                key={assignment.id}
+                assignment={assignment}
+                borderColor="border-l-blue-500"
+                isOverdue={assignment.isOverdue}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Done Assignments */}
+      {doneAssignments.length > 0 && (
+        <section>
+          <h2 className="text-xl font-semibold mb-4 text-green-700">Done</h2>
+          {/* Table Header */}
+          <div className="flex gap-4 text-sm font-medium text-gray-500 mb-2">
+            <div className="w-24">Lab #</div>
+            <div className="grid grid-cols-4 gap-4 flex-1">
+              <div>Assignment Name</div>
+              <div>Status</div>
+              <div>Dates</div>
+              <div>Score</div>
+            </div>
+          </div>          <div className="space-y-3">            {doneAssignments.map((assignment) => (
+              <StudentAssignmentCard
+                key={assignment.id}
+                assignment={assignment}
+                borderColor="border-l-green-500"
+                isOverdue={false}
+              />
+            ))}
+          </div>
+        </section>
+      )}      {/* Empty State */}
+      {assignments.length === 0 && (
+        <div className="text-center py-12">
+          <div className="text-gray-500 text-lg">No assignments available</div>
+          <div className="text-gray-400 text-sm mt-2">Check back later for new assignments</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+type ProcessedAssignment = StudentAssignment & {
+  publishDate: Date;
+  dueDate: Date;
+  isAvailable: boolean;
+  isOverdue: boolean;
+  isDueSoon: boolean;
+};
+
+function StudentAssignmentCard({
+  assignment,
+  borderColor,
+  isOverdue
+}: {
+  assignment: ProcessedAssignment;
+  borderColor: string;
+  isOverdue: boolean;
+}) {
+  const locale = useLocale();
+  
   const formatDateTime = (date: Date) => {
     return new Intl.DateTimeFormat(locale, {
       year: 'numeric',
@@ -76,7 +155,8 @@ function StudentAssignmentList({
       minute: '2-digit',
       hour12: false
     }).format(date);
-  };  const getStatusInfo = (assignment: any) => {
+  };
+  const getStatusInfo = (assignment: ProcessedAssignment) => {
     if (!assignment.isAvailable) {
       return {
         icon: <Clock className="w-4 h-4" />,
@@ -149,125 +229,41 @@ function StudentAssignmentList({
           color: "text-gray-600"
         };
     }
-  };  const todoAssignments = processedAssignments.filter(a => a.isAvailable && a.status !== "completed");
-  const doneAssignments = processedAssignments.filter(a => a.status === "completed");
+  };
+
+  const statusInfo = getStatusInfo(assignment);
+  const actualBorderColor = isOverdue ? 'border-l-red-500' : borderColor;
 
   return (
-    <div className="space-y-8">
-      {/* Todo Assignments */}
-      {todoAssignments.length > 0 && (
-        <section>
-          <h2 className="text-xl font-semibold mb-4 text-blue-700">Todo</h2>
-          {/* Table Header */}
-          <div className="flex gap-4 text-sm font-medium text-gray-500 mb-2">
-            <div className="w-24">Lab #</div>
-            <div className="grid grid-cols-4 gap-4 flex-1">
-              <div>Assignment Name</div>
-              <div>Status</div>
-              <div>Dates</div>
-              <div>Score</div>
-            </div>
-          </div>
-          <div className="space-y-3">
-            {todoAssignments.map((assignment) => {
-              const statusInfo = getStatusInfo(assignment);
-              const borderColor = assignment.isOverdue ? 'border-l-red-500' : 'border-l-blue-500';
-              return (
-                <Link key={assignment.id} href={`./assignment/${assignment.id}`} className="block">
-                  <div className={`flex gap-4 items-center rounded-lg overflow-clip border shadow-sm transition-all hover:shadow-md border-l-4 ${borderColor} ${assignment.isOverdue ? 'opacity-80' : ''}`}>
-                    <div className="flex items-center self-stretch justify-center w-12 mr-12 bg-secondary font-semibold text-lg">
-                      {assignment.number}
-                    </div>
-                    <div className="flex-1 grid grid-cols-4 gap-4 items-center py-4">
-                      <div className="font-medium">{assignment.name}</div>
-                      <div className="flex items-center gap-2">
-                        <Badge variant={statusInfo.variant} className="flex items-center gap-1">
-                          {statusInfo.icon}
-                          {statusInfo.text}
-                        </Badge>
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        <div className="flex items-center gap-1">
-                          <Calendar className="w-3 h-3" />
-                          {formatDateTime(assignment.publishDate)}
-                        </div>
-                        <div className="flex items-center gap-1 mt-1">
-                          <Clock className={`w-3 h-3 ${assignment.isDueSoon || assignment.isOverdue ? 'text-red-500' : 'text-gray-500'}`} />
-                          {formatDateTime(assignment.dueDate)}
-                        </div>
-                      </div>
-                      <div className="text-sm">
-                        <div className="font-medium">{assignment.score || 0} points</div>
-                        <div className={`text-xs ${statusInfo.color}`}>{statusInfo.text}</div>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        </section>
-      )}
-
-      {/* Done Assignments */}
-      {doneAssignments.length > 0 && (
-        <section>
-          <h2 className="text-xl font-semibold mb-4 text-green-700">Done</h2>
-          {/* Table Header */}
-          <div className="flex gap-4 text-sm font-medium text-gray-500 mb-2">
-            <div className="w-24">Lab #</div>
-            <div className="grid grid-cols-4 gap-4 flex-1">
-              <div>Assignment Name</div>
-              <div>Status</div>
-              <div>Dates</div>
-              <div>Score</div>
-            </div>
-          </div>
-          <div className="space-y-3">
-            {doneAssignments.map((assignment) => {
-              const statusInfo = getStatusInfo(assignment);
-              return (
-                <Link key={assignment.id} href={`./assignment/${assignment.id}`} className="block">
-                  <div className="flex gap-4 items-center rounded-lg overflow-clip border shadow-sm transition-all hover:shadow-md border-l-4 border-l-green-500">
-                    <div className="flex items-center self-stretch justify-center w-12 mr-12 bg-secondary font-semibold text-lg">
-                      {assignment.number}
-                    </div>
-                    <div className="flex-1 grid grid-cols-4 gap-4 items-center py-4">
-                      <div className="font-medium">{assignment.name}</div>
-                      <div className="flex items-center gap-2">
-                        <Badge variant={statusInfo.variant} className="flex items-center gap-1">
-                          {statusInfo.icon}
-                          {statusInfo.text}
-                        </Badge>
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        <div className="flex items-center gap-1">
-                          <Calendar className="w-3 h-3" />
-                          {formatDateTime(assignment.publishDate)}
-                        </div>
-                        <div className="flex items-center gap-1 mt-1">
-                          <Clock className="w-3 h-3 text-gray-500" />
-                          {formatDateTime(assignment.dueDate)}
-                        </div>
-                      </div>
-                      <div className="text-sm">
-                        <div className="font-medium">{assignment.score || 0} points</div>
-                        <div className={`text-xs ${statusInfo.color}`}>{statusInfo.text}</div>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        </section>
-      )}      {/* Empty State */}
-      {assignments.length === 0 && (
-        <div className="text-center py-12">
-          <div className="text-gray-500 text-lg">No assignments available</div>
-          <div className="text-gray-400 text-sm mt-2">Check back later for new assignments</div>
+    <Link href={`./assignment/${assignment.id}`} className="block">
+      <div className={`flex gap-4 items-center rounded-lg overflow-clip border shadow-sm transition-all hover:shadow-md border-l-4 ${actualBorderColor} ${isOverdue ? 'opacity-80' : ''}`}>
+        <div className="flex items-center self-stretch justify-center w-12 mr-12 bg-secondary font-semibold text-lg">
+          {assignment.number}
         </div>
-      )}
-    </div>
+        <div className="flex-1 grid grid-cols-4 gap-4 items-center py-4">
+          <div className="font-medium">{assignment.name}</div>
+          <div className="flex items-center gap-2">
+            <Badge variant={statusInfo.variant} className="flex items-center gap-1">
+              {statusInfo.icon}
+              {statusInfo.text}
+            </Badge>
+          </div>
+          <div className="text-sm text-gray-600">
+            <div className="flex items-center gap-1">
+              <Calendar className="w-3 h-3" />
+              {formatDateTime(assignment.publishDate)}
+            </div>
+            <div className="flex items-center gap-1 mt-1">
+              <Clock className={`w-3 h-3 ${assignment.isDueSoon || assignment.isOverdue ? 'text-red-500' : 'text-gray-500'}`} />
+              {formatDateTime(assignment.dueDate)}
+            </div>
+          </div>
+          <div className="text-sm">
+            <div className="font-medium">{assignment.score || 0} points</div>
+            <div className={`text-xs ${statusInfo.color}`}>{statusInfo.text}</div>
+          </div>
+        </div>
+      </div>
+    </Link>
   );
 }

@@ -42,7 +42,7 @@ export default function Page() {
     onError: (error) => {
       toast.error("Failed to update assignment", { description: error.message });
     }
-  });  
+  });
   function onUpdateAssignment(assignmentId: number, updatedData: AssignmentUpdateData) {
     if (updatedData.status) {
       let publishDate: Date | undefined;
@@ -286,35 +286,68 @@ function AssignmentList({
       </div>      {/* Card Rows */}
       <div className="space-y-3">
         {processedAssignments.map((assignment) => (
-          <Link
+          <AssignmentCard
             key={assignment.id}
-            href={`./assignments/${assignment.id}`}
-            className={`flex gap-4 items-center rounded-lg overflow-clip border shadow-sm transition-all hover:shadow-md`}
-          >
-            <div className="flex items-center self-stretch justify-center w-12 mr-12 bg-secondary font-semibold text-lg">
-              {assignment.labNumber}
-            </div>
-            <div className="flex-1 grid grid-cols-4 gap-4 items-center py-2 ">
-              <div className="font-medium">{assignment.labName}</div>
-              <div onClick={(e) => e.preventDefault()}>{getStatusBadge(assignment.status, assignment.id)}</div>
-              <div onClick={(e) => e.preventDefault()}>
-                <DateTimePicker
-                  date={assignment.publishDate}
-                  onDateTimeChange={(date) => handleDateTimeChange(assignment.id, "publishDate", date)}
-                  isExam={assignment.isExam}
-                />
-              </div>
-              <div onClick={(e) => e.preventDefault()}>
-                <DateTimePicker
-                  date={assignment.dueDate}
-                  onDateTimeChange={(date) => handleDateTimeChange(assignment.id, "dueDate", date)}
-                  isExam={assignment.isExam}
-                />
-              </div>
-            </div>
-          </Link>
+            assignment={assignment}
+            getStatusBadge={getStatusBadge}
+            DateTimePicker={DateTimePicker}
+            handleDateTimeChange={handleDateTimeChange}
+          />
         ))}
       </div>
     </div>
+  );
+}
+
+function AssignmentCard({
+  assignment,
+  getStatusBadge,
+  DateTimePicker,
+  handleDateTimeChange
+}: {
+  assignment: {
+    id: number;
+    labNumber: number;
+    labName: string;
+    status: "unpublished" | "published" | "end";
+    publishDate: Date;
+    dueDate: Date;
+    isExam: boolean;
+  };
+  getStatusBadge: (status: string, assignmentId: number) => React.ReactElement;
+  DateTimePicker: ({ date, onDateTimeChange, isExam }: {
+    date: Date;
+    onDateTimeChange: (date: Date | undefined) => void;
+    isExam: boolean;
+  }) => React.ReactElement;
+  handleDateTimeChange: (assignmentId: number, dateType: "publishDate" | "dueDate", newDate: Date | undefined) => void;
+}) {
+  return (
+    <Link
+      href={`./assignments/${assignment.id}`}
+      className={`flex gap-4 items-center rounded-lg overflow-clip border shadow-sm transition-all hover:shadow-md`}
+    >
+      <div className="flex items-center self-stretch justify-center w-12 mr-12 bg-secondary font-semibold text-lg">
+        {assignment.labNumber}
+      </div>
+      <div className="flex-1 grid grid-cols-4 gap-4 items-center py-2 ">
+        <div className="font-medium">{assignment.labName}</div>
+        <div onClick={(e) => e.preventDefault()}>{getStatusBadge(assignment.status, assignment.id)}</div>
+        <div onClick={(e) => e.preventDefault()}>
+          <DateTimePicker
+            date={assignment.publishDate}
+            onDateTimeChange={(date) => handleDateTimeChange(assignment.id, "publishDate", date)}
+            isExam={assignment.isExam}
+          />
+        </div>
+        <div onClick={(e) => e.preventDefault()}>
+          <DateTimePicker
+            date={assignment.dueDate}
+            onDateTimeChange={(date) => handleDateTimeChange(assignment.id, "dueDate", date)}
+            isExam={assignment.isExam}
+          />
+        </div>
+      </div>
+    </Link>
   );
 }
