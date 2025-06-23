@@ -16,11 +16,11 @@
             },
             "fields": {
                 "name": {
-                    "label": "Assignment Name",
+                    "label": "Lab Name",
                     "placeholder": "Lab 1: Hello World"
                 },
                 "number": {
-                    "label": "Assignment Number"
+                    "label": "Lab Number"
                 },
                 "publish": {
                     "label": "Publish Date & Time",
@@ -46,13 +46,13 @@
                     "label": "Exam Mode",
                     "description": "Enable exam mode for stricter security"
                 },
-                "closeOnDue": {
-                    "label": "Close on Due Date",
-                    "description": "Automatically close submissions when due date passes"
+                "allowLateSubmission": {
+                    "label": "Allow Late Submission",
+                    "description": "Allow students to submit after the due date"
                 },
                 "showScoreOnLock": {
-                    "label": "Show Score on Lock",
-                    "description": "Show scores to students after submission is locked"
+                    "label": "Reveal score after submission closure",
+                    "description": "Show students their score after the assignment is closed"
                 },
                 "examPin": {
                     "label": "Exam PIN",

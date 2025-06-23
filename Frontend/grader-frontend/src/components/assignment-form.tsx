@@ -44,7 +44,7 @@ const createSchemas = (t: ReturnType<typeof useTranslations>) => {
     due: z.string().min(1, t('assignment.form.validation.due.required')),
     languages: z.array(z.string()).min(1, t('assignment.form.validation.languages.min')),
     examMode: z.boolean(),
-    closeOnDue: z.boolean(),
+    allowLateSubmission: z.boolean(),
     showScoreOnLock: z.boolean(),
     examPin: z.string(),
     assignedGroupIds: z.array(z.string()),
@@ -131,7 +131,7 @@ export function AssignmentForm({ submit, cancel, classId, prefill, existingFiles
       due: "",
       languages: [],
       examMode: false,
-      closeOnDue: false,
+      allowLateSubmission: true,
       showScoreOnLock: false,
       examPin: "",
       assignedGroupIds: [],
@@ -466,7 +466,7 @@ export function AssignmentForm({ submit, cancel, classId, prefill, existingFiles
                   <div className="space-y-3">
                     <FormField
                       control={form.control}
-                      name="closeOnDue"
+                      name="allowLateSubmission"
                       render={({ field }) => (
                         <FormItem className="flex gap-3">
                           <FormControl>
@@ -475,7 +475,7 @@ export function AssignmentForm({ submit, cancel, classId, prefill, existingFiles
                               onCheckedChange={field.onChange}
                             />
                           </FormControl>
-                          <FormLabel>{t('assignment.form.fields.closeOnDue.label')}</FormLabel>
+                          <FormLabel>{t('assignment.form.fields.allowLateSubmission.label')}</FormLabel>
                         </FormItem>
                       )}
                     />
