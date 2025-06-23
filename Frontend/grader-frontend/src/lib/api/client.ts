@@ -267,8 +267,28 @@ export function createClient() {
           }
         });
       },
-      getById: async (labId: number) => {
+        getById: async (labId: number) => {
         const lab = await generatedClient.labLabIdGet({ labId });
+
+        // Fetch questions in parallel using the questionIds from the lab
+        const questionPromises = (lab.questionIds ?? []).map(async questionId => {
+          const q = await generatedClient.questionQuestionIdGet({ questionId });
+
+          return {
+            description: q.description!,
+            maxScore: q.maxScore!,
+            name: q.name!,
+            number: q.number!,
+            template: q.predefine!,
+            submission: q.submission && {
+              id: q.submission.submissionId!,
+              score: q.submission.score!,
+              submittedAt: parseDateTime(q.submission.timestamp!)
+            }
+          } satisfies StudentQuestion;
+        });
+
+        const questions = await Promise.all(questionPromises);
 
         return {
           // Base assignment fields
@@ -281,6 +301,7 @@ export function createClient() {
           score: 0, // TODO: get from user submission
           status: "new" as const, // TODO: compute status from submission data
           // Detail fields
+          questions,
           languages: lab.language ?? [],
           assignedGroupIds: lab.assignTo ?? [],
           closeOnDue: lab.closeOnDue ?? false,

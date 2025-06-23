@@ -9,16 +9,18 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock, Calendar, CheckCircle, AlertCircle, XCircle, ArrowLeft, FileText } from "lucide-react";
+import { Clock, Calendar, CheckCircle, AlertCircle, XCircle, ArrowLeft, FileText, Copy } from "lucide-react";
 
 export default function Page() {
   const params = useParams();
   const assignmentId = parseInt(params.assignment_id as string);
-  
+
   const assignmentQuery = useSuspenseQuery({
     queryKey: ["student", "assignment", assignmentId],
     queryFn: () => api.assignments.getById(assignmentId)
   });
+
+  console.log(assignmentQuery.data);
 
   return (
     <main className="space-y-6 p-6">
@@ -30,7 +32,7 @@ export default function Page() {
           </Link>
         </Button>
       </div>
-      
+
       <StudentAssignmentDetail assignment={assignmentQuery.data} />
     </main>
   );
@@ -46,7 +48,7 @@ function StudentAssignmentDetail({
   const now = new Date();
   const publishDate = assignment.publish.toDate(Intl.DateTimeFormat().resolvedOptions().timeZone);
   const dueDate = assignment.due.toDate(Intl.DateTimeFormat().resolvedOptions().timeZone);
-  
+
   // Determine if assignment is available
   const isAvailable = publishDate <= now;
   const isOverdue = dueDate < now;
@@ -73,7 +75,7 @@ function StudentAssignmentDetail({
         bgColor: "bg-gray-50"
       };
     }
-    
+
     if (isOverdue) {
       return {
         icon: <XCircle className="w-5 h-5" />,
@@ -83,7 +85,7 @@ function StudentAssignmentDetail({
         bgColor: "bg-red-50"
       };
     }
-    
+
     if (isDueSoon) {
       return {
         icon: <AlertCircle className="w-5 h-5" />,
@@ -193,31 +195,82 @@ function StudentAssignmentDetail({
       )}
 
       {/* Assignment Questions */}
-      {assignment.questionIds && assignment.questionIds.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Questions ({assignment.questionIds.length})</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {assignment.questionIds.map((questionId, index) => (
-                <div key={questionId} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <span className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium">
-                      {index + 1}
-                    </span>
-                    <span>Question {questionId}</span>
-                  </div>
-                  {isAvailable && !isOverdue && (
-                    <Button variant="outline" size="sm">
-                      View Question
-                    </Button>
-                  )}
+      {assignment.questions && assignment.questions.length > 0 && (
+        <div className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Questions ({assignment.questions.length})</CardTitle>
+            </CardHeader>
+          </Card>
+          {assignment.questions.map((question, index) => (
+            <Card key={question.number}>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-3">
+                  <span className="bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center text-sm font-medium">
+                    {index + 1}
+                  </span>
+                  {question.name}
+                  <Badge variant="outline" className="ml-auto">
+                    {question.maxScore} points
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="prose prose-sm max-w-none">
+                  <div dangerouslySetInnerHTML={{ __html: question.description }} />
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+
+                {question.template && (
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-medium">Template Code:</h4>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => navigator.clipboard.writeText(question.template)}
+                        className="flex items-center gap-1"
+                      >
+                        <Copy className="w-3 h-3" />
+                        Copy
+                      </Button>
+                    </div>
+                    <pre className="bg-gray-100 p-3 rounded-md overflow-x-auto text-sm">
+                      <code>{question.template}</code>
+                    </pre>
+                  </div>
+                )}
+
+                {question.submission && (
+                  <div className="border-t pt-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-medium">Your Submission</h4>
+                      <Badge variant={question.submission.score === question.maxScore ? "default" : "secondary"}>
+                        {question.submission.score} / {question.maxScore} points
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-gray-600">
+                      Submitted: {new Intl.DateTimeFormat('en', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      }).format(question.submission.submittedAt.toDate(Intl.DateTimeFormat().resolvedOptions().timeZone))}
+                    </p>
+                  </div>
+                )}
+
+                {isAvailable && !isOverdue && (
+                  <div className="border-t pt-4">
+                    <Button className="w-full">
+                      {question.submission ? 'Edit Submission' : 'Start Coding'}
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       )}
 
       {/* Additional Information */}

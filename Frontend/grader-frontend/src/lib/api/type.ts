@@ -172,6 +172,7 @@ export interface StudentAssignment extends Assignment {
 }
 
 export interface StudentAssignmentDetails extends StudentAssignment, AssignmentDetails {
+  questions: StudentQuestion[];
 }
 
 export interface InstructorAssignment extends Assignment {
