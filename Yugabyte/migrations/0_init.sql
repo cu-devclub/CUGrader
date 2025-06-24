@@ -67,9 +67,9 @@ CREATE TABLE IF NOT EXISTS "class_student" (
     class_id INT NOT NULL REFERENCES "class" (id) ON DELETE CASCADE,
     user_id INT NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
     section_id INT NOT NULL REFERENCES "section" (id) ON DELETE CASCADE,
-    group_id INT REFERENCES "group" (id) ON DELETE CASCADE DEFAULT NULL,
+    group_id INT NULL REFERENCES "group" (id) ON DELETE CASCADE DEFAULT NULL,
     withdrawn BOOLEAN NOT NULL DEFAULT FALSE,
-    withdrawn_at TIMESTAMP DEFAULT NULL,
+    withdrawn_at TIMESTAMP NULL DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -78,6 +78,12 @@ CREATE TABLE IF NOT EXISTS "system_language" (
     id SERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL UNIQUE,
     service_name VARCHAR(50) NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS "testcase" (
+    id SERIAL PRIMARY KEY,
+    testcase_object_id CHAR(24) NOT NULL,
+    secret_testcase_object_id CHAR(24) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "lab" (
@@ -89,7 +95,7 @@ CREATE TABLE IF NOT EXISTS "lab" (
     due TIMESTAMP NOT NULL,
     close_on_due BOOLEAN NOT NULL DEFAULT FALSE,
     exam_mode BOOLEAN NOT NULL DEFAULT FALSE,
-    exam_pin VARCHAR(20) DEFAULT NULL,
+    exam_pin VARCHAR(20) NULL DEFAULT NULL,
     show_score_on_lock BOOLEAN NOT NULL DEFAULT FALSE,
     testcase_id INT NOT NULL REFERENCES "testcase" (id) ON DELETE CASCADE
 );
@@ -104,18 +110,6 @@ CREATE TABLE IF NOT EXISTS "assign_to" (
     id SERIAL PRIMARY KEY,
     lab_id INT NOT NULL REFERENCES "lab" (id) ON DELETE CASCADE,
     group_id INT NOT NULL REFERENCES "group" (id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS "question" (
-    id SERIAL PRIMARY KEY,
-    lab_id INT NOT NULL REFERENCES "lab" (id) ON DELETE CASCADE,
-    number INT NOT NULL,
-    name VARCHAR(100) NOT NULL,
-    score INT NOT NULL,
-    description CHAR(24) NOT NULL,
-    answer CHAR(24) NOT NULL,
-    predefine CHAR(24) NOT NULL,
-    testcase_id INT NOT NULL REFERENCES "testcase" (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS "testcase" (
@@ -134,6 +128,18 @@ CREATE TABLE IF NOT EXISTS "multilang_secret_testcase" (
     id SERIAL PRIMARY KEY,
     question_id INT NOT NULL REFERENCES "question" (id) ON DELETE CASCADE,
     object_id CHAR(24) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS "question" (
+    id SERIAL PRIMARY KEY,
+    lab_id INT NOT NULL REFERENCES "lab" (id) ON DELETE CASCADE,
+    number INT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    score INT NOT NULL,
+    description VARCHAR(24) NOT NULL,
+    answer VARCHAR(24) NOT NULL,
+    predefine VARCHAR(24) NOT NULL,
+    testcase_id INT NOT NULL REFERENCES "testcase" (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS "addition_files" (
