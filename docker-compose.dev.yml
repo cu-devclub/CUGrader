@@ -51,15 +51,17 @@ services:
             --base_dir=/home/yugabyte/yb_data
             --background=false
     mongo:
-        image: mongo:latest
+        image: mongo:8
         container_name: mongodb
         ports:
             - "27017:27017"
         environment:
-            MONGO_INITDB_ROOT_USERNAME: root
-            MONGO_INITDB_ROOT_PASSWORD: example
+            - MONGO_INITDB_ROOT_USERNAME=root
+            - MONGO_INITDB_ROOT_PASSWORD=12345678
+            - MONGO_INITDB_DATABASE=cugrader
         volumes:
           - mongo_data:/data/db
+          - ./mongo/init-mongo.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
 
 volumes:
   yugabyte_data:
