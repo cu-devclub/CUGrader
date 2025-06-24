@@ -969,8 +969,214 @@ paths:
                             type: string
                           output:
                             type: string
+# Begin phase 3 =======================================================================================>
+  /code:
+    summary: save code into database
+    servers:
+      - url: https://apicugrader.sittha.net/v1
+    parameters:
+      - in: header
+        name: Authentication
+        description: "Bearer ..."
+        schema:
+          type: string
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - "question_id"
+                - "code"
+                - "language_id"
+              properties:
+                language_id:
+                  $ref: "#/components/schemas/language_id"
+                question_id:
+                  $ref: "#/components/schemas/question_id"
+                code:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - "page_name"
+                      - "content"
+                    properties:
+                      page_name:
+                        type: string
+                      content:
+                        type: string
+      responses:
+        "200":
+          description: save into database
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - "submission_id"
+                properties:
+                  submission_id:
+                    $ref: "#/components/schemas/submission_id"
 
-                    
+  /code/{question_id}:
+    summary: save code into database
+    servers:
+      - url: https://apicugrader.sittha.net/v1
+    parameters:
+      - in: header
+        name: Authentication
+        description: "Bearer ..."
+        schema:
+          type: string
+    get:
+      parameters:
+        - name: question_id
+          description: question_id primary key
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/question_id"
+      responses:
+        "200":
+          description: code content
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - "code"
+                  - "submission_id"
+                properties:
+                  submission_id:
+                    $ref: "#/components/schemas/submission_id"
+                  language:
+                    type: object
+                    properties:
+                        id:
+                          type: integer
+                          description: language primary key
+                        name:
+                          type: string
+                          description: language name
+                  code:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - "page_name"
+                        - "content"
+                      properties:
+                        page_name:
+                          type: string
+                        content:
+                          type: string
+
+  /submit:
+    summary: tell grader to grade code
+    servers:
+      - url: https://apicugrader.sittha.net/v1
+    parameters:
+      - in: header
+        name: Authentication
+        description: "Bearer ..."
+        schema:
+          type: string
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - "submission_id"
+              properties:
+                submission_id:
+                  $ref: "#/components/schemas/submission_id"
+      responses:
+        "200":
+          description: request grader to grade submission
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Empty json
+
+  /result/{submission_id}:
+    summary: get result from grader
+    servers:
+      - url: https://apicugrader.sittha.net/v1
+    parameters:
+      - in: header
+        name: Authentication
+        description: "Bearer ..."
+        schema:
+          type: string
+    get:
+      parameters:
+        - name: submission_id
+          description: submission_id primary key
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/submission_id"
+      responses:
+        "200":
+          description: return result array
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  normal:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        input:
+                          type: string
+                        output:
+                          type: string
+                          description: expected result (nil in somecase)
+                        message:
+                          type: string
+                          description: message result
+                        status:
+                          type: string
+                          enum:
+                            - "fail"
+                            - "pass"
+                  secret:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+                          description: message result
+                        status:
+                          type: string
+                          enum:
+                            - "fail"
+                            - "pass"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -979,6 +1185,12 @@ components:
     addfile_id:
       description: addfile_id(additional files) primary key
       type: integer
+    language_id:
+      type: integer
+      description: language_id primary key
+    submission_id:
+      type: integer
+      description: submission_id primary key
     question_id:
       description: question_id primary key
       type: integer

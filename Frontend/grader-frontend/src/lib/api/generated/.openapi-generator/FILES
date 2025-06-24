@@ -8,6 +8,10 @@ models/CallbackPostRequest.ts
 models/ClassObject.ts
 models/ClassesClassesYearSemesterGet200Response.ts
 models/ClassesSemestersGet200Response.ts
+models/CodePost200Response.ts
+models/CodePostRequest.ts
+models/CodePostRequestCodeInner.ts
+models/CodeQuestionIdGet200Response.ts
 models/CreateStudent.ts
 models/DeleteStudent.ts
 models/EditStudent.ts
@@ -27,6 +31,9 @@ models/NearDueDateGet200Response.ts
 models/NearDueDateGet200ResponseLabsInner.ts
 models/QuestionQuestionIdGet200Response.ts
 models/QuestionQuestionIdGet200ResponseSubmission.ts
+models/ResultSubmissionIdGet200Response.ts
+models/ResultSubmissionIdGet200ResponseNormalInner.ts
+models/ResultSubmissionIdGet200ResponseSecretInner.ts
 models/SectionArray.ts
 models/SemesterClasses.ts
 models/StudentInfo.ts
