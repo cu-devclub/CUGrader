@@ -1,59 +1,72 @@
 version: "3.8"
 
 services:
-    authenticator:
-        build:
-            context: ./Auth
-            dockerfile: Dockerfile
-        container_name: authenticator
-        ports:
-            - "6000:6000"
-        environment:
-            - SERVICE_ENV=development
-            - CERT_PATH=/etc/ssl/auth/fullchain.pem
-            - KEY_PATH=/etc/ssl/auth/privkey.pem
-        volumes:
-            - /home/ubuntu/ssl/auth:/etc/ssl/auth:ro
+  authenticator:
+    build:
+      context: ./Auth
+      dockerfile: Dockerfile
+    ports:
+      - "6000:6000"
+    environment:
+      - SERVICE_ENV=development
+      - CERT_PATH=/etc/ssl/auth/fullchain.pem
+      - KEY_PATH=/etc/ssl/auth/privkey.pem
+    volumes:
+      - /home/ubuntu/ssl/auth:/etc/ssl/auth:ro
 
-    backend:
-        build:
-            context: ./Backend
-            dockerfile: Dockerfile
-        container_name: backend
-        ports:
-            - "5000:5000"
-        environment:
-            - SERVICE_ENV=development
-        depends_on:
-            - yugabytedb
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    container_name: backend
+    ports:
+      - "5000:5000"
+    environment:
+      - SERVICE_ENV=development
+    depends_on:
+      - yugabytedb
+      - rabbitmq  
 
-    frontend:
-        build:
-            context: ./Frontend
-            dockerfile: Dockerfile
-        container_name: frontend
-        ports:
-            - "3000:3000"
-        environment:
-            - NODE_ENV=development
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
 
-    yugabytedb:
-        image: yugabytedb/yugabyte
-        container_name: yugabyte
-        ports:
-            - "7000:7000"     # Admin UI
-            - "9000:9000"     # Master Admin UI
-            - "15433:15433"   # YSQL Web UI
-            - "5433:5433"     # YSQL
-        environment:
-            YSQL_USER: yugabyte
-            YSQL_PASSWORD: yugabyte
-        volumes:
-            - yugabyte_data:/home/yugabyte/yb_data    
-        command: >
-            bin/yugabyted start
-            --base_dir=/home/yugabyte/yb_data
-            --background=false
+  yugabytedb:
+    image: yugabytedb/yugabyte
+    container_name: yugabyte
+    ports:
+      - "7000:7000"
+      - "9000:9000"
+      - "15433:15433"
+      - "5433:5433"
+    environment:
+      YSQL_USER: yugabyte
+      YSQL_PASSWORD: yugabyte
+    volumes:
+      - yugabyte_data:/home/yugabyte/yb_data
+    command: >
+      bin/yugabyted start
+      --base_dir=/home/yugabyte/yb_data
+      --background=false
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"    
+      - "15672:15672"  
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
 
 volumes:
   yugabyte_data:
+  rabbitmq_data:
