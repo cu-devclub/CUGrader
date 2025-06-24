@@ -5,7 +5,7 @@ import "database/sql"
 // GetQuestionIdsByLabId retrieves all question IDs associated with a specific lab ID.
 func (m *QuestionModel) GetQuestionIdsByLabId(labId int) ([]int, error) {
 	questionId := []int{}
-	query := `SELECT id FROM question WHERE lab_id = ?`
+	query := `SELECT id FROM question WHERE lab_id = $1`
 	rows, err := m.DB.Query(query, labId)
 	if err != nil {
 		return nil, err
@@ -37,7 +37,7 @@ func (m *QuestionModel) GetQuestionByID(questionId int) (*QuestionFullModel, err
 		testcase_object_id,
 		secret_testcase_object_id
 	FROM question
-	WHERE id = ?`
+	WHERE id = $1`
 	row := m.DB.QueryRow(query, questionId)
 	question := &QuestionFullModel{}
 	if err := row.Scan(
