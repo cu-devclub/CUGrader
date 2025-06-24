@@ -17,7 +17,7 @@ func (m *LabModel) GetLab(labId int) (*LabFullModel, error) {
 		testcase_object_id,
 		secret_testcase_object_id
 	FROM lab
-	WHERE id = ?`
+	WHERE id = $1`
 	row := m.DB.QueryRow(query, labId)
 	if err := row.Scan(
 		&lab.ID,
@@ -40,7 +40,7 @@ func (m *LabModel) GetLab(labId int) (*LabFullModel, error) {
 
 // GetLabStudentDetail retrieves detailed information about a lab for students, including questions, languages, and assigned groups.
 func (m *LabModel) GetLabAssignedGroupNames(labId int) ([]string, error) {
-	query := `SELECT DISTINCT g.name FROM group g LEFT JOIN assign_to at ON g.id = at.group_id WHERE at.lab_id = ?`
+	query := `SELECT DISTINCT g.name FROM group g LEFT JOIN assign_to at ON g.id = at.group_id WHERE at.lab_id = $1`
 	rows, err := m.DB.Query(query, labId)
 	if err != nil {
 		return nil, err
