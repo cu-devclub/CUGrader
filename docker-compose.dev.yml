@@ -50,6 +50,14 @@ services:
             bin/yugabyted start
             --base_dir=/home/yugabyte/yb_data
             --background=false
+    mongo:
+        image: mongo:latest
+        container_name: mongodb
+        ports:
+            - "27017:27017"
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_ROOT_PASSWORD: example
 
 volumes:
   yugabyte_data:
