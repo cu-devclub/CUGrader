@@ -14,7 +14,7 @@ func (m *LabModel) InsertLab(classID int, questionNumber int, name string, publi
 		exam_pin,
 		show_score_on_lock,
 		testcase_id
-	) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 	RETURNING id`
 
 	var labID int
