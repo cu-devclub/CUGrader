@@ -29,6 +29,7 @@ export * from './NearDueDateGet200Response';
 export * from './NearDueDateGet200ResponseLabsInner';
 export * from './QuestionQuestionIdGet200Response';
 export * from './QuestionQuestionIdGet200ResponseSubmission';
+export * from './RequestGradeRequest';
 export * from './ResultSubmissionIdGet200Response';
 export * from './ResultSubmissionIdGet200ResponseNormalInner';
 export * from './ResultSubmissionIdGet200ResponseSecretInner';

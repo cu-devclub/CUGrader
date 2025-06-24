@@ -207,7 +207,7 @@ paths:
           schema:
             $ref: "#/components/schemas/class_id"
       responses:
-        '200':
+        "200":
           description: get specific class info
           content:
             application/json:
@@ -540,7 +540,7 @@ paths:
                     type: string
                     description: JWT Token with "Bearer " prefix
 
-# Begin phase 2 =======================================================================================>
+  # Begin phase 2 =======================================================================================>
 
   /near_due_date:
     servers:
@@ -552,7 +552,7 @@ paths:
         schema:
           type: string
     summary: get nearly unsubmit due date lab
-    get: 
+    get:
       responses:
         "200":
           description: json of labs array
@@ -603,7 +603,7 @@ paths:
                 lab_data:
                   $ref: "#/components/schemas/lab_edit"
       responses:
-        '200':
+        "200":
           description: A short description of the response
           content:
             application/json:
@@ -621,7 +621,7 @@ paths:
                 lab_data:
                   $ref: "#/components/schemas/lab_edit"
       responses:
-        '200':
+        "200":
           description: A short description of the response
           content:
             application/json:
@@ -696,8 +696,7 @@ paths:
                   secret_testcase:
                     type: integer
                     description: testcase_id primary key. null if multilanguage
-                  
-      
+
   /question/{question_id}:
     summary: get question detail
     servers:
@@ -754,7 +753,7 @@ paths:
                         type: string
                         description: datetime
                       submission_id:
-                        type:  integer
+                        type: integer
   /labs/{class_id}:
     summary: get question detail
     servers:
@@ -837,8 +836,6 @@ paths:
       responses:
         "200":
           description: delete success
-              
-
 
   /language:
     summary: get system support language
@@ -893,7 +890,7 @@ paths:
                 properties:
                   exam_pin:
                     type: integer
-    
+
   /testcase/{testcase_id}:
     summary: get testcase
     servers:
@@ -965,11 +962,11 @@ paths:
                     type: array
                     items:
                       properties:
-                          input:
-                            type: string
-                          output:
-                            type: string
-# Begin phase 3 =======================================================================================>
+                        input:
+                          type: string
+                        output:
+                          type: string
+  # Begin phase 3 =======================================================================================>
   /code:
     summary: save code into database
     servers:
@@ -1054,12 +1051,12 @@ paths:
                   language:
                     type: object
                     properties:
-                        id:
-                          type: integer
-                          description: language primary key
-                        name:
-                          type: string
-                          description: language name
+                      id:
+                        type: integer
+                        description: language primary key
+                      name:
+                        type: string
+                        description: language name
                   code:
                     type: array
                     items:
@@ -1084,15 +1081,18 @@ paths:
         schema:
           type: string
     post:
+      operationId: requestGrade
       requestBody:
         content:
           application/json:
             schema:
               type: object
+              description: this is to prevent codegen from merging type
               required:
                 - "submission_id"
               properties:
                 submission_id:
+                  # type: integer
                   $ref: "#/components/schemas/submission_id"
       responses:
         "200":
@@ -1160,25 +1160,6 @@ paths:
                           enum:
                             - "fail"
                             - "pass"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 components:
   schemas:
@@ -1525,4 +1506,3 @@ components:
           items:
             type: string
             format: binary
-

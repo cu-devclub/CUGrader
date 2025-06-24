@@ -35,6 +35,7 @@ import type {
   MultilangTestcaseQuestionIdGet200Response,
   NearDueDateGet200Response,
   QuestionQuestionIdGet200Response,
+  RequestGradeRequest,
   ResultSubmissionIdGet200Response,
   SectionArray,
   Students,
@@ -83,6 +84,8 @@ import {
     NearDueDateGet200ResponseToJSON,
     QuestionQuestionIdGet200ResponseFromJSON,
     QuestionQuestionIdGet200ResponseToJSON,
+    RequestGradeRequestFromJSON,
+    RequestGradeRequestToJSON,
     ResultSubmissionIdGet200ResponseFromJSON,
     ResultSubmissionIdGet200ResponseToJSON,
     SectionArrayFromJSON,
@@ -204,6 +207,11 @@ export interface QuestionQuestionIdGetRequest {
     authentication?: string;
 }
 
+export interface RequestGradeOperationRequest {
+    authentication?: string;
+    requestGradeRequest?: RequestGradeRequest;
+}
+
 export interface ResultSubmissionIdGetRequest {
     submissionId: number;
     authentication?: string;
@@ -232,11 +240,6 @@ export interface StudentPatchRequest {
 export interface StudentPostRequest {
     authentication?: string;
     createStudent?: CreateStudent;
-}
-
-export interface SubmitPostRequest {
-    authentication?: string;
-    codePost200Response?: CodePost200Response;
 }
 
 export interface TAClassIdGetRequest {
@@ -1163,6 +1166,37 @@ export class DefaultApi extends runtime.BaseAPI {
 
     /**
      */
+    async requestGradeRaw(requestParameters: RequestGradeOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (requestParameters['authentication'] != null) {
+            headerParameters['Authentication'] = String(requestParameters['authentication']);
+        }
+
+        const response = await this.request({
+            path: `/submit`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: RequestGradeRequestToJSON(requestParameters['requestGradeRequest']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse<any>(response);
+    }
+
+    /**
+     */
+    async requestGrade(requestParameters: RequestGradeOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+        const response = await this.requestGradeRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
     async resultSubmissionIdGetRaw(requestParameters: ResultSubmissionIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResultSubmissionIdGet200Response>> {
         if (requestParameters['submissionId'] == null) {
             throw new runtime.RequiredError(
@@ -1364,37 +1398,6 @@ export class DefaultApi extends runtime.BaseAPI {
      */
     async studentPost(requestParameters: StudentPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
         const response = await this.studentPostRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     */
-    async submitPostRaw(requestParameters: SubmitPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        if (requestParameters['authentication'] != null) {
-            headerParameters['Authentication'] = String(requestParameters['authentication']);
-        }
-
-        const response = await this.request({
-            path: `/submit`,
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-            body: CodePost200ResponseToJSON(requestParameters['codePost200Response']),
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse<any>(response);
-    }
-
-    /**
-     */
-    async submitPost(requestParameters: SubmitPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.submitPostRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

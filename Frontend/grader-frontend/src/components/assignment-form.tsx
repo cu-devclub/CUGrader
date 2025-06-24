@@ -121,7 +121,7 @@ export function AssignmentForm({ submit, cancel, classId, prefill, existingFiles
     queries: [
       {
         queryKey: ['supportedLanguages'],
-        queryFn: () => api.supportedLanguages.list(),
+        queryFn: () => api.supportedLanguages.list().then(res => res.map(lang => lang.name)),
       },
       {
         queryKey: ['groups', classId],

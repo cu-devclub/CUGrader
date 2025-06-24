@@ -87,7 +87,10 @@ export interface InstructorQuestion extends Question {
   secretTestCases: Testcase[];
 }
 
-type SupportedLanguage = string;
+export type SupportedLanguage = {
+  id: number; // e.g. 1, 2, 3
+  name: string; // e.g. "C++", "Python 3"
+};
 
 // ===========
 
@@ -125,9 +128,6 @@ export interface CreateClassPayload {
 }
 
 export type UpdateClassPayload = Partial<CreateClassPayload>;
-
-
-
 
 
 export type AssignmentStatus = "new" | "partially-completed" | "completed" | "lated" | "due-soon";
@@ -182,6 +182,13 @@ export interface InstructorAssignmentDetails extends InstructorAssignment, Assig
   questions: InstructorQuestion[];
 }
 
+
+export interface QuestionSubmissionPayload {
+  questionId: number;
+  languageId: number;
+  code: string;
+}
+
 export type CreateAssignmentPayload = Omit<InstructorAssignment, "id"> & {
   // Required fields for creation
   examPin: string;
@@ -200,6 +207,32 @@ export type UpdateAssignmentPayload = Omit<CreateAssignmentPayload, "additionalF
   // WE CANT REMOVE FILE USING THIS REQ
   filesToAdd: File[];
 };
+
+
+export interface CodePage { // ?????
+  pageName: string;
+  content: string;
+}
+
+export interface SubmissionResult {
+  public: PublicTestcaseResult[];
+  secret: SecretTestcaseResult[];
+}
+
+export interface PublicTestcaseResult {
+  input: string; // TODO: request output if ui need it
+  expectedOutput: string | null; // ????
+  message: string;
+  status: "pass" | "fail";
+}
+
+export type SecretTestcaseResult = Omit<PublicTestcaseResult, "input" | "expectedOutput">;
+
+export interface CodeSubmission {
+  submissionId: number;
+  code: CodePage[];
+  language: SupportedLanguage;
+}
 
 export interface APIClient {
   students: {
@@ -228,7 +261,7 @@ export interface APIClient {
     addToClass: (classId: number, email: string) => Promise<void>,
     removeFromClass: (classId: number, email: string) => Promise<void>,
   },
-  
+
   assignments: {
     listNearDue: () => Promise<NearDueAssignment[]>;
     listByClass: (classId: number) => Promise<StudentAssignment[]>;
@@ -246,9 +279,14 @@ export interface APIClient {
   questions: {
     getById: (questionId: number) => Promise<StudentQuestion>;
     getByIdI: (questionId: number) => Promise<InstructorQuestion>;
+
+    submit: (questionId: number, languageId: number, codes: CodePage[]) => Promise<{ submissionId: number; }>;
+    getSubmission: (questionId: number) => Promise<CodeSubmission>;
+    requestGrade: (submissionId: number) => Promise<void>;
+    getSubmissionResult: (submissionId: number) => Promise<SubmissionResult>;
   };
   supportedLanguages: {
-    list: () => Promise<string[]>;
+    list: () => Promise<SupportedLanguage[]>;
   };
   groups: {
     listByClassId: (classId: number) => Promise<string[]>;

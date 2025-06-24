@@ -3,6 +3,7 @@ import { unimplemented } from "../utils";
 import { ClassObject, Configuration, DefaultApi } from "./generated";
 import { LabsClassIdGet200ResponseInnerStatusEnum } from "./generated/models/LabsClassIdGet200ResponseInner";
 import { APIClient, AssignmentStatus, Class, CreateAssignmentPayload, CreateClassPayload, CreateStudentPayload, Instructor, InstructorAssignment, InstructorAssignmentDetails, InstructorQuestion, InstructorsAndTAs, NearDueAssignment, ParticipatingClasses, Semester, Student, StudentAssignment, StudentAssignmentDetails, StudentQuestion, Testcase, UpdateAssignmentPayload, UpdateClassPayload, UpdateStudentPayload } from "./type";
+import { th } from "zod/v4/locales";
 
 function toClass(input: ClassObject): Class {
   return {
@@ -267,8 +268,16 @@ export function createClient() {
           }
         });
       },
-        getById: async (labId: number) => {
-        const lab = await generatedClient.labLabIdGet({ labId });
+      getById: async (labId: number) => {
+        // TODO: refactor this to avoid code duplication
+        const [lab, supportedLanguages] = await Promise.all([
+          generatedClient.labLabIdGet({ labId }),
+          generatedClient.languageGet(),
+        ]);
+        const languages = supportedLanguages.languages?.map(lang => ({
+          id: lang.id!,
+          name: lang.name!
+        })) ?? [];
 
         // Fetch questions in parallel using the questionIds from the lab
         const questionPromises = (lab.questionIds ?? []).map(async questionId => {
@@ -302,7 +311,7 @@ export function createClient() {
           status: "new" as const, // TODO: compute status from submission data
           // Detail fields
           questions,
-          languages: lab.language ?? [],
+          languages: languages.filter(lang => lab.language?.includes(lang.name!)),
           assignedGroupIds: lab.assignTo ?? [],
           closeOnDue: lab.closeOnDue ?? false,
           examMode: lab.examMode ?? false,
@@ -312,9 +321,14 @@ export function createClient() {
       },
 
       getByIdI: async (labId: number) => {
-        const [lab, examPinResponse] = await Promise.all([
+        // TODO: refactor this to avoid code duplication
+        const [lab, examPinResponse, languages] = await Promise.all([
           generatedClient.labLabIdGet({ labId }),
-          generatedClient.examPinLabIdGet({ labId }).catch(() => ({ examPin: "000000" }))
+          generatedClient.examPinLabIdGet({ labId }).catch(() => ({ examPin: "000000" })),
+          generatedClient.languageGet().then(response => response.languages?.map(lang => ({
+            id: lang.id!,
+            name: lang.name!
+          })) ?? []),
         ]);
         // Fetch questions in parallel using the questionIds from the lab
         const questionPromises = (lab.questionIds ?? []).map(async questionId => {
@@ -352,7 +366,7 @@ export function createClient() {
           // Detail fields
           questionIds: lab.questionIds ?? [],
           additionalFileIds: lab.addfiles ?? [],
-          languages: lab.language ?? [],
+          languages: languages.filter(lang => lab.language?.includes(lang.name!)),
           examMode: lab.examMode ?? false,
           closeOnDue: lab.closeOnDue ?? false,
           assignedGroupIds: lab.assignTo ?? [],
@@ -376,6 +390,7 @@ export function createClient() {
         });
       },
     },
+
     questions: {
       getById: async (questionId: number) => {
         const q = await generatedClient.questionQuestionIdGet({ questionId });
@@ -392,7 +407,9 @@ export function createClient() {
             submittedAt: parseDateTime(q.submission.timestamp!)
           }
         };
-      }, getByIdI: async (questionId: number) => {
+      },
+
+      getByIdI: async (questionId: number) => {
         const [q, testcaseData] = await Promise.all([
           generatedClient.questionQuestionIdGet({ questionId }),
           generatedClient.multilangTestcaseQuestionIdGet({ questionId }).catch(() => ({
@@ -414,11 +431,61 @@ export function createClient() {
           secretTestCases: testcaseData.secretTestcase?.map(it => ({ input: it.input!, output: it.output! })) ?? [],
         } satisfies InstructorQuestion;
       },
+
+      async getSubmission(questionId) {
+        const submission = await generatedClient.codeQuestionIdGet({ questionId });
+        return {
+          language: {
+            id: submission.language!.id!,
+            name: submission.language!.name!
+          },
+          submissionId: submission.submissionId!,
+          code: submission.code.map(it => ({
+            pageName: it.pageName!,
+            content: it.content!,
+          })),
+        };
+      },
+
+      async submit(questionId, languageId, codes) {
+        const { submissionId } = await generatedClient.codePost({
+          codePostRequest: {
+            questionId,
+            code: codes.map(it => ({
+              pageName: it.pageName,
+              content: it.content
+            })),
+            languageId
+          }
+        });
+
+        return { submissionId };
+      },
+
+      async getSubmissionResult(submissionId) {
+        const { normal, secret } = await generatedClient.resultSubmissionIdGet({ submissionId });
+        return {
+          public: normal?.map(it => ({
+            input: it.input!,
+            expectedOutput: it.output!,
+            message: it.message!,
+            status: it.status!,
+          })) ?? [],
+          secret: secret?.map(it => ({
+            message: it.message!,
+            status: it.status!,
+          })) ?? []
+        };
+      },
+
+      async requestGrade(submissionId) {
+        await generatedClient.requestGrade({ requestGradeRequest: { submissionId } });
+      },
     },
     supportedLanguages: {
       list: async () => {
         const response = await generatedClient.languageGet();
-        return response.languages?.map(lang => lang.name!) || [];
+        return response.languages?.map(lang => ({ id: lang.id!, name: lang.name! })) || [];
       },
     },
     groups: {

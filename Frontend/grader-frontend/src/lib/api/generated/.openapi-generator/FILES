@@ -1,4 +1,3 @@
-.openapi-generator-ignore
 apis/DefaultApi.ts
 apis/index.ts
 index.ts
@@ -31,6 +30,7 @@ models/NearDueDateGet200Response.ts
 models/NearDueDateGet200ResponseLabsInner.ts
 models/QuestionQuestionIdGet200Response.ts
 models/QuestionQuestionIdGet200ResponseSubmission.ts
+models/RequestGradeRequest.ts
 models/ResultSubmissionIdGet200Response.ts
 models/ResultSubmissionIdGet200ResponseNormalInner.ts
 models/ResultSubmissionIdGet200ResponseSecretInner.ts
