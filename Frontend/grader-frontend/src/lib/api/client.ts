@@ -270,14 +270,7 @@ export function createClient() {
       },
       getById: async (labId: number) => {
         // TODO: refactor this to avoid code duplication
-        const [lab, supportedLanguages] = await Promise.all([
-          generatedClient.labLabIdGet({ labId }),
-          generatedClient.languageGet(),
-        ]);
-        const languages = supportedLanguages.languages?.map(lang => ({
-          id: lang.id!,
-          name: lang.name!
-        })) ?? [];
+        const lab = await generatedClient.labLabIdGet({ labId });
 
         // Fetch questions in parallel using the questionIds from the lab
         const questionPromises = (lab.questionIds ?? []).map(async questionId => {
@@ -311,7 +304,7 @@ export function createClient() {
           status: "new" as const, // TODO: compute status from submission data
           // Detail fields
           questions,
-          languages: languages.filter(lang => lab.language?.includes(lang.name!)),
+          languages: lab.language!.map(it => ({ id: it.id!, name: it.name! })),
           assignedGroupIds: lab.assignTo ?? [],
           closeOnDue: lab.closeOnDue ?? false,
           examMode: lab.examMode ?? false,
@@ -322,13 +315,9 @@ export function createClient() {
 
       getByIdI: async (labId: number) => {
         // TODO: refactor this to avoid code duplication
-        const [lab, examPinResponse, languages] = await Promise.all([
+        const [lab, examPinResponse] = await Promise.all([
           generatedClient.labLabIdGet({ labId }),
           generatedClient.examPinLabIdGet({ labId }).catch(() => ({ examPin: "000000" })),
-          generatedClient.languageGet().then(response => response.languages?.map(lang => ({
-            id: lang.id!,
-            name: lang.name!
-          })) ?? []),
         ]);
         // Fetch questions in parallel using the questionIds from the lab
         const questionPromises = (lab.questionIds ?? []).map(async questionId => {
@@ -366,7 +355,7 @@ export function createClient() {
           // Detail fields
           questionIds: lab.questionIds ?? [],
           additionalFileIds: lab.addfiles ?? [],
-          languages: languages.filter(lang => lab.language?.includes(lang.name!)),
+          languages: lab.language!.map(it => ({ id: it.id!, name: it.name! })),
           examMode: lab.examMode ?? false,
           closeOnDue: lab.closeOnDue ?? false,
           assignedGroupIds: lab.assignTo ?? [],

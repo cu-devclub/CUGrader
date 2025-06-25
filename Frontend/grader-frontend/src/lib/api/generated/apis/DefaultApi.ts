@@ -797,7 +797,7 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
-     * getting image with picture id
+     * lab detail
      */
     async labLabIdGetRaw(requestParameters: LabLabIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<LabLabIdGet200Response>> {
         if (requestParameters['labId'] == null) {
@@ -826,7 +826,7 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
-     * getting image with picture id
+     * lab detail
      */
     async labLabIdGet(requestParameters: LabLabIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<LabLabIdGet200Response> {
         const response = await this.labLabIdGetRaw(requestParameters, initOverrides);

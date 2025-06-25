@@ -639,7 +639,7 @@ paths:
         schema:
           type: string
     get:
-      summary: getting image with picture id
+      summary: lab detail
       parameters:
         - name: lab_id
           description: lab_id primary key
@@ -678,9 +678,13 @@ paths:
                   language:
                     type: array
                     items:
-                      type: string
-                      description: language name
-                      example: csharp, cpp, python, java
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          description: language name
+                        id:
+                          $ref: "#/components/schemas/language_id"
                   exam_mode:
                     type: boolean
                   close_on_due:
@@ -1092,7 +1096,6 @@ paths:
                 - "submission_id"
               properties:
                 submission_id:
-                  # type: integer
                   $ref: "#/components/schemas/submission_id"
       responses:
         "200":

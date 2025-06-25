@@ -18,6 +18,7 @@ export * from './InstructorInfo';
 export * from './LabEdit';
 export * from './LabEditQuestionsInner';
 export * from './LabLabIdGet200Response';
+export * from './LabLabIdGet200ResponseLanguageInner';
 export * from './LabsClassIdGet200ResponseInner';
 export * from './LanguageGet200Response';
 export * from './LanguageGet200ResponseLanguagesInner';

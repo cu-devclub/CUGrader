@@ -19,6 +19,7 @@ models/InstructorInfo.ts
 models/LabEdit.ts
 models/LabEditQuestionsInner.ts
 models/LabLabIdGet200Response.ts
+models/LabLabIdGet200ResponseLanguageInner.ts
 models/LabsClassIdGet200ResponseInner.ts
 models/LanguageGet200Response.ts
 models/LanguageGet200ResponseLanguagesInner.ts

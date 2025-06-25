@@ -14,7 +14,7 @@
 
 import { mapValues } from '../runtime';
 /**
- * a
+ * this is to prevent codegen from merging type
  * @export
  * @interface RequestGradeRequest
  */
