@@ -1,5 +1,7 @@
 package class
 
+import "database/sql"
+
 func (m *ClassModel) Insert(courseID int, name string, semester int, year int, pictureID int, creatorUserID int) (int, error) {
 	var classID int
 	query := `
@@ -23,7 +25,7 @@ func (m *ClassModel) InsertUserIfNotExist(email, name string) (int, error) {
 		return userID, nil
 	}
 
-	if err.Error() != "sql: no rows in result set" {
+	if err != sql.ErrNoRows {
 		return 0, err
 	}
 	// Insert if not exist
