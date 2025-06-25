@@ -13,13 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
-import type { LabEditQuestionsInnerMultilangTestcaseInner } from './LabEditQuestionsInnerMultilangTestcaseInner';
+import type { MultilangTestcaseQuestionIdGet200ResponseTestcaseInner } from './MultilangTestcaseQuestionIdGet200ResponseTestcaseInner';
 import {
-    LabEditQuestionsInnerMultilangTestcaseInnerFromJSON,
-    LabEditQuestionsInnerMultilangTestcaseInnerFromJSONTyped,
-    LabEditQuestionsInnerMultilangTestcaseInnerToJSON,
-    LabEditQuestionsInnerMultilangTestcaseInnerToJSONTyped,
-} from './LabEditQuestionsInnerMultilangTestcaseInner';
+    MultilangTestcaseQuestionIdGet200ResponseTestcaseInnerFromJSON,
+    MultilangTestcaseQuestionIdGet200ResponseTestcaseInnerFromJSONTyped,
+    MultilangTestcaseQuestionIdGet200ResponseTestcaseInnerToJSON,
+    MultilangTestcaseQuestionIdGet200ResponseTestcaseInnerToJSONTyped,
+} from './MultilangTestcaseQuestionIdGet200ResponseTestcaseInner';
 
 /**
  * 
@@ -77,16 +77,16 @@ export interface LabEditQuestionsInner {
     secretTestcase?: string;
     /**
      * 
-     * @type {Array<LabEditQuestionsInnerMultilangTestcaseInner>}
+     * @type {Array<MultilangTestcaseQuestionIdGet200ResponseTestcaseInner>}
      * @memberof LabEditQuestionsInner
      */
-    multilangTestcase?: Array<LabEditQuestionsInnerMultilangTestcaseInner>;
+    multilangTestcase?: Array<MultilangTestcaseQuestionIdGet200ResponseTestcaseInner>;
     /**
      * 
-     * @type {Array<LabEditQuestionsInnerMultilangTestcaseInner>}
+     * @type {Array<MultilangTestcaseQuestionIdGet200ResponseTestcaseInner>}
      * @memberof LabEditQuestionsInner
      */
-    multilangSecretTestcase?: Array<LabEditQuestionsInnerMultilangTestcaseInner>;
+    multilangSecretTestcase?: Array<MultilangTestcaseQuestionIdGet200ResponseTestcaseInner>;
 }
 
 /**
@@ -114,8 +114,8 @@ export function LabEditQuestionsInnerFromJSONTyped(json: any, ignoreDiscriminato
         'score': json['score'] == null ? undefined : json['score'],
         'testcase': json['testcase'] == null ? undefined : json['testcase'],
         'secretTestcase': json['secret_testcase'] == null ? undefined : json['secret_testcase'],
-        'multilangTestcase': json['multilang_testcase'] == null ? undefined : ((json['multilang_testcase'] as Array<any>).map(LabEditQuestionsInnerMultilangTestcaseInnerFromJSON)),
-        'multilangSecretTestcase': json['multilang_secret_testcase'] == null ? undefined : ((json['multilang_secret_testcase'] as Array<any>).map(LabEditQuestionsInnerMultilangTestcaseInnerFromJSON)),
+        'multilangTestcase': json['multilang_testcase'] == null ? undefined : ((json['multilang_testcase'] as Array<any>).map(MultilangTestcaseQuestionIdGet200ResponseTestcaseInnerFromJSON)),
+        'multilangSecretTestcase': json['multilang_secret_testcase'] == null ? undefined : ((json['multilang_secret_testcase'] as Array<any>).map(MultilangTestcaseQuestionIdGet200ResponseTestcaseInnerFromJSON)),
     };
 }
 
@@ -138,8 +138,8 @@ export function LabEditQuestionsInnerToJSONTyped(value?: LabEditQuestionsInner |
         'score': value['score'],
         'testcase': value['testcase'],
         'secret_testcase': value['secretTestcase'],
-        'multilang_testcase': value['multilangTestcase'] == null ? undefined : ((value['multilangTestcase'] as Array<any>).map(LabEditQuestionsInnerMultilangTestcaseInnerToJSON)),
-        'multilang_secret_testcase': value['multilangSecretTestcase'] == null ? undefined : ((value['multilangSecretTestcase'] as Array<any>).map(LabEditQuestionsInnerMultilangTestcaseInnerToJSON)),
+        'multilang_testcase': value['multilangTestcase'] == null ? undefined : ((value['multilangTestcase'] as Array<any>).map(MultilangTestcaseQuestionIdGet200ResponseTestcaseInnerToJSON)),
+        'multilang_secret_testcase': value['multilangSecretTestcase'] == null ? undefined : ((value['multilangSecretTestcase'] as Array<any>).map(MultilangTestcaseQuestionIdGet200ResponseTestcaseInnerToJSON)),
     };
 }
 

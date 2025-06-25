@@ -25,7 +25,7 @@ export default function Page({ }) {
         // maxScore: unimplemented("this is computed property now"),
         languages: data.languages,
         examMode: data.examMode,
-        closeOnDue: data.closeOnDue,
+        closeOnDue: !data.allowLateSubmission,
         showScoreOnLock: data.showScoreOnLock,
         examPin: data.examPin,
         assignedGroupIds: data.assignedGroupIds,

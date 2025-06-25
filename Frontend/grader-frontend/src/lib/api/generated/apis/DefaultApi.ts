@@ -24,16 +24,19 @@ import type {
   CreateStudent,
   DeleteStudent,
   EditStudent,
+  ExamPinLabIdGet200Response,
   LabEdit,
   LabLabIdGet200Response,
-  LabsClassIdGet200Response,
+  LabsClassIdGet200ResponseInner,
   LanguageGet200Response,
+  MultilangTestcaseQuestionIdGet200Response,
   NearDueDateGet200Response,
   QuestionQuestionIdGet200Response,
   SectionArray,
   Students,
   TAeditBody,
   TestCallbackPostRequest,
+  TestcaseTestcaseIdGet200Response,
 } from '../models/index';
 import {
     AssistantFromJSON,
@@ -54,14 +57,18 @@ import {
     DeleteStudentToJSON,
     EditStudentFromJSON,
     EditStudentToJSON,
+    ExamPinLabIdGet200ResponseFromJSON,
+    ExamPinLabIdGet200ResponseToJSON,
     LabEditFromJSON,
     LabEditToJSON,
     LabLabIdGet200ResponseFromJSON,
     LabLabIdGet200ResponseToJSON,
-    LabsClassIdGet200ResponseFromJSON,
-    LabsClassIdGet200ResponseToJSON,
+    LabsClassIdGet200ResponseInnerFromJSON,
+    LabsClassIdGet200ResponseInnerToJSON,
     LanguageGet200ResponseFromJSON,
     LanguageGet200ResponseToJSON,
+    MultilangTestcaseQuestionIdGet200ResponseFromJSON,
+    MultilangTestcaseQuestionIdGet200ResponseToJSON,
     NearDueDateGet200ResponseFromJSON,
     NearDueDateGet200ResponseToJSON,
     QuestionQuestionIdGet200ResponseFromJSON,
@@ -74,6 +81,8 @@ import {
     TAeditBodyToJSON,
     TestCallbackPostRequestFromJSON,
     TestCallbackPostRequestToJSON,
+    TestcaseTestcaseIdGet200ResponseFromJSON,
+    TestcaseTestcaseIdGet200ResponseToJSON,
 } from '../models/index';
 
 export interface AddfileAddfileIdDeleteRequest {
@@ -123,6 +132,11 @@ export interface ClassesSemestersGetRequest {
     authentication?: string;
 }
 
+export interface ExamPinLabIdGetRequest {
+    labId: number;
+    authentication?: string;
+}
+
 export interface GroupClassIdGetRequest {
     classId: number;
     authentication?: string;
@@ -147,6 +161,11 @@ export interface LabPostRequest {
 
 export interface LabsClassIdGetRequest {
     classId: number;
+    authentication?: string;
+}
+
+export interface MultilangTestcaseQuestionIdGetRequest {
+    questionId: number;
     authentication?: string;
 }
 
@@ -205,6 +224,11 @@ export interface TAPostRequest {
 
 export interface TestCallbackPostOperationRequest {
     testCallbackPostRequest?: TestCallbackPostRequest;
+}
+
+export interface TestcaseTestcaseIdGetRequest {
+    testcaseId: number;
+    authentication?: string;
 }
 
 /**
@@ -600,6 +624,43 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
+     * get exam pin
+     */
+    async examPinLabIdGetRaw(requestParameters: ExamPinLabIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ExamPinLabIdGet200Response>> {
+        if (requestParameters['labId'] == null) {
+            throw new runtime.RequiredError(
+                'labId',
+                'Required parameter "labId" was null or undefined when calling examPinLabIdGet().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters['authentication'] != null) {
+            headerParameters['Authentication'] = String(requestParameters['authentication']);
+        }
+
+        const response = await this.request({
+            path: `/exam_pin/{lab_id}`.replace(`{${"lab_id"}}`, encodeURIComponent(String(requestParameters['labId']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ExamPinLabIdGet200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * get exam pin
+     */
+    async examPinLabIdGet(requestParameters: ExamPinLabIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ExamPinLabIdGet200Response> {
+        const response = await this.examPinLabIdGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
      */
     async groupClassIdGetRaw(requestParameters: GroupClassIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<string>>> {
         if (requestParameters['classId'] == null) {
@@ -787,7 +848,7 @@ export class DefaultApi extends runtime.BaseAPI {
 
     /**
      */
-    async labsClassIdGetRaw(requestParameters: LabsClassIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<LabsClassIdGet200Response>> {
+    async labsClassIdGetRaw(requestParameters: LabsClassIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<LabsClassIdGet200ResponseInner>>> {
         if (requestParameters['classId'] == null) {
             throw new runtime.RequiredError(
                 'classId',
@@ -810,12 +871,12 @@ export class DefaultApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => LabsClassIdGet200ResponseFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(LabsClassIdGet200ResponseInnerFromJSON));
     }
 
     /**
      */
-    async labsClassIdGet(requestParameters: LabsClassIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<LabsClassIdGet200Response> {
+    async labsClassIdGet(requestParameters: LabsClassIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<LabsClassIdGet200ResponseInner>> {
         const response = await this.labsClassIdGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -865,6 +926,43 @@ export class DefaultApi extends runtime.BaseAPI {
      */
     async loginGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.loginGetRaw(initOverrides);
+    }
+
+    /**
+     * get multi language testcase
+     */
+    async multilangTestcaseQuestionIdGetRaw(requestParameters: MultilangTestcaseQuestionIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MultilangTestcaseQuestionIdGet200Response>> {
+        if (requestParameters['questionId'] == null) {
+            throw new runtime.RequiredError(
+                'questionId',
+                'Required parameter "questionId" was null or undefined when calling multilangTestcaseQuestionIdGet().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters['authentication'] != null) {
+            headerParameters['Authentication'] = String(requestParameters['authentication']);
+        }
+
+        const response = await this.request({
+            path: `/multilang_testcase/{question_id}`.replace(`{${"question_id"}}`, encodeURIComponent(String(requestParameters['questionId']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => MultilangTestcaseQuestionIdGet200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * get multi language testcase
+     */
+    async multilangTestcaseQuestionIdGet(requestParameters: MultilangTestcaseQuestionIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MultilangTestcaseQuestionIdGet200Response> {
+        const response = await this.multilangTestcaseQuestionIdGetRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**
@@ -1263,6 +1361,43 @@ export class DefaultApi extends runtime.BaseAPI {
      */
     async testCallbackPost(requestParameters: TestCallbackPostOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CallbackPost200Response> {
         const response = await this.testCallbackPostRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * get testcase
+     */
+    async testcaseTestcaseIdGetRaw(requestParameters: TestcaseTestcaseIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TestcaseTestcaseIdGet200Response>> {
+        if (requestParameters['testcaseId'] == null) {
+            throw new runtime.RequiredError(
+                'testcaseId',
+                'Required parameter "testcaseId" was null or undefined when calling testcaseTestcaseIdGet().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters['authentication'] != null) {
+            headerParameters['Authentication'] = String(requestParameters['authentication']);
+        }
+
+        const response = await this.request({
+            path: `/testcase/{testcase_id}`.replace(`{${"testcase_id"}}`, encodeURIComponent(String(requestParameters['testcaseId']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => TestcaseTestcaseIdGet200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * get testcase
+     */
+    async testcaseTestcaseIdGet(requestParameters: TestcaseTestcaseIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TestcaseTestcaseIdGet200Response> {
+        const response = await this.testcaseTestcaseIdGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

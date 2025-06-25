@@ -16,7 +16,7 @@ export default function Layout({ children }: LayoutProps) {
   const activeTab = useActiveTab();
 
   return (
-    <main className="max-w-4xl px-8 mt-4 mb-16 mx-auto ">
+    <main className="max-w-5xl px-8 mt-4 mb-16 mx-auto ">
       <Tabs value={activeTab ?? undefined}>
         <TabsList className="relative">
           <TabsTrigger value="settings" asChild>
