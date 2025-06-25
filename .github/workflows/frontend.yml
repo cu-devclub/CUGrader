@@ -42,6 +42,10 @@ jobs:
           REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
           echo "REPO_LOWER=$REPO_LOWER" >> $GITHUB_ENV
 
+      - name: List files in context
+        working-directory: ./Frontend
+        run: ls -laR
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
