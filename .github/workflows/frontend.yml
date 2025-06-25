@@ -27,7 +27,7 @@ jobs:
           password: ${{ secrets.GHCR_PAT_J || secrets.GITHUB_TOKEN }}
 
       - name: Generate .env from template
-        working-directory: ./Frontend/grader-frontend/.env.template
+        working-directory: ./Frontend/grader-frontend/
         run: cp .env.template .env    
 
       - name: Set lowercase repository
