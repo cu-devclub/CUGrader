@@ -1,14 +1,12 @@
 "use client";
 
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import clsx from "clsx";
+import { ChartNoAxesColumn, FileText } from "lucide-react";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ReactNode } from "react";
-import clsx from "clsx";
-import { Button } from "@/components/ui/button";
-import { ChartNoAxesColumn } from "lucide-react";
-import { FileText } from "lucide-react";
-import { useTranslations } from "next-intl";
 
 export default function StudentLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();

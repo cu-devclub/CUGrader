@@ -13,6 +13,14 @@
  */
 
 import { mapValues } from '../runtime';
+import type { LabLabIdGet200ResponseLanguageInner } from './LabLabIdGet200ResponseLanguageInner';
+import {
+    LabLabIdGet200ResponseLanguageInnerFromJSON,
+    LabLabIdGet200ResponseLanguageInnerFromJSONTyped,
+    LabLabIdGet200ResponseLanguageInnerToJSON,
+    LabLabIdGet200ResponseLanguageInnerToJSONTyped,
+} from './LabLabIdGet200ResponseLanguageInner';
+
 /**
  * 
  * @export
@@ -57,10 +65,10 @@ export interface LabLabIdGet200Response {
     due?: string;
     /**
      * 
-     * @type {Array<string>}
+     * @type {Array<LabLabIdGet200ResponseLanguageInner>}
      * @memberof LabLabIdGet200Response
      */
-    language?: Array<string>;
+    language?: Array<LabLabIdGet200ResponseLanguageInner>;
     /**
      * 
      * @type {boolean}
@@ -116,7 +124,7 @@ export function LabLabIdGet200ResponseFromJSONTyped(json: any, ignoreDiscriminat
         'name': json['name'] == null ? undefined : json['name'],
         'publish': json['publish'] == null ? undefined : json['publish'],
         'due': json['due'] == null ? undefined : json['due'],
-        'language': json['language'] == null ? undefined : json['language'],
+        'language': json['language'] == null ? undefined : ((json['language'] as Array<any>).map(LabLabIdGet200ResponseLanguageInnerFromJSON)),
         'examMode': json['exam_mode'] == null ? undefined : json['exam_mode'],
         'closeOnDue': json['close_on_due'] == null ? undefined : json['close_on_due'],
         'assignTo': json['assign_to'] == null ? undefined : json['assign_to'],
@@ -142,7 +150,7 @@ export function LabLabIdGet200ResponseToJSONTyped(value?: LabLabIdGet200Response
         'name': value['name'],
         'publish': value['publish'],
         'due': value['due'],
-        'language': value['language'],
+        'language': value['language'] == null ? undefined : ((value['language'] as Array<any>).map(LabLabIdGet200ResponseLanguageInnerToJSON)),
         'exam_mode': value['examMode'],
         'close_on_due': value['closeOnDue'],
         'assign_to': value['assignTo'],

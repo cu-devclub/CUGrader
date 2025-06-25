@@ -12,8 +12,8 @@ import { useMemo } from "react";
 
 export default function Page() {
   const params = useParams();
-  // const classId = parseInt(params.class_id as string);
-  const classId = 420;
+  const classId = parseInt(params.class_id as string);
+  // const classId = 420;
   const assignmentsQuery = useSuspenseQuery({
     queryKey: ["student", "class", classId, "assignments"],
     queryFn: () => api.assignments.listByClass(classId)
@@ -61,7 +61,8 @@ function StudentAssignmentList({
         return a.isAvailable ? -1 : 1;
       }
       return a.dueDate.getTime() - b.dueDate.getTime();
-    });  }, [assignments]);
+    });
+  }, [assignments]);
 
   const todoAssignments = processedAssignments.filter(a => a.isAvailable && a.status !== "completed");
   const doneAssignments = processedAssignments.filter(a => a.status === "completed");
@@ -82,13 +83,13 @@ function StudentAssignmentList({
               <div>Score</div>
             </div>
           </div>          <div className="space-y-3">            {todoAssignments.map((assignment) => (
-              <StudentAssignmentCard
-                key={assignment.id}
-                assignment={assignment}
-                borderColor="border-l-blue-500"
-                isOverdue={assignment.isOverdue}
-              />
-            ))}
+            <StudentAssignmentCard
+              key={assignment.id}
+              assignment={assignment}
+              borderColor="border-l-blue-500"
+              isOverdue={assignment.isOverdue}
+            />
+          ))}
           </div>
         </section>
       )}
@@ -107,13 +108,13 @@ function StudentAssignmentList({
               <div>Score</div>
             </div>
           </div>          <div className="space-y-3">            {doneAssignments.map((assignment) => (
-              <StudentAssignmentCard
-                key={assignment.id}
-                assignment={assignment}
-                borderColor="border-l-green-500"
-                isOverdue={false}
-              />
-            ))}
+            <StudentAssignmentCard
+              key={assignment.id}
+              assignment={assignment}
+              borderColor="border-l-green-500"
+              isOverdue={false}
+            />
+          ))}
           </div>
         </section>
       )}      {/* Empty State */}
@@ -145,7 +146,7 @@ function StudentAssignmentCard({
   isOverdue: boolean;
 }) {
   const locale = useLocale();
-  
+
   const formatDateTime = (date: Date) => {
     return new Intl.DateTimeFormat(locale, {
       year: 'numeric',

@@ -23,7 +23,7 @@ export default function Page({ }) {
         publish: parseDateTime(data.publish),
         due: parseDateTime(data.due),
         // maxScore: unimplemented("this is computed property now"),
-        languages: data.languages,
+        languageIds: data.languageIds,
         examMode: data.examMode,
         closeOnDue: !data.allowLateSubmission,
         showScoreOnLock: data.showScoreOnLock,
