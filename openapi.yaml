@@ -2,11 +2,26 @@ openapi: "3.0.0"
 servers:
   - url: https://authcugrader.sittha.net/v1
   - url: https://apicugrader.sittha.net/v1
+  - url: https://authcugrader.sittha.net/v1
+  - url: https://apicugrader.sittha.net/v1
 info:
+  version: "2.0.0"
+  title: "CUGrader"
   version: "2.0.0"
   title: "CUGrader"
 
 paths:
+  /student:
+    parameters:
+      - in: header
+        name: Authentication
+        description: "Bearer ..."
+        schema:
+          type: string
+    servers:
+      - url: https://apicugrader.sittha.net/v1
+    post:
+      summary: Insert student
   /student:
     parameters:
       - in: header
@@ -104,6 +119,16 @@ paths:
           type: string
     servers:
       - url: https://apicugrader.sittha.net/v1
+
+  /student/{class_id}:
+    parameters:
+      - in: header
+        name: Authentication
+        description: "Bearer ..."
+        schema:
+          type: string
+    servers:
+      - url: https://apicugrader.sittha.net/v1
     get:
       summary: "list student by class"
       parameters:
@@ -116,6 +141,7 @@ paths:
       responses:
         "200":
           description: Array of students
+          description: Array of students
           content:
             application/json:
               schema:
@@ -127,6 +153,17 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+  /class:
+    parameters:
+      - in: header
+        name: Authentication
+        description: "Bearer ..."
+        schema:
+          type: string
+    servers:
+      - url: https://apicugrader.sittha.net/v1
+    post:
+      summary: Create class
   /class:
     parameters:
       - in: header
@@ -207,7 +244,7 @@ paths:
           schema:
             $ref: "#/components/schemas/class_id"
       responses:
-        '200':
+        "200":
           description: get specific class info
           content:
             application/json:
@@ -255,6 +292,18 @@ paths:
     summary: List of class in year-semester
     get:
       parameters:
+  /classes/classes/{year-semester}:
+    parameters:
+      - in: header
+        name: Authentication
+        description: "Bearer ..."
+        schema:
+          type: string
+    servers:
+      - url: https://apicugrader.sittha.net/v1
+    summary: List of class in year-semester
+    get:
+      parameters:
         - name: year-semester
           description: The unique identifier of the class
           in: path
@@ -283,6 +332,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /TA:
+    parameters:
+      - in: header
+        name: Authentication
+        description: "Bearer ..."
+        schema:
+          type: string
+    servers:
+      - url: https://apicugrader.sittha.net/v1
+    post:
   /TA:
     parameters:
       - in: header
@@ -355,6 +414,16 @@ paths:
           type: string
     servers:
       - url: https://apicugrader.sittha.net/v1
+
+  /TA/{class_id}:
+    parameters:
+      - in: header
+        name: Authentication
+        description: "Bearer ..."
+        schema:
+          type: string
+    servers:
+      - url: https://apicugrader.sittha.net/v1
     get:
       summary: "list ta and instructor by class"
       parameters:
@@ -378,6 +447,15 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+  /section/{class_id}:
+    parameters:
+      - in: header
+        name: Authentication
+        description: "Bearer ..."
+        schema:
+          type: string
+    servers:
+      - url: https://apicugrader.sittha.net/v1
   /section/{class_id}:
     parameters:
       - in: header
@@ -417,6 +495,15 @@ paths:
           type: string
     servers:
       - url: https://apicugrader.sittha.net/v1
+  /group/{class_id}:
+    parameters:
+      - in: header
+        name: Authentication
+        description: "Bearer ..."
+        schema:
+          type: string
+    servers:
+      - url: https://apicugrader.sittha.net/v1
     get:
       parameters:
         - name: class_id
@@ -438,6 +525,9 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /picture/{picture_id}:
+    servers:
+      - url: https://apicugrader.sittha.net/v1
   /picture/{picture_id}:
     servers:
       - url: https://apicugrader.sittha.net/v1
@@ -464,6 +554,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /login:
+    servers:
+      - url: https://authcugrader.sittha.net/v1
+    summary: redirect to google
   /login:
     servers:
       - url: https://authcugrader.sittha.net/v1
@@ -521,26 +615,36 @@ paths:
               type: object
               required:
                 - "credential"
+              type: object
+              required:
+                - "credential"
               properties:
+                key:
+                  type: string
+                  description: unused
                 key:
                   type: string
                   description: unused
                 credential:
                   type: string
                   description: email end with @chula.ac.th or @student chula.ac.th
+                  description: email end with @chula.ac.th or @student chula.ac.th
       responses:
         "200":
+          description: get access token
           description: get access token
           content:
             application/json:
               schema:
                 type: object
+                type: object
                 properties:
                   access-token:
                     type: string
+                    type: string
                     description: JWT Token with "Bearer " prefix
 
-# Begin phase 2 =======================================================================================>
+  # Begin phase 2 =======================================================================================>
 
   /near_due_date:
     servers:
@@ -552,7 +656,7 @@ paths:
         schema:
           type: string
     summary: get nearly unsubmit due date lab
-    get: 
+    get:
       responses:
         "200":
           description: json of labs array
@@ -603,7 +707,7 @@ paths:
                 lab_data:
                   $ref: "#/components/schemas/lab_edit"
       responses:
-        '200':
+        "200":
           description: A short description of the response
           content:
             application/json:
@@ -621,7 +725,7 @@ paths:
                 lab_data:
                   $ref: "#/components/schemas/lab_edit"
       responses:
-        '200':
+        "200":
           description: A short description of the response
           content:
             application/json:
@@ -639,7 +743,7 @@ paths:
         schema:
           type: string
     get:
-      summary: getting image with picture id
+      summary: lab detail
       parameters:
         - name: lab_id
           description: lab_id primary key
@@ -678,9 +782,13 @@ paths:
                   language:
                     type: array
                     items:
-                      type: string
-                      description: language name
-                      example: csharp, cpp, python, java
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          description: language name
+                        id:
+                          $ref: "#/components/schemas/language_id"
                   exam_mode:
                     type: boolean
                   close_on_due:
@@ -690,8 +798,13 @@ paths:
                     items:
                       type: string
                       description: group name
-                  
-      
+                  testcase:
+                    type: integer
+                    description: testcase_id primary key. null if multilanguage
+                  secret_testcase:
+                    type: integer
+                    description: testcase_id primary key. null if multilanguage
+
   /question/{question_id}:
     summary: get question detail
     servers:
@@ -733,6 +846,12 @@ paths:
                     description: predefine function
                   max_score:
                     type: integer
+                  testcase:
+                    type: integer
+                    description: testcase_id primary key. null if multilanguage
+                  secret_testcase:
+                    type: integer
+                    description: testcase_id primary key. null if multilanguage
                   submission:
                     type: object
                     properties:
@@ -742,7 +861,7 @@ paths:
                         type: string
                         description: datetime
                       submission_id:
-                        type:  integer
+                        type: integer
   /labs/{class_id}:
     summary: get question detail
     servers:
@@ -767,31 +886,34 @@ paths:
           content:
             application/json:
               schema:
-                properties:
-                  lab_id:
-                    $ref: "#/components/schemas/lab_id"
-                  lab_number:
-                    type: integer
-                  lab_name:
-                    type: string
-                  publish:
-                    type: string
-                    description: datetime
-                  due:
-                    type: string
-                    description: datetime
-                  score:
-                    type: integer
-                  max_score:
-                    type: integer
-                  status:
-                    type: string
-                    enum:
-                      - "new"
-                      - "partial_complete"
-                      - "complete"
-                      - "late"
-                      - "due_soon"
+                type: array
+                items:
+                  type: object
+                  properties:
+                    lab_id:
+                      $ref: "#/components/schemas/lab_id"
+                    lab_number:
+                      type: integer
+                    lab_name:
+                      type: string
+                    publish:
+                      type: string
+                      description: datetime
+                    due:
+                      type: string
+                      description: datetime
+                    score:
+                      type: integer
+                    max_score:
+                      type: integer
+                    status:
+                      type: string
+                      enum:
+                        - "new"
+                        - "partial_complete"
+                        - "complete"
+                        - "late"
+                        - "due_soon"
 
   /addfile/{addfile_id}:
     summary: operation about additional files
@@ -822,8 +944,6 @@ paths:
       responses:
         "200":
           description: delete success
-              
-
 
   /language:
     summary: get system support language
@@ -849,22 +969,324 @@ paths:
                         name:
                           type: string
                           description: language name
+  /exam_pin/{lab_id}:
+    summary: get exam pin
+    servers:
+      - url: https://apicugrader.sittha.net/v1
+    parameters:
+      - in: header
+        name: Authentication
+        description: "Bearer ..."
+        schema:
+          type: string
+    get:
+      summary: get exam pin
+      parameters:
+        - name: lab_id
+          description: lab_id primary key
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/lab_id"
+      responses:
+        "200":
+          description: exam pin
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  exam_pin:
+                    type: integer
 
+  /testcase/{testcase_id}:
+    summary: get testcase
+    servers:
+      - url: https://apicugrader.sittha.net/v1
+    parameters:
+      - in: header
+        name: Authentication
+        description: "Bearer ..."
+        schema:
+          type: string
+    get:
+      summary: get testcase
+      parameters:
+        - name: testcase_id
+          description: testcase_id primary key
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/testcase_id"
+      responses:
+        "200":
+          description: get testcase
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  testcase:
+                    type: string
 
-                    
+  /multilang_testcase/{question_id}:
+    summary: get multi language testcase
+    servers:
+      - url: https://apicugrader.sittha.net/v1
+    parameters:
+      - in: header
+        name: Authentication
+        description: "Bearer ..."
+        schema:
+          type: string
+    get:
+      summary: get multi language testcase
+      parameters:
+        - name: question_id
+          description: question_id primary key
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/question_id"
+      responses:
+        "200":
+          description: get multi language testcase
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  testcase:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        input:
+                          type: string
+                        output:
+                          type: string
+                  secret_testcase:
+                    description: null if student
+                    type: array
+                    items:
+                      properties:
+                        input:
+                          type: string
+                        output:
+                          type: string
+  # Begin phase 3 =======================================================================================>
+  /code:
+    summary: save code into database
+    servers:
+      - url: https://apicugrader.sittha.net/v1
+    parameters:
+      - in: header
+        name: Authentication
+        description: "Bearer ..."
+        schema:
+          type: string
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - "question_id"
+                - "code"
+                - "language_id"
+              properties:
+                language_id:
+                  $ref: "#/components/schemas/language_id"
+                question_id:
+                  $ref: "#/components/schemas/question_id"
+                code:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - "page_name"
+                      - "content"
+                    properties:
+                      page_name:
+                        type: string
+                      content:
+                        type: string
+      responses:
+        "200":
+          description: save into database
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - "submission_id"
+                properties:
+                  submission_id:
+                    $ref: "#/components/schemas/submission_id"
 
+  /code/{question_id}:
+    summary: save code into database
+    servers:
+      - url: https://apicugrader.sittha.net/v1
+    parameters:
+      - in: header
+        name: Authentication
+        description: "Bearer ..."
+        schema:
+          type: string
+    get:
+      parameters:
+        - name: question_id
+          description: question_id primary key
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/question_id"
+      responses:
+        "200":
+          description: code content
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - "code"
+                  - "submission_id"
+                properties:
+                  submission_id:
+                    $ref: "#/components/schemas/submission_id"
+                  language:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        description: language primary key
+                      name:
+                        type: string
+                        description: language name
+                  code:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - "page_name"
+                        - "content"
+                      properties:
+                        page_name:
+                          type: string
+                        content:
+                          type: string
 
+  /submit:
+    summary: tell grader to grade code
+    servers:
+      - url: https://apicugrader.sittha.net/v1
+    parameters:
+      - in: header
+        name: Authentication
+        description: "Bearer ..."
+        schema:
+          type: string
+    post:
+      operationId: requestGrade
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: this is to prevent codegen from merging type
+              required:
+                - "submission_id"
+              properties:
+                submission_id:
+                  $ref: "#/components/schemas/submission_id"
+      responses:
+        "200":
+          description: request grader to grade submission
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Empty json
+
+  /result/{submission_id}:
+    summary: get result from grader
+    servers:
+      - url: https://apicugrader.sittha.net/v1
+    parameters:
+      - in: header
+        name: Authentication
+        description: "Bearer ..."
+        schema:
+          type: string
+    get:
+      parameters:
+        - name: submission_id
+          description: submission_id primary key
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/submission_id"
+      responses:
+        "200":
+          description: return result array
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  normal:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        input:
+                          type: string
+                        output:
+                          type: string
+                          description: expected result (nil in somecase)
+                        message:
+                          type: string
+                          description: message result
+                        status:
+                          type: string
+                          enum:
+                            - "fail"
+                            - "pass"
+                  secret:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+                          description: message result
+                        status:
+                          type: string
+                          enum:
+                            - "fail"
+                            - "pass"
 
 components:
   schemas:
     addfile_id:
       description: addfile_id(additional files) primary key
       type: integer
+    language_id:
+      type: integer
+      description: language_id primary key
+    submission_id:
+      type: integer
+      description: submission_id primary key
     question_id:
       description: question_id primary key
       type: integer
     lab_id:
       description: lab_id primary key
+      type: integer
+    testcase_id:
+      description: testcase_id primary key
       type: integer
     class_id:
       description: class_id primary key
@@ -882,6 +1304,10 @@ components:
       items:
         type: string
         description: group name
+      type: array
+      items:
+        type: string
+        description: group name
     TAInfo:
       type: object
       properties:
@@ -894,10 +1320,13 @@ components:
           type: boolean
         email:
           type: string
+        email:
+          type: string
       required:
         - "name"
         - "picture"
         - "leader"
+        - "email"
         - "email"
     InstructorInfo:
       type: object
@@ -909,9 +1338,12 @@ components:
           type: string
         email:
           type: string
+        email:
+          type: string
       required:
         - "name"
         - "picture"
+        - "email"
         - "email"
     Assistant:
       type: object
@@ -1025,6 +1457,7 @@ components:
           type: string
       required:
         - "class_id"
+        - "class_id"
         - "email"
     ClassObject:
       type: object
@@ -1132,6 +1565,10 @@ components:
         due:
           type: string
           description: datetime
+        language_ids:
+          type: array
+          items:
+            type: integer
         close_on_due:
           type: boolean
         exam_mode:
@@ -1191,4 +1628,3 @@ components:
           items:
             type: string
             format: binary
-
