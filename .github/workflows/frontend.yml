@@ -30,6 +30,7 @@ jobs:
             ${{ runner.os }}-node-
 
       - name: Install dependencies
+        working-directory: ./Frontend/grader-frontend 
         run: npm install
 
       - name: Install lightningcss
