@@ -6,6 +6,10 @@ WORKDIR /app
 COPY grader-frontend/package.json grader-frontend/package-lock.json ./
 RUN npm install
 
+# คัดลอกไฟล์ configuration
+COPY .eslintrc.js ./
+COPY next.config.js ./
+
 # คัดลอก source code
 COPY grader-frontend/. .
 #  คัดลอก .env ที่สร้างไว้จาก GitHub Workflow
