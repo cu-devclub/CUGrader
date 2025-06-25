@@ -53,7 +53,7 @@ func (s *LabService) GetLabByIdForStudent(labId int) (*labModel.LabStudentDetail
 
 // GetLabByIdForInstructor retrieves the lab details for an instructor (teacher, admin, and TA) by lab ID.
 // This is more detailed than the student version and includes additional information such as question IDs and languages.
-func (s *LabService) GetLabByIdForInstructor(labId int) (*lab.LabInstructorDetailModel, error) {
+func (s *LabService) GetLabByIdForInstructor(labId int) (*labModel.LabInstructorDetailModel, error) {
 	labFull, err := s.Model.GetLab(labId)
 	if err != nil {
 		return nil, err
@@ -79,7 +79,7 @@ func (s *LabService) GetLabByIdForInstructor(labId int) (*lab.LabInstructorDetai
 		return nil, err
 	}
 
-	lab := &lab.LabInstructorDetailModel{
+	lab := &labModel.LabInstructorDetailModel{
 		// sorted by apperance in API spec
 		ClassID:                labFull.ClassID,
 		ExamPin:                labFull.ExamPin,
@@ -87,7 +87,7 @@ func (s *LabService) GetLabByIdForInstructor(labId int) (*lab.LabInstructorDetai
 		TestcaseObjectID:       labFull.TestcaseObjectID,
 		SecretTestcaseObjectID: labFull.SecretTestcaseObjectID,
 
-		LabStudentDetailModel: lab.LabStudentDetailModel{
+		LabStudentDetailModel: labModel.LabStudentDetailModel{
 			AdditionalFiles: additionalFileIDs,
 			QuestionIDs:     questionIds,
 			Number:          labFull.Number,

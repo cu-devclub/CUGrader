@@ -185,6 +185,7 @@ func RegisterRoutes(r *gin.RouterGroup) {
 
 	r.GET("/picture/:pictureId", pictureController.GetPicture)
 
+	r.GET("/labs/:classId", labController.GetLabsByClassIDHandler)
 	r.GET("/lab/:lab_id", labController.GetLabByIDHandler)
 	r.POST("/lab", labController.AddLabHandler)
 	r.PATCH("/lab", labController.EditLabHandler)
@@ -195,6 +196,4 @@ func RegisterRoutes(r *gin.RouterGroup) {
 	r.DELETE("/addfile/:addfile_id", additionalFileController.DeleteAdditionalFileByIDHandler)
 
 	r.GET("/language", languageController.GetLanguagesHandler)
-
-	r.GET("/labs/:classId", labController.GetLabsByClassIDHandler)
 }
