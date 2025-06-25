@@ -1,10 +1,12 @@
 package student
 
+import "fmt"
+
 func (m *StudentModel) Add(classID int, Email int, sectionID int, groupID *int) error {
 	var userID int
 	err := m.DB.QueryRow(`SELECT id FROM "user" WHERE email = $1`, Email).Scan(&userID)
 	if err != nil {
-		return err
+		return fmt.Errorf("User not found: %w", err)
 	}
 
 	query := `
