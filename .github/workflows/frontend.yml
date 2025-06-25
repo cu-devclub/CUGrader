@@ -33,6 +33,7 @@ jobs:
         run: npm install
 
       - name: Install lightningcss
+        working-directory: ./Frontend/grader-frontend 
         run: npm install lightningcss --force
 
       - name: Log in to GitHub Container Registry
