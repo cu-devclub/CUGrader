@@ -152,7 +152,6 @@ func RegisterRoutes(r *gin.RouterGroup) {
 	additionalFileService := &additionalFileService.AdditionalFileService{Model: additionalFileModel, Utils: utilsModel}
 	additionalFileController := &additionalFileController.AdditionalFileController{Service: additionalFileService}
 
-
 	languageModel := &languageModel.LanguageModel{DB: db}
 	languageService := &languageService.LanguageService{Model: languageModel}
 	languageController := &languageController.LanguageController{Service: languageService}
@@ -166,7 +165,6 @@ func RegisterRoutes(r *gin.RouterGroup) {
 		AdditionalFileModel: additionalFileModel,
 	}
 	labController := &labController.LabController{Service: labService}
-
 
 	r.POST("/callback", userController.Callback)
 	r.POST("/test/callback", userController.TestCallback)
@@ -189,6 +187,7 @@ func RegisterRoutes(r *gin.RouterGroup) {
 
 	r.GET("/picture/:pictureId", pictureController.GetPicture)
 
+  r.GET("/labs:classId", labController.GetLabsByClassIDHandler)
 	r.GET("/lab/:lab_id", labController.GetLabByIDHandler)
 	r.POST("/lab", labController.AddLabHandler)
 	r.PATCH("/lab", labController.EditLabHandler)
@@ -197,6 +196,6 @@ func RegisterRoutes(r *gin.RouterGroup) {
 
 	r.GET("/addfile/:addfile_id", additionalFileController.GetAdditionalFileByIDHandler)
 	r.DELETE("/addfile/:addfile_id", additionalFileController.DeleteAdditionalFileByIDHandler)
-
+  
 	r.GET("/language", languageController.GetLanguagesHandler)
 }

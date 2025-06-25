@@ -1,6 +1,7 @@
 package lab
 
 import (
+	"time"
 	questionModel "CUGrader/backend/versions/v1/models/question"
 	"database/sql"
 )
@@ -9,6 +10,16 @@ type LabModel struct {
 	DB *sql.DB
 }
 
+type LabResponse struct {
+	LabID     int       `json:"lab_id"`
+	LabNumber int       `json:"lab_number"`
+	LabName   string    `json:"lab_name"`
+	Publish   time.Time `json:"publish"`
+	Due       time.Time `json:"due"`
+	Score     int       `json:"score"` // เซ็ตเป็น 0 ชั่วคราว
+	MaxScore  int       `json:"max_score"`
+	Status    string    `json:"status"`
+  
 // LabFullModel represents the full details of a lab found in the database.
 // It includes all the necessary fields to describe a lab, such as its ID, class ID,
 // number, name, publish and due dates, exam mode settings, and associated test cases.

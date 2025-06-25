@@ -1,6 +1,7 @@
 package lab
 
 import (
+	labModel "CUGrader/backend/versions/v1/models/lab"
 	additionalFileModel "CUGrader/backend/versions/v1/models/file"
 	labModel "CUGrader/backend/versions/v1/models/lab"
 	languageModel "CUGrader/backend/versions/v1/models/language"
@@ -14,4 +15,5 @@ type LabService struct {
 	LanguageModel       *languageModel.LanguageModel
 	AdditionalFileModel *additionalFileModel.AdditionalFileModel
 	Utils               *utilsModel.UtilsModel
+
 }
