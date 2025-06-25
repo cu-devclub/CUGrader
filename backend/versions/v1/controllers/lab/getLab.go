@@ -31,7 +31,7 @@ func (lc *LabController) GetLabByIDHandler(c *gin.Context) {
 		return
 	}
 
-	isEnrolledStudent, err := lc.Service.Utils.CanStudentAccessLab(labIdInt, claims.UserID)
+	isEnrolledStudent, err := lc.Service.Utils.IsStudentAssignedToLabID(claims.UserID, labIdInt)
 	isClassInstructor := lc.Service.Utils.IsUserTeacherAdminOrAssistantByLabID(labIdInt, claims.UserID)
 
 	if err != nil {

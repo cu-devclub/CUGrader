@@ -44,9 +44,9 @@ func (m *UtilsModel) IsUserAnAssistantToQuestion(questionID int, userID int) (bo
 	return exists, nil
 }
 
-// CanStudentAccessLab checks if a student can access a lab based on their user ID and the lab ID.
+// IsStudentAssignedToLabID checks if a student can access a lab based on their user ID and the lab ID.
 // It check if student is enrolled in the class that the lab belongs to.
-func (m *UtilsModel) CanStudentAccessLab(labID int, userID int) (bool, error) {
+func (m *UtilsModel) IsStudentAssignedToLabID(userID int, labID int) (bool, error) {
 	query := `SELECT EXISTS (
 		SELECT 1 FROM class_student cs
 		INNER JOIN lab l on cs.class_id = l.class_id
