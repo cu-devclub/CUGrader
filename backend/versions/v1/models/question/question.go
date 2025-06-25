@@ -1,9 +1,14 @@
 package question
 
-import "database/sql"
+import (
+	"database/sql"
+
+	"go.mongodb.org/mongo-driver/v2/mongo"
+)
 
 type QuestionModel struct {
-	DB *sql.DB
+	DB      *sql.DB
+	MongoDB *mongo.Client
 }
 
 type MultilangTestcase struct {
