@@ -8,7 +8,7 @@ RUN npm install
 
 # คัดลอกไฟล์ configuration
 COPY .eslintrc.js ./
-COPY grader-frontend/next.config.js ./
+COPY grader-frontend/next.config.ts ./
 
 # คัดลอก source code
 COPY grader-frontend/. .
