@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type NearduedateModel struct {
+type NearDueDateModel struct {
 	DB *sql.DB
 }
 

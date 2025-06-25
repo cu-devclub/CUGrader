@@ -4,14 +4,14 @@ import (
 	assistantController "CUGrader/backend/versions/v1/controllers/assistant"
 	classController "CUGrader/backend/versions/v1/controllers/class"
 	additionalFileController "CUGrader/backend/versions/v1/controllers/file"
-	nearduedateController "CUGrader/backend/versions/v1/controllers/near-due-date"
+	nearDueDateController "CUGrader/backend/versions/v1/controllers/near_due_date"
 	pictureController "CUGrader/backend/versions/v1/controllers/picture"
 	studentController "CUGrader/backend/versions/v1/controllers/student"
 	userController "CUGrader/backend/versions/v1/controllers/user"
 	assistantModel "CUGrader/backend/versions/v1/models/assistant"
 	classModel "CUGrader/backend/versions/v1/models/class"
 	additionalFileModel "CUGrader/backend/versions/v1/models/file"
-	nearduedateModel "CUGrader/backend/versions/v1/models/near-due-date"
+	nearDueDateModel "CUGrader/backend/versions/v1/models/near_due_date"
 	pictureModel "CUGrader/backend/versions/v1/models/picture"
 	studentModel "CUGrader/backend/versions/v1/models/student"
 	userModel "CUGrader/backend/versions/v1/models/user"
@@ -19,7 +19,7 @@ import (
 	assistantService "CUGrader/backend/versions/v1/services/assistant"
 	classService "CUGrader/backend/versions/v1/services/class"
 	additionalFileService "CUGrader/backend/versions/v1/services/file"
-	nearduedateService "CUGrader/backend/versions/v1/services/near-due-date"
+	nearDueDateService "CUGrader/backend/versions/v1/services/near_due_date"
 	pictureService "CUGrader/backend/versions/v1/services/picture"
 	studentService "CUGrader/backend/versions/v1/services/student"
 	userService "CUGrader/backend/versions/v1/services/user"
@@ -110,9 +110,9 @@ func RegisterRoutes(r *gin.RouterGroup) {
 	additionalFileService := &additionalFileService.AdditionalFileService{Model: additionalFileModel, Utils: utilsModel}
 	additionalFileController := &additionalFileController.AdditionalFileController{Service: additionalFileService}
 
-	nearduedateModel := &nearduedateModel.NearduedateModel{DB: db}
-	nearduedateService := &nearduedateService.NearduedateService{Model: nearduedateModel, Utils: utilsModel}
-	nearduedateController := &nearduedateController.NearDueDateController{Service: nearduedateService, Utils: utilsModel}
+	nearDueDateModel := &nearDueDateModel.NearDueDateModel{DB: db}
+	nearDueDateService := &nearDueDateService.NearDueDateService{Model: nearDueDateModel, Utils: utilsModel}
+	nearDueDateController := &nearDueDateController.NearDueDateController{Service: nearDueDateService, Utils: utilsModel}
 
 	r.POST("/callback", userController.Callback)
 	r.POST("/test/callback", userController.TestCallback)
@@ -138,5 +138,5 @@ func RegisterRoutes(r *gin.RouterGroup) {
 	r.GET("/addfile/:addfile_id", additionalFileController.GetAdditionalFileByIDHandler)
 	r.DELETE("/addfile/:addfile_id", additionalFileController.DeleteAdditionalFileByIDHandler)
 
-	r.GET("/near_due_date", nearduedateController.GetNearDueDateHandler)
+	r.GET("/near_due_date", nearDueDateController.GetNearDueDateHandler)
 }

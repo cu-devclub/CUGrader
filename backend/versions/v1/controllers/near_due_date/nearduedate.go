@@ -6,6 +6,6 @@ import (
 )
 
 type NearDueDateController struct {
-	Service *nearduedateService.NearduedateService
+	Service *nearduedateService.NearDueDateService
 	Utils   *utilsModel.UtilsModel
 }

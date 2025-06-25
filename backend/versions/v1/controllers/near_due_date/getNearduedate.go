@@ -7,13 +7,23 @@ import (
 )
 
 func (lc *NearDueDateController) GetNearDueDateHandler(c *gin.Context) {
-	labs, err := lc.Service.GetAllLabsNearDue()
+	authHeader := c.GetHeader("Authentication")
+	claims, err := lc.Service.Utils.GetJWTClaims(authHeader)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "internal error"})
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"labs": labs,
-	})
+	if claims.Role != "teacher" && claims.Role != "admin" && claims.Role != "student" && claims.Role != "ta" {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "invalid role"})
+		return
+	}
+
+	labs, err := lc.Service.GetLabsNearDueDate(claims.UserID, claims.Role)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "failed to get labs"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"labs": labs})
 }

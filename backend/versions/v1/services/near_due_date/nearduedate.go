@@ -5,7 +5,7 @@ import (
 	utilsModel "CUGrader/backend/versions/v1/models/utils"
 )
 
-type NearduedateService struct {
-	Model *nearduedateModel.NearduedateModel
+type NearDueDateService struct {
+	Model *nearduedateModel.NearDueDateModel
 	Utils *utilsModel.UtilsModel
 }
