@@ -47,7 +47,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./Frontend/grader-frontend
+          context: ./Frontend
           file: ./Frontend/Dockerfile
           push: true
           tags: |
