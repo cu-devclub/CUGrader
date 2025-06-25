@@ -2,11 +2,11 @@ package lab
 
 import (
 	"CUGrader/backend/versions/v1/models/lab"
-  labModel "CUGrader/backend/versions/v1/models/lab"
+	labModel "CUGrader/backend/versions/v1/models/lab"
 )
 
 func (s *LabService) GetLabs(classID int, userID int, role string) ([]labModel.LabResponse, error) {
-	return s.Model.GetLabsByClassID(classID, userID, role)\
+	return s.Model.GetLabsByClassID(classID, userID, role)
 }
 
 // GetLabByIdForStudent retrieves the lab details for a student by lab ID.

@@ -147,3 +147,26 @@ CREATE TABLE IF NOT EXISTS "addition_files" (
     lab_id INT NOT NULL REFERENCES "lab" (id) ON DELETE CASCADE,
     path VARCHAR(255) NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS "submission" (
+    id SERIAL PRIMARY KEY,
+    class_student_id INT NOT NULL REFERENCES "class_student" (id) ON DELETE CASCADE,
+    question_id INT NOT NULL REFERENCES "question" (id) ON DELETE CASCADE,
+    system_language_id INT NOT NULL REFERENCES "system_language" (id) ON DELETE CASCADE,
+    object_id CHAR(24) NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS "result" (
+    id SERIAL PRIMARY KEY,
+    question_id INT NOT NULL REFERENCES "question" (id) ON DELETE CASCADE,
+    submission_id INT NOT NULL REFERENCES "submission" (id) ON DELETE CASCADE,
+    testcase_id INT REFERENCES "testcase" (id) ON DELETE CASCADE DEFAULT NULL,
+    secret_testcase_id INT REFERENCES "testcase" (id) ON DELETE CASCADE DEFAULT NULL,
+    multilang_testcase_id INT REFERENCES "multilang_testcase" (id) ON DELETE CASCADE DEFAULT NULL,
+    multilang_secret_testcase_id INT REFERENCES "multilang_secret_testcase" (id) DEFAULT NULL,
+    message TEXT NOT NULL,
+    socre INT NOT NULL,
+    is_failed BOOLEAN NOT NULL DEFAULT FALSE,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
