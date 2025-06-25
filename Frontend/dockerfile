@@ -7,7 +7,7 @@ COPY grader-frontend/package.json grader-frontend/package-lock.json ./
 RUN npm install
 
 # คัดลอกไฟล์ configuration
-COPY .eslintrc.js ./
+COPY grader-frontend/eslint.config.mjs ./
 COPY grader-frontend/next.config.ts ./
 
 # คัดลอก source code
