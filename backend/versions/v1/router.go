@@ -6,8 +6,8 @@ import (
 	classController "CUGrader/backend/versions/v1/controllers/class"
 	additionalFileController "CUGrader/backend/versions/v1/controllers/file"
 	nearduedateController "CUGrader/backend/versions/v1/controllers/near-due-date"
-	languageController "CUGrader/backend/versions/v1/controllers/language"
 	labController "CUGrader/backend/versions/v1/controllers/lab"
+	languageController "CUGrader/backend/versions/v1/controllers/language"
 	pictureController "CUGrader/backend/versions/v1/controllers/picture"
 	questionController "CUGrader/backend/versions/v1/controllers/question"
 	studentController "CUGrader/backend/versions/v1/controllers/student"
@@ -31,8 +31,8 @@ import (
 	classService "CUGrader/backend/versions/v1/services/class"
 	additionalFileService "CUGrader/backend/versions/v1/services/file"
 	nearduedateService "CUGrader/backend/versions/v1/services/near-due-date"
-	languageService "CUGrader/backend/versions/v1/services/language"
 	labService "CUGrader/backend/versions/v1/services/lab"
+	languageService "CUGrader/backend/versions/v1/services/language"
 	pictureService "CUGrader/backend/versions/v1/services/picture"
 	questionService "CUGrader/backend/versions/v1/services/question"
 	studentService "CUGrader/backend/versions/v1/services/student"
@@ -145,8 +145,6 @@ func RegisterRoutes(r *gin.RouterGroup) {
 	pictureService := &pictureService.PictureService{Model: pictureModel}
 	pictureController := &pictureController.PictureController{Service: pictureService}
 
-	languageModel := &languageModel.LanguageModel{DB: db}
-
 	questionModel := &questionModel.QuestionModel{DB: db, MongoDB: mongoClient}
 	questionService := &questionService.QuestionService{Model: questionModel, Utils: utilsModel}
 	questionController := &questionController.QuestionController{Service: questionService}
@@ -195,7 +193,7 @@ func RegisterRoutes(r *gin.RouterGroup) {
 
 	r.GET("/picture/:pictureId", pictureController.GetPicture)
 
-  r.GET("/labs:classId", labController.GetLabsByClassIDHandler)
+	r.GET("/labs:classId", labController.GetLabsByClassIDHandler)
 	r.GET("/lab/:lab_id", labController.GetLabByIDHandler)
 	r.POST("/lab", labController.AddLabHandler)
 	r.PATCH("/lab", labController.EditLabHandler)
