@@ -4,8 +4,8 @@ FROM node:21 AS build
 WORKDIR /app
 
 # ติดตั้ง dependencies
-COPY grader-frontend/src/package*.json ./
-RUN npm install
+# COPY grader-frontend/src/package*.json ./
+# RUN npm install
 
 # คัดลอก source code
 COPY grader-frontend/src/ .
