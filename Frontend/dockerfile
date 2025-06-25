@@ -4,11 +4,11 @@ FROM node:21 AS build
 WORKDIR /app
 
 # ติดตั้ง dependencies
-COPY src/package*.json ./
+COPY grader-frontend/src/package*.json ./
 RUN npm install
 
 # คัดลอก source code
-COPY src/ .
+COPY grader-frontend/src/ .
 #  คัดลอก .env ที่สร้างไว้จาก GitHub Workflow
 # COPY ../.env .env
 
