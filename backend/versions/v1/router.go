@@ -5,6 +5,7 @@ import (
 	assistantController "CUGrader/backend/versions/v1/controllers/assistant"
 	classController "CUGrader/backend/versions/v1/controllers/class"
 	additionalFileController "CUGrader/backend/versions/v1/controllers/file"
+	languageController "CUGrader/backend/versions/v1/controllers/language"
 	labController "CUGrader/backend/versions/v1/controllers/lab"
 	pictureController "CUGrader/backend/versions/v1/controllers/picture"
 	questionController "CUGrader/backend/versions/v1/controllers/question"
@@ -27,6 +28,7 @@ import (
 	assistantService "CUGrader/backend/versions/v1/services/assistant"
 	classService "CUGrader/backend/versions/v1/services/class"
 	additionalFileService "CUGrader/backend/versions/v1/services/file"
+	languageService "CUGrader/backend/versions/v1/services/language"
 	labService "CUGrader/backend/versions/v1/services/lab"
 	pictureService "CUGrader/backend/versions/v1/services/picture"
 	questionService "CUGrader/backend/versions/v1/services/question"
@@ -150,6 +152,11 @@ func RegisterRoutes(r *gin.RouterGroup) {
 	additionalFileService := &additionalFileService.AdditionalFileService{Model: additionalFileModel, Utils: utilsModel}
 	additionalFileController := &additionalFileController.AdditionalFileController{Service: additionalFileService}
 
+
+	languageModel := &languageModel.LanguageModel{DB: db}
+	languageService := &languageService.LanguageService{Model: languageModel}
+	languageController := &languageController.LanguageController{Service: languageService}
+
 	labModel := &labModel.LabModel{DB: db}
 	labService := &labService.LabService{
 		Model:               labModel,
@@ -159,6 +166,7 @@ func RegisterRoutes(r *gin.RouterGroup) {
 		AdditionalFileModel: additionalFileModel,
 	}
 	labController := &labController.LabController{Service: labService}
+
 
 	r.POST("/callback", userController.Callback)
 	r.POST("/test/callback", userController.TestCallback)
@@ -189,4 +197,6 @@ func RegisterRoutes(r *gin.RouterGroup) {
 
 	r.GET("/addfile/:addfile_id", additionalFileController.GetAdditionalFileByIDHandler)
 	r.DELETE("/addfile/:addfile_id", additionalFileController.DeleteAdditionalFileByIDHandler)
+
+	r.GET("/language", languageController.GetLanguagesHandler)
 }
