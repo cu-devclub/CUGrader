@@ -15,7 +15,7 @@ func (m *StudentModel) GetByClassID(classID int) ([]StudentInfo, error) {
 	}
 	defer rows.Close()
 
-	var students []StudentInfo
+	students := []StudentInfo{}
 	for rows.Next() {
 		var s StudentInfo
 		err := rows.Scan(&s.UserID, &s.Name, &s.Email, &s.Picture, &s.StudentID, &s.Withdrawn)
