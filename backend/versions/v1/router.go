@@ -155,7 +155,6 @@ func RegisterRoutes(r *gin.RouterGroup) {
 	additionalFileService := &additionalFileService.AdditionalFileService{Model: additionalFileModel, Utils: utilsModel}
 	additionalFileController := &additionalFileController.AdditionalFileController{Service: additionalFileService}
 
-
 	nearduedateModel := &nearduedateModel.NearduedateModel{DB: db}
 	nearduedateService := &nearduedateService.NearduedateService{Model: nearduedateModel, Utils: utilsModel}
 	nearduedateController := &nearduedateController.NearDueDateController{Service: nearduedateService, Utils: utilsModel}
@@ -174,7 +173,6 @@ func RegisterRoutes(r *gin.RouterGroup) {
 		AdditionalFileModel: additionalFileModel,
 	}
 	labController := &labController.LabController{Service: labService}
-
 
 	r.POST("/callback", userController.Callback)
 	r.POST("/test/callback", userController.TestCallback)
@@ -197,6 +195,7 @@ func RegisterRoutes(r *gin.RouterGroup) {
 
 	r.GET("/picture/:pictureId", pictureController.GetPicture)
 
+  r.GET("/labs:classId", labController.GetLabsByClassIDHandler)
 	r.GET("/lab/:lab_id", labController.GetLabByIDHandler)
 	r.POST("/lab", labController.AddLabHandler)
 	r.PATCH("/lab", labController.EditLabHandler)
