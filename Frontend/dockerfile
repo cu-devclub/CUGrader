@@ -3,7 +3,7 @@ FROM node:21 AS build
 WORKDIR /app
 
 # ติดตั้ง dependencies
-COPY package.json ./
+COPY grader-frontend/package.json ./
 RUN npm install
 
 # คัดลอก source code
