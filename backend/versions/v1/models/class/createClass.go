@@ -22,6 +22,10 @@ func (m *ClassModel) InsertUserIfNotExist(email, name string) (int, error) {
 	if err == nil {
 		return userID, nil
 	}
+
+	if err.Error() != "sql: no rows in result set" {
+		return 0, err
+	}
 	// Insert if not exist
 	err = m.DB.QueryRow(
 		`INSERT INTO "user" (email, name, picture) VALUES ($1, $2, '') RETURNING id`,
