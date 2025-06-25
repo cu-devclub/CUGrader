@@ -9,7 +9,7 @@ func (m *QuestionModel) GetTestcaseByQuestionID(questionID int) (*TestcaseModel,
 		secret_testcase_object_id
 	FROM testcase t
 	INNER JOIN question q ON t.id = q.testcase_id
-	WHERE q.id = ?`
+	WHERE q.id = $1`
 	row := m.DB.QueryRow(query, questionID)
 	testcase := &TestcaseModel{}
 	if err := row.Scan(
