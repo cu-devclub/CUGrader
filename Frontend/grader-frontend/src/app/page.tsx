@@ -1,8 +1,8 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-function getUserRole() {
-  const cookieStore = cookies();
+async function getUserRole() {
+  const cookieStore = await cookies();
   const userInfoCookie = cookieStore.get('user_info');
   if (userInfoCookie) {
     try {
@@ -16,8 +16,8 @@ function getUserRole() {
   return null;
 }
 
-export default function Home() {
-  const role = getUserRole();
+export default async function Home() {
+  const role = await getUserRole();
 
   if (role) {
     switch (role) {
