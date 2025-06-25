@@ -6,6 +6,7 @@ import (
 	classController "CUGrader/backend/versions/v1/controllers/class"
 	additionalFileController "CUGrader/backend/versions/v1/controllers/file"
 	nearduedateController "CUGrader/backend/versions/v1/controllers/near-due-date"
+	languageController "CUGrader/backend/versions/v1/controllers/language"
 	labController "CUGrader/backend/versions/v1/controllers/lab"
 	pictureController "CUGrader/backend/versions/v1/controllers/picture"
 	questionController "CUGrader/backend/versions/v1/controllers/question"
@@ -30,12 +31,14 @@ import (
 	classService "CUGrader/backend/versions/v1/services/class"
 	additionalFileService "CUGrader/backend/versions/v1/services/file"
 	nearduedateService "CUGrader/backend/versions/v1/services/near-due-date"
+	languageService "CUGrader/backend/versions/v1/services/language"
 	labService "CUGrader/backend/versions/v1/services/lab"
 	pictureService "CUGrader/backend/versions/v1/services/picture"
 	questionService "CUGrader/backend/versions/v1/services/question"
 	studentService "CUGrader/backend/versions/v1/services/student"
 	userService "CUGrader/backend/versions/v1/services/user"
 
+	"context"
 	"crypto/rsa"
 	"crypto/x509"
 	"database/sql"
@@ -46,6 +49,8 @@ import (
 	"os"
 
 	_ "github.com/lib/pq"
+	"go.mongodb.org/mongo-driver/v2/mongo"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 
 	"github.com/gin-gonic/gin"
 )
@@ -71,6 +76,26 @@ func initDB() *sql.DB {
 	return database
 }
 
+func initMongoDB() *mongo.Client {
+	uri := os.Getenv("MONGODB_URI")
+	if uri == "" {
+		log.Fatal("MONGODB_URI environment variable is not set")
+	}
+
+	client, err := mongo.Connect(options.Client().ApplyURI(uri))
+
+	if err != nil {
+		panic(err)
+	}
+	defer func() {
+		if err := client.Disconnect(context.TODO()); err != nil {
+			panic(err)
+		}
+	}()
+
+	return client
+}
+
 func loadPrivateKeyFromEnv() (*rsa.PrivateKey, error) {
 	privKeyPEM := os.Getenv("PRIVATE_KEY")
 	block, _ := pem.Decode([]byte(privKeyPEM))
@@ -86,6 +111,8 @@ func loadPrivateKeyFromEnv() (*rsa.PrivateKey, error) {
 
 func RegisterRoutes(r *gin.RouterGroup) {
 	db = initDB()
+	mongoClient := initMongoDB()
+
 	var err error
 	privKey, err = loadPrivateKeyFromEnv()
 	if err != nil {
@@ -120,7 +147,7 @@ func RegisterRoutes(r *gin.RouterGroup) {
 
 	languageModel := &languageModel.LanguageModel{DB: db}
 
-	questionModel := &questionModel.QuestionModel{DB: db}
+	questionModel := &questionModel.QuestionModel{DB: db, MongoDB: mongoClient}
 	questionService := &questionService.QuestionService{Model: questionModel, Utils: utilsModel}
 	questionController := &questionController.QuestionController{Service: questionService}
 
@@ -128,9 +155,15 @@ func RegisterRoutes(r *gin.RouterGroup) {
 	additionalFileService := &additionalFileService.AdditionalFileService{Model: additionalFileModel, Utils: utilsModel}
 	additionalFileController := &additionalFileController.AdditionalFileController{Service: additionalFileService}
 
+
 	nearduedateModel := &nearduedateModel.NearduedateModel{DB: db}
 	nearduedateService := &nearduedateService.NearduedateService{Model: nearduedateModel, Utils: utilsModel}
 	nearduedateController := &nearduedateController.NearDueDateController{Service: nearduedateService, Utils: utilsModel}
+
+	languageModel := &languageModel.LanguageModel{DB: db}
+	languageService := &languageService.LanguageService{Model: languageModel}
+	languageController := &languageController.LanguageController{Service: languageService}
+
 
 	labModel := &labModel.LabModel{DB: db}
 	labService := &labService.LabService{
@@ -174,4 +207,7 @@ func RegisterRoutes(r *gin.RouterGroup) {
 	r.DELETE("/addfile/:addfile_id", additionalFileController.DeleteAdditionalFileByIDHandler)
 
 	r.GET("/near_due_date", nearduedateController.GetNearDueDateHandler)
+
+	r.GET("/language", languageController.GetLanguagesHandler)
+
 }
