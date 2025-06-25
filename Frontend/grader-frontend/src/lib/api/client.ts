@@ -227,6 +227,8 @@ export function createClient() {
             addfiles: p.additionalFiles,
             assignTo: p.assignedGroupIds,
             closeOnDue: p.closeOnDue,
+            
+            languageIds: p.languageIds,
 
             examMode: p.examMode,
             examPin: parseInt(p.examPin), // Convert string to number

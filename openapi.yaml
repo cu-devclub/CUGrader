@@ -1450,6 +1450,10 @@ components:
         due:
           type: string
           description: datetime
+        language_ids:
+          type: array
+          items:
+            type: integer
         close_on_due:
           type: boolean
         exam_mode:

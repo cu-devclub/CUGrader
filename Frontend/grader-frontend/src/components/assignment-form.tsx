@@ -2,13 +2,6 @@
 
 // 99% of this is by sonnet 4
 
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,6 +12,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/api";
 import { useDropzoneFrFr } from "@/lib/file";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -52,7 +52,7 @@ const createSchemas = (t: ReturnType<typeof useTranslations>) => {
     number: z.coerce.number().min(1, t('assignment.form.validation.number.min')),
     publish: z.string().min(1, t('assignment.form.validation.publish.required')),
     due: z.string().min(1, t('assignment.form.validation.due.required')),
-    languages: z.array(z.string()).min(1, t('assignment.form.validation.languages.min')),
+    languageIds: z.array(z.number()).min(1, t('assignment.form.validation.languages.min')),
     examMode: z.boolean(),
     allowLateSubmission: z.boolean(),
     showScoreOnLock: z.boolean(),
@@ -115,13 +115,13 @@ export function AssignmentForm({ submit, cancel, classId, prefill, existingFiles
   const t = useTranslations();
 
   const [
-    { data: supportedLanguages = [] },
-    { data: availableGroups = [] }
+    { data: supportedLanguages },
+    { data: availableGroups }
   ] = useSuspenseQueries({
     queries: [
       {
         queryKey: ['supportedLanguages'],
-        queryFn: () => api.supportedLanguages.list().then(res => res.map(lang => lang.name)),
+        queryFn: () => api.supportedLanguages.list(),
       },
       {
         queryKey: ['groups', classId],
@@ -139,7 +139,7 @@ export function AssignmentForm({ submit, cancel, classId, prefill, existingFiles
       number: 1,
       publish: "",
       due: "",
-      languages: [],
+      languageIds: [],
       examMode: false,
       allowLateSubmission: true,
       showScoreOnLock: false,
@@ -163,7 +163,7 @@ export function AssignmentForm({ submit, cancel, classId, prefill, existingFiles
     },
   });
 
-  const selectedLanguages = form.watch("languages");
+  const selectedLanguages = form.watch("languageIds");
   const isMultipleLanguages = selectedLanguages.length > 1;
 
   // Clear global test code fields when multiple languages are selected
@@ -448,37 +448,37 @@ export function AssignmentForm({ submit, cancel, classId, prefill, existingFiles
                   <h2 className="text-lg font-medium">{t('assignment.form.sections.languages')}</h2>
                   <FormField
                     control={form.control}
-                    name="languages"
+                    name="languageIds"
                     render={() => (
                       <FormItem>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                          {supportedLanguages.map((language: string) => (
+                          {supportedLanguages.map((language) => (
                             <FormField
-                              key={language}
+                              key={language.id}
                               control={form.control}
-                              name="languages"
+                              name="languageIds"
                               render={({ field }) => {
                                 return (
                                   <FormItem
-                                    key={language}
+                                    key={language.id}
                                     className="flex flex-row gap-3"
                                   >
                                     <FormControl>
                                       <Checkbox
-                                        checked={field.value?.includes(language)}
+                                        checked={field.value?.includes(language.id)}
                                         onCheckedChange={(checked) => {
                                           return checked
-                                            ? field.onChange([...field.value, language])
+                                            ? field.onChange([...field.value, language.id])
                                             : field.onChange(
                                               field.value?.filter(
-                                                (value) => value !== language
+                                                (value) => value !== language.id
                                               )
                                             );
                                         }}
                                       />
                                     </FormControl>
                                     <FormLabel className="font-normal">
-                                      {language}
+                                      {language.name}
                                     </FormLabel>
                                   </FormItem>
                                 );
