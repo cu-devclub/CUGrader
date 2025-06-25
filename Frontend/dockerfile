@@ -7,7 +7,7 @@ COPY grader-frontend/package.json ./
 RUN npm install
 
 # คัดลอก source code
-COPY . .
+COPY grader-frontend/. .
 #  คัดลอก .env ที่สร้างไว้จาก GitHub Workflow
 # COPY ../.env .env
 
