@@ -353,15 +353,6 @@ function createClient(persistence: Storage<Database>): APIClient {
       },
       
       create: async (classId, payload) => {
-        // Handle additional files
-        const additionalFileIds: number[] = [];
-        if (payload.additionalFiles) {
-          for (const file of payload.additionalFiles) {
-            const fileId = await persistence.saveFile(file);
-            additionalFileIds.push(parseInt(fileId));
-          }
-        }
-
         const newAssignment: DbAssignment = {
           id: currentAssignmentId++,
           classId,
@@ -374,7 +365,7 @@ function createClient(persistence: Storage<Database>): APIClient {
           closeOnDue: payload.closeOnDue,
           examMode: payload.examMode,
           languageIds: payload.languageIds,
-          additionalFileIds,
+          additionalFileIds: [],
           examPin: payload.examPin,
           secretTestCode: payload.secretTestCode,
           showScoreOnLock: payload.showScoreOnLock,
@@ -426,6 +417,15 @@ function createClient(persistence: Storage<Database>): APIClient {
 
         persistence.persist();
       },
+      
+      attachFile: async (assignmentId: number, file: File) => {
+        const assignment = assignments.find(a => a.id === assignmentId);
+        if (!assignment) throw new Error(`Assignment ${assignmentId} not found`);
+        const fileId = await persistence.saveFile(file);
+        assignment.additionalFileIds.push(parseInt(fileId));
+        persistence.persist();
+      },
+
       removeFile: async (fileId) => {
         await persistence.deleteFile(String(fileId));
         persistence.persist();

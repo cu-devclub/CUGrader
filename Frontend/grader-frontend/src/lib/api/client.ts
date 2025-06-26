@@ -224,7 +224,6 @@ export function createClient() {
         await generatedClient.labPost({
           classId,
           labData: {
-            addfiles: p.additionalFiles,
             assignTo: p.assignedGroupIds,
             closeOnDue: p.closeOnDue,
             
@@ -250,8 +249,6 @@ export function createClient() {
         await generatedClient.labPatch({
           labId,
           labData: {
-            // THIS IS ONLY FOR APPENDING FILES 
-            addfiles: p.filesToAdd,
             assignTo: p.assignedGroupIds,
             closeOnDue: p.closeOnDue,
 
@@ -368,6 +365,10 @@ export function createClient() {
           testCode: String(lab.testcase ?? ""),
           secretTestCode: String(lab.secretTestcase ?? ""),
         } satisfies InstructorAssignmentDetails;
+      },
+
+      attachFile: async (assignmentId: number, file: File) => {
+        throw new Error("not implemented");
       },
 
       downloadFile: async (fileId: number) => {

@@ -199,13 +199,9 @@ export type CreateAssignmentPayload = Omit<InstructorAssignment, "id"> & {
   closeOnDue: boolean;
   assignedGroupIds: string[];
   questions: InstructorQuestion[];
-  additionalFiles: File[];
 };
 
-export type UpdateAssignmentPayload = Partial<Omit<CreateAssignmentPayload, "additionalFiles"> & {
-  // WE CANT REMOVE FILE USING THIS REQ
-  filesToAdd: File[];
-}>;
+export type UpdateAssignmentPayload = Partial<CreateAssignmentPayload>;
 
 
 export interface CodePage { // ?????
@@ -272,6 +268,7 @@ export interface APIClient {
     create: (classId: number, payload: CreateAssignmentPayload) => Promise<void>;
     update: (labId: number, payload: UpdateAssignmentPayload) => Promise<void>;
 
+    attachFile: (assignmentId: number, file: File) => Promise<void>;
     removeFile: (fileId: number) => Promise<void>;
     downloadFile: (fileId: number) => Promise<Blob>;
   };
