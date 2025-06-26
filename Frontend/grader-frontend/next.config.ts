@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 import createNextIntlPlugin from 'next-intl/plugin';
 
 const nextConfig: NextConfig = {
+  /* config options here */
   transpilePackages: [
     'antd',
     '@ant-design/icons',
@@ -16,11 +17,8 @@ const nextConfig: NextConfig = {
   ],
   experimental: {
     optimizePackageImports: ['antd'],
-  },
-  eslint: {
-    ignoreDuringBuilds: true,  // ✅ เพิ่มบรรทัดนี้เพื่อให้ build ไม่พังเพราะ ESLint error
-  },
+  }
 };
-
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 export default withNextIntl(nextConfig);
+
