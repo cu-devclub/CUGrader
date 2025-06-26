@@ -1,10 +1,10 @@
-name: Build & Push Go App to GHCR
+name: Build & Push backend to GHCR
 
 on:
   push:
     branches:
-      - main
-      - testing
+      - '**'
+      
 
 jobs:
   build:
@@ -15,15 +15,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-              
-      # - name: Generate .env from secrets
-      #   working-directory: ./backend
-      #   run: |
-      #     echo "PORT=${{ secrets.PORT }}" >> .env
-      #     echo "DB_URL=${{ secrets.DB_URL }}" >> .env
-      #     echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
-
+        uses: actions/checkout@v3            
 
       - name: Set up Go
         uses: actions/setup-go@v4
@@ -36,9 +28,9 @@ jobs:
           path: |
             ~/go/pkg/mod
             ~/.cache/go-build
-          key: ${{ runner.os }}-go-${{ hashFiles('backend/go.sum') }}
+          key: ${{ runner.os }}-go-v2-${{ hashFiles('backend/go.sum') }}
           restore-keys: |
-            ${{ runner.os }}-go-
+            ${{ runner.os }}-go-v2-
 
       - name: Tidy Go Modules
         working-directory: ./backend
@@ -63,6 +55,13 @@ jobs:
         run: |
           REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
           echo "REPO_LOWER=$REPO_LOWER" >> $GITHUB_ENV
+
+      - name: Generate .env from template
+        working-directory: ./backend
+        run: cp .env.template .env
+      
+      - name: Debug check file exists
+        run: ls -l backend/go.sum
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5

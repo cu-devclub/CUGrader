@@ -3,142 +3,133 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
+// Types
+type CallbackStatus = 'loading' | 'success' | 'error';
+
+// Components
+function LoadingState() {
+    return (
+        <div className="flex items-center justify-center min-h-screen">
+            <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                <h2 className="text-xl font-semibold">Authenticating...</h2>
+                <p className="text-muted-foreground">Please wait while we process your login</p>
+            </div>
+        </div>
+    );
+}
+
+function SuccessState() {
+    return (
+        <div className="flex items-center justify-center min-h-screen">
+            <div className="text-center">
+                <div className="text-green-500 text-5xl mb-4">✓</div>
+                <h2 className="text-xl font-semibold text-green-600">Login Successful!</h2>
+                <p className="text-muted-foreground">Redirecting to dashboard...</p>
+            </div>
+        </div>
+    );
+}
+
+function ErrorState({ error }: { error: string }) {
+    return (
+        <div className="flex items-center justify-center min-h-screen">
+            <div className="text-center">
+                <div className="text-red-500 text-5xl mb-4">✗</div>
+                <h2 className="text-xl font-semibold text-red-600">Authentication Failed</h2>
+                <p className="text-muted-foreground mb-4">{error}</p>
+                <p className="text-sm text-muted-foreground">Redirecting to login page...</p>
+            </div>
+        </div>
+    );
+}
+
+// Helper functions
+function validateCallbackParams(searchParams: URLSearchParams) {
+    const errorParam = searchParams.get('error');
+    if (errorParam) {
+        throw new Error(`OAuth error: ${errorParam}`);
+    }
+
+    const credential = searchParams.get('credential');
+    if (!credential) {
+        throw new Error('Authorization credential not found in callback URL');
+    }
+
+    return {
+        credential,
+        key: searchParams.get('key')
+    };
+}
+
+async function callAuthAPI(credential: string, key: string | null): Promise<Response> {
+    const params = new URLSearchParams({
+        credential,
+        ...(key && { key })
+    });
+
+    return fetch(`/api/auth/callback?${params}`, {
+        method: 'GET',
+        credentials: 'include',
+    });
+}
+
 export default function Callback() {
-    const router = useRouter()
-    const searchParams = useSearchParams()
-    const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
-    const [error, setError] = useState<string>('')
-    const [Credential, setCredential] = useState<string>('')
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const [status, setStatus] = useState<CallbackStatus>('loading');
+    const [error, setError] = useState<string>('');
 
     useEffect(() => {
         const handleCallback = async () => {
             try {
-                // Get authorization credential from URL params
-                const credential = searchParams.get('credential')
-                setCredential(credential || '')
+                // Validate URL parameters
+                const { credential, key } = validateCallbackParams(searchParams);
 
-                if (!credential) {
-                    throw new Error('Authorization credential not found')
+                console.log('Processing OAuth callback...');
+
+                // Call authentication API
+                const response = await callAuthAPI(credential, key);
+                const data = await response.json();
+
+                console.log('Auth API response:', response.status, data);
+
+                if (!response.ok || !data.success) {
+                    throw new Error(data.error || `Authentication failed: ${response.status}`);
                 }
 
-                console.log('Sending credential to backend:', credential.substring(0, 20) + '...')
+                // On success, redirect to the URL provided by the API
+                setStatus('success');
+                console.log('Redirecting to:', data.redirectTo);
+                router.push(data.redirectTo);
 
-                // Send credentials to backend API with additional options
-                const response = await fetch('https://appcugrader.sittha.net/v1/callback', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        credential,
-                    }),
-                    // Add these for potential CORS/network issues
-                    mode: 'cors',
-                    credentials: 'omit',
-                })
-
-                console.log('Response status:', response.status)
-                console.log('Response headers:', Object.fromEntries(response.headers.entries()))
-
-                if (!response.ok) {
-                    let errorMessage = `HTTP error! status: ${response.status}`
-                    try {
-                        const errorData = await response.json()
-                        errorMessage = errorData.message || errorMessage
-                    } catch {
-                        // If error response is not JSON, use status text
-                        errorMessage = response.statusText || errorMessage
-                    }
-                    throw new Error(errorMessage)
-                }
-
-                const data = await response.json()
-                console.log('Response data:', data)
-
-                // Store JWT token
-                if (data.token) {
-                    localStorage.setItem('auth_token', data.token)
-
-                    // Optionally store user data
-                    if (data.user) {
-                        localStorage.setItem('user_data', JSON.stringify(data.user))
-                    }
-
-                    setStatus('success')
-
-                    // Redirect to dashboard or home page
-                    setTimeout(() => {
-                        router.push('/dashboard')
-                    }, 1500)
-                } else {
-                    throw new Error('No token received from server')
-                }
 
             } catch (err) {
-                console.error('Auth callback error:', err)
+                console.error('Auth callback error:', err);
 
-                // More specific error messages
-                let errorMessage = 'Unknown error occurred'
-                if (err instanceof TypeError && err.message === 'Failed to fetch') {
-                    errorMessage = 'Network error: Cannot connect to authentication server. Please check your internet connection.'
-                } else if (err instanceof Error) {
-                    errorMessage = err.message
-                }
+                const errorMessage = err instanceof Error ? err.message : 'Authentication failed';
+                setError(errorMessage);
+                setStatus('error');
 
-                setError(errorMessage)
-                setStatus('error')
-
-                // Redirect to login page after error
-                /*
+                // Redirect to login with error after delay
                 setTimeout(() => {
-                    router.push('/')
-                }, 5000)
-                */
+                    router.push(`/login?error=${encodeURIComponent(errorMessage)}`);
+                }, 3000);
             }
-        }
+        };
 
-        handleCallback()
-    }, [searchParams, router])
-    if (status === 'loading') {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-                    <h2 className="text-xl font-semibold">Authenticating...</h2>
-                    <p className="text-muted-foreground">Please wait while we log you in</p>
-                    <p className="text-sm text-muted-foreground">logging in as {Credential}</p>
-                </div>
-            </div>
-        )
+        handleCallback();
+    }, [searchParams, router]);
+
+    // Render based on status
+    switch (status) {
+        case 'loading':
+            return <LoadingState />;
+        case 'success':
+            return <SuccessState />;
+        case 'error':
+            return <ErrorState error={error} />;
+        default:
+            return null;
     }
-
-    if (status === 'success') {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="text-center">
-                    <div className="text-green-500 text-5xl mb-4">✓</div>
-                    <h2 className="text-xl font-semibold text-green-600">Login Successful!</h2>
-                    <p className="text-muted-foreground">Redirecting to dashboard...</p>
-                    <p className="text-sm text-muted-foreground">logging in as {Credential}</p>
-                </div>
-            </div>
-        )
-    }
-
-    if (status === 'error') {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="text-center">
-                    <div className="text-red-500 text-5xl mb-4">✗</div>
-                    <h2 className="text-xl font-semibold text-red-600">Authentication Failed</h2>
-                    <p className="text-muted-foreground mb-4">{error}</p>
-                    <p className="text-sm text-muted-foreground">Redirecting to login page...</p>
-                    <p className="text-sm text-muted-foreground mt-2">Attempted logging in as {Credential}</p>
-                </div>
-            </div>
-        )
-    }
-
-    return null
 }

@@ -6,7 +6,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { CreateClassDialog } from "./create-class-dialog";
-import { SemesterSelector } from "./semester-selector";
+import { SemesterSelector } from "../../components/semester-selector";
 import { api } from "@/lib/api";
 
 export default function InstructorPage() {
