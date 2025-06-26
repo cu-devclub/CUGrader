@@ -60,3 +60,20 @@ func (m *UtilsModel) IsUserTeacherAdminOrAssistant(classID int, userID int) bool
 
 	return false
 }
+
+func (m *UtilsModel) IsUserAnAssistantToTestcase(testcaseID int, userID int) (bool, error) {
+	// Check if user is assistant in the class of the testcase
+	var exists bool
+	query := `SELECT EXISTS (
+		SELECT 1
+		FROM class_assistant ca
+		INNER JOIN lab l ON ca.class_id = l.class_id
+		INNER JOIN testcase t ON l.id = t.lab_id
+		WHERE t.id = $1 AND ca.user_id = $2
+	)`
+	err := m.DB.QueryRow(query, testcaseID, userID).Scan(&exists)
+	if err != nil {
+		return false, err
+	}
+	return exists, nil
+}
