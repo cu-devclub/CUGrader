@@ -105,7 +105,7 @@ export default function Page() {
               key={index}
               id={studyClass.classId}
               class_name={studyClass.courseName}
-              class_id={Number(studyClass.courseId)}
+              class_id={Number(studyClass.classId)}
               image={studyClass.imageUrl}
               semester={selectedSemester}
             />

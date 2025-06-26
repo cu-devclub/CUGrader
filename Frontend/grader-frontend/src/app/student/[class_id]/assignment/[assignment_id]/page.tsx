@@ -44,6 +44,7 @@ function StudentAssignmentDetail({
   assignment: StudentAssignmentDetails;
 }) {
   const locale = useLocale();
+  const params = useParams();
 
   const now = new Date();
   const publishDate = assignment.publish.toDate(Intl.DateTimeFormat().resolvedOptions().timeZone);
@@ -161,7 +162,7 @@ function StudentAssignmentDetail({
             </div>
             <div className="flex items-center gap-2">
               <span className="text-gray-600">Language:</span>
-              <span className="font-medium">{assignment.languages?.join(', ') || 'Not specified'}</span>
+              <span className="font-medium">{assignment.languages?.map(it => it.name).join(', ') || 'Not specified'}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-gray-600">Mode:</span>
@@ -179,9 +180,11 @@ function StudentAssignmentDetail({
           </CardHeader>
           <CardContent>
             <div className="flex gap-4">
-              <Button size="lg" className="flex items-center gap-2">
-                <FileText className="w-5 h-5" />
-                Start Working
+              <Button size="lg" className="flex items-center gap-2" asChild>
+                <Link href={`/student/${params.class_id}/assignment/${params.assignment_id}/editor`} prefetch={false}>
+                  <FileText className="w-5 h-5" />
+                  Start Working
+                </Link>
               </Button>
               {assignment.additionalFileIds && assignment.additionalFileIds.length > 0 && (
                 <Button variant="outline" size="lg" className="flex items-center gap-2">
