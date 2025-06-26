@@ -1,6 +1,9 @@
 package question
 
-import "database/sql"
+import (
+	"context"
+	"database/sql"
+)
 
 func (m *QuestionModel) GetTestcaseByQuestionID(questionID int) (*TestcaseModel, error) {
 	query := `SELECT
@@ -23,4 +26,20 @@ func (m *QuestionModel) GetTestcaseByQuestionID(questionID int) (*TestcaseModel,
 		return nil, err // Other error
 	}
 	return testcase, nil
+}
+
+func (m *QuestionModel) GetTestcaseCodeByTestcaseID(testcaseID string) (string, error) {
+	// Get the testcase ID from the database
+	query := `SELECT testcase_object_id from testcase WHERE id = $1`
+	row := m.DB.QueryRow(query, testcaseID)
+	var testcaseObjectID string
+	if err := row.Scan(&testcaseObjectID); err != nil {
+		if err == sql.ErrNoRows {
+			return "", nil // No testcase found
+		}
+		return "", err // Other error
+	}
+
+	// Use the helper method to get code content from MongoDB
+	return m.GetCodeContent(context.TODO(), testcaseObjectID)
 }

@@ -64,3 +64,7 @@ type TestcaseModel struct {
 	TestcaseObjectID       string `json:"testcase_object_id"` // testcase_id primary key, null if multilanguage
 	SecretTestcaseObjectID string `json:"secret_testcase_id"`
 }
+
+type TestcaseCodeResponseModel struct {
+	Testcase string `json:"testcase"` // Test case code
+}
