@@ -192,6 +192,8 @@ func RegisterRoutes(r *gin.RouterGroup) {
 
 	r.GET("/question/:questionId", questionController.GetQuestionForStudentController)
 
+	r.GET("/testcase/:testcaseId", questionController.GetTestcaseCodeByTestcaseIDHandler)
+
 	r.GET("/addfile/:addfile_id", additionalFileController.GetAdditionalFileByIDHandler)
 	r.DELETE("/addfile/:addfile_id", additionalFileController.DeleteAdditionalFileByIDHandler)
 
