@@ -56,7 +56,7 @@ export default function Page({ params }: { params: Promise<{ assignment_id: stri
       };
 
       // Handle file removals and update assignment in parallel
-      const promises: Promise<any>[] = [];
+      const promises: Promise<unknown>[] = [];
 
       if (data.toRemoveExistingFileIds.length > 0) {
         promises.push(...data.toRemoveExistingFileIds.map(fileId =>

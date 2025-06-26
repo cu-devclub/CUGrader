@@ -1,13 +1,12 @@
-import * as React from "react";
-import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import * as React from "react";
 
 interface Props {
   barName: string;
 }
 
-export default function progressBar({ barName }: Props) {
+export default function ProgressBar({ barName }: Props) {
   const [progress, setProgress] = React.useState(13);
 
   React.useEffect(() => {

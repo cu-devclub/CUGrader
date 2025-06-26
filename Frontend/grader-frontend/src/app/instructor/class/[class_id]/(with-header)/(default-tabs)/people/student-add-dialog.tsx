@@ -9,8 +9,7 @@ import { useDropzoneFrFr } from "@/lib/file";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { FileSpreadsheet, Paperclip, TableOfContents, Trash2, Upload } from "lucide-react";
-import { startTransition, useEffect, useMemo, useRef, useState } from "react";
-import { FileWithPath, useDropzone } from 'react-dropzone';
+import { startTransition, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -46,7 +45,7 @@ export { type Mode as StudentAddDialogMode };
 export interface StudentAddDialogProps {
   state: StudentAddDialogState;
   classId: number;
-  refetch: () => any; // TODO: move this to dialog state
+  refetch: () => unknown; // TODO: move this to dialog state
 }
 
 const numericString = z.string().min(1).refine(value => {
@@ -93,7 +92,7 @@ export function StudentAddDialog({ state: { mode, setMode, open, setOpen }, clas
       // console.log(value.students);
       for (const { group, id, section } of value.students) {
         await api.students.addToClass(classId, {
-          email: id + "@student.chula.ac.th", 
+          email: id + "@student.chula.ac.th",
           section: parseInt(section),
           group
         });
@@ -126,13 +125,13 @@ export function StudentAddDialog({ state: { mode, setMode, open, setOpen }, clas
     control: form.control, // control props comes from useForm (optional: if you are using FormProvider)
     name: "students",
   });
-  const addRow = useMemo(() => () => {
+  const addRow = useCallback(() => {
     append({
       id: "",
       group: "",
       section: "",
     });
-  }, []);
+  }, [append]);
 
   useEffect(() => {
     if (open === true) {

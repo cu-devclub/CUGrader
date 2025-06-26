@@ -5,7 +5,7 @@ import { Select, SelectValue } from "@radix-ui/react-select";
 export interface SemesterSelectorProps {
   semester: string;
   semesterList: string[];
-  onSemesterChange: (semester: Semester) => any;
+  onSemesterChange: (semester: Semester) => unknown;
 }
 
 export function SemesterSelector({ onSemesterChange, semester, semesterList }: SemesterSelectorProps) {

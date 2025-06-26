@@ -14,10 +14,10 @@ interface Props {
   labName: string;
   courseName: string;
   due: string;
-  maxScore: Number;
+  maxScore: number;
 }
 
-export default function notificationCard({
+export default function NotificationCard({
   labName,
   courseName,
   due,

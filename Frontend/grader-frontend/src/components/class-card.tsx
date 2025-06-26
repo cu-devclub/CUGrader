@@ -24,7 +24,7 @@ type MenuItem = {
   icon: LucideIcon;
 } & (
   | {
-      action: () => any;
+      action: () => unknown;
     }
   | {
       href: string;

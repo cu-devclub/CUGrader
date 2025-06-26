@@ -5,7 +5,7 @@ import { api } from "@/lib/api";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
-export default function page() {
+export default function Page() {
   const { data: assigmentsList } = useSuspenseQuery({
     queryKey: ["notification-student"],
     queryFn: () => api.assignments.listNearDue(),

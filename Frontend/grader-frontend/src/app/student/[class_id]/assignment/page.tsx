@@ -2,7 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { api } from "@/lib/api";
-import type { StudentAssignment, AssignmentStatus } from "@/lib/api/type";
+import type { StudentAssignment } from "@/lib/api/type";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { AlertCircle, Calendar, CheckCircle, Clock, XCircle } from "lucide-react";
 import { useLocale } from "next-intl";

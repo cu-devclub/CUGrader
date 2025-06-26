@@ -7,13 +7,13 @@ import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { api } from "@/lib/api";
-import type { InstructorAssignment } from "@/lib/api/type";
-import { CalendarDateTime, fromDate } from "@internationalized/date";
+import type { InstructorAssignment, UpdateAssignmentPayload } from "@/lib/api/type";
+import { CalendarDateTime, fromDate, getLocalTimeZone, toCalendarDateTime } from "@internationalized/date";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { useLocale } from "next-intl";
 import Link from "next/link";
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useClassData } from "../../../class-data-context";
 
@@ -33,7 +33,7 @@ export default function Page() {
   });
 
   const updateAssignmentMutation = useMutation({
-    mutationFn: ({ assignmentId, payload }: { assignmentId: number, payload: any; }) =>
+    mutationFn: ({ assignmentId, payload }: { assignmentId: number, payload: UpdateAssignmentPayload; }) =>
       api.assignments.update(assignmentId, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["class", classData.id, "assignment"] });
@@ -71,20 +71,23 @@ export default function Page() {
         default:
           publishDate = new Date();
       }
-      const payload: any = {};
+
+      const payload: UpdateAssignmentPayload = {};
       if (publishDate) {
-        payload.publish = fromDate(publishDate, Intl.DateTimeFormat().resolvedOptions().timeZone);
+        payload.publish = toCalendarDateTime(fromDate(publishDate, getLocalTimeZone()));
       }
       if (dueDate) {
-        payload.due = fromDate(dueDate, Intl.DateTimeFormat().resolvedOptions().timeZone);
+        payload.due = toCalendarDateTime(fromDate(dueDate, getLocalTimeZone()));
       }
-      updateAssignmentMutation.mutate({ assignmentId, payload });
+      updateAssignmentMutation.mutate({ assignmentId, payload: payload });
       // toast("Assignment status updated", {
       //   description: `Assignment ${assignmentId}: ${JSON.stringify(payload)}`
       // });
       return;
-    } if (updatedData.publish || updatedData.due) {
-      const payload: any = {};
+    }
+    
+    if (updatedData.publish || updatedData.due) {
+      const payload: UpdateAssignmentPayload = {};
 
       if (updatedData.publish) {
         payload.publish = updatedData.publish;
@@ -92,7 +95,7 @@ export default function Page() {
       if (updatedData.due) {
         payload.due = updatedData.due;
       }
-      updateAssignmentMutation.mutate({ assignmentId, payload });
+      updateAssignmentMutation.mutate({ assignmentId, payload: payload });
       toast("Assignment dates updated", {
         description: `Assignment ${assignmentId}: ${JSON.stringify(payload)}`
       });

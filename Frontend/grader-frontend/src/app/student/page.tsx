@@ -9,8 +9,8 @@ import StudentCard from "./studentCard";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 
 type Assistant = {
   name: string;

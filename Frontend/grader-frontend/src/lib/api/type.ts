@@ -175,8 +175,7 @@ export interface StudentAssignmentDetails extends StudentAssignment, AssignmentD
   questions: StudentQuestion[];
 }
 
-export interface InstructorAssignment extends Assignment {
-}
+export type InstructorAssignment = Assignment;
 
 export interface InstructorAssignmentDetails extends InstructorAssignment, AssignmentDetails, InstructorAssignmentDetailsFields {
   questions: InstructorQuestion[];
@@ -203,10 +202,10 @@ export type CreateAssignmentPayload = Omit<InstructorAssignment, "id"> & {
   additionalFiles: File[];
 };
 
-export type UpdateAssignmentPayload = Omit<CreateAssignmentPayload, "additionalFiles"> & {
+export type UpdateAssignmentPayload = Partial<Omit<CreateAssignmentPayload, "additionalFiles"> & {
   // WE CANT REMOVE FILE USING THIS REQ
   filesToAdd: File[];
-};
+}>;
 
 
 export interface CodePage { // ?????

@@ -23,8 +23,6 @@ const settingsSchema = z.object({
   image: z.instanceof(File).optional()
 });
 
-export interface SettingsFormProps {
-}
 
 export function SettingsForm() {
   const { classData } = useClassData();

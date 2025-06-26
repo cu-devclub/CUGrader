@@ -95,8 +95,8 @@ export interface AssignmentFormProps {
   existingFiles?: AttachmentMetadata[];
 
   isPending: boolean;
-  submit: (result: AssignmentFormResult) => any;
-  cancel: () => any;
+  submit: (result: AssignmentFormResult) => unknown;
+  cancel: () => unknown;
 }
 
 export type AssignmentFormResult = AssignmentFormData & {
@@ -716,7 +716,7 @@ interface QuestionFormProps {
   form: ReturnType<typeof useForm<AssignmentFormData>>;
   onRemove: () => void;
   canRemove: boolean;
-  t: any;
+  t: ReturnType<typeof useTranslations>;
 }
 
 
@@ -1050,7 +1050,7 @@ function QuestionForm({ questionIndex, form, onRemove, canRemove, t }: QuestionF
 interface FileCardProps {
   name: string;
   size?: number;
-  remove: () => any;
+  remove: () => unknown;
 }
 
 function FileCard({ name, remove, size }: FileCardProps) {

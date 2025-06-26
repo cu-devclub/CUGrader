@@ -11,24 +11,24 @@ import { z } from "zod";
 
 
 interface EditDialogConfig<TPrefilled, TOutput, TKey> {
-  onDone: (id: TKey, value: TOutput) => any;
+  onDone: (id: TKey, value: TOutput) => unknown;
 }
 
 // we can infer this tho
 export interface EditDialogState<TPrefilled, TOutput> {
   open: boolean,
   loading: boolean;
-  onOpenChange: (open: boolean) => any;
+  onOpenChange: (open: boolean) => unknown;
   prefilled?: TPrefilled,
-  save: (data: TOutput) => any;
+  save: (data: TOutput) => unknown;
 };
 
 // i hate react
 export function useEditDialogState<TPrefilled, TOutput, TKey = string>(config: EditDialogConfig<TPrefilled, TOutput, TKey>) {
   const [open, setOpen] = useState(false);
-  let [loading, setLoading] = useState(false);
-  let [currentPrefill, setCurrentPrefill] = useState<TPrefilled>();
-  let [currentId, setCurrentId] = useState<TKey>();
+  const [loading, setLoading] = useState(false);
+  const [currentPrefill, setCurrentPrefill] = useState<TPrefilled>();
+  const [currentId, setCurrentId] = useState<TKey>();
 
   function launch(id: TKey, prefilled: TPrefilled) {
     startTransition(() => {
@@ -75,7 +75,7 @@ export interface Student {
 
 export type StudentWithoutIdAndName = Omit<Student, "name" | "studentId">;
 
-export function useStudentEditDialog(classId: number, invalidate?: () => any) {
+export function useStudentEditDialog(classId: number, invalidate?: () => unknown) {
   return useEditDialogState<Student, StudentWithoutIdAndName>({
     async onDone(id, value) {
       await api.students.update(classId, id, {
@@ -109,7 +109,7 @@ export function StudentEditDialog({ state }: StudentEditDialogProps) {
     if (state.open) {
       form.reset({
         ...state.prefilled,
-        withdrawed: String(state.prefilled!.withdrawed) as any
+        withdrawed: String(state.prefilled!.withdrawed) as ("true" | "false")
       });
     }
   }, [state.open]);
@@ -220,7 +220,7 @@ export function StudentEditDialog({ state }: StudentEditDialogProps) {
 }
 
 
-export function useStudentBatchEditDialog(classId: number, invalidate?: () => any) {
+export function useStudentBatchEditDialog(classId: number, invalidate?: () => unknown) {
   return useEditDialogState<StudentWithoutIdAndName, StudentWithoutIdAndName>({
     async onDone(id, value) {
       await api.students.update(classId, id, {
