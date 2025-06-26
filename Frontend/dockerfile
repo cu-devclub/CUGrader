@@ -8,7 +8,7 @@ RUN npm ci --verbose
 COPY grader-frontend/. . 
 COPY grader-frontend/.env .env
 
-RUN NEXTJS_IGNORE_ESLINT=1 npm run build --verbose
+RUN npm run build --verbose
 
 FROM nginx:alpine
 RUN rm -rf /usr/share/nginx/html/*
