@@ -13,92 +13,64 @@
  */
 
 
-import * as runtime from '../runtime';
 import type {
-  Assistant,
-  CallbackPost200Response,
-  CallbackPostRequest,
-  ClassObject,
-  ClassesClassesYearSemesterGet200Response,
-  ClassesSemestersGet200Response,
-  CodePost200Response,
-  CodePostRequest,
-  CodeQuestionIdGet200Response,
-  CreateStudent,
-  DeleteStudent,
-  EditStudent,
-  ExamPinLabIdGet200Response,
-  LabEdit,
-  LabLabIdGet200Response,
-  LabsClassIdGet200ResponseInner,
-  LanguageGet200Response,
-  MultilangTestcaseQuestionIdGet200Response,
-  NearDueDateGet200Response,
-  QuestionQuestionIdGet200Response,
-  RequestGradeRequest,
-  ResultSubmissionIdGet200Response,
-  SectionArray,
-  Students,
-  TAeditBody,
-  TestCallbackPostRequest,
-  TestcaseTestcaseIdGet200Response,
+    Assistant,
+    CallbackPost200Response,
+    CallbackPostRequest,
+    ClassObject,
+    ClassesClassesYearSemesterGet200Response,
+    ClassesSemestersGet200Response,
+    CodePost200Response,
+    CodePostRequest,
+    CodeQuestionIdGet200Response,
+    CreateStudent,
+    DeleteStudent,
+    EditStudent,
+    ExamPinLabIdGet200Response,
+    LabEdit,
+    LabLabIdGet200Response,
+    LabsClassIdGet200ResponseInner,
+    LanguageGet200Response,
+    MultilangTestcaseQuestionIdGet200Response,
+    NearDueDateGet200Response,
+    QuestionQuestionIdGet200Response,
+    RequestGradeRequest,
+    ResultSubmissionIdGet200Response,
+    SectionArray,
+    Students,
+    TAeditBody,
+    TestCallbackPostRequest,
+    TestcaseTestcaseIdGet200Response,
 } from '../models/index';
 import {
     AssistantFromJSON,
-    AssistantToJSON,
     CallbackPost200ResponseFromJSON,
-    CallbackPost200ResponseToJSON,
-    CallbackPostRequestFromJSON,
     CallbackPostRequestToJSON,
     ClassObjectFromJSON,
-    ClassObjectToJSON,
     ClassesClassesYearSemesterGet200ResponseFromJSON,
-    ClassesClassesYearSemesterGet200ResponseToJSON,
     ClassesSemestersGet200ResponseFromJSON,
-    ClassesSemestersGet200ResponseToJSON,
     CodePost200ResponseFromJSON,
-    CodePost200ResponseToJSON,
-    CodePostRequestFromJSON,
     CodePostRequestToJSON,
     CodeQuestionIdGet200ResponseFromJSON,
-    CodeQuestionIdGet200ResponseToJSON,
-    CreateStudentFromJSON,
     CreateStudentToJSON,
-    DeleteStudentFromJSON,
     DeleteStudentToJSON,
-    EditStudentFromJSON,
     EditStudentToJSON,
     ExamPinLabIdGet200ResponseFromJSON,
-    ExamPinLabIdGet200ResponseToJSON,
-    LabEditFromJSON,
-    LabEditToJSON,
     LabLabIdGet200ResponseFromJSON,
-    LabLabIdGet200ResponseToJSON,
     LabsClassIdGet200ResponseInnerFromJSON,
-    LabsClassIdGet200ResponseInnerToJSON,
     LanguageGet200ResponseFromJSON,
-    LanguageGet200ResponseToJSON,
     MultilangTestcaseQuestionIdGet200ResponseFromJSON,
-    MultilangTestcaseQuestionIdGet200ResponseToJSON,
     NearDueDateGet200ResponseFromJSON,
-    NearDueDateGet200ResponseToJSON,
     QuestionQuestionIdGet200ResponseFromJSON,
-    QuestionQuestionIdGet200ResponseToJSON,
-    RequestGradeRequestFromJSON,
     RequestGradeRequestToJSON,
     ResultSubmissionIdGet200ResponseFromJSON,
-    ResultSubmissionIdGet200ResponseToJSON,
     SectionArrayFromJSON,
-    SectionArrayToJSON,
     StudentsFromJSON,
-    StudentsToJSON,
-    TAeditBodyFromJSON,
     TAeditBodyToJSON,
-    TestCallbackPostRequestFromJSON,
     TestCallbackPostRequestToJSON,
-    TestcaseTestcaseIdGet200ResponseFromJSON,
-    TestcaseTestcaseIdGet200ResponseToJSON,
+    TestcaseTestcaseIdGet200ResponseFromJSON
 } from '../models/index';
+import * as runtime from '../runtime';
 
 export interface AddfileAddfileIdDeleteRequest {
     addfileId: number;
@@ -450,7 +422,7 @@ export class DefaultApi extends runtime.BaseAPI {
         // @ts-ignore: canConsumeForm may be unused
         const canConsumeForm = runtime.canConsumeForm(consumes);
 
-        let formParams: { append(param: string, value: any): any };
+        let formParams: { append(param: string, value: any): any; };
         let useForm = false;
         // use FormData to transmit files using content-type "multipart/form-data"
         useForm = canConsumeForm;
@@ -544,7 +516,7 @@ export class DefaultApi extends runtime.BaseAPI {
         // @ts-ignore: canConsumeForm may be unused
         const canConsumeForm = runtime.canConsumeForm(consumes);
 
-        let formParams: { append(param: string, value: any): any };
+        let formParams: { append(param: string, value: any): any; };
         let useForm = false;
         // use FormData to transmit files using content-type "multipart/form-data"
         useForm = canConsumeForm;
@@ -837,6 +809,11 @@ export class DefaultApi extends runtime.BaseAPI {
      * edit lab
      */
     async labPatchRaw(requestParameters: LabPatchRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>> {
+        // TODO: we are sending a nested object in a form data
+        // we already discuss about it. but new openapi.yaml is not available yet
+        // so
+        throw new Error("API definitions changed");
+
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -851,7 +828,7 @@ export class DefaultApi extends runtime.BaseAPI {
         // @ts-ignore: canConsumeForm may be unused
         const canConsumeForm = runtime.canConsumeForm(consumes);
 
-        let formParams: { append(param: string, value: any): any };
+        let formParams: { append(param: string, value: any): any; };
         let useForm = false;
         if (useForm) {
             formParams = new FormData();
@@ -864,8 +841,8 @@ export class DefaultApi extends runtime.BaseAPI {
         }
 
         if (requestParameters['labData'] != null) {
-            formParams.append('lab_data', new Blob([JSON.stringify(stringToJSON(requestParameters['labData']))], { type: "application/json", }));
-                    }
+            // formParams.append('lab_data', new Blob([JSON.stringify(stringToJSON(requestParameters['labData']))], { type: "application/json", }));
+        }
 
         const response = await this.request({
             path: `/lab`,
@@ -894,6 +871,11 @@ export class DefaultApi extends runtime.BaseAPI {
      * create lab
      */
     async labPostRaw(requestParameters: LabPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>> {
+        // TODO: we are sending a nested object in a form data
+        // we already discuss about it. but new openapi.yaml is not available yet
+        // so
+        throw new Error("API definitions changed");
+
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -908,7 +890,7 @@ export class DefaultApi extends runtime.BaseAPI {
         // @ts-ignore: canConsumeForm may be unused
         const canConsumeForm = runtime.canConsumeForm(consumes);
 
-        let formParams: { append(param: string, value: any): any };
+        let formParams: { append(param: string, value: any): any; };
         let useForm = false;
         if (useForm) {
             formParams = new FormData();
@@ -921,8 +903,8 @@ export class DefaultApi extends runtime.BaseAPI {
         }
 
         if (requestParameters['labData'] != null) {
-            formParams.append('lab_data', new Blob([JSON.stringify(stringToJSON(requestParameters['labData']))], { type: "application/json", }));
-                    }
+            // formParams.append('lab_data', new Blob([JSON.stringify(stringToJSON(requestParameters['labData']))], { type: "application/json", }));
+        }
 
         const response = await this.request({
             path: `/lab`,
