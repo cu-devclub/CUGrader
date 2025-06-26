@@ -68,7 +68,7 @@ function StudentCard({ class_id, class_name, image, semester }: Props) {
 
   const toAssignmentPage = () => {
     router.push(
-      `/student/${class_id}/${semester.replace("/", "-")}/1/assignment`
+      `/student/${class_id}/assignment`
     );
   };
 

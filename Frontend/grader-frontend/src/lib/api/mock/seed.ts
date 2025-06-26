@@ -50,7 +50,7 @@ export async function seed(client: APIClient) {
     showScoreOnLock: true,
     testCode: "describe \"Maybe Monad\" $ do\n  it \"handles safe division\" $ do\n    safeDivide 10 2 `shouldBe` Just 5.0\n    safeDivide 10 0 `shouldBe` Nothing\n  it \"chains operations\" $ do\n    chainDivisions 20 4 2 `shouldBe` Just 2.5",
     secretTestCode: "describe \"IO Monad\" $ do\n  it \"processes input correctly\" $ do\n    result <- captureOutput processInput\n    result `shouldContain` \"10\"",
-    languageIds: [6],
+    languageIds: [8],
     examMode: true,
     closeOnDue: true,
     assignedGroupIds: ["Default"],
@@ -159,7 +159,7 @@ export async function seed(client: APIClient) {
   await client.assignments.create(420, {
     number: 6,
     name: "Generic Linked List Implementation",
-    publish: parseDateTime('2025-07-01T09:00'),
+    publish: parseDateTime('2025-06-01T09:00'),
     due: parseDateTime('2025-07-20T23:59'),
     examPin: "111111",
     showScoreOnLock: true,
@@ -187,7 +187,7 @@ export async function seed(client: APIClient) {
   await client.assignments.create(420, {
     number: 6,
     name: "Generic Binary Search Tree",
-    publish: parseDateTime('2025-07-05T09:00'),
+    publish: parseDateTime('2025-06-05T09:00'),
     due: parseDateTime('2025-07-25T23:59'),
     examPin: "222222",
     showScoreOnLock: true,
@@ -215,7 +215,7 @@ export async function seed(client: APIClient) {
   await client.assignments.create(420, {
     number: 7,
     name: "Graph Algorithms Implementation",
-    publish: parseDateTime('2025-07-10T09:00'),
+    publish: parseDateTime('2025-06-10T09:00'),
     due: parseDateTime('2025-08-01T23:59'),
     examPin: "333333",
     showScoreOnLock: true,
@@ -243,7 +243,7 @@ export async function seed(client: APIClient) {
   await client.assignments.create(420, {
     number: 9,
     name: "Dynamic Programming Algorithms",
-    publish: parseDateTime('2025-07-15T09:00'),
+    publish: parseDateTime('2025-06-15T09:00'),
     due: parseDateTime('2025-08-05T23:59'),
     examPin: "444444",
     showScoreOnLock: true, testCode: "dynamic programming test",
@@ -271,7 +271,7 @@ export async function seed(client: APIClient) {
   await client.assignments.create(420, {
     number: 10,
     name: "Advanced Data Structures",
-    publish: parseDateTime('2025-07-20T09:00'),
+    publish: parseDateTime('2025-06-20T09:00'),
     due: parseDateTime('2025-08-10T23:59'),
     examPin: "555555",
     showScoreOnLock: true, testCode: "advanced data structures test",

@@ -507,6 +507,13 @@ function createClient(persistence: Storage<Database>): APIClient {
           { id: 4, name: "Java" },
           { id: 5, name: "JavaScript" },
           { id: 6, name: "TypeScript" },
+          { id: 7, name: "Swift" },
+          { id: 8, name: "Haskell" },
+          { id: 9, name: "Rust" },
+          { id: 10, name: "Zig" },
+          { id: 11, name: "Kotlin" },
+          { id: 12, name: "Erlang" },
+          { id: 13, name: "Gleam" },
         ];
       }
     },

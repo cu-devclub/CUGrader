@@ -82,7 +82,8 @@ function StudentAssignmentList({
               <div>Dates</div>
               <div>Score</div>
             </div>
-          </div>          <div className="space-y-3">            {todoAssignments.map((assignment) => (
+          </div>
+          <div className="space-y-3">            {todoAssignments.map((assignment) => (
             <StudentAssignmentCard
               key={assignment.id}
               assignment={assignment}
