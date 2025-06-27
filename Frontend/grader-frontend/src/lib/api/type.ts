@@ -66,6 +66,7 @@ export interface Question {
   name: string;
   description: string;
   template: string; // predefine
+  languages: SupportedLanguage[];
 
   maxScore: number;
 }
@@ -86,6 +87,10 @@ export interface InstructorQuestion extends Question {
 
   testcases: Testcase[];
   secretTestCases: Testcase[];
+}
+
+export interface CreateInstructorQuestionPayload extends Omit<InstructorQuestion, "languages" | "id"> {
+  languageIds: number[];
 }
 
 export type SupportedLanguage = {
@@ -153,7 +158,6 @@ export interface Assignment {
 export interface AssignmentDetails {
   questionIds: number[];
   additionalFileIds: number[];
-  languages: SupportedLanguage[];
   examMode: boolean;
   closeOnDue: boolean;
   assignedGroupIds: string[];
@@ -195,11 +199,10 @@ export type CreateAssignmentPayload = Omit<InstructorAssignment, "id"> & {
   showScoreOnLock: boolean;
   testCode: string;
   secretTestCode: string;
-  languageIds: number[];
   examMode: boolean;
   closeOnDue: boolean;
   assignedGroupIds: string[];
-  questions: Omit<InstructorQuestion, "id">[];
+  questions: CreateInstructorQuestionPayload[];
 };
 
 export type UpdateAssignmentPayload = Partial<CreateAssignmentPayload>;
