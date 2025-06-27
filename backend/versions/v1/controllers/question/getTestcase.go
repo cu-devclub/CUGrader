@@ -59,3 +59,50 @@ func (qc *QuestionController) GetTestcaseCodeByTestcaseIDHandler(c *gin.Context)
 
 	c.JSON(http.StatusOK, gin.H{"testcase": testcaseCode.Testcase})
 }
+
+func (qc *QuestionController) GetMultilangTestcaseCodeByQuestionIDHandler(c *gin.Context) {
+	authHeader := c.GetHeader("Authentication")
+	claims, err := qc.Service.Utils.GetJWTClaims(authHeader)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
+		return
+	}
+
+	questionIDStr := c.Param("questionId")
+	questionID, err := strconv.Atoi(questionIDStr)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid question_id"})
+		return
+	}
+
+	isGetSecretTestcase := false
+	if claims.Role != "teacher" && claims.Role != "admin" {
+		isAssistant, err := qc.Service.Utils.IsUserAnAssistantToQuestion(questionID, claims.UserID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to check access"})
+			return
+		}
+
+		if !isAssistant {
+			isAssigned, err := qc.Service.Utils.IsStudentAssignedToQuestion(claims.UserID, questionID)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to check access"})
+				return
+			}
+
+			if !isAssigned {
+				c.JSON(http.StatusForbidden, gin.H{"message": "You do not have access to this question"})
+				return
+			}
+		}
+	}
+
+	testcase, err := qc.Service.GetMultilangTestcaseByQuestionID(questionID, isGetSecretTestcase)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to get testcase code"})
+		return
+	}
+
+	c.JSON(http.StatusOK, testcase)
+}
