@@ -28,7 +28,7 @@ export default function CodeSpacePage({ params }: CodeSpacePageProps) {
 
   return <DesktopCodeSpace
     question={question}
-    supportedLanguages={assignment.languages}
+    lab={assignment}
   />;
 }
 
