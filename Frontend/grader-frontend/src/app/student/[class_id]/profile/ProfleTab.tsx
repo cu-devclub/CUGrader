@@ -33,14 +33,13 @@ export default function ProflieTab() {
   return (
     <>
       <div className="w-full h-full mt-5">
-        <div className="w-full h-[45%] flex flex-col pl-20 pr-8">
-          <h1 className="px-4 mb-3">{t("scoreSum")}</h1>
+        <div className="w-full h-[45%] flex flex-col pl-2 pr-8">
           <div className="h-full w-full flex flex-row">
             <ScoreCard />
           </div>
         </div>
 
-        <div className="w-full h-1/2 flex flex-col pl-20 pr-8 mt-7">
+        <div className="w-full h-1/2 flex flex-col pl-2 pr-8 mt-7">
           <h1 className="px-4 mb-3">{t("ranking")}</h1>
           <div className="h-full w-full flex-row flex justify-center items-center">
             <div className="h-full w-1/3 flex flex-col items-center justify-center gap-y-5">

@@ -68,9 +68,7 @@ function studentCard({ class_id, class_name, image, semester }: Props) {
   const router = useRouter();
 
   const toAssignmentPage = () => {
-    router.push(
-      `/student/${class_id}/${semester.replace("/", "-")}/1/assignment`
-    );
+    router.push(`/student/${class_id}/assignment`);
   };
 
   const [progress, setProgress] = React.useState(13);
@@ -101,7 +99,7 @@ function studentCard({ class_id, class_name, image, semester }: Props) {
           <div className="flex h-[55%] w-full m-0 p-0 flex-col">
             <div className="flex flex-row items-end min-w-full space-x-19 pl-4 pt-2">
               <h1
-                className="text-md py-1 font-bold"
+                className="text-md py-1 font-semibold"
                 onClick={() => toAssignmentPage()} // Temporary Change to test the Popover
               >
                 {class_name} ({semester})

@@ -1,17 +1,28 @@
-'use client';
+"use client";
 
-import { AssignmentForm, AssignmentFormResult } from "@/components/assignment-form";
+import {
+  AssignmentForm,
+  AssignmentFormResult,
+} from "@/components/assignment-form";
 import { api } from "@/lib/api";
 import { UpdateAssignmentPayload } from "@/lib/api/type";
 import { parseDateTime } from "@internationalized/date";
-import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { use } from "react";
 import { useClassData } from "../../class-data-context";
 
-export default function Page({ params }: { params: Promise<{ assignment_id: string; }>; }) {
+export default function Page({
+  params,
+}: {
+  params: Promise<{ assignment_id: string }>;
+}) {
   const { assignment_id } = use(params);
   const { classData } = useClassData();
   const t = useTranslations();
@@ -21,7 +32,7 @@ export default function Page({ params }: { params: Promise<{ assignment_id: stri
   const queryClient = useQueryClient();
 
   const { data: assignment } = useSuspenseQuery({
-    queryKey: ['class', classData.id, 'assignment', assignmentId],
+    queryKey: ["class", classData.id, "assignment", assignmentId],
     queryFn: () => api.assignments.getByIdI(assignmentId),
   });
 
@@ -59,9 +70,11 @@ export default function Page({ params }: { params: Promise<{ assignment_id: stri
       const promises: Promise<any>[] = [];
 
       if (data.toRemoveExistingFileIds.length > 0) {
-        promises.push(...data.toRemoveExistingFileIds.map(fileId =>
-          api.assignments.removeFile(fileId)
-        ));
+        promises.push(
+          ...data.toRemoveExistingFileIds.map((fileId) =>
+            api.assignments.removeFile(fileId)
+          )
+        );
       }
 
       promises.push(api.assignments.update(assignmentId, payload));
@@ -69,18 +82,19 @@ export default function Page({ params }: { params: Promise<{ assignment_id: stri
       await Promise.all(promises);
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['class', classData.id, 'assignment'] });
-      toast.success(t('assignment.form.messages.updateSuccess'));
+      await queryClient.invalidateQueries({
+        queryKey: ["class", classData.id, "assignment"],
+      });
+      toast.success(t("assignment.form.messages.updateSuccess"));
       router.push(`/instructor/class/${classData.id}/assignments`);
     },
     onError: (error) => {
       console.error(error);
-      toast.error(t('assignment.form.messages.updateError'), {
+      toast.error(t("assignment.form.messages.updateError"), {
         description: error.message,
       });
     },
   });
-
 
   function submit(data: AssignmentFormResult) {
     mutation.mutate(data);
@@ -96,14 +110,21 @@ export default function Page({ params }: { params: Promise<{ assignment_id: stri
         classId={classData.id}
         isPending={mutation.isPending}
         submit={submit}
-        cancel={() => router.push(`/instructor/class/${classData.id}/assignments`)}
-        existingFiles={assignment.additionalFileIds?.map(id => ({ id, name: `File ${id}` })) || []}
+        cancel={() =>
+          router.push(`/instructor/class/${classData.id}/assignments`)
+        }
+        existingFiles={
+          assignment.additionalFileIds?.map((id) => ({
+            id,
+            name: `File ${id}`,
+          })) || []
+        }
         prefill={{
           name: assignment.name,
           number: assignment.number,
           publish: assignment.publish.toString(),
           due: assignment.due.toString(),
-          languageIds: assignment.languages.map(it => it.id),
+          languageIds: assignment.languages.map((it) => it.id),
           examMode: assignment.examMode,
           allowLateSubmission: !assignment.closeOnDue,
           showScoreOnLock: assignment.showScoreOnLock,
@@ -111,7 +132,7 @@ export default function Page({ params }: { params: Promise<{ assignment_id: stri
           assignedGroupIds: assignment.assignedGroupIds,
           testCode: assignment.testCode,
           secretTestCode: assignment.secretTestCode,
-          questions: assignment.questions.map(q => ({
+          questions: assignment.questions.map((q) => ({
             name: q.name,
             description: q.description,
             template: q.template,

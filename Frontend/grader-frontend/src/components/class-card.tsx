@@ -45,8 +45,8 @@ function Menu({ items }: MenuProps) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem>Profile</DropdownMenuItem>
-        <DropdownMenuItem>Billing</DropdownMenuItem>
+        <DropdownMenuItem>Setting</DropdownMenuItem>
+        <DropdownMenuItem>Delete Class</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

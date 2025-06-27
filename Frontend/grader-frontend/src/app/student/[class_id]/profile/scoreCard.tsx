@@ -9,7 +9,7 @@ export default function scoreCard() {
 
   return (
     <>
-      <Card className="w-[45%] gap-2 h-80 pt-2 border border-solid">
+      <Card className="w-[60%] gap-2 h-80 pt-2 border border-solid">
         <CardHeader>
           <h1 className="text-lg">{t("scoreSum")}</h1>
         </CardHeader>
