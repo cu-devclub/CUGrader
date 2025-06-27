@@ -43,8 +43,10 @@ export default function Page({ }) {
           testcases: q.testcases,
           secretTestCases: q.secretTestCases,
         })),
-        additionalFiles: data.additionalFiles
+        // additionalFiles: data.additionalFiles
       };
+
+      // TODO: implement file updloading again 
 
       // console.log(payload);
       await api.assignments.create(classData.id, payload);

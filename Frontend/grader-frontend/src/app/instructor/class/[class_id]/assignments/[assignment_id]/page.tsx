@@ -52,8 +52,9 @@ export default function Page({ params }: { params: Promise<{ assignment_id: stri
           testcases: q.testcases,
           secretTestCases: q.secretTestCases,
         })),
-        filesToAdd: data.additionalFiles,
       };
+
+      // TODO: handle file uploading again
 
       // Handle file removals and update assignment in parallel
       const promises: Promise<unknown>[] = [];

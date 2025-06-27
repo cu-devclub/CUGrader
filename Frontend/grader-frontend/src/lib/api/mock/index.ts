@@ -256,19 +256,7 @@ function createClient(persistence: Storage<Database>): APIClient {
         const assignment = assignments.find(a => a.id === labId);
         if (!assignment) throw new Error(`Assignment ${labId} not found`);
 
-        const assignmentQuestions = questions.filter(q => assignment.questionIds.includes(q.id))
-          .map(q => ({
-            number: q.number,
-            name: q.name,
-            description: q.description,
-            template: q.template,
-            maxScore: q.maxScore,
-            submission: Math.random() > 0.5 ? {
-              id: Math.floor(Math.random() * 1000),
-              score: Math.floor(Math.random() * q.maxScore),
-              submittedAt: parseDateTime('2025-06-20T10:30')
-            } : undefined
-          }));
+        const assignmentQuestions = await Promise.all(assignment.questionIds.map(id => client.questions.getById(id)));
 
         // Map languageIds to supported languages
         const supportedLanguages = await client.supportedLanguages.list();
@@ -298,7 +286,7 @@ function createClient(persistence: Storage<Database>): APIClient {
         const assignment = assignments.find(a => a.id === labId);
         if (!assignment) throw new Error(`Assignment ${labId} not found`);
 
-        const assignmentQuestions = questions.filter(q => assignment.questionIds.includes(q.id));
+        const assignmentQuestions = await Promise.all(assignment.questionIds.map(id => client.questions.getByIdI(id)));
 
         // Map languageIds to supported languages
         const supportedLanguages = await client.supportedLanguages.list();
@@ -351,7 +339,7 @@ function createClient(persistence: Storage<Database>): APIClient {
           name: a.name
         }));
       },
-      
+
       create: async (classId, payload) => {
         const newAssignment: DbAssignment = {
           id: currentAssignmentId++,
@@ -417,7 +405,7 @@ function createClient(persistence: Storage<Database>): APIClient {
 
         persistence.persist();
       },
-      
+
       attachFile: async (assignmentId: number, file: File) => {
         const assignment = assignments.find(a => a.id === assignmentId);
         if (!assignment) throw new Error(`Assignment ${assignmentId} not found`);
@@ -444,6 +432,7 @@ function createClient(persistence: Storage<Database>): APIClient {
         if (!question) throw new Error(`Question ${questionId} not found`);
 
         return {
+          id: questionId,
           number: question.number,
           name: question.name,
           description: question.description,

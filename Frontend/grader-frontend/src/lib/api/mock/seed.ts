@@ -78,7 +78,6 @@ export async function seed(client: APIClient) {
         secretTestCases: [{ input: "abc", output: "Invalid input" }]
       }
     ],
-    additionalFiles: []
   });
   await client.assignments.create(420, {
     number: 3,
@@ -116,7 +115,6 @@ export async function seed(client: APIClient) {
         secretTestCases: [{ input: "[3,1,2,1,3]", output: "[1,2,3]" }]
       }
     ],
-    additionalFiles: []
   });
 
   await client.assignments.create(420, {
@@ -156,7 +154,6 @@ export async function seed(client: APIClient) {
         testcases: [{ input: "obj.a.b.c", output: "42" }],
         secretTestCases: [{ input: "obj.a.x", output: "undefined" }]
       }],
-    additionalFiles: []
   });
 
   await client.assignments.create(420, {
@@ -186,7 +183,6 @@ export async function seed(client: APIClient) {
         secretTestCases: [{ input: "insert(1, 5)", output: "[1,5,2,3]" }]
       }
     ],
-    additionalFiles: []
   });
   await client.assignments.create(420, {
     number: 6,
@@ -215,7 +211,6 @@ export async function seed(client: APIClient) {
         secretTestCases: [{ input: "delete(3)", output: "in-order: [5,7]" }]
       }
     ],
-    additionalFiles: []
   });
   await client.assignments.create(420, {
     number: 7,
@@ -244,7 +239,6 @@ export async function seed(client: APIClient) {
         secretTestCases: [{ input: "dijkstra from A to C", output: "distance: 3" }]
       }
     ],
-    additionalFiles: []
   });
   await client.assignments.create(420, {
     number: 9,
@@ -254,7 +248,6 @@ export async function seed(client: APIClient) {
     examPin: "444444",
     showScoreOnLock: true, testCode: "dynamic programming test",
     secretTestCode: "dynamic programming secret",
-    additionalFiles: [],
     languageIds: [6, 1, 4, 2],
     examMode: false,
     closeOnDue: true,
@@ -283,7 +276,6 @@ export async function seed(client: APIClient) {
     examPin: "555555",
     showScoreOnLock: true, testCode: "advanced data structures test",
     secretTestCode: "advanced data structures secret",
-    additionalFiles: [],
     languageIds: [6, 1, 4, 2],
     examMode: false,
     closeOnDue: true,
