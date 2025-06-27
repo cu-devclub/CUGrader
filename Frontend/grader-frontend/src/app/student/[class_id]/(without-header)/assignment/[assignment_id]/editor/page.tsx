@@ -1,9 +1,9 @@
 'use client';
 
+import { api } from "@/lib/api";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { use } from "react";
 import { DesktopCodeSpace } from "./desktop";
-import { useSuspenseQueries, useSuspenseQuery } from "@tanstack/react-query";
-import { api } from "@/lib/api";
 
 interface CodeSpacePageProps {
   params: Promise<{
