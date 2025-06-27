@@ -139,7 +139,6 @@ export function StudentAddDialog({ state: { mode, setMode, open, setOpen }, clas
     }
   }, [open]);
 
-  // TODO: tanstack query this
   const onAdd = async () => {
     if (mode === "file") {
       uploadFileMutation.mutate();
