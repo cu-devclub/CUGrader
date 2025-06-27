@@ -225,7 +225,7 @@ export function createClient() {
           labData: {
             assignTo: p.assignedGroupIds,
             closeOnDue: p.closeOnDue,
-            
+
             languageIds: p.languageIds,
 
             examMode: p.examMode,
@@ -285,7 +285,7 @@ export function createClient() {
               score: q.submission.score!,
               submittedAt: parseDateTime(q.submission.timestamp!)
             }
-          } satisfies StudentQuestion;
+          };
         });
 
         const questions = await Promise.all(questionPromises);
