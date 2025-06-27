@@ -16,6 +16,12 @@ type MultilangTestcase struct {
 	Output string `json:"output"` // Expected output for the test case
 }
 
+// Intentionally duplicated struct for MongoDB usage
+type TestcaseMongoModel struct {
+	Input  string `bson:"input"`
+	Output string `bson:"output"`
+}
+
 type QuestionEditModel struct {
 	Number                  int                 `json:"number"`                    // Number of the question, used for ordering and identification
 	Name                    string              `json:"name"`                      // Name of the question
@@ -67,4 +73,9 @@ type TestcaseModel struct {
 
 type TestcaseCodeResponseModel struct {
 	Testcase string `json:"testcase"` // Test case code
+}
+
+type TestcaseWithSecretModel struct {
+	Testcase       []MultilangTestcase `json:"testcase"`        // Test case content
+	SecretTestcase []MultilangTestcase `json:"secret_testcase"` // Secret test case content
 }
