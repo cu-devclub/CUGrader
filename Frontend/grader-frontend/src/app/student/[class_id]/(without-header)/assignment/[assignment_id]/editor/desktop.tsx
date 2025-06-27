@@ -1,14 +1,15 @@
 import { Button } from '@/components/ui/button';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
+import { StudentQuestion, SupportedLanguage } from '@/lib/api/type';
 import { cn } from '@/lib/utils';
 import * as Tabs from "@radix-ui/react-tabs";
 import { PlayIcon, TestTubeIcon } from 'lucide-react';
 import { useMemo, useRef } from 'react';
+import Markdown from 'react-markdown';
 import { ImperativePanelHandle } from 'react-resizable-panels';
-import { CodeSpaceTabs } from './shared';
 import { CodeFile, EditorPanel, ImperativeEditorHandle } from './editor';
 import { useSubmitCode } from './hooks';
-import { StudentQuestion, SupportedLanguage } from '@/lib/api/type';
+import { CodeSpaceTabs } from './shared';
 
 // TODO: extract this to seperated file
 function getMonacoLanguageId(language: SupportedLanguage) {
@@ -99,8 +100,9 @@ function DetailPanel({ question }: { question: StudentQuestion; }) {
       {/* Using dangerouslySetInnerHTML for markdown/html content */}
       <div
         className="prose prose-sm dark:prose-invert max-w-none"
-        dangerouslySetInnerHTML={{ __html: question.description }}
-      />
+      >
+        <Markdown>{question.description}</Markdown>
+      </div>
     </div>
   );
 }
