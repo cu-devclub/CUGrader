@@ -23,9 +23,9 @@ export default function Page({ }) {
         publish: parseDateTime(data.publish),
         due: parseDateTime(data.due),
         // maxScore: unimplemented("this is computed property now"),
-        languages: data.languages,
+        languageIds: data.languageIds,
         examMode: data.examMode,
-        closeOnDue: data.closeOnDue,
+        closeOnDue: !data.allowLateSubmission,
         showScoreOnLock: data.showScoreOnLock,
         examPin: data.examPin,
         assignedGroupIds: data.assignedGroupIds,
@@ -43,8 +43,10 @@ export default function Page({ }) {
           testcases: q.testcases,
           secretTestCases: q.secretTestCases,
         })),
-        additionalFiles: data.additionalFiles
+        // additionalFiles: data.additionalFiles
       };
+
+      // TODO: implement file updloading again 
 
       // console.log(payload);
       await api.assignments.create(classData.id, payload);

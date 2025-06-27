@@ -53,6 +53,12 @@ export interface LabEdit {
     due?: string;
     /**
      * 
+     * @type {Array<number>}
+     * @memberof LabEdit
+     */
+    languageIds?: Array<number>;
+    /**
+     * 
      * @type {boolean}
      * @memberof LabEdit
      */
@@ -128,6 +134,7 @@ export function LabEditFromJSONTyped(json: any, ignoreDiscriminator: boolean): L
         'name': json['name'] == null ? undefined : json['name'],
         'publish': json['publish'] == null ? undefined : json['publish'],
         'due': json['due'] == null ? undefined : json['due'],
+        'languageIds': json['language_ids'] == null ? undefined : json['language_ids'],
         'closeOnDue': json['close_on_due'] == null ? undefined : json['close_on_due'],
         'examMode': json['exam_mode'] == null ? undefined : json['exam_mode'],
         'showScoreOnLock': json['show_score_on_lock'] == null ? undefined : json['show_score_on_lock'],
@@ -155,6 +162,7 @@ export function LabEditToJSONTyped(value?: LabEdit | null, ignoreDiscriminator: 
         'name': value['name'],
         'publish': value['publish'],
         'due': value['due'],
+        'language_ids': value['languageIds'],
         'close_on_due': value['closeOnDue'],
         'exam_mode': value['examMode'],
         'show_score_on_lock': value['showScoreOnLock'],

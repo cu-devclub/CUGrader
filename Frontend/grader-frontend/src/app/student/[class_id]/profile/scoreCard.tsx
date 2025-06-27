@@ -4,7 +4,7 @@ import SumProgressBar from "./sumProgressBar";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { useTranslations } from "next-intl";
 
-export default function scoreCard() {
+export default function ScoreCard() {
   const t = useTranslations("profile-page");
 
   return (

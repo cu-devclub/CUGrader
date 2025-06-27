@@ -16,85 +16,85 @@ import { mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface LabsClassIdGet200Response
+ * @interface LabsClassIdGet200ResponseInner
  */
-export interface LabsClassIdGet200Response {
+export interface LabsClassIdGet200ResponseInner {
     /**
      * lab_id primary key
      * @type {number}
-     * @memberof LabsClassIdGet200Response
+     * @memberof LabsClassIdGet200ResponseInner
      */
     labId?: number;
     /**
      * 
      * @type {number}
-     * @memberof LabsClassIdGet200Response
+     * @memberof LabsClassIdGet200ResponseInner
      */
     labNumber?: number;
     /**
      * 
      * @type {string}
-     * @memberof LabsClassIdGet200Response
+     * @memberof LabsClassIdGet200ResponseInner
      */
     labName?: string;
     /**
      * datetime
      * @type {string}
-     * @memberof LabsClassIdGet200Response
+     * @memberof LabsClassIdGet200ResponseInner
      */
     publish?: string;
     /**
      * datetime
      * @type {string}
-     * @memberof LabsClassIdGet200Response
+     * @memberof LabsClassIdGet200ResponseInner
      */
     due?: string;
     /**
      * 
      * @type {number}
-     * @memberof LabsClassIdGet200Response
+     * @memberof LabsClassIdGet200ResponseInner
      */
     score?: number;
     /**
      * 
      * @type {number}
-     * @memberof LabsClassIdGet200Response
+     * @memberof LabsClassIdGet200ResponseInner
      */
     maxScore?: number;
     /**
      * 
      * @type {string}
-     * @memberof LabsClassIdGet200Response
+     * @memberof LabsClassIdGet200ResponseInner
      */
-    status?: LabsClassIdGet200ResponseStatusEnum;
+    status?: LabsClassIdGet200ResponseInnerStatusEnum;
 }
 
 
 /**
  * @export
  */
-export const LabsClassIdGet200ResponseStatusEnum = {
+export const LabsClassIdGet200ResponseInnerStatusEnum = {
     New: 'new',
     PartialComplete: 'partial_complete',
     Complete: 'complete',
     Late: 'late',
     DueSoon: 'due_soon'
 } as const;
-export type LabsClassIdGet200ResponseStatusEnum = typeof LabsClassIdGet200ResponseStatusEnum[keyof typeof LabsClassIdGet200ResponseStatusEnum];
+export type LabsClassIdGet200ResponseInnerStatusEnum = typeof LabsClassIdGet200ResponseInnerStatusEnum[keyof typeof LabsClassIdGet200ResponseInnerStatusEnum];
 
 
 /**
- * Check if a given object implements the LabsClassIdGet200Response interface.
+ * Check if a given object implements the LabsClassIdGet200ResponseInner interface.
  */
-export function instanceOfLabsClassIdGet200Response(value: object): value is LabsClassIdGet200Response {
+export function instanceOfLabsClassIdGet200ResponseInner(value: object): value is LabsClassIdGet200ResponseInner {
     return true;
 }
 
-export function LabsClassIdGet200ResponseFromJSON(json: any): LabsClassIdGet200Response {
-    return LabsClassIdGet200ResponseFromJSONTyped(json, false);
+export function LabsClassIdGet200ResponseInnerFromJSON(json: any): LabsClassIdGet200ResponseInner {
+    return LabsClassIdGet200ResponseInnerFromJSONTyped(json, false);
 }
 
-export function LabsClassIdGet200ResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): LabsClassIdGet200Response {
+export function LabsClassIdGet200ResponseInnerFromJSONTyped(json: any, ignoreDiscriminator: boolean): LabsClassIdGet200ResponseInner {
     if (json == null) {
         return json;
     }
@@ -111,11 +111,11 @@ export function LabsClassIdGet200ResponseFromJSONTyped(json: any, ignoreDiscrimi
     };
 }
 
-export function LabsClassIdGet200ResponseToJSON(json: any): LabsClassIdGet200Response {
-    return LabsClassIdGet200ResponseToJSONTyped(json, false);
+export function LabsClassIdGet200ResponseInnerToJSON(json: any): LabsClassIdGet200ResponseInner {
+    return LabsClassIdGet200ResponseInnerToJSONTyped(json, false);
 }
 
-export function LabsClassIdGet200ResponseToJSONTyped(value?: LabsClassIdGet200Response | null, ignoreDiscriminator: boolean = false): any {
+export function LabsClassIdGet200ResponseInnerToJSONTyped(value?: LabsClassIdGet200ResponseInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -1,9 +1,7 @@
-import * as React from "react";
 import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
+import * as React from "react";
 
-export default function sumProgressBar() {
+export default function useSumProgressBar() {
   const [progress, setProgress] = React.useState(13);
 
   React.useEffect(() => {

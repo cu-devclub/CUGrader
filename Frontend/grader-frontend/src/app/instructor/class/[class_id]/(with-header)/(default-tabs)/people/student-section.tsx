@@ -165,7 +165,7 @@ export function StudentSection({ classId }: StudentSectionProps) {
 
             <div className="flex justify-between gap-2">
               <div className="flex gap-2">
-                <Input placeholder="Search" value={search} onInput={e => setSearch((e.target as any).value)} />
+                <Input placeholder="Search" value={search} onInput={e => setSearch((e.target as HTMLInputElement).value)} />
               </div>
               <div className="flex gap-2">
                 {hasSelected &&

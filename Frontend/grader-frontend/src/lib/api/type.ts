@@ -87,7 +87,10 @@ export interface InstructorQuestion extends Question {
   secretTestCases: Testcase[];
 }
 
-type SupportedLanguage = string;
+export type SupportedLanguage = {
+  id: number; // e.g. 1, 2, 3
+  name: string; // e.g. "C++", "Python 3"
+};
 
 // ===========
 
@@ -127,9 +130,6 @@ export interface CreateClassPayload {
 export type UpdateClassPayload = Partial<CreateClassPayload>;
 
 
-
-
-
 export type AssignmentStatus = "new" | "partially-completed" | "completed" | "lated" | "due-soon";
 
 export type NearDueAssignment = {
@@ -142,22 +142,27 @@ export type NearDueAssignment = {
 };
 
 export interface Assignment {
-  id: number; // not exist yet
-
-  additionalFileIds: number[];
+  id: number;
   number: number;
   name: string;
-  publish: CalendarDateTime; // @internationalized/date maybe
-  due: CalendarDateTime; // RFC3339: 1996-12-19T16:39:57+07:00
+  publish: CalendarDateTime;
+  due: CalendarDateTime;
+}
 
+export interface AssignmentDetails {
   questionIds: number[];
-  // maxScore: number; // This is computed property now
-  languages: SupportedLanguage[]; // select at least one
-
-  // should this be in StudentAssignment
+  additionalFileIds: number[];
+  languages: SupportedLanguage[];
   examMode: boolean;
   closeOnDue: boolean;
   assignedGroupIds: string[];
+}
+
+export interface InstructorAssignmentDetailsFields {
+  examPin: string;
+  showScoreOnLock: boolean;
+  testCode: string;
+  secretTestCode: string;
 }
 
 // TODO: omit a lot more
@@ -166,25 +171,63 @@ export interface StudentAssignment extends Assignment {
   status: AssignmentStatus;
 }
 
-export interface InstructorAssignment extends Assignment {
-  // how do i get this?
-  examPin: string; // 6 digit num
-  showScoreOnLock: boolean; // hideOnClose ??? -> which mean we have some kind of state `isLocked` from the api
-
-  testCode: string; // aka `testcase` | its like the one in 2024 class
-  secretTestCode: string;
-  questionIds: number[];
+export interface StudentAssignmentDetails extends StudentAssignment, AssignmentDetails {
+  questions: StudentQuestion[];
 }
 
-export type CreateAssignmentPayload = Omit<InstructorAssignment, "id" | "questionIds" | "additionalFileIds"> & {
+export type InstructorAssignment = Assignment;
+
+export interface InstructorAssignmentDetails extends InstructorAssignment, AssignmentDetails, InstructorAssignmentDetailsFields {
   questions: InstructorQuestion[];
-  additionalFiles: File[];
+}
+
+
+export interface QuestionSubmissionPayload {
+  questionId: number;
+  languageId: number;
+  code: string;
+}
+
+export type CreateAssignmentPayload = Omit<InstructorAssignment, "id"> & {
+  // Required fields for creation
+  examPin: string;
+  showScoreOnLock: boolean;
+  testCode: string;
+  secretTestCode: string;
+  languageIds: number[];
+  examMode: boolean;
+  closeOnDue: boolean;
+  assignedGroupIds: string[];
+  questions: InstructorQuestion[];
 };
 
-export type UpdateAssignmentPayload = Omit<CreateAssignmentPayload, "additionalFiles"> & {
-  // WE CANT REMOVE FILE USING THIS REQ
-  filesToAdd: File[];
-};
+export type UpdateAssignmentPayload = Partial<CreateAssignmentPayload>;
+
+
+export interface CodePage { // ?????
+  pageName: string;
+  content: string;
+}
+
+export interface SubmissionResult {
+  public: PublicTestcaseResult[];
+  secret: SecretTestcaseResult[];
+}
+
+export interface PublicTestcaseResult {
+  input: string; // TODO: request output if ui need it
+  expectedOutput: string | null; // ????
+  message: string;
+  status: "pass" | "fail";
+}
+
+export type SecretTestcaseResult = Omit<PublicTestcaseResult, "input" | "expectedOutput">;
+
+export interface CodeSubmission {
+  submissionId: number;
+  code: CodePage[];
+  language: SupportedLanguage;
+}
 
 export interface APIClient {
   students: {
@@ -213,31 +256,44 @@ export interface APIClient {
     addToClass: (classId: number, email: string) => Promise<void>,
     removeFromClass: (classId: number, email: string) => Promise<void>,
   },
+
   assignments: {
     listNearDue: () => Promise<NearDueAssignment[]>;
     listByClass: (classId: number) => Promise<StudentAssignment[]>;
     listByClassI: (classId: number) => Promise<InstructorAssignment[]>;
 
-    // TODO: seperate this
-    getById: (labId: number) => Promise<StudentAssignment>;
-    getByIdI: (labId: number) => Promise<InstructorAssignment>;
+    getById: (labId: number) => Promise<StudentAssignmentDetails>;
+    getByIdI: (labId: number) => Promise<InstructorAssignmentDetails>;
 
     create: (classId: number, payload: CreateAssignmentPayload) => Promise<void>;
     update: (labId: number, payload: UpdateAssignmentPayload) => Promise<void>;
-    // 
 
+    attachFile: (assignmentId: number, file: File) => Promise<void>;
     removeFile: (fileId: number) => Promise<void>;
-    // TODO: download it fr
     downloadFile: (fileId: number) => Promise<Blob>;
   };
   questions: {
     getById: (questionId: number) => Promise<StudentQuestion>;
     getByIdI: (questionId: number) => Promise<InstructorQuestion>;
+
+    submit: (questionId: number, languageId: number, codes: CodePage[]) => Promise<{ submissionId: number; }>;
+    getSubmission: (questionId: number) => Promise<CodeSubmission>;
+    requestGrade: (submissionId: number) => Promise<void>;
+    getSubmissionResult: (submissionId: number) => Promise<SubmissionResult>;
   };
   supportedLanguages: {
-    list: () => Promise<string[]>;
+    list: () => Promise<SupportedLanguage[]>;
   };
   groups: {
     listByClassId: (classId: number) => Promise<string[]>;
+  };
+  examPin: {
+    getByAssignmentId: (assignmentId: number) => Promise<string>;
+  };
+  testCode: { // TODO: rename this
+    getById: (testCodeId: number) => Promise<string>;
+  };
+  testcase: { // TODO: rename this
+    listByQuestionId: (testCodeId: number) => Promise<{ public: Testcase[], secret: Testcase[]; }>;
   };
 };

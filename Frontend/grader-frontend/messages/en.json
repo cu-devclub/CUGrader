@@ -16,11 +16,11 @@
             },
             "fields": {
                 "name": {
-                    "label": "Assignment Name",
+                    "label": "Lab Name",
                     "placeholder": "Lab 1: Hello World"
                 },
                 "number": {
-                    "label": "Assignment Number"
+                    "label": "Lab Number"
                 },
                 "publish": {
                     "label": "Publish Date & Time",
@@ -46,13 +46,13 @@
                     "label": "Exam Mode",
                     "description": "Enable exam mode for stricter security"
                 },
-                "closeOnDue": {
-                    "label": "Close on Due Date",
-                    "description": "Automatically close submissions when due date passes"
+                "allowLateSubmission": {
+                    "label": "Allow Late Submission",
+                    "description": "Allow students to submit after the due date"
                 },
                 "showScoreOnLock": {
-                    "label": "Show Score on Lock",
-                    "description": "Show scores to students after submission is locked"
+                    "label": "Reveal score after submission closure",
+                    "description": "Show students their score after the assignment is closed"
                 },
                 "examPin": {
                     "label": "Exam PIN",
@@ -73,7 +73,9 @@
                 }
             },
             "question": {
-                "title": "Question {number}",
+                "no": "Question No.",
+                "title": "Question Title",
+                "titlePlaceholder": "Enter question title...",
                 "fields": {
                     "name": {
                         "label": "Question Name",
@@ -128,7 +130,9 @@
                 "addTestcase": "Add Test Case",
                 "removeTestcase": "Remove",
                 "cancel": "Cancel",
-                "save": "Create Assignment",
+                "save": "Save Assignment",
+                "create": "Create Assignment",
+                "saving": "Saving...",
                 "creating": "Creating...",
                 "selectFiles": "Select Files"
             },
@@ -269,7 +273,6 @@
             }
         }
     },
-
     "student": {
         "allClass": "All Classes",
         "ta": "Teacher Assistant",
@@ -277,7 +280,6 @@
         "assignment": "Assignment",
         "profile-text": "Profile"
     },
-
     "assignment-page": {
         "assign-title": "Assigned",
         "done-title": "Done",
@@ -287,7 +289,6 @@
         "due": "Due Date",
         "score": "Score"
     },
-
     "profile-page": {
         "scoreSum": "Score Summary",
         "midterm": "midterm",
@@ -297,9 +298,8 @@
         "max": "Max Score",
         "sd": "S.D."
     },
-
     "notification-page": {
-        "noti-title": "Notification",
+        "noti-title": "Notification Center",
         "notification": "Course Notification",
         "max": "Max Score"
     }

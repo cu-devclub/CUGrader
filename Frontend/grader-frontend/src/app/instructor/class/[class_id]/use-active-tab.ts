@@ -4,14 +4,16 @@ export function useActiveTab() {
   const path = usePathname();
   const segments = path.split('/');
   const pageSegment = segments[4]; // instructor/class/{class_id}/{page}
-  
+
   const pages = [
     "assignments",
-    "people", 
+    "people",
     "exam-mode",
     "settings",
     "teacher-management"
   ] as const;
-  
-  return pages.includes(pageSegment as any) ? pageSegment as typeof pages[number] : null;
+
+  type PageName = typeof pages[number];
+
+  return pages.includes(pageSegment as PageName) ? pageSegment as PageName : null;
 }

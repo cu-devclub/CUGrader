@@ -159,7 +159,7 @@ export class PersistenceStorage<Data> implements Storage<Data> {
       const persistenceDir = await this.getOPFSDirectory();
       const fileIds: string[] = [];
 
-      // @ts-ignore - OPFS entries() method might not be in types yet
+      // @ts-expect-error - OPFS entries() method might not be in types yet
       for await (const [name, handle] of persistenceDir.entries()) {
         if (handle.kind === 'file') {
           fileIds.push(name);
@@ -214,7 +214,7 @@ export class PersistenceStorage<Data> implements Storage<Data> {
       try {
         const persistenceDir = await this.getOPFSDirectory();
 
-        // @ts-ignore - OPFS entries() method might not be in types yet
+        // @ts-expect-error - OPFS entries() method might not be in types yet
         for await (const [name, handle] of persistenceDir.entries()) {
           if (handle.kind === 'file') {
             await persistenceDir.removeEntry(name);

@@ -1,16 +1,15 @@
 "use client";
 
-import * as React from "react";
-import { Progress } from "@/components/ui/progress";
-import { Card } from "@/components/ui/card";
-import { useRouter } from "next/navigation";
-import { FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { FileText } from "lucide-react";
+import { useRouter } from "next/navigation";
+import * as React from "react";
 
-import AssignContent from "./assignContent";
-import { useSuspenseQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import AssignContent from "./assignContent";
 
 import {
   Popover,
@@ -26,7 +25,7 @@ interface Props {
   semester: string;
 }
 
-function statPopOver(class_id: number) {
+function StatPopOver(class_id: number) {
   const { data: assigmentsList } = useSuspenseQuery({
     queryKey: ["assigment-popover"],
     queryFn: () => api.assignments.listByClass(class_id),
@@ -64,7 +63,7 @@ function statPopOver(class_id: number) {
   );
 }
 
-function studentCard({ class_id, class_name, image, semester }: Props) {
+function StudentCard({ class_id, class_name, image, semester }: Props) {
   const router = useRouter();
 
   const toAssignmentPage = () => {
@@ -84,7 +83,7 @@ function studentCard({ class_id, class_name, image, semester }: Props) {
     <>
       <Card
         className="w-80 h-50 p-0 m-0 overflow-hidden relative"
-        // onClick={() => toAssignmentPage()}
+      // onClick={() => toAssignmentPage()}
       >
         <div className="h-full w-full">
           <div className="flex h-[45%] w-full m-0 p-0 items-center justify-center border border-solid bg-blue-500 overflow-hidden">
@@ -106,7 +105,7 @@ function studentCard({ class_id, class_name, image, semester }: Props) {
               >
                 {class_name} ({semester})
               </h1>
-              {statPopOver(class_id)}
+              {StatPopOver(class_id)}
             </div>
 
             <div className="px-4 flex flex-col gap-y-3">
@@ -120,4 +119,4 @@ function studentCard({ class_id, class_name, image, semester }: Props) {
   );
 }
 
-export default studentCard;
+export default StudentCard;

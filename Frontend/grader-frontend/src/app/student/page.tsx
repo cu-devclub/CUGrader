@@ -1,7 +1,7 @@
 "use client";
 
 import { ClassCard } from "@/components/class-card";
-import { Bell, LogOut, Plus } from "lucide-react";
+import { LogOut, Plus } from "lucide-react";
 import { useState } from "react";
 import { SemesterSelector } from "../../components/semester-selector";
 import StudentCard from "./studentCard";
@@ -9,8 +9,9 @@ import StudentCard from "./studentCard";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { NotificationPopover } from "@/components/notification-popover";
 
 type Assistant = {
   name: string;
@@ -55,9 +56,7 @@ export default function Page() {
           <Button variant="ghost" className="text-xl mr-8">
             <Plus />
           </Button>
-          <Button variant="ghost" className="text-xl">
-            <Bell />
-          </Button>
+          <NotificationPopover />
           <Button variant="ghost" className="text-xl">
             <LogOut />
           </Button>

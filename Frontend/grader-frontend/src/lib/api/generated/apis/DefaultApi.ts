@@ -13,68 +13,64 @@
  */
 
 
-import * as runtime from '../runtime';
 import type {
-  Assistant,
-  CallbackPost200Response,
-  CallbackPostRequest,
-  ClassObject,
-  ClassesClassesYearSemesterGet200Response,
-  ClassesSemestersGet200Response,
-  CreateStudent,
-  DeleteStudent,
-  EditStudent,
-  LabEdit,
-  LabLabIdGet200Response,
-  LabsClassIdGet200Response,
-  LanguageGet200Response,
-  NearDueDateGet200Response,
-  QuestionQuestionIdGet200Response,
-  SectionArray,
-  Students,
-  TAeditBody,
-  TestCallbackPostRequest,
+    Assistant,
+    CallbackPost200Response,
+    CallbackPostRequest,
+    ClassObject,
+    ClassesClassesYearSemesterGet200Response,
+    ClassesSemestersGet200Response,
+    CodePost200Response,
+    CodePostRequest,
+    CodeQuestionIdGet200Response,
+    CreateStudent,
+    DeleteStudent,
+    EditStudent,
+    ExamPinLabIdGet200Response,
+    LabEdit,
+    LabLabIdGet200Response,
+    LabsClassIdGet200ResponseInner,
+    LanguageGet200Response,
+    MultilangTestcaseQuestionIdGet200Response,
+    NearDueDateGet200Response,
+    QuestionQuestionIdGet200Response,
+    RequestGradeRequest,
+    ResultSubmissionIdGet200Response,
+    SectionArray,
+    Students,
+    TAeditBody,
+    TestCallbackPostRequest,
+    TestcaseTestcaseIdGet200Response,
 } from '../models/index';
 import {
     AssistantFromJSON,
-    AssistantToJSON,
     CallbackPost200ResponseFromJSON,
-    CallbackPost200ResponseToJSON,
-    CallbackPostRequestFromJSON,
     CallbackPostRequestToJSON,
     ClassObjectFromJSON,
-    ClassObjectToJSON,
     ClassesClassesYearSemesterGet200ResponseFromJSON,
-    ClassesClassesYearSemesterGet200ResponseToJSON,
     ClassesSemestersGet200ResponseFromJSON,
-    ClassesSemestersGet200ResponseToJSON,
-    CreateStudentFromJSON,
+    CodePost200ResponseFromJSON,
+    CodePostRequestToJSON,
+    CodeQuestionIdGet200ResponseFromJSON,
     CreateStudentToJSON,
-    DeleteStudentFromJSON,
     DeleteStudentToJSON,
-    EditStudentFromJSON,
     EditStudentToJSON,
-    LabEditFromJSON,
-    LabEditToJSON,
+    ExamPinLabIdGet200ResponseFromJSON,
     LabLabIdGet200ResponseFromJSON,
-    LabLabIdGet200ResponseToJSON,
-    LabsClassIdGet200ResponseFromJSON,
-    LabsClassIdGet200ResponseToJSON,
+    LabsClassIdGet200ResponseInnerFromJSON,
     LanguageGet200ResponseFromJSON,
-    LanguageGet200ResponseToJSON,
+    MultilangTestcaseQuestionIdGet200ResponseFromJSON,
     NearDueDateGet200ResponseFromJSON,
-    NearDueDateGet200ResponseToJSON,
     QuestionQuestionIdGet200ResponseFromJSON,
-    QuestionQuestionIdGet200ResponseToJSON,
+    RequestGradeRequestToJSON,
+    ResultSubmissionIdGet200ResponseFromJSON,
     SectionArrayFromJSON,
-    SectionArrayToJSON,
     StudentsFromJSON,
-    StudentsToJSON,
-    TAeditBodyFromJSON,
     TAeditBodyToJSON,
-    TestCallbackPostRequestFromJSON,
     TestCallbackPostRequestToJSON,
+    TestcaseTestcaseIdGet200ResponseFromJSON
 } from '../models/index';
+import * as runtime from '../runtime';
 
 export interface AddfileAddfileIdDeleteRequest {
     addfileId: number;
@@ -123,6 +119,21 @@ export interface ClassesSemestersGetRequest {
     authentication?: string;
 }
 
+export interface CodePostOperationRequest {
+    authentication?: string;
+    codePostRequest?: CodePostRequest;
+}
+
+export interface CodeQuestionIdGetRequest {
+    questionId: number;
+    authentication?: string;
+}
+
+export interface ExamPinLabIdGetRequest {
+    labId: number;
+    authentication?: string;
+}
+
 export interface GroupClassIdGetRequest {
     classId: number;
     authentication?: string;
@@ -150,6 +161,11 @@ export interface LabsClassIdGetRequest {
     authentication?: string;
 }
 
+export interface MultilangTestcaseQuestionIdGetRequest {
+    questionId: number;
+    authentication?: string;
+}
+
 export interface NearDueDateGetRequest {
     authentication?: string;
 }
@@ -160,6 +176,16 @@ export interface PicturePictureIdGetRequest {
 
 export interface QuestionQuestionIdGetRequest {
     questionId: number;
+    authentication?: string;
+}
+
+export interface RequestGradeOperationRequest {
+    authentication?: string;
+    requestGradeRequest?: RequestGradeRequest;
+}
+
+export interface ResultSubmissionIdGetRequest {
+    submissionId: number;
     authentication?: string;
 }
 
@@ -205,6 +231,11 @@ export interface TAPostRequest {
 
 export interface TestCallbackPostOperationRequest {
     testCallbackPostRequest?: TestCallbackPostRequest;
+}
+
+export interface TestcaseTestcaseIdGetRequest {
+    testcaseId: number;
+    authentication?: string;
 }
 
 /**
@@ -391,7 +422,7 @@ export class DefaultApi extends runtime.BaseAPI {
         // @ts-ignore: canConsumeForm may be unused
         const canConsumeForm = runtime.canConsumeForm(consumes);
 
-        let formParams: { append(param: string, value: any): any };
+        let formParams: { append(param: string, value: any): any; };
         let useForm = false;
         // use FormData to transmit files using content-type "multipart/form-data"
         useForm = canConsumeForm;
@@ -485,7 +516,7 @@ export class DefaultApi extends runtime.BaseAPI {
         // @ts-ignore: canConsumeForm may be unused
         const canConsumeForm = runtime.canConsumeForm(consumes);
 
-        let formParams: { append(param: string, value: any): any };
+        let formParams: { append(param: string, value: any): any; };
         let useForm = false;
         // use FormData to transmit files using content-type "multipart/form-data"
         useForm = canConsumeForm;
@@ -601,6 +632,109 @@ export class DefaultApi extends runtime.BaseAPI {
 
     /**
      */
+    async codePostRaw(requestParameters: CodePostOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CodePost200Response>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (requestParameters['authentication'] != null) {
+            headerParameters['Authentication'] = String(requestParameters['authentication']);
+        }
+
+        const response = await this.request({
+            path: `/code`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: CodePostRequestToJSON(requestParameters['codePostRequest']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => CodePost200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async codePost(requestParameters: CodePostOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CodePost200Response> {
+        const response = await this.codePostRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async codeQuestionIdGetRaw(requestParameters: CodeQuestionIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CodeQuestionIdGet200Response>> {
+        if (requestParameters['questionId'] == null) {
+            throw new runtime.RequiredError(
+                'questionId',
+                'Required parameter "questionId" was null or undefined when calling codeQuestionIdGet().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters['authentication'] != null) {
+            headerParameters['Authentication'] = String(requestParameters['authentication']);
+        }
+
+        const response = await this.request({
+            path: `/code/{question_id}`.replace(`{${"question_id"}}`, encodeURIComponent(String(requestParameters['questionId']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => CodeQuestionIdGet200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async codeQuestionIdGet(requestParameters: CodeQuestionIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CodeQuestionIdGet200Response> {
+        const response = await this.codeQuestionIdGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * get exam pin
+     */
+    async examPinLabIdGetRaw(requestParameters: ExamPinLabIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ExamPinLabIdGet200Response>> {
+        if (requestParameters['labId'] == null) {
+            throw new runtime.RequiredError(
+                'labId',
+                'Required parameter "labId" was null or undefined when calling examPinLabIdGet().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters['authentication'] != null) {
+            headerParameters['Authentication'] = String(requestParameters['authentication']);
+        }
+
+        const response = await this.request({
+            path: `/exam_pin/{lab_id}`.replace(`{${"lab_id"}}`, encodeURIComponent(String(requestParameters['labId']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ExamPinLabIdGet200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * get exam pin
+     */
+    async examPinLabIdGet(requestParameters: ExamPinLabIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ExamPinLabIdGet200Response> {
+        const response = await this.examPinLabIdGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
     async groupClassIdGetRaw(requestParameters: GroupClassIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<string>>> {
         if (requestParameters['classId'] == null) {
             throw new runtime.RequiredError(
@@ -635,7 +769,7 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
-     * getting image with picture id
+     * lab detail
      */
     async labLabIdGetRaw(requestParameters: LabLabIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<LabLabIdGet200Response>> {
         if (requestParameters['labId'] == null) {
@@ -664,7 +798,7 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
-     * getting image with picture id
+     * lab detail
      */
     async labLabIdGet(requestParameters: LabLabIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<LabLabIdGet200Response> {
         const response = await this.labLabIdGetRaw(requestParameters, initOverrides);
@@ -675,6 +809,11 @@ export class DefaultApi extends runtime.BaseAPI {
      * edit lab
      */
     async labPatchRaw(requestParameters: LabPatchRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>> {
+        // TODO: we are sending a nested object in a form data
+        // we already discuss about it. but new openapi.yaml is not available yet
+        // so
+        throw new Error("API definitions changed");
+
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -689,7 +828,7 @@ export class DefaultApi extends runtime.BaseAPI {
         // @ts-ignore: canConsumeForm may be unused
         const canConsumeForm = runtime.canConsumeForm(consumes);
 
-        let formParams: { append(param: string, value: any): any };
+        let formParams: { append(param: string, value: any): any; };
         let useForm = false;
         if (useForm) {
             formParams = new FormData();
@@ -702,8 +841,8 @@ export class DefaultApi extends runtime.BaseAPI {
         }
 
         if (requestParameters['labData'] != null) {
-            formParams.append('lab_data', new Blob([JSON.stringify(stringToJSON(requestParameters['labData']))], { type: "application/json", }));
-                    }
+            // formParams.append('lab_data', new Blob([JSON.stringify(stringToJSON(requestParameters['labData']))], { type: "application/json", }));
+        }
 
         const response = await this.request({
             path: `/lab`,
@@ -732,6 +871,11 @@ export class DefaultApi extends runtime.BaseAPI {
      * create lab
      */
     async labPostRaw(requestParameters: LabPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>> {
+        // TODO: we are sending a nested object in a form data
+        // we already discuss about it. but new openapi.yaml is not available yet
+        // so
+        throw new Error("API definitions changed");
+
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -746,7 +890,7 @@ export class DefaultApi extends runtime.BaseAPI {
         // @ts-ignore: canConsumeForm may be unused
         const canConsumeForm = runtime.canConsumeForm(consumes);
 
-        let formParams: { append(param: string, value: any): any };
+        let formParams: { append(param: string, value: any): any; };
         let useForm = false;
         if (useForm) {
             formParams = new FormData();
@@ -759,8 +903,8 @@ export class DefaultApi extends runtime.BaseAPI {
         }
 
         if (requestParameters['labData'] != null) {
-            formParams.append('lab_data', new Blob([JSON.stringify(stringToJSON(requestParameters['labData']))], { type: "application/json", }));
-                    }
+            // formParams.append('lab_data', new Blob([JSON.stringify(stringToJSON(requestParameters['labData']))], { type: "application/json", }));
+        }
 
         const response = await this.request({
             path: `/lab`,
@@ -787,7 +931,7 @@ export class DefaultApi extends runtime.BaseAPI {
 
     /**
      */
-    async labsClassIdGetRaw(requestParameters: LabsClassIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<LabsClassIdGet200Response>> {
+    async labsClassIdGetRaw(requestParameters: LabsClassIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<LabsClassIdGet200ResponseInner>>> {
         if (requestParameters['classId'] == null) {
             throw new runtime.RequiredError(
                 'classId',
@@ -810,12 +954,12 @@ export class DefaultApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => LabsClassIdGet200ResponseFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(LabsClassIdGet200ResponseInnerFromJSON));
     }
 
     /**
      */
-    async labsClassIdGet(requestParameters: LabsClassIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<LabsClassIdGet200Response> {
+    async labsClassIdGet(requestParameters: LabsClassIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<LabsClassIdGet200ResponseInner>> {
         const response = await this.labsClassIdGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -865,6 +1009,43 @@ export class DefaultApi extends runtime.BaseAPI {
      */
     async loginGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.loginGetRaw(initOverrides);
+    }
+
+    /**
+     * get multi language testcase
+     */
+    async multilangTestcaseQuestionIdGetRaw(requestParameters: MultilangTestcaseQuestionIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MultilangTestcaseQuestionIdGet200Response>> {
+        if (requestParameters['questionId'] == null) {
+            throw new runtime.RequiredError(
+                'questionId',
+                'Required parameter "questionId" was null or undefined when calling multilangTestcaseQuestionIdGet().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters['authentication'] != null) {
+            headerParameters['Authentication'] = String(requestParameters['authentication']);
+        }
+
+        const response = await this.request({
+            path: `/multilang_testcase/{question_id}`.replace(`{${"question_id"}}`, encodeURIComponent(String(requestParameters['questionId']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => MultilangTestcaseQuestionIdGet200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * get multi language testcase
+     */
+    async multilangTestcaseQuestionIdGet(requestParameters: MultilangTestcaseQuestionIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MultilangTestcaseQuestionIdGet200Response> {
+        const response = await this.multilangTestcaseQuestionIdGetRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**
@@ -962,6 +1143,72 @@ export class DefaultApi extends runtime.BaseAPI {
      */
     async questionQuestionIdGet(requestParameters: QuestionQuestionIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<QuestionQuestionIdGet200Response> {
         const response = await this.questionQuestionIdGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async requestGradeRaw(requestParameters: RequestGradeOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (requestParameters['authentication'] != null) {
+            headerParameters['Authentication'] = String(requestParameters['authentication']);
+        }
+
+        const response = await this.request({
+            path: `/submit`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: RequestGradeRequestToJSON(requestParameters['requestGradeRequest']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse<any>(response);
+    }
+
+    /**
+     */
+    async requestGrade(requestParameters: RequestGradeOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+        const response = await this.requestGradeRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async resultSubmissionIdGetRaw(requestParameters: ResultSubmissionIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResultSubmissionIdGet200Response>> {
+        if (requestParameters['submissionId'] == null) {
+            throw new runtime.RequiredError(
+                'submissionId',
+                'Required parameter "submissionId" was null or undefined when calling resultSubmissionIdGet().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters['authentication'] != null) {
+            headerParameters['Authentication'] = String(requestParameters['authentication']);
+        }
+
+        const response = await this.request({
+            path: `/result/{submission_id}`.replace(`{${"submission_id"}}`, encodeURIComponent(String(requestParameters['submissionId']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ResultSubmissionIdGet200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async resultSubmissionIdGet(requestParameters: ResultSubmissionIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResultSubmissionIdGet200Response> {
+        const response = await this.resultSubmissionIdGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -1263,6 +1510,43 @@ export class DefaultApi extends runtime.BaseAPI {
      */
     async testCallbackPost(requestParameters: TestCallbackPostOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CallbackPost200Response> {
         const response = await this.testCallbackPostRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * get testcase
+     */
+    async testcaseTestcaseIdGetRaw(requestParameters: TestcaseTestcaseIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TestcaseTestcaseIdGet200Response>> {
+        if (requestParameters['testcaseId'] == null) {
+            throw new runtime.RequiredError(
+                'testcaseId',
+                'Required parameter "testcaseId" was null or undefined when calling testcaseTestcaseIdGet().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters['authentication'] != null) {
+            headerParameters['Authentication'] = String(requestParameters['authentication']);
+        }
+
+        const response = await this.request({
+            path: `/testcase/{testcase_id}`.replace(`{${"testcase_id"}}`, encodeURIComponent(String(requestParameters['testcaseId']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => TestcaseTestcaseIdGet200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * get testcase
+     */
+    async testcaseTestcaseIdGet(requestParameters: TestcaseTestcaseIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TestcaseTestcaseIdGet200Response> {
+        const response = await this.testcaseTestcaseIdGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
