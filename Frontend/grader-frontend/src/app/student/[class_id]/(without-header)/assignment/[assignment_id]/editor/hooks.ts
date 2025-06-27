@@ -21,7 +21,7 @@ export function useSubmitCode(options: UseSubmitCodeOptions) {
   const mutation = useMutation({
     mutationFn: async () => {
       const codes = options.getCodes();
-      await api.questions.submit(options.questionId, options.languageId, codes.map(it => ({
+      return await api.questions.submit(options.questionId, options.languageId, codes.map(it => ({
         content: it.content,
         pageName: it.name
       })));
@@ -65,9 +65,9 @@ export function useSubmitCode(options: UseSubmitCodeOptions) {
 }
 
 interface UseRequestGradeOptions {
-
+  submissionId: number;
 }
 
 export function useRequestGrade(options: UseRequestGradeOptions) {
-  
+
 }
