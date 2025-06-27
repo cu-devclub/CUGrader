@@ -41,7 +41,7 @@ export function createClient() {
 
   const generatedClient = new DefaultApi(config);
 
-  return {
+  const client: APIClient = {
     students: {
       addToClass: async (classId: number, { email, section, group }: CreateStudentPayload) => {
         await generatedClient.studentPost({
@@ -226,6 +226,7 @@ export function createClient() {
             assignTo: p.assignedGroupIds,
             closeOnDue: p.closeOnDue,
 
+
             languageIds: p.languageIds,
 
             examMode: p.examMode,
@@ -267,27 +268,9 @@ export function createClient() {
         });
       },
       getById: async (labId: number) => {
-        // TODO: refactor this to avoid code duplication
         const lab = await generatedClient.labLabIdGet({ labId });
 
-        // Fetch questions in parallel using the questionIds from the lab
-        const questionPromises = (lab.questionIds ?? []).map(async questionId => {
-          const q = await generatedClient.questionQuestionIdGet({ questionId });
-
-          return {
-            description: q.description!,
-            maxScore: q.maxScore!,
-            name: q.name!,
-            number: q.number!,
-            template: q.predefine!,
-            submission: q.submission && {
-              id: q.submission.submissionId!,
-              score: q.submission.score!,
-              submittedAt: parseDateTime(q.submission.timestamp!)
-            }
-          };
-        });
-
+        const questionPromises = (lab.questionIds ?? []).map(async questionId => client.questions.getById(questionId));
         const questions = await Promise.all(questionPromises);
 
         return {
@@ -313,34 +296,12 @@ export function createClient() {
 
       getByIdI: async (labId: number) => {
         // TODO: refactor this to avoid code duplication
-        const [lab, examPinResponse] = await Promise.all([
+        const [lab, examPin] = await Promise.all([
           generatedClient.labLabIdGet({ labId }),
-          generatedClient.examPinLabIdGet({ labId }).catch(() => ({ examPin: "000000" })),
+          client.examPin.getByAssignmentId(labId),
         ]);
-        // Fetch questions in parallel using the questionIds from the lab
-        const questionPromises = (lab.questionIds ?? []).map(async questionId => {
-          const [q, testcaseData] = await Promise.all([
-            generatedClient.questionQuestionIdGet({ questionId }),
-            generatedClient.multilangTestcaseQuestionIdGet({ questionId }).catch(() => ({
-              testcase: [],
-              secretTestcase: []
-            }))
-          ]);
 
-          return {
-            description: q.description!,
-            maxScore: q.maxScore!,
-            name: q.name!,
-            number: q.number!,
-            template: q.predefine!,
-            answer: "", // TODO: get instructor answer from API when available
-            testCode: String(q.testcase ?? ""),
-            secretTestCode: String(q.secretTestcase ?? ""),
-            testcases: testcaseData.testcase?.map(it => ({ input: it.input!, output: it.output! })) ?? [],
-            secretTestCases: testcaseData.secretTestcase?.map(it => ({ input: it.input!, output: it.output! })) ?? [],
-          } satisfies InstructorQuestion;
-        });
-
+        const questionPromises = (lab.questionIds ?? []).map(async questionId => client.questions.getByIdI(questionId));
         const questions = await Promise.all(questionPromises);
 
         return {
@@ -359,9 +320,9 @@ export function createClient() {
           assignedGroupIds: lab.assignTo ?? [],
           questions,
           // Instructor-specific detail fields
-          examPin: String(examPinResponse.examPin ?? "000000"),
-          showScoreOnLock: false, // TODO: request the api
-          testCode: String(lab.testcase ?? ""),
+          examPin: String(examPin ?? "000000"),
+          showScoreOnLock: false,
+          testCode: String(lab.testcase ?? ""), // wtf why did these exist on normal api too 
           secretTestCode: String(lab.secretTestcase ?? ""),
         } satisfies InstructorAssignmentDetails;
       },
@@ -387,6 +348,7 @@ export function createClient() {
         const q = await generatedClient.questionQuestionIdGet({ questionId });
 
         return {
+          id: questionId,
           description: q.description!,
           maxScore: q.maxScore!,
           name: q.name!,
@@ -402,24 +364,22 @@ export function createClient() {
 
       getByIdI: async (questionId: number) => {
         const [q, testcaseData] = await Promise.all([
-          generatedClient.questionQuestionIdGet({ questionId }),
-          generatedClient.multilangTestcaseQuestionIdGet({ questionId }).catch(() => ({
-            testcase: [],
-            secretTestcase: []
-          }))
+          client.questions.getById(questionId),
+          client.testcase.listByQuestionId(questionId)
         ]);
 
         return {
+          id: questionId,
           description: q.description!,
           maxScore: q.maxScore!,
           name: q.name!,
           number: q.number!,
-          template: q.predefine!,
+          template: q.template!,
           answer: "", // TODO: get instructor answer from API when available
           testCode: "", // TODO: get public test code when available
           secretTestCode: "", // TODO: get secret test code when available
-          testcases: testcaseData.testcase?.map(it => ({ input: it.input!, output: it.output! })) ?? [],
-          secretTestCases: testcaseData.secretTestcase?.map(it => ({ input: it.input!, output: it.output! })) ?? [],
+          testcases: testcaseData.public,
+          secretTestCases: testcaseData.secret,
         } satisfies InstructorQuestion;
       },
 
@@ -505,6 +465,8 @@ export function createClient() {
         };
       },
     }
-  } satisfies APIClient;
+  };
+
+  return client;
 };
 
