@@ -1,6 +1,7 @@
+import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import Editor, { useMonaco } from '@monaco-editor/react';
-import * as Tabs from "@radix-ui/react-tabs";
-import { CodeIcon } from 'lucide-react';
+import { CheckIcon, CodeIcon, CopyIcon, DownloadIcon, RefreshCcwIcon, SaveIcon, UploadIcon } from 'lucide-react';
 import { Ref, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { CodeSpaceTabs } from './shared';
 
@@ -40,11 +41,12 @@ export interface EditorPanelProps {
   initialCodeFiles: CodeFile[];
   onChange: () => unknown;
   ref?: Ref<ImperativeEditorHandle>;
+  savingStatus: "saving" | "unsaved" | "saved"
 }
 
 // TODO: if we want lsp then we need to run it somewhere else probably same server as the backend 💀💀💀
 // we CAN use wasm but only clangd has a VERY EXPERIMENTAL support  
-export function EditorPanel({ initialCodeFiles, onChange, ref }: EditorPanelProps) {
+export function EditorPanel({ initialCodeFiles, onChange, ref, savingStatus }: EditorPanelProps) {
   const monaco = useMonaco();
   const [files, setFiles] = useState(initialCodeFiles);
   const [selectedFile, setSelectedFile] = useState(files.length > 0 ? files[0] : null);
@@ -101,22 +103,81 @@ export function EditorPanel({ initialCodeFiles, onChange, ref }: EditorPanelProp
   }, []);
 
   return (
-    <CodeSpaceTabs
-      className='h-full'
-      tabs={tabs}
-      selected={selectedFile?.name}
-      onSelect={onTabSelect}
-      onAdd={onAddFile}
-    >
-      <Tabs.Content value="main.ts" className="flex-1">
+    <section className='h-full grid grid-rows-[auto_1fr_auto]'>
+      <CodeSpaceTabs
+        tabs={tabs}
+        selected={selectedFile?.name}
+        onSelect={onTabSelect}
+        onAdd={onAddFile}
+      >
+      </CodeSpaceTabs>
+      <div className='bg-red-50 overflow-hidden'>
         {selectedFile &&
           <Editor
             path={selectedFile.name}
+            options={{
+              automaticLayout: true
+            }}
             defaultLanguage={selectedFile.language}
             defaultValue={selectedFile.content}
           />
         }
-      </Tabs.Content>
-    </CodeSpaceTabs>
+      </div>
+      <div className='text-xs border-t flex justify-between p-0.5'>
+        <div className='flex gap-1'>
+          <Button size="sm" className='text-xs h-7 m-0.5'> Run </Button>
+          <div className="flex">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button size="icon" variant="ghost" className='size-8'> <CopyIcon /> </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>t.copy</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button size="icon" variant="ghost" className='size-8'> <SaveIcon /> </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>t.save</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button size="icon" variant="ghost" className='size-8'> <RefreshCcwIcon /> </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>t.reset</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button size="icon" variant="ghost" className='size-8'> <DownloadIcon /> </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>t.download</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button size="icon" variant="ghost" className='size-8'> <UploadIcon /> </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>t.upload</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </div>
+        <span className='flex gap-1 font-medium items-center mr-2 text-emerald-600'>
+          Saved
+          <CheckIcon className='size-3.5' />
+        </span>
+      </div>
+    </section>
   );
 }

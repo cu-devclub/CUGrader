@@ -1,12 +1,21 @@
 import { Button } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
+import { usePanelControl } from '@/hooks/use-panel-control';
 import { StudentQuestion, SupportedLanguage } from '@/lib/api/type';
 import { cn } from '@/lib/utils';
 import * as Tabs from "@radix-ui/react-tabs";
-import { PlayIcon, TestTubeIcon } from 'lucide-react';
+import {
+  ArrowLeftToLine,
+  ArrowRightToLine,
+  LayoutPanelLeft,
+  PanelBottom,
+  PanelTop,
+  PlayIcon,
+  TestTubeIcon
+} from 'lucide-react';
 import { useMemo, useRef } from 'react';
 import Markdown from 'react-markdown';
-import { ImperativePanelHandle } from 'react-resizable-panels';
 import { CodeFile, EditorPanel, ImperativeEditorHandle } from './editor';
 import { useSubmitCode } from './hooks';
 import { CodeSpaceTabs } from './shared';
@@ -29,11 +38,11 @@ export interface CodeSpaceProps {
 }
 
 export function DesktopCodeSpace({ question, supportedLanguages }: CodeSpaceProps) {
-  const infoPanelRef = useRef<ImperativePanelHandle>(null);
-  const rightPanelRef = useRef<ImperativePanelHandle>(null);
-  const codePanelRef = useRef<ImperativePanelHandle>(null);
-  const testPanelRef = useRef<ImperativePanelHandle>(null);
   const editorRef = useRef<ImperativeEditorHandle>(null);
+
+  const infoPanel = usePanelControl({ id: 'info' });
+  const codePanel = usePanelControl({ id: 'code' });
+  const testPanel = usePanelControl({ id: 'test' });
 
   const lang = supportedLanguages[0];
   const submitCode = useSubmitCode({
@@ -46,10 +55,10 @@ export function DesktopCodeSpace({ question, supportedLanguages }: CodeSpaceProp
   const initialCodeFiles: CodeFile[] = useMemo(() => [
     {
       content: question.template,
-      name: `main.ts`,
-      language: `typescript`
+      name: `main.${getFileExtension(lang)}`,
+      language: getMonacoLanguageId(lang),
     }
-  ], [question]);
+  ], [question, lang]);
 
   function onSubmit() {
     const f = editorRef.current?.getCodeFiles();
@@ -59,27 +68,80 @@ export function DesktopCodeSpace({ question, supportedLanguages }: CodeSpaceProp
   return (
     <main className='flex flex-col bg-neutral-50 h-screen'>
       <nav className='flex items-center justify-between p-2 pb-0'>
-        <div>nav</div>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button size="icon" variant="ghost" className='h-7 w-7'>
+              <LayoutPanelLeft className='h-4 w-4' />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-1">
+            <div className='flex flex-col gap-2'>
+              <Button
+                variant="ghost"
+                className='h-7 w-auto px-2 flex justify-start gap-2'
+                onClick={infoPanel.toggle}
+              >
+                {infoPanel.isCollapsed ? <ArrowRightToLine className='h-4 w-4' /> : <ArrowLeftToLine className='h-4 w-4' />}
+                <span className='text-xs'>Toggle Info</span>
+              </Button>
+              <Button
+                variant="ghost"
+                className='h-7 w-auto px-2 flex justify-start gap-2'
+                onClick={codePanel.toggle}
+              >
+                <PanelTop className='h-4 w-4' />
+                <span className='text-xs'>Toggle Code</span>
+              </Button>
+              <Button
+                variant="ghost"
+                className='h-7 w-auto px-2 flex justify-start gap-2'
+                onClick={testPanel.toggle}
+              >
+                <PanelBottom className='h-4 w-4' />
+                <span className='text-xs'>Toggle Test</span>
+              </Button>
+            </div>
+          </PopoverContent>
+        </Popover>
         <Button size="sm" className='text-xs' onClick={onSubmit}>
           Submit
         </Button>
       </nav>
       <ResizablePanelGroup direction="horizontal" className='flex-1 p-1'>
-        <ResizablePanel collapsible ref={infoPanelRef} minSize={10} className={cn('rounded-md bg-background m-0.5', infoPanelRef.current?.isCollapsed() ? 'border-transparent' : 'border')}>
+        <ResizablePanel
+          ref={infoPanel.panelRef}
+          {...infoPanel.panelProps}
+          collapsible
+          minSize={10}
+          className={cn('rounded-md bg-background m-0.5', infoPanel.isCollapsed ? 'border-transparent' : 'border')}
+        >
           <DetailPanel question={question} />
         </ResizablePanel>
         <ResizableHandle className='bg-transparent' withHandle />
-        <ResizablePanel collapsible ref={rightPanelRef} minSize={10}>
+        <ResizablePanel collapsible minSize={10}>
           <ResizablePanelGroup direction="vertical">
-            <ResizablePanel collapsible ref={codePanelRef} minSize={10} className={cn('rounded-md bg-background m-0.5', codePanelRef.current?.isCollapsed() ? 'border-transparent' : 'border')}>
+            <ResizablePanel
+              ref={codePanel.panelRef}
+              {...codePanel.panelProps}
+              collapsible
+              minSize={10}
+              className={cn('rounded-md bg-background m-0.5', codePanel.isCollapsed ? 'border-transparent' : 'border')}
+            >
               <EditorPanel
+                savingStatus='saved'
                 ref={editorRef}
                 initialCodeFiles={initialCodeFiles}
                 onChange={() => submitCode.notifyChange()}
               />
             </ResizablePanel>
             <ResizableHandle className='bg-transparent' withHandle />
-            <ResizablePanel collapsible ref={testPanelRef} minSize={10} className={cn('rounded-md bg-background m-0.5', testPanelRef.current?.isCollapsed() ? 'border-transparent' : 'border')}>
+            <ResizablePanel
+              ref={testPanel.panelRef}
+              {...testPanel.panelProps}
+              collapsible
+              minSize={10}
+              className={cn('rounded-md bg-background m-0.5', testPanel.isCollapsed ? 'border-transparent' : 'border')}
+            >
               <BottomPanelContent testcases={sampleTestCases} />
             </ResizablePanel>
           </ResizablePanelGroup>
@@ -155,7 +217,7 @@ function BottomPanelContent({ testcases }: BottomPanelContent) {
         {
           id: "output",
           icon: PlayIcon,
-          name: "Code Output"
+          name: "Idk"
         },
       ]}
       onSelect={() => { }}
