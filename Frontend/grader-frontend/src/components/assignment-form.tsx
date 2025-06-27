@@ -760,7 +760,8 @@ export function AssignmentForm({
             {/* Questions */}
             <div className="space-y-4">
               {questionFields.map((question, questionIndex) => (
-                <QuestionForm
+                // To Change Back: change QuestionFormFigma --> QuestionForm
+                <QuestionFormFigma
                   key={question.id}
                   questionIndex={questionIndex}
                   form={form}
@@ -930,7 +931,6 @@ function QuestionForm({
           )}
         </div>
       </div>
-
       <div className="grid grid-cols-3 gap-6 px-12 items-start">
         <FormField
           control={form.control}
@@ -943,6 +943,7 @@ function QuestionForm({
               <FormControl>
                 <Textarea
                   className="min-h-24 resize-y"
+                  // original min-h-24
                   placeholder={t(
                     "assignment.form.question.fields.description.placeholder"
                   )}
@@ -972,7 +973,6 @@ function QuestionForm({
           )}
         />
       </div>
-
       <div className="px-12 flex flex-col gap-8">
         <FormField
           control={form.control}
@@ -988,6 +988,7 @@ function QuestionForm({
                     "assignment.form.question.fields.answer.placeholder"
                   )}
                   className="font-mono resize-y min-h-24"
+                  // original min-h-24, w-full (Not put in)
                   rows={4}
                   {...field}
                 />
@@ -1020,8 +1021,33 @@ function QuestionForm({
           )}
         />
       </div>
-
+      {/* Pre Function Define */}
+      {/* <div className="px-12 flex flex-col gap-8">
+        <FormField
+          control={form.control}
+          name={`questions.${questionIndex}.answer`}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                {t("assignment.form.question.fields.answer.label")}
+              </FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder={t(
+                    "assignment.form.question.fields.answer.placeholder"
+                  )}
+                  className="font-mono resize-y min-h-48 w-[70%]"
+                  rows={4}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div> */}
       <div className="px-12 grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Original => "px-12 grid grid-cols-1 md:grid-cols-2 gap-4" */}
         <FormField
           control={form.control}
           name={`questions.${questionIndex}.testCode`}
@@ -1068,8 +1094,7 @@ function QuestionForm({
           )}
         />
       </div>
-
-      {/* Testcases */}
+      Testcases
       <div className="px-12 space-y-4">
         <div className="flex items-center justify-between">
           <h4 className="text-lg font-semibold text-foreground">
@@ -1156,7 +1181,6 @@ function QuestionForm({
           </div>
         ))}
       </div>
-
       {/* Secret Testcases */}
       <div className="px-12 pb-12 space-y-4">
         <div className="flex items-center justify-between">
@@ -1276,5 +1300,197 @@ function FileCard({ name, remove, size }: FileCardProps) {
         <X className="w-4 h-4" />
       </Button>
     </div>
+  );
+}
+
+function QuestionFormFigma({
+  questionIndex,
+  form,
+  onRemove,
+  canRemove,
+  t,
+}: QuestionFormProps) {
+  const {
+    fields: testcaseFields,
+    append: appendTestcase,
+    remove: removeTestcase,
+  } = useFieldArray({
+    control: form.control,
+    name: `questions.${questionIndex}.testcases`,
+  });
+
+  const {
+    fields: secretTestcaseFields,
+    append: appendSecretTestcase,
+    remove: removeSecretTestcase,
+  } = useFieldArray({
+    control: form.control,
+    name: `questions.${questionIndex}.secretTestCases`,
+  });
+
+  return (
+    <section className="border rounded-xl overflow-clip flex flex-col gap-8">
+      {/* Question name */}
+      <div className="border-b">
+        <div className="h-4 bg-muted-foreground/50 border-b"></div>
+
+        <div className="flex">
+          <div className="p-8">
+            <Label>{t("assignment.form.question.no")}</Label>
+            <div className="text-center text-3xl mt-4">
+              {questionIndex + 1}.
+            </div>
+          </div>
+
+          <FormField
+            control={form.control}
+            name={`questions.${questionIndex}.name`}
+            render={({ field }) => (
+              <FormItem className="p-8 flex-1">
+                <FormLabel>{t("assignment.form.question.title")}</FormLabel>
+                <FormControl>
+                  <input
+                    className="text-3xl outline-offset-8 placeholder:text-muted-foreground/50"
+                    placeholder={t("assignment.form.question.titlePlaceholder")}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {canRemove && (
+            <div className="flex items-center justify-between p-3 ">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={onRemove}
+                className="size-fit p-3 text-destructive hover:text-destructive hover:bg-destructive/10"
+              >
+                <X className="size-6" />
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+      <div className="grid grid-cols-3 gap-6 px-12 items-start">
+        <FormField
+          control={form.control}
+          name={`questions.${questionIndex}.description`}
+          render={({ field }) => (
+            <FormItem className="col-span-2">
+              <FormLabel>
+                {t("assignment.form.question.fields.description.label")}
+              </FormLabel>
+              <FormControl>
+                <Textarea
+                  className="min-h-42 resize-y"
+                  // original min-h-24
+                  placeholder={t(
+                    "assignment.form.question.fields.description.placeholder"
+                  )}
+                  rows={6}
+                  {...field}
+                />
+              </FormControl>
+              <p>todo: md editor</p>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name={`questions.${questionIndex}.maxScore`}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                {t("assignment.form.question.fields.maxScore.label")}
+              </FormLabel>
+              <FormControl>
+                <Input type="number" min="0" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+      <div className="px-12 flex flex-col gap-8">
+        <FormField
+          control={form.control}
+          name={`questions.${questionIndex}.answer`}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                {t("assignment.form.question.fields.answer.label")}
+              </FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder={t(
+                    "assignment.form.question.fields.answer.placeholder"
+                  )}
+                  className="font-mono resize-y min-h-48 w-[70%]"
+                  // original min-h-24, w-full (Not put in)
+                  rows={4}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+      {/* Pre Function Define */}
+      <div className="px-12 flex flex-col gap-8">
+        <FormField
+          control={form.control}
+          name={`questions.${questionIndex}.answer`}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                {t("assignment.form.question.fields.answer.label")}
+              </FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder={t(
+                    "assignment.form.question.fields.answer.placeholder"
+                  )}
+                  className="font-mono resize-y min-h-48 w-[70%]"
+                  rows={4}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+      <div className="px-12 pb-12 grid grid-cols-1 gap-4">
+        <FormField
+          control={form.control}
+          name={`questions.${questionIndex}.testCode`}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                {t("assignment.form.question.fields.testCode.label")}
+              </FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder={t(
+                    "assignment.form.question.fields.testCode.placeholder"
+                  )}
+                  className="font-mono resize-y min-h-48 w-[70%]"
+                  rows={4}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+    </section>
   );
 }
