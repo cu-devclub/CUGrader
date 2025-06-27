@@ -6,6 +6,28 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
 export default function Page() {
+  // Mock data for assignments
+  const mockAssignmentsList = [
+    {
+      name: "Lab 1: Introduction to React",
+      courseName: "Web Programming 101",
+      due: new Date().toISOString(),
+      maxScore: 100,
+    },
+    {
+      name: "Lab 2: State Management",
+      courseName: "Web Programming 101",
+      due: new Date(Date.now() + 86400000).toISOString(),
+      maxScore: 100,
+    },
+    {
+      name: "Project Proposal",
+      courseName: "Software Engineering",
+      due: new Date(Date.now() + 3 * 86400000).toISOString(),
+      maxScore: 50,
+    },
+  ];
+
   const { data: assigmentsList } = useSuspenseQuery({
     queryKey: ["notification-student"],
     queryFn: () => api.assignments.listNearDue(),
@@ -29,7 +51,7 @@ export default function Page() {
               <h1>{t("notification")}</h1>
             </div>
             <div className="flex flex-col item-center gap-y-2 border border-solid h-full p-2">
-              {assigmentsList.map((assign, index) => (
+              {mockAssignmentsList.map((assign, index) => (
                 <NotificationCard
                   key={index}
                   labName={assign.name}
