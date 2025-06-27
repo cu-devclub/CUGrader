@@ -35,7 +35,6 @@ export function DesktopCodeSpace({ question, supportedLanguages }: CodeSpaceProp
   const testPanelRef = useRef<ImperativePanelHandle>(null);
   const editorRef = useRef<ImperativeEditorHandle>(null);
 
-  // TODO: think about language selector
   const lang = supportedLanguages[0];
   const submitCode = useSubmitCode({
     getCodes: () => editorRef.current?.getCodeFiles() ?? [],
@@ -66,13 +65,13 @@ export function DesktopCodeSpace({ question, supportedLanguages }: CodeSpaceProp
         </Button>
       </nav>
       <ResizablePanelGroup direction="horizontal" className='flex-1 p-1'>
-        <ResizablePanel ref={infoPanelRef} minSize={10} className={cn('rounded-md bg-background m-0.5', infoPanelRef.current?.isCollapsed() ? 'border-transparent' : 'border')}>
+        <ResizablePanel collapsible ref={infoPanelRef} minSize={10} className={cn('rounded-md bg-background m-0.5', infoPanelRef.current?.isCollapsed() ? 'border-transparent' : 'border')}>
           <DetailPanel question={question} />
         </ResizablePanel>
         <ResizableHandle className='bg-transparent' withHandle />
-        <ResizablePanel ref={rightPanelRef} minSize={10}>
+        <ResizablePanel collapsible ref={rightPanelRef} minSize={10}>
           <ResizablePanelGroup direction="vertical">
-            <ResizablePanel ref={codePanelRef} minSize={10} className={cn('rounded-md bg-background m-0.5', codePanelRef.current?.isCollapsed() ? 'border-transparent' : 'border')}>
+            <ResizablePanel collapsible ref={codePanelRef} minSize={10} className={cn('rounded-md bg-background m-0.5', codePanelRef.current?.isCollapsed() ? 'border-transparent' : 'border')}>
               <EditorPanel
                 ref={editorRef}
                 initialCodeFiles={initialCodeFiles}
@@ -80,7 +79,7 @@ export function DesktopCodeSpace({ question, supportedLanguages }: CodeSpaceProp
               />
             </ResizablePanel>
             <ResizableHandle className='bg-transparent' withHandle />
-            <ResizablePanel ref={testPanelRef} minSize={10} className={cn('rounded-md bg-background m-0.5', testPanelRef.current?.isCollapsed() ? 'border-transparent' : 'border')}>
+            <ResizablePanel collapsible ref={testPanelRef} minSize={10} className={cn('rounded-md bg-background m-0.5', testPanelRef.current?.isCollapsed() ? 'border-transparent' : 'border')}>
               <BottomPanelContent testcases={sampleTestCases} />
             </ResizablePanel>
           </ResizablePanelGroup>
@@ -175,6 +174,11 @@ function BottomPanelContent({ testcases }: BottomPanelContent) {
 
 interface UnitTestInfo {
   type: "unit-public";
+  message: string;
+}
+
+interface PrivateUnitTestInfo {
+  type: "unit-private";
   message: string;
 }
 
