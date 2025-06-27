@@ -4,6 +4,27 @@ import { CodeIcon } from 'lucide-react';
 import { Ref, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { CodeSpaceTabs } from './shared';
 
+/*
+TODOS:
+- polish some routing
+- question switching
+  - reinstatiate monaco
+  - or tell it to relint somehow
+- multifile template is not in the api yet
+- Add new file button
+- file renaming | disable it for main.* ?? | or some way to mark it as main
+- examination timer
+- code submission api
+- test result api
+
+- assignment card: click to publish dont work
+- language selector: no ui yet
+- previous version: no ui, no api
+
+- we need some way to run the code with custom input not only the one provided
+- confetti on submit
+
+*/
 
 export interface CodeFile {
   name: string,

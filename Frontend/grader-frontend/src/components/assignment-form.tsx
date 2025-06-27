@@ -107,7 +107,6 @@ export type AssignmentFormResult = AssignmentFormData & {
 export interface AttachmentMetadata {
   id: number;
   name: string;
-  // TODO: request an api for this...
   // size maybe
 }
 
