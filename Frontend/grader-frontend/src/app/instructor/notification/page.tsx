@@ -8,48 +8,30 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
 export default function Page() {
-  const NEAR_DUE_THERSHOLD = 3;
-
-  let { data: AssignmentNearDue } = useSuspenseQuery({
-    queryKey: ["notification-student"],
-    queryFn: () => api.assignments.listNearDue(),
-  });
-
-  // Use mock data for testing
-  AssignmentNearDue = mockAssignmentsList;
-
-  // Filter assignments that are near due (within 3 days)
-  const now = new Date();
-  const threeDaysFromNow = new Date(
-    now.getTime() + NEAR_DUE_THERSHOLD * 24 * 60 * 60 * 1000
-  );
-  AssignmentNearDue = AssignmentNearDue.filter((assignment) => {
-    const dueDate = new Date(assignment.due.toString());
-    return dueDate >= now && dueDate <= threeDaysFromNow;
-  });
-
-  // set notification created date to 3 days before due date
-  const notificationsAssignmentNearDue = AssignmentNearDue.map((assignment) => {
-    const dueDate = dayjs(assignment.due.toString());
-    const notificationDate = dueDate.subtract(3, "day");
-    const daysLeft = dueDate.diff(dayjs(), "day");
-    let secondaryMessage;
-    if (daysLeft === 0) {
-      const hoursLeft = dueDate.diff(dayjs(), "hour");
-      secondaryMessage = `Assignment due in ${hoursLeft} hours`;
-    } else {
-      secondaryMessage = `Assignment due in ${daysLeft} days`;
-    }
-    return {
-      primaryMessage: assignment.name,
-      secondaryMessage,
+  // Mock notification data for instructor
+  const notificationsToShow = [
+    {
+      primaryMessage: "Assignment graded",
+      notificationDate: dayjs().format("DD MMM YY"),
+      type: "success",
+      courseId: "2301101",
+      secondaryMessage: "Lab 1: Introduction to React graded successfully.",
+    },
+    {
+      primaryMessage: "Assignment submission error",
+      notificationDate: dayjs().subtract(1, "day").format("DD MMM YY"),
+      type: "error",
+      courseId: "2301102",
+      secondaryMessage: "Lab 2: State Management submission failed.",
+    },
+    {
+      primaryMessage: "Upcoming project deadline",
+      notificationDate: dayjs().add(2, "day").format("DD MMM YY"),
       type: "normal",
-      ...assignment,
-      notificationDate: notificationDate.toISOString(),
-    };
-  });
-
-  const notificationsToShow = [...notificationsAssignmentNearDue].sort(
+      courseId: "2303105",
+      secondaryMessage: "Project Proposal due in 2 days.",
+    },
+  ].sort(
     (a, b) => {
       const aDate = dayjs(a.notificationDate);
       const bDate = dayjs(b.notificationDate);

@@ -47,10 +47,10 @@ export default function NotificationCard({
       <div className="flex items-start">
         {iconMap[type]}
         <div className="flex flex-col min-w-0">
-          <span className="font-semibold text-base text-gray-900 leading-tight truncate max-w-[220px]">
+          <span className="font-semibold text-base text-gray-900 leading-tight truncate ">
             {primaryMessage}
           </span>
-          <span className="text-sm text-muted-foreground truncate max-w-[220px]">
+          <span className="text-sm text-muted-foreground truncate">
             {secondaryMessage}
           </span>
         </div>
