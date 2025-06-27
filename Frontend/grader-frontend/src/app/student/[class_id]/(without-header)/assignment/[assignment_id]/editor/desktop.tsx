@@ -1,8 +1,18 @@
+import { Badge } from "@/components/ui/badge";
 import { Button } from '@/components/ui/button';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { usePanelControl } from '@/hooks/use-panel-control';
-import { StudentQuestion, SupportedLanguage } from '@/lib/api/type';
+import { StudentAssignmentDetails, StudentQuestion, SupportedLanguage } from '@/lib/api/type';
 import { cn } from '@/lib/utils';
 import * as Tabs from "@radix-ui/react-tabs";
 import {
@@ -34,17 +44,17 @@ function getFileExtension(language: SupportedLanguage) {
 
 export interface CodeSpaceProps {
   question: StudentQuestion;
-  supportedLanguages: SupportedLanguage[];
+  lab: StudentAssignmentDetails;
 }
 
-export function DesktopCodeSpace({ question, supportedLanguages }: CodeSpaceProps) {
+export function DesktopCodeSpace({ question, lab }: CodeSpaceProps) {
   const editorRef = useRef<ImperativeEditorHandle>(null);
 
   const infoPanel = usePanelControl({ id: 'info' });
   const codePanel = usePanelControl({ id: 'code' });
   const testPanel = usePanelControl({ id: 'test' });
 
-  const lang = supportedLanguages[0];
+  const lang = question.languages[0];
   const submitCode = useSubmitCode({
     getCodes: () => editorRef.current?.getCodeFiles() ?? [],
     languageId: lang.id,
@@ -115,7 +125,7 @@ export function DesktopCodeSpace({ question, supportedLanguages }: CodeSpaceProp
           minSize={10}
           className={cn('rounded-md bg-background m-0.5', infoPanel.isCollapsed ? 'border-transparent' : 'border')}
         >
-          <DetailPanel question={question} />
+          <DetailPanel question={question} lab={lab} />
         </ResizablePanel>
         <ResizableHandle className='bg-transparent' withHandle />
         <ResizablePanel collapsible minSize={10}>
@@ -151,18 +161,46 @@ export function DesktopCodeSpace({ question, supportedLanguages }: CodeSpaceProp
   );
 }
 
-function DetailPanel({ question }: { question: StudentQuestion; }) {
+function DetailPanel({ question, lab }: { question: StudentQuestion, lab: StudentAssignmentDetails; }) {
   return (
-    <div className="p-4 h-full overflow-y-auto">
-      <h2 className="text-xl font-semibold mb-2">{question.name}</h2>
-      <div className="text-sm text-muted-foreground mb-4">
-        Max Score: {question.maxScore}
+    <div className="p-4 h-full overflow-y-auto flex flex-col gap-2">
+      <Pagination>
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious href="#" />
+          </PaginationItem>
+          <PaginationItem>
+            <PaginationLink href="#">1</PaginationLink>
+          </PaginationItem>
+          <PaginationItem>
+            <PaginationLink href="#" isActive>
+              2
+            </PaginationLink>
+          </PaginationItem>
+          <PaginationItem>
+            <PaginationLink href="#">3</PaginationLink>
+          </PaginationItem>
+          <PaginationItem>
+            <PaginationEllipsis />
+          </PaginationItem>
+          <PaginationItem>
+            <PaginationNext href="#" />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
+      <div className="flex justify-between">
+        <Badge>Lab 1 : {question.name}</Badge>
+        <p className="text-sm font-semibold">Score: {question.maxScore}</p>
       </div>
-      {/* Using dangerouslySetInnerHTML for markdown/html content */}
-      <div
-        className="prose prose-sm dark:prose-invert max-w-none"
-      >
-        <Markdown>{question.description}</Markdown>
+      <p className="text-sm text-muted-foreground">
+        {lab.publish.toString()}
+        {lab.due.toString()}
+      </p>
+      <div>
+        <h1 className="text-xl font-bold">1. Question title</h1>
+        <div className="prose prose-sm dark:prose-invert max-w-none">
+          <Markdown>{question.description}</Markdown>
+        </div>
       </div>
     </div>
   );
