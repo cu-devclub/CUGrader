@@ -1,9 +1,8 @@
 import { parseDateTime } from "@internationalized/date";
-import { unimplemented } from "../utils";
 import { ClassObject, Configuration, DefaultApi } from "./generated";
 import { LabsClassIdGet200ResponseInnerStatusEnum } from "./generated/models/LabsClassIdGet200ResponseInner";
-import { APIClient, AssignmentStatus, Class, CreateAssignmentPayload, CreateClassPayload, CreateStudentPayload, Instructor, InstructorAssignment, InstructorAssignmentDetails, InstructorQuestion, InstructorsAndTAs, NearDueAssignment, ParticipatingClasses, Semester, Student, StudentAssignment, StudentAssignmentDetails, StudentQuestion, Testcase, UpdateAssignmentPayload, UpdateClassPayload, UpdateStudentPayload } from "./type";
-import { th } from "zod/v4/locales";
+import { APIClient, AssignmentStatus, Class, CreateAssignmentPayload, CreateClassPayload, CreateStudentPayload, Instructor, InstructorAssignment, InstructorAssignmentDetails, InstructorQuestion, NearDueAssignment, Semester, Student, StudentAssignment, StudentAssignmentDetails, UpdateAssignmentPayload, UpdateClassPayload, UpdateStudentPayload } from "./type";
+import { getCookie } from "cookies-next/client";
 
 function toClass(input: ClassObject): Class {
   return {
@@ -32,7 +31,7 @@ function toStatus(status: LabsClassIdGet200ResponseInnerStatusEnum | undefined):
 }
 
 export function createClient() {
-  const authToken = "TODO: get it, after auth is implemented";
+  const authToken = getCookie('auth_token');
   const config = new Configuration({
     headers: {
       "Authentication": `Bearer ${authToken}`,

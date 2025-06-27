@@ -77,7 +77,7 @@ function hasRouteAccess(pathname: string, userRole: string): boolean {
 }
 
 export async function middleware(request: NextRequest) {
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.NEXT_PUBLIC_USE_MOCK_AUTH === "true") {
         return NextResponse.next();
     }
     

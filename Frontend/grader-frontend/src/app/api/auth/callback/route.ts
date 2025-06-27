@@ -72,7 +72,7 @@ function getUserRedirectUrl(claims: JWTClaims | null): string {
 async function setAuthCookie(token: string): Promise<void> {
     const cookieStore = await cookies();
     cookieStore.set('auth_token', token, {
-        httpOnly: true,
+        // httpOnly: true, // TODO: stop using server? and stop using cookies 
         secure: process.env.NODE_ENV === 'production',
         maxAge: 60 * 60 * 24, // 24 hours
         path: '/',

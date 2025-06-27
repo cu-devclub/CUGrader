@@ -37,6 +37,7 @@
     "chart.js": "^4.4.9",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "cookies-next": "^6.0.0",
     "date-fns": "^4.1.0",
     "devalue": "^5.1.1",
     "lucide-react": "^0.513.0",
