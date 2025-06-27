@@ -60,9 +60,6 @@ export function EditorPanel({ initialCodeFiles, onChange, ref }: EditorPanelProp
   useImperativeHandle(ref, () => {
     return {
       getCodeFiles() {
-        // const uri = monaco!.editor.getModels().map(it => it.uri);
-        // console.log({ uri });
-        // return [];
         const models = monaco!.editor.getModels();
 
         return models.map(it => ({
@@ -78,12 +75,17 @@ export function EditorPanel({ initialCodeFiles, onChange, ref }: EditorPanelProp
     setSelectedFile(files.find(it => it.name === id)!);
   }, [files]);
 
+  const onAddFile = useCallback(() => {
+    // TODO: this is not yet final
+  }, []);
+
   return (
     <CodeSpaceTabs
       className='h-full'
       tabs={tabs}
       selected={selectedFile?.name}
       onSelect={onTabSelect}
+      onAdd={onAddFile}
     >
       <Tabs.Content value="main.ts" className="flex-1">
         {selectedFile &&
