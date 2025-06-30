@@ -1,9 +1,10 @@
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import Editor, { useMonaco } from '@monaco-editor/react';
-import { CheckIcon, CodeIcon, CopyIcon, DownloadIcon, RefreshCcwIcon, SaveIcon, UploadIcon } from 'lucide-react';
-import { Ref, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
+import { CheckIcon, CopyIcon, DownloadIcon, RefreshCcwIcon, SaveIcon, UploadIcon } from 'lucide-react';
+import { FormEvent, Ref, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { CodeSpaceTabs } from './shared';
+import { FileTabs } from './file-tabs';
 
 /*
 TODOS:
@@ -41,7 +42,7 @@ export interface EditorPanelProps {
   initialCodeFiles: CodeFile[];
   onChange: () => unknown;
   ref?: Ref<ImperativeEditorHandle>;
-  savingStatus: "saving" | "unsaved" | "saved"
+  savingStatus: "saving" | "unsaved" | "saved";
 }
 
 // TODO: if we want lsp then we need to run it somewhere else probably same server as the backend 💀💀💀
@@ -74,12 +75,6 @@ export function EditorPanel({ initialCodeFiles, onChange, ref, savingStatus }: E
     };
   }, [monaco, onChange]);
 
-  const tabs = useMemo(() => files.map(it => ({
-    id: it.name,
-    icon: CodeIcon, // TODO: get language icon
-    name: it.name
-  })), [files]);
-
   useImperativeHandle(ref, () => {
     return {
       getCodeFiles() {
@@ -99,18 +94,66 @@ export function EditorPanel({ initialCodeFiles, onChange, ref, savingStatus }: E
   }, [files]);
 
   const onAddFile = useCallback(() => {
-    // TODO: this is not yet final
-  }, []);
+    let counter = 1;
+    let newFileName = `untitled${counter}`;
+
+    while (files.some(file => file.name === newFileName)) {
+      counter++;
+      newFileName = `untitled${counter}`;
+    }
+
+    const newFile: CodeFile = {
+      name: newFileName,
+      content: '',
+      language: 'plaintext'
+    };
+
+    setFiles(prev => [...prev, newFile]);
+    setSelectedFile(newFile);
+  }, [files]);
+
+  const renameFile = (file: CodeFile, newName: string) => {
+    // fucking cursed
+    // TODO: escape this
+    file.name = newName;
+    setFiles(f => [...f]);
+  };
+
+  const deleteFile = useCallback((file: CodeFile) => {
+    // Remove the file from the files array
+    const newFiles = files.filter(f => f !== file);
+    setFiles(newFiles);
+    
+    // If the deleted file was selected, select another file
+    if (selectedFile === file) {
+      if (newFiles.length > 0) {
+        setSelectedFile(newFiles[0]);
+      } else {
+        setSelectedFile(null);
+      }
+    }
+
+    // Dispose the Monaco model for the deleted file
+    if (monaco) {
+      const model = monaco.editor.getModels().find(m => m.uri.path.slice(1) === file.name);
+      if (model) {
+        model.dispose();
+      }
+    }
+  }, [files, selectedFile, monaco]);
+
 
   return (
     <section className='h-full grid grid-rows-[auto_1fr_auto]'>
-      <CodeSpaceTabs
-        tabs={tabs}
-        selected={selectedFile?.name}
-        onSelect={onTabSelect}
-        onAdd={onAddFile}
-      >
-      </CodeSpaceTabs>
+      <FileTabs
+        files={files}
+        selectedFile={selectedFile}
+        onTabSelect={onTabSelect}
+        onAddFile={onAddFile}
+        onRenameFile={renameFile}
+        onDeleteFile={deleteFile}
+      />
+
       <div className='bg-red-50 overflow-hidden'>
         {selectedFile &&
           <Editor
