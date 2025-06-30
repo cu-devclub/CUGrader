@@ -21,7 +21,6 @@ interface DbAssignment {
   assignedGroupIds: string[];
   closeOnDue: boolean;
   examMode: boolean;
-  languageIds: number[];
   additionalFileIds: number[];
   examPin: string;
   secretTestCode: string;
@@ -41,6 +40,7 @@ interface DbQuestion {
   secretTestCode: string;
   testcases: { input: string; output: string; }[];
   secretTestCases: { input: string; output: string; }[];
+  languageIds: number[];
 }
 
 function createClient(persistence: Storage<Database>): APIClient {
@@ -258,12 +258,6 @@ function createClient(persistence: Storage<Database>): APIClient {
 
         const assignmentQuestions = await Promise.all(assignment.questionIds.map(id => client.questions.getById(id)));
 
-        // Map languageIds to supported languages
-        const supportedLanguages = await client.supportedLanguages.list();
-        const languages = assignment.languageIds
-          .map(id => supportedLanguages.find(lang => lang.id === id))
-          .filter((lang): lang is SupportedLanguage => lang !== undefined);
-
         return {
           id: assignment.id,
           number: assignment.number,
@@ -275,7 +269,6 @@ function createClient(persistence: Storage<Database>): APIClient {
           assignedGroupIds: assignment.assignedGroupIds,
           closeOnDue: assignment.closeOnDue,
           examMode: assignment.examMode,
-          languages,
           additionalFileIds: assignment.additionalFileIds,
           score: Math.floor(Math.random() * 100),
           status: "completed"
@@ -288,12 +281,6 @@ function createClient(persistence: Storage<Database>): APIClient {
 
         const assignmentQuestions = await Promise.all(assignment.questionIds.map(id => client.questions.getByIdI(id)));
 
-        // Map languageIds to supported languages
-        const supportedLanguages = await client.supportedLanguages.list();
-        const languages = assignment.languageIds
-          .map(id => supportedLanguages.find(lang => lang.id === id))
-          .filter((lang): lang is SupportedLanguage => lang !== undefined);
-
         return {
           id: assignment.id,
           number: assignment.number,
@@ -304,7 +291,6 @@ function createClient(persistence: Storage<Database>): APIClient {
           assignedGroupIds: assignment.assignedGroupIds,
           closeOnDue: assignment.closeOnDue,
           examMode: assignment.examMode,
-          languages,
           additionalFileIds: assignment.additionalFileIds,
           examPin: assignment.examPin,
           secretTestCode: assignment.secretTestCode,
@@ -352,7 +338,6 @@ function createClient(persistence: Storage<Database>): APIClient {
           assignedGroupIds: payload.assignedGroupIds,
           closeOnDue: payload.closeOnDue,
           examMode: payload.examMode,
-          languageIds: payload.languageIds,
           additionalFileIds: [],
           examPin: payload.examPin,
           secretTestCode: payload.secretTestCode,
@@ -375,7 +360,8 @@ function createClient(persistence: Storage<Database>): APIClient {
             testCode: q.testCode,
             secretTestCode: q.secretTestCode,
             testcases: q.testcases,
-            secretTestCases: q.secretTestCases
+            secretTestCases: q.secretTestCases,
+            languageIds: q.languageIds
           };
           questions.push(newQuestion);
           questionIds.push(newQuestion.id);
@@ -397,7 +383,6 @@ function createClient(persistence: Storage<Database>): APIClient {
         if (payload.assignedGroupIds !== undefined) assignment.assignedGroupIds = payload.assignedGroupIds;
         if (payload.closeOnDue !== undefined) assignment.closeOnDue = payload.closeOnDue;
         if (payload.examMode !== undefined) assignment.examMode = payload.examMode;
-        if (payload.languageIds !== undefined) assignment.languageIds = payload.languageIds;
         if (payload.examPin !== undefined) assignment.examPin = payload.examPin;
         if (payload.secretTestCode !== undefined) assignment.secretTestCode = payload.secretTestCode;
         if (payload.showScoreOnLock !== undefined) assignment.showScoreOnLock = payload.showScoreOnLock;
@@ -431,6 +416,12 @@ function createClient(persistence: Storage<Database>): APIClient {
         const question = questions.find(q => q.id === questionId);
         if (!question) throw new Error(`Question ${questionId} not found`);
 
+        // Map languageIds to supported languages for StudentQuestion
+        const supportedLanguages = await client.supportedLanguages.list();
+        const languages = question.languageIds
+          .map(id => supportedLanguages.find(lang => lang.id === id))
+          .filter((lang): lang is SupportedLanguage => lang !== undefined);
+
         return {
           id: questionId,
           number: question.number,
@@ -438,6 +429,7 @@ function createClient(persistence: Storage<Database>): APIClient {
           description: question.description,
           template: question.template,
           maxScore: question.maxScore,
+          languages,
         };
       },
 
@@ -445,7 +437,16 @@ function createClient(persistence: Storage<Database>): APIClient {
         const question = questions.find(q => q.id === questionId);
         if (!question) throw new Error(`Question ${questionId} not found`);
 
-        return question;
+        // Map languageIds to supported languages for InstructorQuestion
+        const supportedLanguages = await client.supportedLanguages.list();
+        const languages = question.languageIds
+          .map(id => supportedLanguages.find(lang => lang.id === id))
+          .filter((lang): lang is SupportedLanguage => lang !== undefined);
+
+        return {
+          ...question,
+          languages,
+        };
       },
 
       submit: async (questionId, languageId, codes) => {

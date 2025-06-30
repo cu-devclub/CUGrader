@@ -18,10 +18,12 @@ import * as Tabs from "@radix-ui/react-tabs";
 import {
   ArrowLeftToLine,
   ArrowRightToLine,
+  CircleCheck,
   LayoutPanelLeft,
   PanelBottom,
   PanelTop,
   PlayIcon,
+  Terminal,
   TestTubeIcon
 } from 'lucide-react';
 import { useMemo, useRef } from 'react';
@@ -244,22 +246,27 @@ const sampleTestCases: TestcaseInfo[] = [
 
 function BottomPanelContent({ testcases }: BottomPanelContent) {
   return (
-    <CodeSpaceTabs
-      className='h-full'
-      tabs={[
-        {
-          id: "testcase",
-          icon: TestTubeIcon,
-          name: "Test Case"
-        },
-        {
-          id: "output",
-          icon: PlayIcon,
-          name: "Idk"
-        },
-      ]}
-      onSelect={() => { }}
+    <Tabs.Root
+      className={cn("flex flex-col")}
+      defaultValue="testcase"
     >
+      <Tabs.List className="text-xs border-b p-0.75 flex gap-1">
+        <Tabs.Trigger
+          value="testcase"
+          className="p-1 px-1.5 flex items-center gap-1.5 rounded data-[state=active]:bg-accent hover:bg-accent/50 transition-colors"
+        >
+          <CircleCheck className="size-3" />
+          Test case
+        </Tabs.Trigger>
+        <Tabs.Trigger
+          value="your-testcase"
+          className="p-1 px-1.5 flex items-center gap-1.5 rounded data-[state=active]:bg-accent hover:bg-accent/50 transition-colors"
+        >
+          <Terminal className="size-3" />
+          Your test case
+        </Tabs.Trigger>
+
+      </Tabs.List>
       <Tabs.Content value="output" className="flex-1 p-4">
         <div className="text-sm text-muted-foreground">Code output will appear here...</div>
       </Tabs.Content>
@@ -268,7 +275,7 @@ function BottomPanelContent({ testcases }: BottomPanelContent) {
           <TestCaseDisplay key={index} testcase={testcase} />
         ))}
       </Tabs.Content>
-    </CodeSpaceTabs>
+    </Tabs.Root >
   );
 }
 
