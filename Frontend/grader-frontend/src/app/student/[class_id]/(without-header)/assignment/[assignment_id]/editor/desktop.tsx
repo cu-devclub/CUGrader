@@ -22,15 +22,12 @@ import {
   LayoutPanelLeft,
   PanelBottom,
   PanelTop,
-  PlayIcon,
-  Terminal,
-  TestTubeIcon
+  Terminal
 } from 'lucide-react';
 import { useMemo, useRef } from 'react';
 import Markdown from 'react-markdown';
 import { CodeFile, EditorPanel, ImperativeEditorHandle } from './editor';
 import { useSubmitCode } from './hooks';
-import { CodeSpaceTabs } from './shared';
 
 // TODO: extract this to seperated file
 function getMonacoLanguageId(language: SupportedLanguage) {
@@ -80,44 +77,44 @@ export function DesktopCodeSpace({ question, lab }: CodeSpaceProps) {
   return (
     <main className='flex flex-col bg-neutral-50 h-screen'>
       <nav className='flex items-center justify-between p-2 pb-0'>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button size="icon" variant="ghost" className='h-7 w-7'>
-              <LayoutPanelLeft className='h-4 w-4' />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-1">
-            <div className='flex flex-col gap-2'>
-              <Button
-                variant="ghost"
-                className='h-7 w-auto px-2 flex justify-start gap-2'
-                onClick={infoPanel.toggle}
-              >
-                {infoPanel.isCollapsed ? <ArrowRightToLine className='h-4 w-4' /> : <ArrowLeftToLine className='h-4 w-4' />}
-                <span className='text-xs'>Toggle Info</span>
+        <div className="flex gap-2 items-center">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button size="icon" variant="ghost" className='h-7 w-7'>
+                <LayoutPanelLeft className='h-4 w-4' />
               </Button>
-              <Button
-                variant="ghost"
-                className='h-7 w-auto px-2 flex justify-start gap-2'
-                onClick={codePanel.toggle}
-              >
-                <PanelTop className='h-4 w-4' />
-                <span className='text-xs'>Toggle Code</span>
-              </Button>
-              <Button
-                variant="ghost"
-                className='h-7 w-auto px-2 flex justify-start gap-2'
-                onClick={testPanel.toggle}
-              >
-                <PanelBottom className='h-4 w-4' />
-                <span className='text-xs'>Toggle Test</span>
-              </Button>
-            </div>
-          </PopoverContent>
-        </Popover>
-        <Button size="sm" className='text-xs' onClick={onSubmit}>
-          Submit
-        </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-1">
+              <div className='flex flex-col gap-2'>
+                <Button
+                  variant="ghost"
+                  className='h-7 w-auto px-2 flex justify-start gap-2'
+                  onClick={infoPanel.toggle}
+                >
+                  {infoPanel.isCollapsed ? <ArrowRightToLine className='h-4 w-4' /> : <ArrowLeftToLine className='h-4 w-4' />}
+                  <span className='text-xs'>Toggle Info</span>
+                </Button>
+                <Button
+                  variant="ghost"
+                  className='h-7 w-auto px-2 flex justify-start gap-2'
+                  onClick={codePanel.toggle}
+                >
+                  <PanelTop className='h-4 w-4' />
+                  <span className='text-xs'>Toggle Code</span>
+                </Button>
+                <Button
+                  variant="ghost"
+                  className='h-7 w-auto px-2 flex justify-start gap-2'
+                  onClick={testPanel.toggle}
+                >
+                  <PanelBottom className='h-4 w-4' />
+                  <span className='text-xs'>Toggle Test</span>
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
+          next question
+        </div>
       </nav>
       <ResizablePanelGroup direction="horizontal" className='flex-1 p-1'>
         <ResizablePanel
