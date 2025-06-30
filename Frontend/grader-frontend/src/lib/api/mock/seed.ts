@@ -50,7 +50,6 @@ export async function seed(client: APIClient) {
     showScoreOnLock: true,
     testCode: "describe \"Maybe Monad\" $ do\n  it \"handles safe division\" $ do\n    safeDivide 10 2 `shouldBe` Just 5.0\n    safeDivide 10 0 `shouldBe` Nothing\n  it \"chains operations\" $ do\n    chainDivisions 20 4 2 `shouldBe` Just 2.5",
     secretTestCode: "describe \"IO Monad\" $ do\n  it \"processes input correctly\" $ do\n    result <- captureOutput processInput\n    result `shouldContain` \"10\"",
-    languageIds: [8],
     examMode: true,
     closeOnDue: true,
     assignedGroupIds: ["Default"],
@@ -61,6 +60,7 @@ export async function seed(client: APIClient) {
         description: "Implement safe division using Maybe monad",
         template: "-- Implement safe division that returns Nothing for division by zero\nsafeDivide :: Double -> Double -> Maybe Double\nsafeDivide x y = -- Your code here\n\n-- Chain safe divisions using monadic operations\nchainDivisions :: Double -> Double -> Double -> Maybe Double\nchainDivisions x y z = -- Your code here using >>= or do notation",
         maxScore: 80,
+        languageIds: [8],
         answer: "safeDivide :: Double -> Double -> Maybe Double\nsafeDivide x 0 = Nothing\nsafeDivide x y = Just (x / y)\n\nchainDivisions :: Double -> Double -> Maybe Double\nchainDivisions x y z = safeDivide x y >>= \\result -> safeDivide result z", testCode: "describe \"Maybe Monad\" $ do\n  it \"handles safe division\" $ do\n    safeDivide 10 2 `shouldBe` Just 5.0\n    safeDivide 10 0 `shouldBe` Nothing",
         secretTestCode: "describe \"Maybe Monad Secret\" $ do\n  it \"handles complex chains\" $ do\n    chainDivisions 100 5 4 `shouldBe` Just 5.0",
         testcases: [{ input: "10 2 5", output: "Just 1.0" }, { input: "10 0 5", output: "Nothing" }],
@@ -72,6 +72,7 @@ export async function seed(client: APIClient) {
         description: "Create an IO action that reads and processes user input",
         template: "-- Create an IO action that reads a line, converts to Int, doubles it, and prints\nprocessInput :: IO ()\nprocessInput = -- Your code here using do notation\n\n-- Helper function to safely parse Int\nsafeRead :: String -> Maybe Int\nsafeRead s = -- Your code here",
         maxScore: 70,
+        languageIds: [8],
         answer: "processInput :: IO ()\nprocessInput = do\n  line <- getLine\n  case safeRead line of\n    Just n -> print (n * 2)\n    Nothing -> putStrLn \"Invalid input\"\n\nsafeRead :: String -> Maybe Int\nsafeRead s = case reads s of\n  [(n, \"\")] -> Just n\n  _ -> Nothing", testCode: "describe \"IO Monad\" $ do\n  it \"processes input safely\" $ do\n    result <- testProcessInput \"5\"\n    result `shouldBe` \"10\"",
         secretTestCode: "describe \"IO Monad Secret\" $ do\n  it \"handles invalid input\" $ do\n    result <- testProcessInput \"abc\"\n    result `shouldBe` \"Invalid input\"",
         testcases: [{ input: "5", output: "10" }],
@@ -87,7 +88,6 @@ export async function seed(client: APIClient) {
     examPin: "321654",
     showScoreOnLock: true, testCode: "XCTAssertEqual(stack.isEmpty, true)\nstack.push(1)\nstack.push(2)\nXCTAssertEqual(stack.pop(), 2)\nXCTAssertEqual(stack.isEmpty, false)",
     secretTestCode: "XCTAssertEqual(findCommon([1,2,3], [2,3,4]).sorted(), [2,3])\nXCTAssertEqual(sortedUnique([3,1,2,1,3]), [1,2,3])",
-    languageIds: [7],
     examMode: true,
     closeOnDue: true,
     assignedGroupIds: ["Default"],
@@ -98,6 +98,7 @@ export async function seed(client: APIClient) {
         description: "Implement a generic Stack with associated types",
         template: "// Define a protocol for Stack behavior\nprotocol StackProtocol {\n    associatedtype Element\n    mutating func push(_ element: Element)\n    mutating func pop() -> Element?\n    var isEmpty: Bool { get }\n}\n\n// Implement a generic Stack\nstruct Stack<T>: StackProtocol {\n    // Your implementation here\n}",
         maxScore: 80,
+        languageIds: [7],
         answer: "protocol StackProtocol {\n    associatedtype Element\n    mutating func push(_ element: Element)\n    mutating func pop() -> Element?\n    var isEmpty: Bool { get }\n}\n\nstruct Stack<T>: StackProtocol {\n    typealias Element = T\n    private var items: [T] = []\n    \n    mutating func push(_ element: T) {\n        items.append(element)\n    }\n    \n    mutating func pop() -> T? {\n        return items.popLast()\n    }\n    \n    var isEmpty: Bool {\n        return items.isEmpty\n    }\n}", testCode: "XCTAssertEqual(stack.isEmpty, true)\nvar stack = Stack<Int>()\nstack.push(1)\nstack.push(2)\nXCTAssertEqual(stack.pop(), 2)",
         secretTestCode: "var emptyStack = Stack<String>()\nXCTAssertEqual(emptyStack.isEmpty, true)\nXCTAssertNil(emptyStack.pop())",
         testcases: [{ input: "push(1), push(2), pop()", output: "2" }],
@@ -109,6 +110,7 @@ export async function seed(client: APIClient) {
         description: "Implement generic functions with where clauses",
         template: "// Generic function that finds common elements between two arrays\n// T must be Equatable and Hashable\nfunc findCommon<T>(_ array1: [T], _ array2: [T]) -> [T] where T: Equatable, T: Hashable {\n    // Your implementation here\n}\n\n// Generic function that sorts and returns unique elements\nfunc sortedUnique<T>(_ array: [T]) -> [T] where T: Comparable, T: Hashable {\n    // Your implementation here\n}",
         maxScore: 70,
+        languageIds: [7],
         answer: "func findCommon<T>(_ array1: [T], _ array2: [T]) -> [T] where T: Equatable, T: Hashable {\n    let set1 = Set(array1)\n    let set2 = Set(array2)\n    return Array(set1.intersection(set2))\n}\n\nfunc sortedUnique<T>(_ array: [T]) -> [T] where T: Comparable, T: Hashable {\n    return Array(Set(array)).sorted()\n}", testCode: "XCTAssertEqual(findCommon([1,2,3], [2,3,4]).sorted(), [2,3])\nXCTAssertEqual(findCommon([1,2], [3,4]), [])",
         secretTestCode: "XCTAssertEqual(sortedUnique([3,1,2,1,3]), [1,2,3])\nXCTAssertEqual(sortedUnique([5,5,5]), [5])",
         testcases: [{ input: "[1,2,3], [2,3,4]", output: "[2,3]" }],
@@ -125,7 +127,6 @@ export async function seed(client: APIClient) {
     examPin: "987321",
     showScoreOnLock: false, testCode: "expect(isPrime(7)).toBeTruthy();\nexpect(isPrime(4)).toBeFalsy();\nexpect(sieveOfEratosthenes(10)).toEqual([2, 3, 5, 7]);",
     secretTestCode: "expect(isPrime(97)).toBeTruthy();\nexpect(isPrime(100)).toBeFalsy();\nexpect(sieveOfEratosthenes(20).length).toBe(8);",
-    languageIds: [6],
     examMode: false,
     closeOnDue: false,
     assignedGroupIds: ["Default"],
@@ -136,6 +137,7 @@ export async function seed(client: APIClient) {
         description: "Implement an efficient prime number checker with proper TypeScript types",
         template: "// Implement a function that checks if a number is prime\n// Use proper TypeScript types and handle edge cases\nfunction isPrime(n: number): boolean {\n  // Your implementation here\n}\n\n// Implement a function that finds all primes up to n using Sieve of Eratosthenes\nfunction sieveOfEratosthenes(limit: number): number[] {\n  // Your implementation here\n}",
         maxScore: 80,
+        languageIds: [6],
         answer: "function isPrime(n: number): boolean {\n  if (n < 2) return false;\n  if (n === 2) return true;\n  if (n % 2 === 0) return false;\n  \n  for (let i = 3; i * i <= n; i += 2) {\n    if (n % i === 0) return false;\n  }\n  return true;\n}\n\nfunction sieveOfEratosthenes(limit: number): number[] {\n  const primes: boolean[] = new Array(limit + 1).fill(true);\n  primes[0] = primes[1] = false;\n  \n  for (let i = 2; i * i <= limit; i++) {\n    if (primes[i]) {\n      for (let j = i * i; j <= limit; j += i) {\n        primes[j] = false;\n      }\n    }\n  }\n  \n  return primes.map((isPrime, index) => isPrime ? index : -1)\n                .filter(num => num !== -1);\n}",
         testCode: "expect(isPrime(7)).toBeTruthy();\nexpect(isPrime(4)).toBeFalsy();\nexpect(sieveOfEratosthenes(10)).toEqual([2, 3, 5, 7]);",
         secretTestCode: "expect(isPrime(97)).toBeTruthy();\nexpected(isPrime(100)).toBeFalsy();\nexpect(sieveOfEratosthenes(20).length).toBe(8);",
@@ -148,6 +150,7 @@ export async function seed(client: APIClient) {
         description: "Implement advanced TypeScript utility types and functions",
         template: "// Implement a deep readonly type\ntype DeepReadonly<T> = {\n  // Your implementation here\n};\n\n// Implement a function that safely gets nested object properties\nfunction safeGet<T, K extends keyof T>(\n  obj: T,\n  path: K[]\n): T[K] | undefined {\n  // Your implementation here\n}\n\n// Implement a generic debounce function\nfunction debounce<T extends (...args: any[]) => any>(\n  func: T,\n  delay: number\n): (...args: Parameters<T>) => void {\n  // Your implementation here\n}",
         maxScore: 90,
+        languageIds: [6],
         answer: "type DeepReadonly<T> = {\n  readonly [P in keyof T]: T[P] extends object ? DeepReadonly<T[P]> : T[P];\n};\n\nfunction safeGet<T, K extends keyof T>(\n  obj: T,\n  path: K[]\n): any {\n  return path.reduce((current: any, key) => {\n    return current && current[key] !== undefined ? current[key] : undefined;\n  }, obj);\n}\n\nfunction debounce<T extends (...args: any[]) => any>(\n  func: T,\n  delay: number\n): (...args: Parameters<T>) => void {\n  let timeoutId: NodeJS.Timeout;\n  return (...args: Parameters<T>) => {\n    clearTimeout(timeoutId);\n    timeoutId = setTimeout(() => func(...args), delay);\n  };\n}",
         testCode: "const obj = { a: { b: { c: 42 } } };\nexpect(safeGet(obj, ['a', 'b', 'c'])).toBe(42);\nexpect(safeGet(obj, ['a', 'x'])).toBeUndefined();",
         secretTestCode: "const debouncedFn = debounce(() => console.log('called'), 100);\nexpect(typeof debouncedFn).toBe('function');",
@@ -165,7 +168,6 @@ export async function seed(client: APIClient) {
     showScoreOnLock: true,
     testCode: "generic linked list test",
     secretTestCode: "generic linked list secret",
-    languageIds: [6, 1, 4, 2],
     examMode: false,
     closeOnDue: true,
     assignedGroupIds: ["Default"],
@@ -175,6 +177,7 @@ export async function seed(client: APIClient) {
         name: "Generic Singly Linked List",
         description: "Implement a generic singly linked list with basic operations",
         template: "// Generic Node class\nclass ListNode<T> {\n  value: T;\n  next: ListNode<T> | null = null;\n  \n  constructor(value: T) {\n    this.value = value;\n  }\n}\n\n// Generic Linked List implementation\nclass LinkedList<T> {\n  private head: ListNode<T> | null = null;\n  private size: number = 0;\n  \n  // Insert at the beginning\n  prepend(value: T): void {\n    // Your implementation here\n  }\n  \n  // Insert at the end\n  append(value: T): void {\n    // Your implementation here\n  }\n  \n  // Insert at specific index\n  insert(index: number, value: T): void {\n    // Your implementation here\n  }\n  \n  // Remove by value (first occurrence)\n  remove(value: T): boolean {\n    // Your implementation here\n  }\n  \n  // Remove at specific index\n  removeAt(index: number): T | null {\n    // Your implementation here\n  }\n  \n  // Find element\n  find(value: T): ListNode<T> | null {\n    // Your implementation here\n  }\n  \n  // Get size\n  getSize(): number {\n    return this.size;\n  }\n  \n  // Convert to array\n  toArray(): T[] {\n    // Your implementation here\n  }\n}",
+        languageIds: [6, 1, 4, 2, 7, 8, 9],
         maxScore: 85,
         answer: "class ListNode<T> {\n  value: T;\n  next: ListNode<T> | null = null;\n  \n  constructor(value: T) {\n    this.value = value;\n  }\n}\n\nclass LinkedList<T> {\n  private head: ListNode<T> | null = null;\n  private size: number = 0;\n  \n  prepend(value: T): void {\n    const newNode = new ListNode(value);\n    newNode.next = this.head;\n    this.head = newNode;\n    this.size++;\n  }\n  \n  append(value: T): void {\n    const newNode = new ListNode(value);\n    if (!this.head) {\n      this.head = newNode;\n    } else {\n      let current = this.head;\n      while (current.next) {\n        current = current.next;\n      }\n      current.next = newNode;\n    }\n    this.size++;\n  }\n  \n  insert(index: number, value: T): void {\n    if (index < 0 || index > this.size) throw new Error('Index out of bounds');\n    if (index === 0) return this.prepend(value);\n    \n    const newNode = new ListNode(value);\n    let current = this.head;\n    for (let i = 0; i < index - 1; i++) {\n      current = current!.next;\n    }\n    newNode.next = current!.next;\n    current!.next = newNode;\n    this.size++;\n  }\n  \n  remove(value: T): boolean {\n    if (!this.head) return false;\n    \n    if (this.head.value === value) {\n      this.head = this.head.next;\n      this.size--;\n      return true;\n    }\n    \n    let current = this.head;\n    while (current.next && current.next.value !== value) {\n      current = current.next;\n    }\n    \n    if (current.next) {\n      current.next = current.next.next;\n      this.size--;\n      return true;\n    }\n    return false;\n  }\n  \n  removeAt(index: number): T | null {\n    if (index < 0 || index >= this.size || !this.head) return null;\n    \n    if (index === 0) {\n      const value = this.head.value;\n      this.head = this.head.next;\n      this.size--;\n      return value;\n    }\n    \n    let current = this.head;\n    for (let i = 0; i < index - 1; i++) {\n      current = current!.next;\n    }\n    \n    const nodeToRemove = current!.next;\n    if (nodeToRemove) {\n      current!.next = nodeToRemove.next;\n      this.size--;\n      return nodeToRemove.value;\n    }\n    return null;\n  }\n  \n  find(value: T): ListNode<T> | null {\n    let current = this.head;\n    while (current) {\n      if (current.value === value) return current;\n      current = current.next;\n    }\n    return null;\n  }\n  \n  getSize(): number {\n    return this.size;\n  }\n  \n  toArray(): T[] {\n    const result: T[] = [];\n    let current = this.head;\n    while (current) {\n      result.push(current.value);\n      current = current.next;\n    }\n    return result;\n  }\n}",
         testCode: "const list = new LinkedList<number>();\nlist.append(1);\nlist.append(2);\nlist.prepend(0);\nexpect(list.toArray()).toEqual([0, 1, 2]);\nexpect(list.getSize()).toBe(3);",
@@ -193,7 +196,6 @@ export async function seed(client: APIClient) {
     showScoreOnLock: true,
     testCode: "binary search tree test",
     secretTestCode: "binary search tree secret",
-    languageIds: [6, 1, 4, 2],
     examMode: false,
     closeOnDue: true,
     assignedGroupIds: ["Default"],
@@ -204,6 +206,7 @@ export async function seed(client: APIClient) {
         description: "Implement a generic binary search tree with insertion, deletion, and traversal",
         template: "// Binary Tree Node\nclass TreeNode<T> {\n  value: T;\n  left: TreeNode<T> | null = null;\n  right: TreeNode<T> | null = null;\n  \n  constructor(value: T) {\n    this.value = value;\n  }\n}\n\n// Binary Search Tree implementation\nclass BinarySearchTree<T> {\n  private root: TreeNode<T> | null = null;\n  private compareFn: (a: T, b: T) => number;\n  \n  constructor(compareFn: (a: T, b: T) => number) {\n    this.compareFn = compareFn;\n  }\n  \n  // Insert a value\n  insert(value: T): void {\n    // Your implementation here\n  }\n  \n  // Search for a value\n  search(value: T): boolean {\n    // Your implementation here\n  }\n  \n  // Delete a value\n  delete(value: T): boolean {\n    // Your implementation here\n  }\n  \n  // In-order traversal\n  inOrder(): T[] {\n    // Your implementation here\n  }\n  \n  // Pre-order traversal\n  preOrder(): T[] {\n    // Your implementation here\n  }\n  \n  // Post-order traversal\n  postOrder(): T[] {\n    // Your implementation here\n  }\n  \n  // Find minimum value\n  findMin(): T | null {\n    // Your implementation here\n  }\n  \n  // Find maximum value\n  findMax(): T | null {\n    // Your implementation here\n  }\n  \n  // Get height of tree\n  getHeight(): number {\n    // Your implementation here\n  }\n}",
         maxScore: 100,
+        languageIds: [6, 1, 4, 2, 7, 8, 9],
         answer: "class TreeNode<T> {\n  value: T;\n  left: TreeNode<T> | null = null;\n  right: TreeNode<T> | null = null;\n  \n  constructor(value: T) {\n    this.value = value;\n  }\n}\n\nclass BinarySearchTree<T> {\n  private root: TreeNode<T> | null = null;\n  private compareFn: (a: T, b: T) => number;\n  \n  constructor(compareFn: (a: T, b: T) => number) {\n    this.compareFn = compareFn;\n  }\n  \n  insert(value: T): void {\n    this.root = this.insertNode(this.root, value);\n  }\n  \n  private insertNode(node: TreeNode<T> | null, value: T): TreeNode<T> {\n    if (!node) return new TreeNode(value);\n    \n    const cmp = this.compareFn(value, node.value);\n    if (cmp < 0) {\n      node.left = this.insertNode(node.left, value);\n    } else if (cmp > 0) {\n      node.right = this.insertNode(node.right, value);\n    }\n    return node;\n  }\n  \n  search(value: T): boolean {\n    return this.searchNode(this.root, value);\n  }\n  \n  private searchNode(node: TreeNode<T> | null, value: T): boolean {\n    if (!node) return false;\n    \n    const cmp = this.compareFn(value, node.value);\n    if (cmp === 0) return true;\n    if (cmp < 0) return this.searchNode(node.left, value);\n    return this.searchNode(node.right, value);\n  }\n  \n  delete(value: T): boolean {\n    const [newRoot, deleted] = this.deleteNode(this.root, value);\n    this.root = newRoot;\n    return deleted;\n  }\n  \n  private deleteNode(node: TreeNode<T> | null, value: T): [TreeNode<T> | null, boolean] {\n    if (!node) return [null, false];\n    \n    const cmp = this.compareFn(value, node.value);\n    if (cmp < 0) {\n      const [newLeft, deleted] = this.deleteNode(node.left, value);\n      node.left = newLeft;\n      return [node, deleted];\n    } else if (cmp > 0) {\n      const [newRight, deleted] = this.deleteNode(node.right, value);\n      node.right = newRight;\n      return [node, deleted];\n    } else {\n      if (!node.left) return [node.right, true];\n      if (!node.right) return [node.left, true];\n      \n      const successor = this.findMinNode(node.right);\n      node.value = successor.value;\n      const [newRight] = this.deleteNode(node.right, successor.value);\n      node.right = newRight;\n      return [node, true];\n    }\n  }\n  \n  private findMinNode(node: TreeNode<T>): TreeNode<T> {\n    while (node.left) node = node.left;\n    return node;\n  }\n  \n  inOrder(): T[] {\n    const result: T[] = [];\n    this.inOrderTraversal(this.root, result);\n    return result;\n  }\n  \n  private inOrderTraversal(node: TreeNode<T> | null, result: T[]): void {\n    if (node) {\n      this.inOrderTraversal(node.left, result);\n      result.push(node.value);\n      this.inOrderTraversal(node.right, result);\n    }\n  }\n  \n  preOrder(): T[] {\n    const result: T[] = [];\n    this.preOrderTraversal(this.root, result);\n    return result;\n  }\n  \n  private preOrderTraversal(node: TreeNode<T> | null, result: T[]): void {\n    if (node) {\n      result.push(node.value);\n      this.preOrderTraversal(node.left, result);\n      this.preOrderTraversal(node.right, result);\n    }\n  }\n  \n  postOrder(): T[] {\n    const result: T[] = [];\n    this.postOrderTraversal(this.root, result);\n    return result;\n  }\n  \n  private postOrderTraversal(node: TreeNode<T> | null, result: T[]): void {\n    if (node) {\n      this.postOrderTraversal(node.left, result);\n      this.postOrderTraversal(node.right, result);\n      result.push(node.value);\n    }\n  }\n  \n  findMin(): T | null {\n    if (!this.root) return null;\n    return this.findMinNode(this.root).value;\n  }\n  \n  findMax(): T | null {\n    if (!this.root) return null;\n    let current = this.root;\n    while (current.right) current = current.right;\n    return current.value;\n  }\n  \n  getHeight(): number {\n    return this.calculateHeight(this.root);\n  }\n  \n  private calculateHeight(node: TreeNode<T> | null): number {\n    if (!node) return 0;\n    return 1 + Math.max(this.calculateHeight(node.left), this.calculateHeight(node.right));\n  }\n}",
         testCode: "const bst = new BinarySearchTree<number>((a, b) => a - b);\nbst.insert(5);\nbst.insert(3);\nbst.insert(7);\nexpect(bst.search(5)).toBe(true);\nexpect(bst.inOrder()).toEqual([3, 5, 7]);",
         secretTestCode: "bst.delete(3);\nexpect(bst.inOrder()).toEqual([5, 7]);\nexpected(bst.getHeight()).toBe(2);",
@@ -221,7 +224,6 @@ export async function seed(client: APIClient) {
     showScoreOnLock: true,
     testCode: "graph algorithms test",
     secretTestCode: "graph algorithms secret",
-    languageIds: [6, 1, 4, 2],
     examMode: false,
     closeOnDue: true,
     assignedGroupIds: ["Default"],
@@ -236,7 +238,8 @@ export async function seed(client: APIClient) {
         testCode: "const graph = new Graph<string>();\ngraph.addEdge('A', 'B', 1);\ngraph.addEdge('B', 'C', 2);\nexpected(graph.bfs('A')).toEqual(['A', 'B', 'C']);\nexpected(graph.dfs('A')).toEqual(['A', 'B', 'C']);",
         secretTestCode: "const distances = graph.dijkstra('A');\nexpected(distances.get('C')?.distance).toBe(3);\nexpected(graph.hasCycle()).toBe(false);",
         testcases: [{ input: "BFS from A", output: "['A', 'B', 'C']" }],
-        secretTestCases: [{ input: "dijkstra from A to C", output: "distance: 3" }]
+        secretTestCases: [{ input: "dijkstra from A to C", output: "distance: 3" }],
+        languageIds: [6, 1, 4, 2, 7, 8, 9]
       }
     ],
   });
@@ -248,7 +251,6 @@ export async function seed(client: APIClient) {
     examPin: "444444",
     showScoreOnLock: true, testCode: "dynamic programming test",
     secretTestCode: "dynamic programming secret",
-    languageIds: [6, 1, 4, 2],
     examMode: false,
     closeOnDue: true,
     assignedGroupIds: ["Default"],
@@ -263,7 +265,8 @@ export async function seed(client: APIClient) {
         testCode: "expect(DynamicProgramming.fibonacciMemo(10)).toBe(55);\nexpect(DynamicProgramming.longestCommonSubsequence('ABCDGH', 'AEDFHR')).toBe(3);\nexpect(DynamicProgramming.coinChange([1, 3, 4], 6)).toBe(2);",
         secretTestCode: "expect(DynamicProgramming.knapsack([10, 20, 30], [60, 100, 120], 50)).toBe(220);\nexpect(DynamicProgramming.maxSubarraySum([-2, 1, -3, 4, -1, 2, 1, -5, 4])).toBe(6);",
         testcases: [{ input: "fibonacci(10)", output: "55" }],
-        secretTestCases: [{ input: "knapsack([10,20,30], [60,100,120], 50)", output: "220" }]
+        secretTestCases: [{ input: "knapsack([10,20,30], [60,100,120], 50)", output: "220" }],
+        languageIds: [6, 1, 4, 2, 7, 8, 9]
       }
     ],
   });
@@ -276,7 +279,6 @@ export async function seed(client: APIClient) {
     examPin: "555555",
     showScoreOnLock: true, testCode: "advanced data structures test",
     secretTestCode: "advanced data structures secret",
-    languageIds: [6, 1, 4, 2],
     examMode: false,
     closeOnDue: true,
     assignedGroupIds: ["Default"],
@@ -291,7 +293,8 @@ export async function seed(client: APIClient) {
         testCode: "const trie = new Trie();\ntrie.insert('apple');\ntrie.insert('app');\nexpect(trie.search('app')).toBe(true);\nexpect(trie.startsWith('ap')).toBe(true);\nexpect(trie.getWordsWithPrefix('ap')).toContain('apple');",
         secretTestCode: "trie.delete('app');\nexpect(trie.search('app')).toBe(false);\nexpect(trie.search('apple')).toBe(true);\nexpect(trie.getAllWords()).toEqual(['apple']);",
         testcases: [{ input: "insert('apple'), search('app')", output: "true" }],
-        secretTestCases: [{ input: "getWordsWithPrefix('ap')", output: "['app', 'apple']" }]
+        secretTestCases: [{ input: "getWordsWithPrefix('ap')", output: "['app', 'apple']" }],
+        languageIds: [6, 1, 4, 2, 7, 8, 9]
       },
       {
         number: 2,
@@ -302,7 +305,8 @@ export async function seed(client: APIClient) {
         answer: "class DisjointSet<T> {\n  private parent: Map<T, T> = new Map();\n  private rank: Map<T, number> = new Map();\n  private componentSize: Map<T, number> = new Map();\n  \n  makeSet(element: T): void {\n    if (!this.parent.has(element)) {\n      this.parent.set(element, element);\n      this.rank.set(element, 0);\n      this.componentSize.set(element, 1);\n    }\n  }\n  \n  find(element: T): T | null {\n    if (!this.parent.has(element)) return null;\n    \n    // Path compression\n    if (this.parent.get(element) !== element) {\n      const root = this.find(this.parent.get(element)!);\n      if (root !== null) {\n        this.parent.set(element, root);\n      }\n    }\n    \n    return this.parent.get(element)!;\n  }\n  \n  union(element1: T, element2: T): boolean {\n    this.makeSet(element1);\n    this.makeSet(element2);\n    \n    const root1 = this.find(element1);\n    const root2 = this.find(element2);\n    \n    if (root1 === null || root2 === null || root1 === root2) {\n      return false; // Already in same set or invalid elements\n    }\n    \n    const rank1 = this.rank.get(root1)!;\n    const rank2 = this.rank.get(root2)!;\n    const size1 = this.componentSize.get(root1)!;\n    const size2 = this.componentSize.get(root2)!;\n    \n    // Union by rank\n    if (rank1 < rank2) {\n      this.parent.set(root1, root2);\n      this.componentSize.set(root2, size1 + size2);\n    } else if (rank1 > rank2) {\n      this.parent.set(root2, root1);\n      this.componentSize.set(root1, size1 + size2);\n    } else {\n      this.parent.set(root2, root1);\n      this.rank.set(root1, rank1 + 1);\n      this.componentSize.set(root1, size1 + size2);\n    }\n    \n    return true;\n  }\n  \n  connected(element1: T, element2: T): boolean {\n    const root1 = this.find(element1);\n    const root2 = this.find(element2);\n    return root1 !== null && root2 !== null && root1 === root2;\n  }\n  \n  getComponentSize(element: T): number {\n    const root = this.find(element);\n    return root ? this.componentSize.get(root) || 0 : 0;\n  }\n  \n  getNumberOfComponents(): number {\n    const roots = new Set<T>();\n    for (const element of this.parent.keys()) {\n      const root = this.find(element);\n      if (root) roots.add(root);\n    }\n    return roots.size;\n  }\n  \n  getComponent(element: T): T[] {\n    const targetRoot = this.find(element);\n    if (!targetRoot) return [];\n    \n    const component: T[] = [];\n    for (const elem of this.parent.keys()) {\n      if (this.find(elem) === targetRoot) {\n        component.push(elem);\n      }\n    }\n    return component;\n  }\n}",
         testCode: "const ds = new DisjointSet<number>();\nds.makeSet(1);\nds.makeSet(2);\nds.makeSet(3);\nexpect(ds.connected(1, 2)).toBe(false);\nds.union(1, 2);\nexpect(ds.connected(1, 2)).toBe(true);",
         secretTestCode: "expect(ds.getComponentSize(1)).toBe(2);\nexpect(ds.getNumberOfComponents()).toBe(2);\nexpect(ds.getComponent(1)).toContain(2);", testcases: [{ input: "union(1,2), connected(1,2)", output: "true" }],
-        secretTestCases: [{ input: "getComponentSize(1)", output: "2" }]
+        secretTestCases: [{ input: "getComponentSize(1)", output: "2" }],
+        languageIds: [6, 1, 4, 2, 7, 8, 9]
       }
     ]
   });
