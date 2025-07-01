@@ -1,7 +1,3 @@
-import { CodeIcon, PlusIcon, XIcon } from 'lucide-react';
-import * as Tabs from "@radix-ui/react-tabs";
-import { CodeFile } from './editor';
-import { toast } from 'sonner';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,8 +9,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import * as Tabs from "@radix-ui/react-tabs";
+import { CodeIcon, PlusIcon, XIcon } from 'lucide-react';
+import { toast } from 'sonner';
+import { CodeFile } from './editor';
+import { LanguageSelector, LanguageSelectorProps } from "./shared";
 
-interface FileTabsProps {
+
+interface FileTabsProps extends LanguageSelectorProps {
   files: CodeFile[];
   selectedFile: CodeFile | null;
   onTabSelect: (fileName: string) => void;
@@ -23,7 +25,17 @@ interface FileTabsProps {
   onDeleteFile: (file: CodeFile) => void;
 }
 
-export function FileTabs({ files, selectedFile, onTabSelect, onAddFile, onRenameFile, onDeleteFile }: FileTabsProps) {
+export function FileTabs({
+  files,
+  selectedFile,
+  onTabSelect,
+  onAddFile,
+  onRenameFile,
+  onDeleteFile,
+  languages,
+  selectedLanguageId,
+  onLanguageChange,
+}: FileTabsProps) {
   const handleRenameFile = (file: CodeFile, newName: string) => {
     console.log(newName);
     if (newName.trim() === "") { // TODO: validate file name
@@ -57,14 +69,18 @@ export function FileTabs({ files, selectedFile, onTabSelect, onAddFile, onRename
       value={selectedFile?.name}
       onValueChange={onTabSelect}
     >
-      <Tabs.List className="text-xs border-b p-0.75 flex gap-1">
-        language selector
-        {files.map(file => (
+      <Tabs.List className="flex gap-1 border-b p-0.75 text-xs">
+        <LanguageSelector
+          languages={languages}
+          selectedLanguageId={selectedLanguageId}
+          onLanguageChange={onLanguageChange}
+        />
+        {files.map((file) => (
           <Tabs.Trigger
             key={file.name}
             value={file.name}
             onClick={() => console.log(`clicked ${file.name}`)}
-            className="group pl-1.5 first-of-type:pr-1.5 flex items-center rounded data-[state=active]:bg-accent hover:bg-accent/50 transition-colors"
+            className="group flex items-center rounded pl-1.5 first-of-type:pr-1.5 data-[state=active]:bg-accent hover:bg-accent/50 transition-colors"
             asChild
           >
             <div>
