@@ -2,66 +2,37 @@ import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import Editor, { useMonaco } from '@monaco-editor/react';
 import { CheckIcon, CopyIcon, DownloadIcon, RefreshCcwIcon, SaveIcon, UploadIcon } from 'lucide-react';
-import { Ref, useCallback, useEffect, useImperativeHandle, useState } from 'react';
+import { useEffect } from 'react';
 import { FileTabs } from './file-tabs';
-import { SupportedLanguage } from '@/lib/api/type';
+import { observer } from 'mobx-react-lite';
+import { useCodeSpaceStore } from './store';
 
-/*
-TODOS:
-- polish some routing
-- question switching
-  - reinstatiate monaco
-  - or tell it to relint somehow
-- multifile template is not in the api yet
-- code submission api
-- test result api
-
-- assignment card: click to publish dont work
-- language selector: no ui yet
-- previous version: no ui, no api
-
-- we need some way to run the code with custom input not only the one provided
-- confetti on submit
-
-*/
-
-export interface CodeFile {
-  name: string,
-  content: string;
-  language: string;
-}
-
-export interface ImperativeEditorHandle {
-  getCodeFiles(): CodeFile[];
-}
-
-export interface EditorPanelProps {
-  initialCodeFiles: CodeFile[];
-  supportedLanguages: SupportedLanguage[];
-  onChange: () => unknown;
-  ref?: Ref<ImperativeEditorHandle>;
-  savingStatus: "saving" | "unsaved" | "saved";
-}
-
-export function EditorPanel({ initialCodeFiles, supportedLanguages, onChange, ref, savingStatus }: EditorPanelProps) {
+export const EditorPanel = observer(() => {
   const monaco = useMonaco();
-  const [files, setFiles] = useState(initialCodeFiles);
-  const [selectedFile, setSelectedFile] = useState(files.length > 0 ? files[0] : null);
-  const [selectedLanguageId, setSelectedLanguageId] = useState(supportedLanguages[0]?.id ?? 0);
+  const store = useCodeSpaceStore();
+  const { savingStatus, files, activeFileId } = store;
 
-  // call onChange, this is for auto save
+  // Set monaco instance in store
+  useEffect(() => {
+    if (monaco) {
+      store.setMonaco(monaco);
+    }
+  }, [monaco, store]);
+
+
+  // Effect for auto-saving
   useEffect(() => {
     if (!monaco) return;
 
     const disposables = monaco.editor.getModels().map(model =>
       model.onDidChangeContent(() => {
-        onChange();
+        store.markAsEdited();
       })
     );
 
     const newModelDisposable = monaco.editor.onDidCreateModel(model => {
       const d = model.onDidChangeContent(() => {
-        onChange();
+        store.markAsEdited();
       });
       disposables.push(d);
     });
@@ -70,89 +41,13 @@ export function EditorPanel({ initialCodeFiles, supportedLanguages, onChange, re
       disposables.forEach(d => d.dispose());
       newModelDisposable.dispose();
     };
-  }, [monaco, onChange]);
+  }, [monaco, store]);
 
-  useImperativeHandle(ref, () => {
-    return {
-      getCodeFiles() {
-        const models = monaco!.editor.getModels();
-
-        return models.map(it => ({
-          name: it.uri.path.slice(1),
-          language: it.getLanguageId(),
-          content: it.getValue(),
-        }));
-      },
-    };
-  });
-
-  const onTabSelect = useCallback((id: string) => {
-    setSelectedFile(files.find(it => it.name === id)!);
-  }, [files]);
-
-  const onAddFile = useCallback(() => {
-    let counter = 1;
-    let newFileName = `untitled${counter}`;
-
-    while (files.some(file => file.name === newFileName)) {
-      counter++;
-      newFileName = `untitled${counter}`;
-    }
-
-    const newFile: CodeFile = {
-      name: newFileName,
-      content: '',
-      language: 'plaintext'
-    };
-
-    setFiles(prev => [...prev, newFile]);
-    setSelectedFile(newFile);
-  }, [files]);
-
-  const renameFile = (file: CodeFile, newName: string) => {
-    // fucking cursed
-    // TODO: escape this
-    file.name = newName;
-    setFiles(f => [...f]);
-  };
-
-  const deleteFile = useCallback((file: CodeFile) => {
-    // Remove the file from the files array
-    const newFiles = files.filter(f => f !== file);
-    setFiles(newFiles);
-    
-    // If the deleted file was selected, select another file
-    if (selectedFile === file) {
-      if (newFiles.length > 0) {
-        setSelectedFile(newFiles[0]);
-      } else {
-        setSelectedFile(null);
-      }
-    }
-
-    // Dispose the Monaco model for the deleted file
-    if (monaco) {
-      const model = monaco.editor.getModels().find(m => m.uri.path.slice(1) === file.name);
-      if (model) {
-        model.dispose();
-      }
-    }
-  }, [files, selectedFile, monaco]);
-
+  const selectedFile = files.find(f => f.id === activeFileId);
 
   return (
     <section className='h-full grid grid-rows-[auto_1fr_auto]'>
-      <FileTabs
-        files={files}
-        selectedFile={selectedFile}
-        onTabSelect={onTabSelect}
-        onAddFile={onAddFile}
-        onRenameFile={renameFile}
-        onDeleteFile={deleteFile}
-        languages={supportedLanguages}
-        selectedLanguageId={selectedLanguageId}
-        onLanguageChange={setSelectedLanguageId}
-      />
+      <FileTabs />
 
       <div className='bg-red-50 overflow-hidden'>
         {selectedFile &&
@@ -161,7 +56,7 @@ export function EditorPanel({ initialCodeFiles, supportedLanguages, onChange, re
             options={{
               automaticLayout: true
             }}
-            defaultLanguage={selectedFile.language}
+            defaultLanguage="typescript"
             defaultValue={selectedFile.content}
           />
         }
@@ -216,11 +111,23 @@ export function EditorPanel({ initialCodeFiles, supportedLanguages, onChange, re
             </Tooltip>
           </div>
         </div>
-        <span className='flex gap-1 font-medium items-center mr-2 text-emerald-600'>
-          Saved
-          <CheckIcon className='size-3.5' />
-        </span>
+        {savingStatus === 'saved' && (
+          <span className='flex gap-1 font-medium items-center mr-2 text-emerald-600'>
+            Saved
+            <CheckIcon className='size-3.5' />
+          </span>
+        )}
+        {savingStatus === 'saving' && (
+          <span className='flex gap-1 font-medium items-center mr-2 text-yellow-600'>
+            Saving...
+          </span>
+        )}
+        {savingStatus === 'unsaved' && (
+          <span className='flex gap-1 font-medium items-center mr-2 text-gray-500'>
+            Unsaved
+          </span>
+        )}
       </div>
     </section>
   );
-}
+});

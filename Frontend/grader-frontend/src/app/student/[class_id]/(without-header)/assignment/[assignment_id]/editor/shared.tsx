@@ -9,16 +9,19 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink } from "@
 import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { SupportedLanguage } from "@/lib/api/type";
 import { SelectTrigger } from "@radix-ui/react-select";
+import { useCodeSpaceStore } from "./store";
+import { observer } from "mobx-react-lite";
+import { cn } from "@/lib/utils";
 
 type PageState = "done" | "active" | "none";
 
 interface PageItemProps {
   page: number;
   state: PageState;
-  href?: string;
+  onClick: () => void;
 }
 
-function PageItem({ page, state, href = "#" }: PageItemProps) {
+function PageItem({ page, state, onClick }: PageItemProps) {
   const getStateClasses = (state: PageState) => {
     switch (state) {
       case "done":
@@ -34,49 +37,49 @@ function PageItem({ page, state, href = "#" }: PageItemProps) {
 
   return (
     <PaginationItem className="">
-      <PaginationLink href={href} isActive={state === "active"} className={getStateClasses(state)}>
+      <PaginationLink href="#" onClick={onClick} isActive={state === "active"} className={getStateClasses(state)}>
         {page}
       </PaginationLink>
     </PaginationItem>
   );
 }
 
-// TODO: props
-export function QuestionPagination() {
-  const pageStates: { page: number; state: PageState; }[] = [
-    { page: 1, state: "done" },
-    { page: 2, state: "done" },
-    { page: 3, state: "active" },
-    { page: 4, state: "none" },
-    { page: 5, state: "none" },
-  ];
+export const QuestionPagination = observer(() => {
+  const store = useCodeSpaceStore();
+  const { questions, currentQuestion, selectQuestion, nextQuestion, previousQuestion } = store;
+
+  if (!currentQuestion) {
+    return null;
+  }
+
+  const pageStates: { page: number; state: PageState; id: number; }[] = questions.map((q, i) => {
+    // TODO: Implement "done" state tracking
+    const state: PageState = q.id === currentQuestion.id ? "active" : "none";
+    return { page: i + 1, state, id: q.id };
+  });
 
   return (
     <Pagination className="">
       <PaginationContent>
         <PaginationItem>
-          <PaginationLink href="#" className="hover:bg-gray-100">
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
+          <PaginationLink href="#" onClick={previousQuestion} className="hover:bg-gray-100">
+            <ChevronLeft className="h-4 w-4" />
           </PaginationLink>
         </PaginationItem>
 
-        {pageStates.map(({ page, state }) => (
-          <PageItem key={page} page={page} state={state} />
+        {pageStates.map(({ page, state, id }) => (
+          <PageItem key={page} page={page} state={state} onClick={() => selectQuestion(id)} />
         ))}
 
         <PaginationItem>
-          <PaginationLink href="#" className="hover:bg-gray-100">
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+          <PaginationLink href="#" onClick={nextQuestion} className="hover:bg-gray-100">
+            <ChevronRight className="h-4 w-4" />
           </PaginationLink>
         </PaginationItem>
       </PaginationContent>
     </Pagination>
   );
-}
+});
 
 export interface QuestionPaginationSmallProps {
   isAtEnd: boolean,
@@ -103,31 +106,31 @@ export function QuestionPaginationSmall({ isAtEnd, onNext, onPrevious }: Questio
 }
 
 export interface LanguageSelectorProps {
-  languages: SupportedLanguage[];
+  supportedLanguages: SupportedLanguage[];
   selectedLanguageId: number;
   onLanguageChange: (languageId: number) => void;
 }
 
-export function LanguageSelector({
-  languages,
-  selectedLanguageId,
-  onLanguageChange,
-}: LanguageSelectorProps) {
+export function LanguageSelector({ supportedLanguages, selectedLanguageId, onLanguageChange }: LanguageSelectorProps) {
+  const selectedLanguage = supportedLanguages.find(l => l.id === selectedLanguageId);
+
   return (
     <Select
       value={selectedLanguageId.toString()}
-      onValueChange={(value) => onLanguageChange(Number(value))}
+      onValueChange={(value) => onLanguageChange(parseInt(value, 10))}
     >
       <SelectTrigger asChild>
-        <button className="group flex gap-1 items-center rounded px-1.5 hover:bg-accent/50 transition-colors border">
-          <SelectValue placeholder="Select a language" />
+        <button className="group flex items-center rounded px-1.5 hover:bg-accent/50 border gap-1 transition-colors">
+          <SelectValue placeholder="Language">
+            {selectedLanguage ? `${selectedLanguage.name}` : "Select Language"}
+          </SelectValue>
           <ChevronDown className="size-3" />
         </button>
       </SelectTrigger>
       <SelectContent>
-        {languages.map((language) => (
-          <SelectItem key={language.id} value={language.id.toString()}>
-            {language.name}
+        {supportedLanguages.map((lang) => (
+          <SelectItem key={lang.id} value={lang.id.toString()}>
+            {lang.name}
           </SelectItem>
         ))}
       </SelectContent>
