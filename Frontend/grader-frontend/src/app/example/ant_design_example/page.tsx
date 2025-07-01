@@ -21,14 +21,6 @@ import {
     Tooltip,
     Popconfirm
 } from 'antd'
-import {
-    UserOutlined,
-    EditOutlined,
-    DeleteOutlined,
-    PlusOutlined,
-    DownloadOutlined,
-    EyeOutlined
-} from '@ant-design/icons'
 import Link from 'next/link'
 
 const { Title, Text } = Typography
@@ -176,7 +168,7 @@ export default function AntDesignExample() {
             key: 'name',
             render: (text: string, record: Student) => (
                 <Space>
-                    <Avatar src={record.avatar} icon={<UserOutlined />} />
+                    {/* <Avatar src={record.avatar} icon={<UserOutlined />} /> */}
                     <div>
                         <div style={{ fontWeight: 'bold' }}>{text}</div>
                         <Text type="secondary" style={{ fontSize: '12px' }}>
@@ -255,14 +247,14 @@ export default function AntDesignExample() {
                     <Tooltip title="View Details">
                         <Button
                             type="text"
-                            icon={<EyeOutlined />}
+                            // icon={<EyeOutlined />}
                             onClick={() => handleViewStudent(record)}
                         />
                     </Tooltip>
                     <Tooltip title="Edit Student">
                         <Button
                             type="text"
-                            icon={<EditOutlined />}
+                            // icon={<EditOutlined />}
                             onClick={() => handleEditStudent(record)}
                         />
                     </Tooltip>
@@ -273,7 +265,7 @@ export default function AntDesignExample() {
                         cancelText="No"
                     >
                         <Tooltip title="Delete Student">
-                            <Button type="text" danger icon={<DeleteOutlined />} />
+                            {/* <Button type="text" danger icon={<DeleteOutlined />} /> */}
                         </Tooltip>
                     </Popconfirm>
                 </Space>
@@ -389,7 +381,7 @@ export default function AntDesignExample() {
                             <Statistic
                                 title="Total Students"
                                 value={mockStudents.length}
-                                prefix={<UserOutlined />}
+                                // prefix={<UserOutlined />}
                                 valueStyle={{ color: '#3f8600' }}
                             />
                         </Card>
@@ -429,12 +421,12 @@ export default function AntDesignExample() {
                     title="Students Management"
                     extra={
                         <Space>
-                            <Button type="primary" icon={<PlusOutlined />}>
+                            {/* <Button type="primary" icon={<PlusOutlined />}>
                                 Add Student
-                            </Button>
-                            <Button icon={<DownloadOutlined />}>
+                            </Button> */}
+                            {/* <Button icon={<DownloadOutlined />}>
                                 Export
-                            </Button>
+                            </Button> */}
                         </Space>
                     }
                     style={{ marginBottom: '24px' }}
