@@ -6,8 +6,7 @@ import Providers from "./providers";
 import { Toaster } from "@/components/ui/sonner";
 
 import { NextIntlClientProvider } from 'next-intl';
-import { getLocale, getMessages } from 'next-intl/server'
-  ;
+import { getLocale, getMessages } from 'next-intl/server';
 
 // TODO: get thai font
 const rubik = Rubik({
