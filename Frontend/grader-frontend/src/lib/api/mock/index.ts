@@ -450,6 +450,7 @@ function createClient(persistence: Storage<Database>): APIClient {
       },
 
       submit: async (questionId, languageId, codes) => {
+        await new Promise(resolve => setTimeout(resolve, 1500));
         return { submissionId: Math.floor(Math.random() * 1000) + 1 };
       },
 

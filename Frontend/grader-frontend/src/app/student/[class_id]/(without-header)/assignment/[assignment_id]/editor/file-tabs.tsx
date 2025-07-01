@@ -12,31 +12,33 @@ import {
 import * as Tabs from "@radix-ui/react-tabs";
 import { CodeIcon, PlusIcon, XIcon } from 'lucide-react';
 import { toast } from 'sonner';
-import { CodeFile } from './editor';
-import { LanguageSelector, LanguageSelectorProps } from "./shared";
+import { LanguageSelector } from "./shared";
+import { observer } from 'mobx-react-lite';
+import { useCodeSpaceStore } from './store';
+import { EditorFile } from "./store/page-store";
 
+export const FileTabs = observer(() => {
+  const store = useCodeSpaceStore();
+  const { 
+    lab, 
+    files, 
+    activeFileId, 
+    selectFile, 
+    addFile, 
+    renameFile, 
+    deleteFile, 
+    setLanguage, 
+    selectedLanguageId,
+    currentQuestion
+  } = store;
 
-interface FileTabsProps extends LanguageSelectorProps {
-  files: CodeFile[];
-  selectedFile: CodeFile | null;
-  onTabSelect: (fileName: string) => void;
-  onAddFile: () => void;
-  onRenameFile: (file: CodeFile, newName: string) => void;
-  onDeleteFile: (file: CodeFile) => void;
-}
+  if (!currentQuestion || !lab) {
+    return null; // Or a loading indicator
+  }
 
-export function FileTabs({
-  files,
-  selectedFile,
-  onTabSelect,
-  onAddFile,
-  onRenameFile,
-  onDeleteFile,
-  languages,
-  selectedLanguageId,
-  onLanguageChange,
-}: FileTabsProps) {
-  const handleRenameFile = (file: CodeFile, newName: string) => {
+  const selectedFile = files.find(f => f.id === activeFileId);
+
+  const handleRenameFile = (file: EditorFile, newName: string) => {
     console.log(newName);
     if (newName.trim() === "") { // TODO: validate file name
       toast.error("t.invalid-name");
@@ -49,16 +51,16 @@ export function FileTabs({
       }
       return;
     }
-    onRenameFile(file, newName);
+    renameFile(file.id, newName);
     toast.success("t.renamed");
   };
 
-  const handleDeleteFile = (file: CodeFile) => {
-    onDeleteFile(file);
+  const handleDeleteFile = (file: EditorFile) => {
+    deleteFile(file.id);
     toast.success("File deleted");
   };
 
-  const canDeleteFile = (file: CodeFile) => {
+  const canDeleteFile = (file: EditorFile) => {
     return files.length > 1 && file !== files[0];
   };
 
@@ -67,13 +69,13 @@ export function FileTabs({
       className="flex flex-col"
       defaultValue={files[0]?.name}
       value={selectedFile?.name}
-      onValueChange={onTabSelect}
+      onValueChange={selectFile}
     >
       <Tabs.List className="flex gap-1 border-b p-0.75 text-xs">
         <LanguageSelector
-          languages={languages}
+          supportedLanguages={currentQuestion.languages}
           selectedLanguageId={selectedLanguageId}
-          onLanguageChange={onLanguageChange}
+          onLanguageChange={setLanguage}
         />
         {files.map((file) => (
           <Tabs.Trigger
@@ -129,10 +131,10 @@ export function FileTabs({
             </div>
           </Tabs.Trigger>
         ))}
-        <button className="w-6 aspect-square flex items-center justify-center rounded hover:bg-accent" onClick={onAddFile}>
+        <button className="w-6 aspect-square flex items-center justify-center rounded hover:bg-accent" onClick={addFile}>
           <PlusIcon className="size-3.5" />
         </button>
       </Tabs.List>
     </Tabs.Root>
   );
-}
+});
