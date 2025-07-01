@@ -20,6 +20,7 @@ export const EditorPanel = observer(() => {
   }, [monaco, store]);
 
 
+  // TODO: move this to the store
   // Effect for auto-saving
   useEffect(() => {
     if (!monaco) return;
@@ -52,6 +53,7 @@ export const EditorPanel = observer(() => {
       <div className='bg-red-50 overflow-hidden'>
         {selectedFile &&
           <Editor
+            key={`${store.lab.id}/${store.currentQuestion.id}`}
             path={selectedFile.name}
             options={{
               automaticLayout: true
