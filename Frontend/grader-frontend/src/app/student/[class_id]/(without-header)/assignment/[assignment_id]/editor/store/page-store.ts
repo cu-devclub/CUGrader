@@ -86,6 +86,10 @@ export class CodeSpaceStore {
   };
 
   selectQuestion = (questionId: number) => {
+    if (this._monaco) {
+      this.disposeModels();
+      // this._monaco.editor.
+    }
     const question = this.questions.find(q => q.id === questionId);
     if (question) {
       this.currentQuestion = question;
@@ -186,6 +190,10 @@ export class CodeSpaceStore {
     if (model) {
       model.dispose();
     }
+  };
+
+  disposeModels = () => {
+    this._monaco.editor.getModels().forEach(it => it.dispose());
   };
 
   markAsEdited = () => {
