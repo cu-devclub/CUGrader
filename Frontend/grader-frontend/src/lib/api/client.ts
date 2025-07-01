@@ -227,7 +227,7 @@ export function createClient() {
             closeOnDue: p.closeOnDue,
 
 
-            languageIds: p.languageIds,
+            // languageIds: p.languageIds,
 
             examMode: p.examMode,
             examPin: parseInt(p.examPin), // Convert string to number
@@ -285,7 +285,7 @@ export function createClient() {
           status: "new" as const, // TODO: compute status from submission data
           // Detail fields
           questions,
-          languages: lab.language!.map(it => ({ id: it.id!, name: it.name! })),
+          // languages: lab.language!.map(it => ({ id: it.id!, name: it.name! })),
           assignedGroupIds: lab.assignTo ?? [],
           closeOnDue: lab.closeOnDue ?? false,
           examMode: lab.examMode ?? false,
@@ -314,7 +314,7 @@ export function createClient() {
           // Detail fields
           questionIds: lab.questionIds ?? [],
           additionalFileIds: lab.addfiles ?? [],
-          languages: lab.language!.map(it => ({ id: it.id!, name: it.name! })),
+          // languages: lab.language!.map(it => ({ id: it.id!, name: it.name! })),
           examMode: lab.examMode ?? false,
           closeOnDue: lab.closeOnDue ?? false,
           assignedGroupIds: lab.assignTo ?? [],
@@ -354,6 +354,7 @@ export function createClient() {
           name: q.name!,
           number: q.number!,
           template: q.predefine!,
+          languages: [], // TODO: implement this once we have the api
           submission: q.submission && {
             id: q.submission.submissionId!,
             score: q.submission.score!,
@@ -375,6 +376,7 @@ export function createClient() {
           name: q.name!,
           number: q.number!,
           template: q.template!,
+          languages: [], // TODO: get this when we have the api
           answer: "", // TODO: get instructor answer from API when available
           testCode: "", // TODO: get public test code when available
           secretTestCode: "", // TODO: get secret test code when available

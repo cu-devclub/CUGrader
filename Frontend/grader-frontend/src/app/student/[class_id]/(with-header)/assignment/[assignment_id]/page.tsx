@@ -162,7 +162,6 @@ function StudentAssignmentDetail({
             </div>
             <div className="flex items-center gap-2">
               <span className="text-gray-600">Language:</span>
-              <span className="font-medium">{assignment.languages?.map(it => it.name).join(', ') || 'Not specified'}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-gray-600">Mode:</span>
