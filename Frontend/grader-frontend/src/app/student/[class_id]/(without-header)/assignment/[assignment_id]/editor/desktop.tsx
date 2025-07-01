@@ -147,6 +147,7 @@ export function DesktopCodeSpace({ question, lab }: CodeSpaceProps) {
                 ref={editorRef}
                 initialCodeFiles={initialCodeFiles}
                 onChange={() => submitCode.notifyChange()}
+                supportedLanguages={question.languages}
               />
             </ResizablePanel>
             <ResizableHandle className='bg-transparent' withHandle />

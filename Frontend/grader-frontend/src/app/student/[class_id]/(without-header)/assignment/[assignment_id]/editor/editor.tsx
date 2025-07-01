@@ -4,6 +4,7 @@ import Editor, { useMonaco } from '@monaco-editor/react';
 import { CheckIcon, CopyIcon, DownloadIcon, RefreshCcwIcon, SaveIcon, UploadIcon } from 'lucide-react';
 import { Ref, useCallback, useEffect, useImperativeHandle, useState } from 'react';
 import { FileTabs } from './file-tabs';
+import { SupportedLanguage } from '@/lib/api/type';
 
 /*
 TODOS:
@@ -12,9 +13,6 @@ TODOS:
   - reinstatiate monaco
   - or tell it to relint somehow
 - multifile template is not in the api yet
-- Add new file button
-- file renaming | disable it for main.* ?? | or some way to mark it as main
-- examination timer
 - code submission api
 - test result api
 
@@ -39,17 +37,17 @@ export interface ImperativeEditorHandle {
 
 export interface EditorPanelProps {
   initialCodeFiles: CodeFile[];
+  supportedLanguages: SupportedLanguage[];
   onChange: () => unknown;
   ref?: Ref<ImperativeEditorHandle>;
   savingStatus: "saving" | "unsaved" | "saved";
 }
 
-// TODO: if we want lsp then we need to run it somewhere else probably same server as the backend 💀💀💀
-// we CAN use wasm but only clangd has a VERY EXPERIMENTAL support  
-export function EditorPanel({ initialCodeFiles, onChange, ref, savingStatus }: EditorPanelProps) {
+export function EditorPanel({ initialCodeFiles, supportedLanguages, onChange, ref, savingStatus }: EditorPanelProps) {
   const monaco = useMonaco();
   const [files, setFiles] = useState(initialCodeFiles);
   const [selectedFile, setSelectedFile] = useState(files.length > 0 ? files[0] : null);
+  const [selectedLanguageId, setSelectedLanguageId] = useState(supportedLanguages[0]?.id ?? 0);
 
   // call onChange, this is for auto save
   useEffect(() => {
@@ -151,6 +149,9 @@ export function EditorPanel({ initialCodeFiles, onChange, ref, savingStatus }: E
         onAddFile={onAddFile}
         onRenameFile={renameFile}
         onDeleteFile={deleteFile}
+        languages={supportedLanguages}
+        selectedLanguageId={selectedLanguageId}
+        onLanguageChange={setSelectedLanguageId}
       />
 
       <div className='bg-red-50 overflow-hidden'>

@@ -1,6 +1,14 @@
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from "@/components/ui/select";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink } from "@/components/ui/pagination";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { SupportedLanguage } from "@/lib/api/type";
+import { SelectTrigger } from "@radix-ui/react-select";
 
 type PageState = "done" | "active" | "none";
 
@@ -91,5 +99,38 @@ export function QuestionPaginationSmall({ isAtEnd, onNext, onPrevious }: Questio
         </Button>
       }
     </div>
+  );
+}
+
+export interface LanguageSelectorProps {
+  languages: SupportedLanguage[];
+  selectedLanguageId: number;
+  onLanguageChange: (languageId: number) => void;
+}
+
+export function LanguageSelector({
+  languages,
+  selectedLanguageId,
+  onLanguageChange,
+}: LanguageSelectorProps) {
+  return (
+    <Select
+      value={selectedLanguageId.toString()}
+      onValueChange={(value) => onLanguageChange(Number(value))}
+    >
+      <SelectTrigger asChild>
+        <button className="group flex gap-1 items-center rounded px-1.5 hover:bg-accent/50 transition-colors border">
+          <SelectValue placeholder="Select a language" />
+          <ChevronDown className="size-3" />
+        </button>
+      </SelectTrigger>
+      <SelectContent>
+        {languages.map((language) => (
+          <SelectItem key={language.id} value={language.id.toString()}>
+            {language.name}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }
