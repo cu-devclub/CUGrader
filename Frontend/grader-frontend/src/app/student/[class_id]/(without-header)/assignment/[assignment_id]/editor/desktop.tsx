@@ -1,13 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from '@/components/ui/button';
 import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
+  Pagination
 } from "@/components/ui/pagination";
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
@@ -18,6 +12,9 @@ import * as Tabs from "@radix-ui/react-tabs";
 import {
   ArrowLeftToLine,
   ArrowRightToLine,
+  ChevronsDown,
+  ChevronsUpDown,
+  CircleArrowLeft,
   CircleCheck,
   LayoutPanelLeft,
   PanelBottom,
@@ -28,6 +25,9 @@ import { useMemo, useRef } from 'react';
 import Markdown from 'react-markdown';
 import { CodeFile, EditorPanel, ImperativeEditorHandle } from './editor';
 import { useSubmitCode } from './hooks';
+import { QuestionPagination, QuestionPaginationSmall } from "./shared";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import Link from "next/link";
 
 // TODO: extract this to seperated file
 function getMonacoLanguageId(language: SupportedLanguage) {
@@ -77,11 +77,17 @@ export function DesktopCodeSpace({ question, lab }: CodeSpaceProps) {
   return (
     <main className='flex flex-col bg-neutral-50 h-screen'>
       <nav className='flex items-center justify-between p-2 pb-0'>
+        <Button asChild size="sm" variant="ghost" className="font-normal text-primary hover:text-primary hover:bg-primary/5 underline underline-offset-2">
+          <Link href={""}>
+              <CircleArrowLeft />
+              Back to problem list
+          </Link>
+        </Button>
         <div className="flex gap-2 items-center">
           <Popover>
             <PopoverTrigger asChild>
-              <Button size="icon" variant="ghost" className='h-7 w-7'>
-                <LayoutPanelLeft className='h-4 w-4' />
+              <Button size="icon" variant="ghost">
+                <LayoutPanelLeft />
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-1">
@@ -113,7 +119,7 @@ export function DesktopCodeSpace({ question, lab }: CodeSpaceProps) {
               </div>
             </PopoverContent>
           </Popover>
-          next question
+          <QuestionPaginationSmall />
         </div>
       </nav>
       <ResizablePanelGroup direction="horizontal" className='flex-1 p-1'>
@@ -160,42 +166,37 @@ export function DesktopCodeSpace({ question, lab }: CodeSpaceProps) {
   );
 }
 
+// TODO: file downloading
 function DetailPanel({ question, lab }: { question: StudentQuestion, lab: StudentAssignmentDetails; }) {
   return (
-    <div className="p-4 h-full overflow-y-auto flex flex-col gap-2">
-      <Pagination>
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious href="#" />
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationLink href="#">1</PaginationLink>
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationLink href="#" isActive>
-              2
-            </PaginationLink>
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationLink href="#">3</PaginationLink>
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationEllipsis />
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationNext href="#" />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
-      <div className="flex justify-between">
-        <Badge>Lab 1 : {question.name}</Badge>
-        <p className="text-sm font-semibold">Score: {question.maxScore}</p>
+    <div className=" h-full overflow-y-auto flex flex-col gap-2">
+      <div className="p-3 border-b">
+        <QuestionPagination />
       </div>
-      <p className="text-sm text-muted-foreground">
-        {lab.publish.toString()}
-        {lab.due.toString()}
-      </p>
-      <div>
+      <div className="p-3 border-b">
+        <div className=" flex justify-between">
+          <Badge variant="secondary">Lab 1 : {question.name}</Badge>
+          <p className="text-sm font-semibold">Score: {question.maxScore}</p>
+        </div>
+        <p className="text-sm mt-2 text-muted-foreground">
+          {lab.publish.toString()}
+          {lab.due.toString()}
+        </p>
+        <Collapsible>
+          <div className="flex justify-end">
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" size="icon" className="size-8">
+                <ChevronsDown />
+                <span className="sr-only">Lab Details</span>
+              </Button>
+            </CollapsibleTrigger>
+          </div>
+          <CollapsibleContent>
+            We're no strangers to love You know the rules and so do I (do I) A full commitment's what I'm thinking of You wouldn't get this from any other guy I just wanna tell you how I'm feeling Gotta make you understand Never gonna give you up Never gonna let you down Never gonna run around and desert you Never gonna make you cry Never gonna say goodbye Never gonna tell a lie and hurt you We've known each other for so long Your heart's been aching, but you're too shy to say it (say it) Inside, we both know what's been going on (going on) We know the game and we're gonna play it And if you ask me how I'm feeling Don't tell me you're too blind to see Never gonna give you up Never gonna let you down Never gonna run around and desert you Never gonna make you cry Never gonna say goodbye Never gonna tell a lie and hurt you Never gonna give you up Never gonna let you down Never gonna run around and desert you Never gonna make you cry Never gonna say goodbye Never gonna tell a lie and hurt you We've known each other for so long Your heart's been aching, but you're too shy to say it (to say it) Inside, we both know what's been going on (going on) We know the game and we're gonna play it I just wanna tell you how I'm feeling Gotta make you understand Never gonna give you up Never gonna let you down Never gonna run around and desert you Never gonna make you cry Never gonna say goodbye Never gonna tell a lie and hurt you Never gonna give you up Never gonna let you down Never gonna run around and desert you Never gonna make you cry Never gonna say goodbye Never gonna tell a lie and hurt you Never gonna give you up Never gonna let you down Never gonna run around and desert you Never gonna make you cry Never gonna say goodbye Never gonna tell a lie and hurt you
+          </CollapsibleContent>
+        </Collapsible>
+      </div>
+      <div className="p-3">
         <h1 className="text-xl font-bold">1. Question title</h1>
         <div className="prose prose-sm dark:prose-invert max-w-none">
           <Markdown>{question.description}</Markdown>
