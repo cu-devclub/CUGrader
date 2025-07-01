@@ -28,12 +28,17 @@ export function FileTabs({ files, selectedFile, onTabSelect, onAddFile, onRename
     console.log(newName);
     if (newName.trim() === "") { // TODO: validate file name
       toast.error("t.invalid-name");
-    } else if (files.some(it => it.name === newName)) {
-      toast.error("t.samename");
-    } else {
-      onRenameFile(file, newName);
-      toast.success("t.renamed");
+      return;
     }
+    const fileWithSameName = files.find(it => it.name === newName);
+    if (fileWithSameName) {
+      if (fileWithSameName !== file) {
+        toast.error("t.samename");
+      }
+      return;
+    }
+    onRenameFile(file, newName);
+    toast.success("t.renamed");
   };
 
   const handleDeleteFile = (file: CodeFile) => {
@@ -59,49 +64,53 @@ export function FileTabs({ files, selectedFile, onTabSelect, onAddFile, onRename
             key={file.name}
             value={file.name}
             onClick={() => console.log(`clicked ${file.name}`)}
-            className="group px-1.5 flex items-center gap-1.5 rounded data-[state=active]:bg-accent hover:bg-accent/50 transition-colors"
+            className="group pl-1.5 first-of-type:pr-1.5 flex items-center rounded data-[state=active]:bg-accent hover:bg-accent/50 transition-colors"
+            asChild
           >
-            <CodeIcon className="size-3" />
-            <span
-              role="textbox"
-              suppressContentEditableWarning
-              onBlur={(event) => handleRenameFile(file, event.currentTarget.innerText)}
-              onKeyDown={event => {
-                if (event.key === "Enter") {
-                  event.preventDefault();
-                  event.currentTarget.blur();
-                }
-              }}
-              contentEditable={file === selectedFile}
-              dangerouslySetInnerHTML={{ __html: file.name }}
-            >
-            </span>
-            {canDeleteFile(file) && (
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <button
-                    onClick={(event) => event.stopPropagation()}
-                    className="ml-1 opacity-0 group-hover:opacity-100 hover:bg-red-500/20 rounded p-0.5 transition-all"
-                  >
-                    <XIcon className="size-3" />
-                  </button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Delete File</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Are you sure you want to delete "{file.name}"? This action cannot be undone.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => handleDeleteFile(file)}>
-                      Delete
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            )}
+            <div>
+              <CodeIcon className="size-3" />
+              <span
+                className='ml-1'
+                role="textbox"
+                suppressContentEditableWarning
+                onBlur={(event) => handleRenameFile(file, event.currentTarget.innerText)}
+                onKeyDown={event => {
+                  if (event.key === "Enter") {
+                    event.preventDefault();
+                    event.currentTarget.blur();
+                  }
+                }}
+                contentEditable={file === selectedFile}
+                dangerouslySetInnerHTML={{ __html: file.name }}
+              >
+              </span>
+              {canDeleteFile(file) && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <button
+                      onClick={(event) => event.stopPropagation()}
+                      className="hover:bg-red-500/20 p-1 rounded transition-all mx-0.5 opacity-0 group-data-[state=active]:opacity-100"
+                    >
+                      <XIcon className="size-3" />
+                    </button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete File</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to delete &quot;{file.name}&quot;? This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => handleDeleteFile(file)}>
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
+            </div>
           </Tabs.Trigger>
         ))}
         <button className="w-6 aspect-square flex items-center justify-center rounded hover:bg-accent" onClick={onAddFile}>

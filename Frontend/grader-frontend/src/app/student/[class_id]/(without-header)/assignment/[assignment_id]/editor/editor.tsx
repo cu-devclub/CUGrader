@@ -2,8 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import Editor, { useMonaco } from '@monaco-editor/react';
 import { CheckIcon, CopyIcon, DownloadIcon, RefreshCcwIcon, SaveIcon, UploadIcon } from 'lucide-react';
-import { FormEvent, Ref, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
-import { CodeSpaceTabs } from './shared';
+import { Ref, useCallback, useEffect, useImperativeHandle, useState } from 'react';
 import { FileTabs } from './file-tabs';
 
 /*
