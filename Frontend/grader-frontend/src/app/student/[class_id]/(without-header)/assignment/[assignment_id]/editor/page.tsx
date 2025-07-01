@@ -24,10 +24,7 @@ export default function CodeSpacePage({ params }: CodeSpacePageProps) {
     queryFn: () => api.assignments.getById(assignmentId)
   });
 
-  const question = assignment.questions[0];
-
   return <DesktopCodeSpace
-    question={question}
     lab={assignment}
   />;
 }
