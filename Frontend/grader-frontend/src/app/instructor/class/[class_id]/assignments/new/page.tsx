@@ -17,39 +17,39 @@ export default function Page({ }) {
 
   const mutation = useMutation({
     mutationFn: async (data: AssignmentFormResult) => {
-      const payload: CreateAssignmentPayload = {
-        name: data.name,
-        number: data.number,
-        publish: parseDateTime(data.publish),
-        due: parseDateTime(data.due),
-        // maxScore: unimplemented("this is computed property now"),
-        languageIds: data.languageIds,
-        examMode: data.examMode,
-        closeOnDue: !data.allowLateSubmission,
-        showScoreOnLock: data.showScoreOnLock,
-        examPin: data.examPin,
-        assignedGroupIds: data.assignedGroupIds,
-        testCode: data.testCode,
-        secretTestCode: data.secretTestCode,
-        questions: data.questions.map((q, index) => ({
-          number: index + 1,
-          name: q.name,
-          description: q.description,
-          template: q.template,
-          maxScore: q.maxScore,
-          answer: q.answer,
-          testCode: q.testCode,
-          secretTestCode: q.secretTestCode,
-          testcases: q.testcases,
-          secretTestCases: q.secretTestCases,
-        })),
-        // additionalFiles: data.additionalFiles
-      };
+      // const payload: CreateAssignmentPayload = {
+      //   name: data.name,
+      //   number: data.number,
+      //   publish: parseDateTime(data.publish),
+      //   due: parseDateTime(data.due),
+      //   // maxScore: unimplemented("this is computed property now"),
+      //   languageIds: data.languageIds,
+      //   examMode: data.examMode,
+      //   closeOnDue: !data.allowLateSubmission,
+      //   showScoreOnLock: data.showScoreOnLock,
+      //   examPin: data.examPin,
+      //   assignedGroupIds: data.assignedGroupIds,
+      //   testCode: data.testCode,
+      //   secretTestCode: data.secretTestCode,
+      //   questions: data.questions.map((q, index) => ({
+      //     number: index + 1,
+      //     name: q.name,
+      //     description: q.description,
+      //     template: q.template,
+      //     maxScore: q.maxScore,
+      //     answer: q.answer,
+      //     testCode: q.testCode,
+      //     secretTestCode: q.secretTestCode,
+      //     testcases: q.testcases,
+      //     secretTestCases: q.secretTestCases,
+      //   })),
+      //   // additionalFiles: data.additionalFiles
+      // };
 
-      // TODO: implement file updloading again 
+      // // TODO: implement file updloading again 
 
-      // console.log(payload);
-      await api.assignments.create(classData.id, payload);
+      // // console.log(payload);
+      // await api.assignments.create(classData.id, payload);
     },
     onSuccess: () => {
       toast.success(t('assignment.form.messages.createSuccess'));
@@ -66,12 +66,12 @@ export default function Page({ }) {
 
   return (
     <main className="space-y-6">
-      <AssignmentForm
+      {/* <AssignmentForm
         classId={classData.id}
         isPending={mutation.isPending}
         submit={res => mutation.mutate(res)}
         cancel={() => { }}
-      />
+      /> */}
     </main>
   );
 }
