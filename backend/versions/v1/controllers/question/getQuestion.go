@@ -23,14 +23,14 @@ func (qc *QuestionController) GetQuestionForStudentController(c *gin.Context) {
 		return
 	}
 
-	isStudentAssigned, err := qc.Service.Model.IsStudentAssignedToQuestion(questionId, claims.UserID)
+	isStudentAssigned, err := qc.Service.Utils.IsStudentAssignedToQuestion(questionId, claims.UserID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
 		return
 	}
 
 	isAdminOrTeacher := qc.Service.Utils.IsUserAdminOrTeacher(claims.UserID)
-	isTeachingAssistant, err := qc.Service.Model.IsUserAnAssistantToQuestion(questionId, claims.UserID)
+	isTeachingAssistant, err := qc.Service.Utils.IsUserAnAssistantToQuestion(questionId, claims.UserID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
 		return

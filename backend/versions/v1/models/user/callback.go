@@ -19,7 +19,7 @@ func (um *UserModel) Callback(email string, name string, picture string) (int, i
 		return 0, 500, err
 	}
 
-	if currentPictureURL != picture {
+	if err != sql.ErrNoRows && currentPictureURL != picture {
 		_, err := um.DB.Exec(`UPDATE "user" SET picture = $1 WHERE id = $2`, picture, userID)
 		if err != nil {
 			return 0, 500, err

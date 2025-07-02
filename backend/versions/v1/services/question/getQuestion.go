@@ -43,3 +43,7 @@ func (s *QuestionService) GetQuestionByIDForStudent(questionId int) (*questionMo
 func (s *QuestionService) GetQuestionByIDForInstructor(questionId int) (*questionModel.QuestionFullModel, error) {
 	return s.Model.GetQuestionByID(questionId)
 }
+
+func (s *QuestionService) GetMultilangTestcaseByQuestionID(questionID int, isGetSecretTestcase bool) (questionModel.TestcaseWithSecretModel, error) {
+	return s.Model.GetMultilangTestcaseCodeByQuestionID(questionID, isGetSecretTestcase)
+}

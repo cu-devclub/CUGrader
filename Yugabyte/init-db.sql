@@ -126,6 +126,17 @@ CREATE TABLE IF NOT EXISTS "question" (
     testcase_id INT NOT NULL REFERENCES "testcase" (id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS "question" (
+    id SERIAL PRIMARY KEY,
+    lab_id INT NOT NULL REFERENCES "lab" (id) ON DELETE CASCADE,
+    number INT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    score INT NOT NULL,
+    description VARCHAR(24) NOT NULL,
+    answer VARCHAR(24) NOT NULL,
+    predefine VARCHAR(24) NOT NULL,
+    testcase_id INT NOT NULL REFERENCES "testcase" (id) ON DELETE CASCADE
+);
 
 CREATE TABLE IF NOT EXISTS "multilang_testcase" (
     id SERIAL PRIMARY KEY,
