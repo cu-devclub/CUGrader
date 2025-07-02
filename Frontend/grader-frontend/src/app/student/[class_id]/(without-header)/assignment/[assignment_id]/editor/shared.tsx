@@ -46,15 +46,12 @@ function PageItem({ page, state, onClick }: PageItemProps) {
 
 export const QuestionPagination = observer(() => {
   const store = useCodeSpaceStore();
-  const { questions, currentQuestion, selectQuestion, nextQuestion, previousQuestion } = store;
-
-  if (!currentQuestion) {
-    return null;
-  }
+  const { lab, currentQuestionState, selectQuestion, nextQuestion, previousQuestion } = store;
+  const { questions } = lab;
 
   const pageStates: { page: number; state: PageState; id: number; }[] = questions.map((q, i) => {
     // TODO: Implement "done" state tracking
-    const state: PageState = q.id === currentQuestion.id ? "active" : "none";
+    const state: PageState = q.id === currentQuestionState.question.id ? "active" : "none";
     return { page: i + 1, state, id: q.id };
   });
 
