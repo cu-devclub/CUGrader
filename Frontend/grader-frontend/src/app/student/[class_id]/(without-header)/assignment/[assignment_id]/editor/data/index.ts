@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import { CodeSpaceStore } from "./page-store";
+import { CodeSpaceStore } from "./store";
 
 export const CodeSpaceStoreContext = createContext<CodeSpaceStore | null>(null);
 

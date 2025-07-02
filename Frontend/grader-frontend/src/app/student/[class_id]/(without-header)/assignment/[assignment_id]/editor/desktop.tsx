@@ -4,7 +4,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { usePanelControl } from "@/hooks/use-panel-control";
-import { StudentAssignmentDetails, SupportedLanguage, Testcase } from '@/lib/api/type';
+import { StudentAssignmentDetails, Testcase } from '@/lib/api/type';
 import { cn } from '@/lib/utils';
 import * as Tabs from "@radix-ui/react-tabs";
 import {
@@ -22,10 +22,10 @@ import { observer } from "mobx-react-lite";
 import Link from "next/link";
 import { useState } from 'react';
 import Markdown from 'react-markdown';
+import { CodeSpaceStoreContext, useCodeSpaceStore } from "./data";
+import { CodeSpaceStore } from "./data/store";
 import { EditorPanel } from './editor';
 import { QuestionPagination, QuestionPaginationSmall } from "./shared";
-import { CodeSpaceStoreContext, useCodeSpaceStore } from "./data";
-import { CodeSpaceStore } from "./data/page-store";
 
 export interface CodeSpaceProps {
   lab: StudentAssignmentDetails;
