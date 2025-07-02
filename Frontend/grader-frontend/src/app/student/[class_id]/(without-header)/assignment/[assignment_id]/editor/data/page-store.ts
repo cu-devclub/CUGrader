@@ -28,7 +28,7 @@ interface LanguageFiles {
 
 export class QuestionState {
   cachedFiles: Map<LanguageId, LanguageFiles> = new Map();
-  selectedLanguageId!: number;
+  activeLanguageId!: number;
 
   submissionResult: SubmissionResult | null;
   submissionStatus: "submitted" | "outdated" | "not-yet" = "not-yet"; // TODO: restore previous submission
@@ -65,7 +65,7 @@ export class QuestionState {
   }
 
   private get activeLanguageFiles() {
-    const a = this.cachedFiles.get(this.selectedLanguageId)!;
+    const a = this.cachedFiles.get(this.activeLanguageId)!;
     return a;
   }
 
@@ -82,7 +82,7 @@ export class QuestionState {
   }
 
   get selectedLanguage() {
-    return this.question.languages.find(it => it.id === this.selectedLanguageId)!;
+    return this.question.languages.find(it => it.id === this.activeLanguageId)!;
   }
 
   get savingStatus(): "saving" | "unsaved" | "saved" {
@@ -154,8 +154,12 @@ export class QuestionState {
     }
   };
 
+  get pathPrefix() {
+    return `/${this.lab.id}/${this.question.id}/${this.activeLanguageId}`;
+  }
+
   setLanguage = (languageId: number) => {
-    this.selectedLanguageId = languageId;
+    this.activeLanguageId = languageId;
     const monacoLanguageId = getMonacoLanguageId({ id: 23, name: 'python' });
 
     const cache = this.cachedFiles.get(languageId);
@@ -164,7 +168,7 @@ export class QuestionState {
     }
 
     const initialFile: EditorFile = {
-      id: `${this.lab.id}/${this.question.id}/${languageId}/main`, // this id is not gonna concern itself with filename
+      id: `${this.pathPrefix}/main`, // this id is not gonna concern itself with filename
       name: 'main.py',
       content: this.question.template, // TODO: multi language template
       language: monacoLanguageId,
@@ -192,7 +196,7 @@ export class QuestionState {
 
     const codes = this.getCodeFilesForCurrentQuestion();
     try {
-      const result = await api.questions.submit(this.question.id, this.selectedLanguageId, codes.map(it => ({
+      const result = await api.questions.submit(this.question.id, this.activeLanguageId, codes.map(it => ({
         content: it.content,
         pageName: it.name
       })));
@@ -241,7 +245,7 @@ export class QuestionState {
   get activeModel() {
     const models = this.monaco.editor.getModels();
     // console.log(models)
-    return models.find(it => it.uri.path === `/${this.activeFileId}`)!;
+    return models.find(it => it.uri.path === this.activeFileId)!;
   }
 
   replaceEditorContentWithFile = async (file: File) => {
@@ -251,6 +255,27 @@ export class QuestionState {
     }
     this.activeModel.setValue(text);
     return true;
+  };
+
+  copy = () => {
+    const code = this.activeModel.getValue();
+    navigator.clipboard.writeText(code);
+  };
+
+  download = () => {
+  };
+
+  reset = () => {
+    const models = this.monaco.editor.getModels();
+    const mainId = `${this.pathPrefix}/main`;
+    const main = models.find(it => it.uri.path === mainId);
+    const affected = models.filter(it => it.uri.path.startsWith(this.pathPrefix) && it !== main);
+    for (const model of affected) {
+      model.dispose();
+    }
+
+    main?.setValue(this.question.template);
+    this.activeLanguageFiles.files = this.activeLanguageFiles.files.filter(it => it.id === mainId);
   };
 }
 

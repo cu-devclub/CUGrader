@@ -15,7 +15,7 @@ import { SubmissionStatusIndicator } from './shared';
 export const EditorPanel = observer(() => {
   const monaco = useMonaco();
   const store = useCodeSpaceStore();
-  const { savingStatus, activeFile, selectedLanguage, replaceEditorContentWithFile } = store.currentQuestionState;
+  const { savingStatus, activeFile, save, replaceEditorContentWithFile, copy, reset, download, } = store.currentQuestionState;
   const [isUploadDialogOpen, setUploadDialogOpen] = useState(false);
   const dropzone = useDropzoneFrFr({
     multiple: false,
@@ -44,6 +44,24 @@ export const EditorPanel = observer(() => {
       dropzone.removeFiles();
     }
   }, [isUploadDialogOpen]);
+
+  const handleCopy = useCallback(() => {
+    copy();
+    toast.success("t.copied");
+  }, [store]);
+
+  const handleReset = useCallback(() => {
+    // TODO: might launch a dialog
+    reset();
+  }, [store]);
+
+  const handleDownload = useCallback(() => {
+
+  }, [store]);
+
+  const handleSave = useCallback(() => {
+    save();
+  }, []);
 
   return (
     <>
@@ -106,7 +124,7 @@ export const EditorPanel = observer(() => {
             <div className="flex">
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button size="icon" variant="ghost" className='size-8'> <CopyIcon /> </Button>
+                  <Button size="icon" variant="ghost" className='size-8' onClick={handleCopy}> <CopyIcon /> </Button>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>t.copy</p>
@@ -115,7 +133,7 @@ export const EditorPanel = observer(() => {
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button size="icon" variant="ghost" className='size-8'> <SaveIcon /> </Button>
+                  <Button size="icon" variant="ghost" className='size-8' onClick={handleSave}> <SaveIcon /> </Button>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>t.save</p>
@@ -124,7 +142,7 @@ export const EditorPanel = observer(() => {
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button size="icon" variant="ghost" className='size-8'> <RefreshCcwIcon /> </Button>
+                  <Button size="icon" variant="ghost" className='size-8' onClick={handleReset}> <RefreshCcwIcon /> </Button>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>t.reset</p>
