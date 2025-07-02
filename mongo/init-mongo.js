@@ -67,3 +67,22 @@ db.createCollection("submission", {
     }
   }
 });
+
+db.createCollection("testcase", {
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["input", "output"],
+      properties: {
+        input: {
+          bsonType: "objectId",
+          description: "reference to the code collection for input code"
+        },
+        output: {
+          bsonType: "objectId",
+          description: "reference to the code collection for output code"
+        }
+      }
+    }
+  }
+})

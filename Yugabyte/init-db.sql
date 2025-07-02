@@ -118,18 +118,6 @@ CREATE TABLE IF NOT EXISTS "testcase" (
     secret_testcase_object_id CHAR(24) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS "multilang_testcase" (
-    id SERIAL PRIMARY KEY,
-    question_id INT NOT NULL REFERENCES "question" (id) ON DELETE CASCADE,
-    object_id CHAR(24) NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS "multilang_secret_testcase" (
-    id SERIAL PRIMARY KEY,
-    question_id INT NOT NULL REFERENCES "question" (id) ON DELETE CASCADE,
-    object_id CHAR(24) NOT NULL
-);
-
 CREATE TABLE IF NOT EXISTS "question" (
     id SERIAL PRIMARY KEY,
     lab_id INT NOT NULL REFERENCES "lab" (id) ON DELETE CASCADE,
@@ -140,6 +128,18 @@ CREATE TABLE IF NOT EXISTS "question" (
     answer VARCHAR(24) NOT NULL,
     predefine VARCHAR(24) NOT NULL,
     testcase_id INT NOT NULL REFERENCES "testcase" (id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS "multilang_testcase" (
+    id SERIAL PRIMARY KEY,
+    question_id INT NOT NULL REFERENCES "question" (id) ON DELETE CASCADE,
+    object_id CHAR(24) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS "multilang_secret_testcase" (
+    id SERIAL PRIMARY KEY,
+    question_id INT NOT NULL REFERENCES "question" (id) ON DELETE CASCADE,
+    object_id CHAR(24) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "addition_files" (
