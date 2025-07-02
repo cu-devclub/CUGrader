@@ -32,7 +32,7 @@ export const FileTabs = observer(() => {
     renameFile,
     deleteFile,
     setLanguage,
-    selectedLanguageId,
+    activeLanguageId: selectedLanguageId,
   } = currentQuestionState;
 
   if (!currentQuestionState || !lab) {
