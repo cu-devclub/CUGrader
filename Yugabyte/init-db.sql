@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS "section" (
     section_number INT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS "group" (
+CREATE TABLE IF NOT EXISTS "groups" (
     id SERIAL PRIMARY KEY,
     class_id INT NOT NULL REFERENCES "class" (id) ON DELETE CASCADE,
     group_name VARCHAR(30) NOT NULL
@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS "class_student" (
     class_id INT NOT NULL REFERENCES "class" (id) ON DELETE CASCADE,
     user_id INT NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
     section_id INT NOT NULL REFERENCES "section" (id) ON DELETE CASCADE,
-    group_id INT NULL REFERENCES "group" (id) ON DELETE CASCADE DEFAULT NULL,
+    group_id INT NULL REFERENCES "groups" (id) ON DELETE CASCADE DEFAULT NULL,
     withdrawn BOOLEAN NOT NULL DEFAULT FALSE,
     withdrawn_at TIMESTAMP NULL DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -97,7 +97,9 @@ CREATE TABLE IF NOT EXISTS "lab" (
     exam_mode BOOLEAN NOT NULL DEFAULT FALSE,
     exam_pin VARCHAR(20) NULL DEFAULT NULL,
     show_score_on_lock BOOLEAN NOT NULL DEFAULT FALSE,
-    testcase_id INT NOT NULL REFERENCES "testcase" (id) ON DELETE CASCADE
+    testcase_id INT NOT NULL REFERENCES "testcase" (id) ON DELETE CASCADE,
+    description_object_id CHAR(24) NULL DEFAULT NULL,
+    lab_testcase_score INT NOT NULL DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS "lab_language" (
@@ -109,13 +111,19 @@ CREATE TABLE IF NOT EXISTS "lab_language" (
 CREATE TABLE IF NOT EXISTS "assign_to" (
     id SERIAL PRIMARY KEY,
     lab_id INT NOT NULL REFERENCES "lab" (id) ON DELETE CASCADE,
-    group_id INT NOT NULL REFERENCES "group" (id) ON DELETE CASCADE
+    group_id INT NOT NULL REFERENCES "groups" (id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS "testcase" (
+CREATE TABLE IF NOT EXISTS "question" (
     id SERIAL PRIMARY KEY,
-    testcase_object_id CHAR(24) NOT NULL,
-    secret_testcase_object_id CHAR(24) NOT NULL
+    lab_id INT NOT NULL REFERENCES "lab" (id) ON DELETE CASCADE,
+    number INT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    score INT NOT NULL,
+    description VARCHAR(24) NOT NULL,
+    answer VARCHAR(24) NOT NULL,
+    predefine VARCHAR(24) NOT NULL,
+    testcase_id INT NOT NULL REFERENCES "testcase" (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS "question" (
@@ -166,7 +174,7 @@ CREATE TABLE IF NOT EXISTS "result" (
     multilang_testcase_id INT REFERENCES "multilang_testcase" (id) ON DELETE CASCADE DEFAULT NULL,
     multilang_secret_testcase_id INT REFERENCES "multilang_secret_testcase" (id) DEFAULT NULL,
     message TEXT NOT NULL,
-    socre INT NOT NULL,
+    score INT NOT NULL,
     is_failed BOOLEAN NOT NULL DEFAULT FALSE,
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

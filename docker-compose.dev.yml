@@ -62,7 +62,28 @@ services:
         volumes:
           - mongo_data:/data/db
           - ./mongo/init-mongo.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    rabbitmq:
+        image: rabbitmq:3-management
+        container_name: rabbitmq
+        ports:
+            - "5672:5672"      # RabbitMQ main port
+            - "15672:15672"    # RabbitMQ management UI
+        environment:
+            - RABBITMQ_DEFAULT_USER=guest
+            - RABBITMQ_DEFAULT_PASS=guest
+
+    judge_service_python:
+        build:
+            context: ./judge_service/python
+            dockerfile: Dockerfile
+        container_name: judge_service_python
+        # environment:
+        #     - SERVICE_ENV=development
+        depends_on:
+            - yugabytedb
+            - rabbitmq
 
 volumes:
   yugabyte_data:
   mongo_data:
+  rabbitmq_data:

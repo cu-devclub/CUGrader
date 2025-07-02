@@ -1150,6 +1150,7 @@ paths:
                           enum:
                             - "fail"
                             - "pass"
+                            - "pending"
                   secret:
                     type: array
                     items:
@@ -1163,6 +1164,7 @@ paths:
                           enum:
                             - "fail"
                             - "pass"
+                            - "pending"
 
 components:
   schemas:
