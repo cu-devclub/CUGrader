@@ -24,20 +24,8 @@ import { useState } from 'react';
 import Markdown from 'react-markdown';
 import { EditorPanel } from './editor';
 import { QuestionPagination, QuestionPaginationSmall } from "./shared";
-import { CodeSpaceStoreContext, useCodeSpaceStore } from "./store";
-import { CodeSpaceStore } from "./store/page-store";
-
-// TODO: extract this to seperated file
-function getMonacoLanguageId(language: SupportedLanguage) {
-  // TODO: properly implement this
-  return "typescript";
-}
-
-function getFileExtension(language: SupportedLanguage) {
-  // TODO: properly implement this
-
-  return "ts";
-}
+import { CodeSpaceStoreContext, useCodeSpaceStore } from "./data";
+import { CodeSpaceStore } from "./data/page-store";
 
 export interface CodeSpaceProps {
   lab: StudentAssignmentDetails;
@@ -53,7 +41,7 @@ const DesktopCodeSpaceInternal = observer(() => {
     <main className='flex flex-col bg-neutral-50 h-screen'>
       <nav className='flex items-center justify-between p-2 pb-0'>
         <Button asChild size="sm" variant="ghost" className="font-normal text-primary hover:text-primary hover:bg-primary/5 underline underline-offset-2">
-          <Link href={""}>
+          <Link href={".."}>
             <CircleArrowLeft />
             Back to problem list
           </Link>
@@ -162,7 +150,7 @@ const DetailPanel = observer(() => {
       </div>
       <div className="p-3 border-b">
         <div className=" flex justify-between">
-          <Badge variant="secondary">Lab 1 : {currentQuestionState.question.name}</Badge>
+          <Badge variant="secondary">Lab 1 : {lab.name}</Badge>
           <p className="text-sm font-semibold">Score: {currentQuestionState.question.maxScore}</p>
         </div>
         <p className="text-sm mt-2 text-muted-foreground">
@@ -184,7 +172,7 @@ const DetailPanel = observer(() => {
         </Collapsible>
       </div>
       <div className="p-3">
-        <h1 className="text-xl font-bold">1. Question title</h1>
+        <h1 className="text-xl font-bold">1. {currentQuestionState.question.name}</h1>
         <div className="prose prose-sm dark:prose-invert max-w-none">
           <Markdown>{currentQuestionState.question.description}</Markdown>
         </div>
