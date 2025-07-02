@@ -58,3 +58,17 @@ func (m *UtilsModel) IsStudentAssignedToLabID(userID int, labID int) (bool, erro
 	}
 	return exists, nil
 }
+
+
+func (m *UtilsModel) IsStudentAssignedToLabByTestcaseID(userID int, testcaseID int) (bool, error) {
+	query := `SELECT EXISTS (
+		SELECT 1 FROM class_student cs
+		INNER JOIN lab l on cs.class_id = l.class_id
+		WHERE cs.user_id = $1 AND l.testcase_id = $2)`
+	var exists bool
+	err := m.DB.QueryRow(query, userID, testcaseID).Scan(&exists)
+	if err != nil {
+		return false, err
+	}
+	return exists, nil
+}
