@@ -41,7 +41,7 @@ export class QuestionState {
   lastEditDebouncingTimeout: ReturnType<typeof setTimeout> | null = null;
   startSavingTimestamp: number = 0;
 
-  private monaco: Monaco;
+  monaco: Monaco;
 
   constructor(question: StudentQuestion, lab: StudentAssignmentDetails, monaco: Monaco) {
     this.lab = lab;
@@ -237,6 +237,21 @@ export class QuestionState {
   disposeModels = () => {
     this.monaco.editor.getModels().forEach(it => it.dispose());
   };
+
+  get activeModel() {
+    const models = this.monaco.editor.getModels();
+    // console.log(models)
+    return models.find(it => it.uri.path === `/${this.activeFileId}`)!;
+  }
+
+  replaceEditorContentWithFile = async (file: File) => {
+    const text = await file.text();
+    if (!file.type.startsWith("text")) {
+      return false;
+    }
+    this.activeModel.setValue(text);
+    return true;
+  };
 }
 
 export class CodeSpaceStore {
@@ -260,6 +275,7 @@ export class CodeSpaceStore {
 
   setMonaco = (monaco: Monaco) => {
     this.monaco = monaco;
+    this.currentQuestionState.monaco = monaco;
 
     const disposables = monaco.editor.getModels().map(model =>
       model.onDidChangeContent(() => {
@@ -311,4 +327,5 @@ export class CodeSpaceStore {
       this.selectQuestion(this.lab.questions[currentIndex - 1].id);
     }
   };
+
 }
