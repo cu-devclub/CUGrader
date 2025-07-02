@@ -1,5 +1,5 @@
 import { StudentAssignmentDetails, StudentQuestion, SubmissionResult } from "@/lib/api/type";
-import { makeAutoObservable, reaction } from "mobx";
+import { makeAutoObservable, reaction, runInAction } from "mobx";
 import { Editor, Monaco } from "@monaco-editor/react";
 import { api } from "@/lib/api";
 import { getMonacoLanguageId } from "./constant";
@@ -31,6 +31,7 @@ export class QuestionState {
   selectedLanguageId!: number;
 
   submissionResult: SubmissionResult | null;
+  submissionStatus: "submitted" | "outdated" | "not-yet" = "not-yet"; // TODO: restore previous submission
   question: StudentQuestion;
   lab: StudentAssignmentDetails;
 
@@ -77,7 +78,7 @@ export class QuestionState {
   }
 
   get activeFile() {
-    return this.files.find(it => it.id === this.activeFileId);
+    return this.files.find(it => it.id === this.activeFileId)!;
   }
 
   get selectedLanguage() {
@@ -97,7 +98,7 @@ export class QuestionState {
     return "unsaved";
   }
 
-  get isSaved() {
+  private get isSaved() {
     return this.lastEdited === null || (this.lastSaved !== null && this.lastSaved >= this.lastEdited);
   }
 
@@ -196,12 +197,16 @@ export class QuestionState {
         pageName: it.name
       })));
       // TODO: do something with result
-      this.lastSaved = this.startSavingTimestamp;
+      runInAction(() => {
+        this.lastSaved = this.startSavingTimestamp;
+      });
     } catch (error) {
       // TODO: handle error
       console.error("Submission failed", error);
     } finally {
-      this.isSubmitting = false;
+      runInAction(() => {
+        this.isSubmitting = false;
+      });
     }
   };
 

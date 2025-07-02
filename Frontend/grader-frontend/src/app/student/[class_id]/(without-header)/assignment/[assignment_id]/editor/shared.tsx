@@ -134,3 +134,16 @@ export function LanguageSelector({ supportedLanguages, selectedLanguageId, onLan
     </Select>
   );
 }
+
+
+export function SubmissionStatusIndicator() {
+  const store = useCodeSpaceStore();
+  if (store.currentQuestionState.submissionStatus !== "submitted") {
+    return null;
+  }
+  return (
+    <span className="border border-green-500 text-green-600 bg-green-100 rounded h-fit p-0.5 px-1">
+      🎉Submitted
+    </span>
+  );
+}

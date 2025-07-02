@@ -25,7 +25,7 @@ export const FileTabs = observer(() => {
   } = store;
 
   const {
-    activeFileId,
+    activeFile,
     selectFile,
     files,
     addFile,
@@ -38,8 +38,6 @@ export const FileTabs = observer(() => {
   if (!currentQuestionState || !lab) {
     return null; // Or a loading indicator
   }
-
-  const selectedFile = files.find(f => f.id === activeFileId);
 
   const handleRenameFile = (file: EditorFile, newName: string) => {
     console.log(newName);
@@ -70,8 +68,8 @@ export const FileTabs = observer(() => {
   return (
     <Tabs.Root
       className="flex flex-col"
-      defaultValue={files[0]?.name}
-      value={selectedFile?.name}
+      defaultValue={activeFile.id}
+      value={activeFile.id}
       onValueChange={selectFile}
     >
       <Tabs.List className="flex gap-1 border-b p-0.75 text-xs">
@@ -82,8 +80,8 @@ export const FileTabs = observer(() => {
         />
         {files.map((file) => (
           <Tabs.Trigger
-            key={file.name}
-            value={file.name}
+            key={file.id}
+            value={file.id}
             className="group flex items-center rounded pl-1.5 first-of-type:pr-1.5 data-[state=active]:bg-accent hover:bg-accent/50 transition-colors"
             asChild
           >
@@ -100,7 +98,7 @@ export const FileTabs = observer(() => {
                     event.currentTarget.blur();
                   }
                 }}
-                contentEditable={file === selectedFile}
+                contentEditable={file === activeFile}
                 dangerouslySetInnerHTML={{ __html: file.name }}
               >
               </span>
