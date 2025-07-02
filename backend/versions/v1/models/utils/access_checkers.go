@@ -59,6 +59,7 @@ func (m *UtilsModel) IsStudentAssignedToLabID(userID int, labID int) (bool, erro
 	return exists, nil
 }
 
+
 func (m *UtilsModel) IsStudentAssignedToLabByTestcaseID(userID int, testcaseID int) (bool, error) {
 	query := `SELECT EXISTS (
 		SELECT 1 FROM class_student cs
