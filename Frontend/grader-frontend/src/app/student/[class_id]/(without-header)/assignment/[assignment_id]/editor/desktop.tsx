@@ -95,7 +95,7 @@ const DesktopCodeSpaceInternal = observer(() => {
             </PopoverContent>
           </Popover>
           <QuestionPaginationSmall
-            isAtEnd={store.currentQuestionIndex === store.questions.length - 1}
+            isAtEnd={store.currentQuestionIndex === store.lab.questions.length - 1}
             onNext={store.nextQuestion}
             onPrevious={store.previousQuestion}
           />
@@ -153,7 +153,7 @@ export const DesktopCodeSpace = observer(({ lab }: CodeSpaceProps) => {
 // TODO: file downloading
 const DetailPanel = observer(() => {
   const store = useCodeSpaceStore();
-  const { currentQuestion, lab } = store;
+  const { currentQuestionState, lab } = store;
 
   return (
     <div className=" h-full overflow-y-auto flex flex-col gap-2">
@@ -162,8 +162,8 @@ const DetailPanel = observer(() => {
       </div>
       <div className="p-3 border-b">
         <div className=" flex justify-between">
-          <Badge variant="secondary">Lab 1 : {currentQuestion.name}</Badge>
-          <p className="text-sm font-semibold">Score: {currentQuestion.maxScore}</p>
+          <Badge variant="secondary">Lab 1 : {currentQuestionState.question.name}</Badge>
+          <p className="text-sm font-semibold">Score: {currentQuestionState.question.maxScore}</p>
         </div>
         <p className="text-sm mt-2 text-muted-foreground">
           {lab.publish.toString()}
@@ -186,7 +186,7 @@ const DetailPanel = observer(() => {
       <div className="p-3">
         <h1 className="text-xl font-bold">1. Question title</h1>
         <div className="prose prose-sm dark:prose-invert max-w-none">
-          <Markdown>{currentQuestion.description}</Markdown>
+          <Markdown>{currentQuestionState.question.description}</Markdown>
         </div>
       </div>
     </div>

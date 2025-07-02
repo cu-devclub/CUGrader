@@ -19,20 +19,23 @@ import { EditorFile } from "./store/page-store";
 
 export const FileTabs = observer(() => {
   const store = useCodeSpaceStore();
-  const { 
-    lab, 
-    files, 
-    activeFileId, 
-    selectFile, 
-    addFile, 
-    renameFile, 
-    deleteFile, 
-    setLanguage, 
-    selectedLanguageId,
-    currentQuestion
+  const {
+    lab,
+    currentQuestionState
   } = store;
 
-  if (!currentQuestion || !lab) {
+  const {
+    activeFileId,
+    selectFile,
+    files,
+    addFile,
+    renameFile,
+    deleteFile,
+    setLanguage,
+    selectedLanguageId,
+  } = currentQuestionState;
+
+  if (!currentQuestionState || !lab) {
     return null; // Or a loading indicator
   }
 
@@ -73,7 +76,7 @@ export const FileTabs = observer(() => {
     >
       <Tabs.List className="flex gap-1 border-b p-0.75 text-xs">
         <LanguageSelector
-          supportedLanguages={currentQuestion.languages}
+          supportedLanguages={currentQuestionState.question.languages}
           selectedLanguageId={selectedLanguageId}
           onLanguageChange={setLanguage}
         />
