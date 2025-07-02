@@ -15,7 +15,7 @@ import { toast } from 'sonner';
 import { LanguageSelector } from "./shared";
 import { observer } from 'mobx-react-lite';
 import { useCodeSpaceStore } from './data';
-import { EditorFile } from "./data/page-store";
+import { EditorFile } from "./data/store";
 
 export const FileTabs = observer(() => {
   const store = useCodeSpaceStore();

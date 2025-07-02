@@ -1,7 +1,7 @@
-import { StudentAssignmentDetails, StudentQuestion, SubmissionResult } from "@/lib/api/type";
-import { makeAutoObservable, reaction, runInAction } from "mobx";
-import { Editor, Monaco } from "@monaco-editor/react";
 import { api } from "@/lib/api";
+import { StudentAssignmentDetails, StudentQuestion, SubmissionResult } from "@/lib/api/type";
+import { Monaco } from "@monaco-editor/react";
+import { makeAutoObservable, reaction, runInAction } from "mobx";
 import { getMonacoLanguageId } from "./constant";
 
 /**
