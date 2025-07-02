@@ -26,7 +26,9 @@ export function useDropzoneFrFr(options?: DropzoneOptions) {
   const removeFiles = () => {
     // console.log(inputRef.current.value);
     setFiles([]);
-    inputRef.current.value = ""; // bruh
+    if (inputRef.current) {
+      inputRef.current.value = ""; // bruh
+    }
   };
 
   const removeFile = (index: number) => {
