@@ -19,36 +19,35 @@ export interface EditorFile {
   language: string;
 }
 
-export class CodeSpaceStore {
-  lab: StudentAssignmentDetails;
-  questions: StudentQuestion[] = [];
-  currentQuestion!: StudentQuestion;
+export class QuestionState {
+  files: EditorFile[];
+  activeFileId: string;
+  selectedLanguageId: number;
+  submissionResult: SubmissionResult | null;
+  question: StudentQuestion;
 
-  // Editor state for the current question
-  files: EditorFile[] = [];
-  activeFileId: string | null = null;
-  selectedLanguageId: number = 0;
-  submissionResult: SubmissionResult | null = null;
-
-  // For submission
   lastEdited: number | null = null;
   lastSaved: number | null = null;
-  isSubmitting = false;
+  isSubmitting: boolean = false;
+  lastEditDebouncingTimeout: ReturnType<typeof setTimeout> | null = null;
+  startSavingTimestamp: number = 0;
 
-  private _monaco!: Monaco;
-  private startSavingTimestamp = 0;
-  private lastEditDebouncingTimeout: ReturnType<typeof setTimeout> | null = null;
+  private monaco: Monaco;
 
-  constructor(lab: StudentAssignmentDetails) {
-    makeAutoObservable(this);
-    this.lab = lab;
-    this.questions = lab.questions;
-    if (lab.questions.length > 0) {
-      // Initialize with the first question
-      this.selectQuestion(lab.questions[0].id);
-    } else {
-      console.error("No questions found for this assignment");
-    }
+  constructor(question: StudentQuestion, monaco: Monaco) {
+    this.monaco = monaco;
+    this.question = question;
+    const initialFile: EditorFile = {
+      id: 'main.py', // Placeholder name
+      name: 'main.py',
+      content: question.template,
+      language: 'python', // Placeholder language
+    };
+    // TODO: cache files of each problem into a map
+    this.files = [initialFile];
+    this.activeFileId = initialFile.id;
+    this.selectedLanguageId = question.languages[0]?.id ?? 0;
+    this.submissionResult = null;
 
     reaction(
       () => this.lastEdited,
@@ -62,6 +61,7 @@ export class CodeSpaceStore {
       }
     );
   }
+
 
   get savingStatus(): "saving" | "unsaved" | "saved" {
     if (this.lastEdited && this.lastEdited > this.startSavingTimestamp) {
@@ -80,53 +80,6 @@ export class CodeSpaceStore {
     return this.lastEdited === null || (this.lastSaved !== null && this.lastSaved >= this.lastEdited);
   }
 
-  // We need access to the monaco instance to manage models correctly
-  setMonaco = (monaco: Monaco) => {
-    this._monaco = monaco;
-  };
-
-  selectQuestion = (questionId: number) => {
-    if (this._monaco) {
-      this.disposeModels();
-      // this._monaco.editor.
-    }
-    const question = this.questions.find(q => q.id === questionId);
-    if (question) {
-      this.currentQuestion = question;
-
-      // Re-initialize editor state for the new question
-      const initialFile: EditorFile = {
-        id: 'main.py', // Placeholder name
-        name: 'main.py',
-        content: question.template,
-        language: 'python', // Placeholder language
-      };
-      this.files = [initialFile];
-      this.activeFileId = initialFile.id;
-      this.selectedLanguageId = question.languages[0]?.id ?? 0;
-      this.submissionResult = null;
-    }
-  };
-
-  get currentQuestionIndex() {
-    return this.questions.findIndex(q => q.id === this.currentQuestion.id);
-  }
-
-  nextQuestion = () => {
-    const currentIndex = this.currentQuestionIndex;
-    if (currentIndex < this.questions.length - 1) {
-      this.selectQuestion(this.questions[currentIndex + 1].id);
-    }
-  };
-
-  previousQuestion = () => {
-    const currentIndex = this.currentQuestionIndex;
-    if (currentIndex > 0) {
-      this.selectQuestion(this.questions[currentIndex - 1].id);
-    }
-  };
-
-  // Methods from QuestionEditorState
   selectFile = (fileId: string) => {
     this.activeFileId = fileId;
   };
@@ -159,11 +112,10 @@ export class CodeSpaceStore {
     this.files.splice(fileIndex, 1);
 
     if (this.activeFileId === fileToDelete.id) {
-      if (this.files.length > 0) {
-        this.activeFileId = this.files[Math.max(0, fileIndex - 1)].id;
-      } else {
-        this.activeFileId = null;
+      if (this.files.length === 0) {
+        throw new Error("wtf");
       }
+      this.activeFileId = this.files[Math.max(0, fileIndex - 1)].id;
     }
 
     this.disposeModel(fileToDelete.name);
@@ -183,23 +135,12 @@ export class CodeSpaceStore {
     this.selectedLanguageId = languageId;
   };
 
-  // Methods from AssignmentEditorStore
-  disposeModel = (fileName: string) => {
-    if (!this._monaco) return;
-    const model = this._monaco.editor.getModels().find(m => m.uri.path.slice(1) === fileName);
-    if (model) {
-      model.dispose();
-    }
-  };
-
-  disposeModels = () => {
-    this._monaco.editor.getModels().forEach(it => it.dispose());
-  };
-
   markAsEdited = () => {
     this.lastEdited = Date.now();
   };
 
+
+  // Todo: move api out
   save = async () => {
     if (this.isSubmitting) return;
 
@@ -208,7 +149,7 @@ export class CodeSpaceStore {
 
     const codes = this.getCodeFilesForCurrentQuestion();
     try {
-      const result = await api.questions.submit(this.currentQuestion.id, this.selectedLanguageId, codes.map(it => ({
+      const result = await api.questions.submit(this.question.id, this.selectedLanguageId, codes.map(it => ({
         content: it.content,
         pageName: it.name
       })));
@@ -223,8 +164,8 @@ export class CodeSpaceStore {
   };
 
   getCodeFilesForCurrentQuestion = (): EditorFile[] => {
-    if (!this._monaco) return [];
-    const models = this._monaco.editor.getModels() ?? [];
+    if (!this.monaco) return [];
+    const models = this.monaco.editor.getModels() ?? [];
     const currentFiles = this.files.map(f => f.name) ?? [];
 
     return models
@@ -235,5 +176,92 @@ export class CodeSpaceStore {
         language: it.getLanguageId(),
         content: it.getValue(),
       }));
+  };
+
+  // Methods from AssignmentEditorStore
+  disposeModel = (fileName: string) => {
+    if (!this.monaco) return;
+    const model = this.monaco.editor.getModels().find(m => m.uri.path.slice(1) === fileName);
+    if (model) {
+      model.dispose();
+    }
+  };
+
+  disposeModels = () => {
+    this.monaco.editor.getModels().forEach(it => it.dispose());
+  };
+}
+
+export class CodeSpaceStore {
+  lab: StudentAssignmentDetails;
+  // TODO: make lab replacable
+  cachedQuestionStates = new Map<number, QuestionState>;
+  currentQuestionState!: QuestionState;
+
+  private monaco!: Monaco;
+
+  constructor(lab: StudentAssignmentDetails) {
+    makeAutoObservable(this);
+    this.lab = lab;
+    if (lab.questions.length > 0) {
+      // Initialize with the first question
+      this.selectQuestion(lab.questions[0].id);
+    } else {
+      console.error("No questions found for this assignment");
+    }
+  }
+
+  setMonaco = (monaco: Monaco) => {
+    this.monaco = monaco;
+
+    const disposables = monaco.editor.getModels().map(model =>
+      model.onDidChangeContent(() => {
+        this.currentQuestionState.markAsEdited();
+      })
+    );
+
+    const newModelDisposable = monaco.editor.onDidCreateModel(model => {
+      const d = model.onDidChangeContent(() => {
+        this.currentQuestionState.markAsEdited();
+      });
+      disposables.push(d);
+    });
+
+    // return () => {
+    //   disposables.forEach(d => d.dispose());
+    //   newModelDisposable.dispose();
+    // };
+  };
+
+  // TODO: wait until saved or show a dialog
+  selectQuestion = (questionId: number) => {
+    const existing = this.cachedQuestionStates.get(questionId);
+    if (existing) {
+      this.currentQuestionState = existing;
+      return;
+    }
+
+    const question = this.lab.questions.find(q => q.id === questionId);
+    if (question) {
+      this.currentQuestionState = new QuestionState(question, this.monaco);
+    }
+  };
+
+  get currentQuestionIndex() {
+    return this.lab.questions.findIndex(q => q.id === this.currentQuestionState.question.id);
+  }
+
+  nextQuestion = () => {
+    const currentIndex = this.currentQuestionIndex;
+    if (currentIndex < this.lab.questions.length - 1) {
+      this.selectQuestion(this.lab.questions[currentIndex + 1].id);
+    }
+  };
+
+  previousQuestion = () => {
+    const currentIndex = this.currentQuestionIndex;
+    if (currentIndex > 0) {
+      this.selectQuestion(this.lab.questions[currentIndex - 1].id);
+    }
   };
 }

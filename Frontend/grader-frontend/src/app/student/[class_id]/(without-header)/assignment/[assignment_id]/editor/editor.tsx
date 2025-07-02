@@ -10,38 +10,13 @@ import { useCodeSpaceStore } from './store';
 export const EditorPanel = observer(() => {
   const monaco = useMonaco();
   const store = useCodeSpaceStore();
-  const { savingStatus, files, activeFileId } = store;
+  const { savingStatus, files, activeFileId } = store.currentQuestionState;
 
   // Set monaco instance in store
   useEffect(() => {
     if (monaco) {
       store.setMonaco(monaco);
     }
-  }, [monaco, store]);
-
-
-  // TODO: move this to the store
-  // Effect for auto-saving
-  useEffect(() => {
-    if (!monaco) return;
-
-    const disposables = monaco.editor.getModels().map(model =>
-      model.onDidChangeContent(() => {
-        store.markAsEdited();
-      })
-    );
-
-    const newModelDisposable = monaco.editor.onDidCreateModel(model => {
-      const d = model.onDidChangeContent(() => {
-        store.markAsEdited();
-      });
-      disposables.push(d);
-    });
-
-    return () => {
-      disposables.forEach(d => d.dispose());
-      newModelDisposable.dispose();
-    };
   }, [monaco, store]);
 
   const selectedFile = files.find(f => f.id === activeFileId);
@@ -53,7 +28,7 @@ export const EditorPanel = observer(() => {
       <div className='bg-red-50 overflow-hidden'>
         {selectedFile &&
           <Editor
-            key={`${store.lab.id}/${store.currentQuestion.id}`}
+            key={`${store.lab.id}/${store.currentQuestionState.question.id}`}
             path={selectedFile.name}
             options={{
               automaticLayout: true
