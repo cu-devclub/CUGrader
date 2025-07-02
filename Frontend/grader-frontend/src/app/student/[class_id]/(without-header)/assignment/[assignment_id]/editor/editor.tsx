@@ -5,8 +5,8 @@ import { CheckIcon, CopyIcon, DownloadIcon, RefreshCcwIcon, SaveIcon, UploadIcon
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import { useCodeSpaceStore } from './data';
-import { getMonacoLanguageId } from './data/constant';
 import { FileTabs } from './file-tabs';
+import { SubmissionStatusIndicator } from './shared';
 
 export const EditorPanel = observer(() => {
   const monaco = useMonaco();
@@ -32,7 +32,7 @@ export const EditorPanel = observer(() => {
             options={{
               automaticLayout: true
             }}
-            defaultLanguage={getMonacoLanguageId(selectedLanguage)}
+            defaultLanguage={activeFile.language}
             defaultValue={activeFile.content}
           />
         }
@@ -87,22 +87,25 @@ export const EditorPanel = observer(() => {
             </Tooltip>
           </div>
         </div>
-        {savingStatus === 'saved' && (
-          <span className='flex gap-1 font-medium items-center mr-2 text-emerald-600'>
-            Saved
-            <CheckIcon className='size-3.5' />
-          </span>
-        )}
-        {savingStatus === 'saving' && (
-          <span className='flex gap-1 font-medium items-center mr-2 text-yellow-600'>
-            Saving...
-          </span>
-        )}
-        {savingStatus === 'unsaved' && (
-          <span className='flex gap-1 font-medium items-center mr-2 text-gray-500'>
-            Unsaved
-          </span>
-        )}
+        <div className="flex items-center gap-2">
+          <SubmissionStatusIndicator />
+          {savingStatus === 'saved' && (
+            <span className='flex gap-1 font-medium items-center mr-2 text-emerald-600'>
+              Saved
+              <CheckIcon className='size-3.5' />
+            </span>
+          )}
+          {savingStatus === 'saving' && (
+            <span className='flex gap-1 font-medium items-center mr-2 text-yellow-600'>
+              Saving...
+            </span>
+          )}
+          {savingStatus === 'unsaved' && (
+            <span className='flex gap-1 font-medium items-center mr-2 text-gray-500'>
+              Unsaved
+            </span>
+          )}
+        </div>
       </div>
     </section>
   );
