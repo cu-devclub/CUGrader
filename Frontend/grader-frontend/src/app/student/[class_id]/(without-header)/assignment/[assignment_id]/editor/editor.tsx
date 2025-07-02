@@ -2,15 +2,16 @@ import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import Editor, { useMonaco } from '@monaco-editor/react';
 import { CheckIcon, CopyIcon, DownloadIcon, RefreshCcwIcon, SaveIcon, UploadIcon } from 'lucide-react';
-import { useEffect } from 'react';
-import { FileTabs } from './file-tabs';
 import { observer } from 'mobx-react-lite';
-import { useCodeSpaceStore } from './store';
+import { useEffect } from 'react';
+import { useCodeSpaceStore } from './data';
+import { getMonacoLanguageId } from './data/constant';
+import { FileTabs } from './file-tabs';
 
 export const EditorPanel = observer(() => {
   const monaco = useMonaco();
   const store = useCodeSpaceStore();
-  const { savingStatus, files, activeFileId } = store.currentQuestionState;
+  const { savingStatus, activeFile, selectedLanguage } = store.currentQuestionState;
 
   // Set monaco instance in store
   useEffect(() => {
@@ -19,22 +20,20 @@ export const EditorPanel = observer(() => {
     }
   }, [monaco, store]);
 
-  const selectedFile = files.find(f => f.id === activeFileId);
-
   return (
     <section className='h-full grid grid-rows-[auto_1fr_auto]'>
       <FileTabs />
 
       <div className='bg-red-50 overflow-hidden'>
-        {selectedFile &&
+        {activeFile &&
           <Editor
-            key={`${store.lab.id}/${store.currentQuestionState.question.id}`}
-            path={selectedFile.name}
+            // key={`${store.lab.id}/${store.currentQuestionState.question.id}`}
+            path={activeFile.id}
             options={{
               automaticLayout: true
             }}
-            defaultLanguage="typescript"
-            defaultValue={selectedFile.content}
+            defaultLanguage={getMonacoLanguageId(selectedLanguage)}
+            defaultValue={activeFile.content}
           />
         }
       </div>

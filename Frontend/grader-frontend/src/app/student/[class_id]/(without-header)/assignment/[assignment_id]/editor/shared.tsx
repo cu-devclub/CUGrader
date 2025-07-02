@@ -9,7 +9,7 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink } from "@
 import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { SupportedLanguage } from "@/lib/api/type";
 import { SelectTrigger } from "@radix-ui/react-select";
-import { useCodeSpaceStore } from "./store";
+import { useCodeSpaceStore } from "./data";
 import { observer } from "mobx-react-lite";
 import { cn } from "@/lib/utils";
 
