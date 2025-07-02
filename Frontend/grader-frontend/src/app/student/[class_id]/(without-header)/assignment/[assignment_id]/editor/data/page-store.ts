@@ -1,7 +1,8 @@
 import { StudentAssignmentDetails, StudentQuestion, SubmissionResult } from "@/lib/api/type";
 import { makeAutoObservable, reaction } from "mobx";
-import { Monaco } from "@monaco-editor/react";
+import { Editor, Monaco } from "@monaco-editor/react";
 import { api } from "@/lib/api";
+import { getMonacoLanguageId } from "./constant";
 
 /**
  * Represents a single file (a tab) in the code editor.
@@ -19,12 +20,19 @@ export interface EditorFile {
   language: string;
 }
 
-export class QuestionState {
+type LanguageId = number;
+interface LanguageFiles {
   files: EditorFile[];
   activeFileId: string;
-  selectedLanguageId: number;
+}
+
+export class QuestionState {
+  cachedFiles: Map<LanguageId, LanguageFiles> = new Map();
+  selectedLanguageId!: number;
+
   submissionResult: SubmissionResult | null;
   question: StudentQuestion;
+  lab: StudentAssignmentDetails;
 
   lastEdited: number | null = null;
   lastSaved: number | null = null;
@@ -34,21 +42,14 @@ export class QuestionState {
 
   private monaco: Monaco;
 
-  constructor(question: StudentQuestion, monaco: Monaco) {
+  constructor(question: StudentQuestion, lab: StudentAssignmentDetails, monaco: Monaco) {
+    this.lab = lab;
     this.monaco = monaco;
     this.question = question;
-    const initialFile: EditorFile = {
-      id: 'main.py', // Placeholder name
-      name: 'main.py',
-      content: question.template,
-      language: 'python', // Placeholder language
-    };
-    // TODO: cache files of each problem into a map
-    this.files = [initialFile];
-    this.activeFileId = initialFile.id;
-    this.selectedLanguageId = question.languages[0]?.id ?? 0;
+    this.setLanguage(question.languages[0]?.id ?? 0);
     this.submissionResult = null;
 
+    makeAutoObservable(this);
     reaction(
       () => this.lastEdited,
       () => {
@@ -62,6 +63,26 @@ export class QuestionState {
     );
   }
 
+  private get activeLanguageFiles() {
+    const a = this.cachedFiles.get(this.selectedLanguageId)!;
+    return a;
+  }
+
+  get files() {
+    return this.activeLanguageFiles.files;
+  }
+
+  get activeFileId() {
+    return this.activeLanguageFiles.activeFileId;
+  }
+
+  get activeFile() {
+    return this.files.find(it => it.id === this.activeFileId);
+  }
+
+  get selectedLanguage() {
+    return this.question.languages.find(it => it.id === this.selectedLanguageId)!;
+  }
 
   get savingStatus(): "saving" | "unsaved" | "saved" {
     if (this.lastEdited && this.lastEdited > this.startSavingTimestamp) {
@@ -81,7 +102,7 @@ export class QuestionState {
   }
 
   selectFile = (fileId: string) => {
-    this.activeFileId = fileId;
+    this.activeLanguageFiles.activeFileId = fileId;
   };
 
   addFile = () => {
@@ -101,7 +122,7 @@ export class QuestionState {
     };
 
     this.files.push(newFile);
-    this.activeFileId = newFile.id;
+    this.selectFile(newFile.id);
   };
 
   deleteFile = (fileId: string) => {
@@ -115,7 +136,8 @@ export class QuestionState {
       if (this.files.length === 0) {
         throw new Error("wtf");
       }
-      this.activeFileId = this.files[Math.max(0, fileIndex - 1)].id;
+      const id = this.files[Math.max(0, fileIndex - 1)].id;
+      this.selectFile(id);
     }
 
     this.disposeModel(fileToDelete.name);
@@ -127,12 +149,32 @@ export class QuestionState {
       // This is complex because the model in monaco is tied to the name.
       // For now, just update the name. A more robust solution is needed.
       file.name = newName;
-      file.id = newName; // Assuming id is the name
+      // file.id = newName; // and we dont gaf about its id
     }
   };
 
   setLanguage = (languageId: number) => {
     this.selectedLanguageId = languageId;
+    const monacoLanguageId = getMonacoLanguageId({ id: 23, name: 'python' });
+
+    const cache = this.cachedFiles.get(languageId);
+    if (cache) {
+      return;
+    }
+
+    const initialFile: EditorFile = {
+      id: `${this.lab.id}/${this.question.id}/${languageId}/main`, // this id is not gonna concern itself with filename
+      name: 'main.py',
+      content: this.question.template, // TODO: multi language template
+      language: monacoLanguageId,
+    };
+
+    const languageFiles: LanguageFiles = {
+      files: [initialFile],
+      activeFileId: initialFile.id
+    };
+    // TODO: cache files of each languages
+    this.cachedFiles.set(languageId, languageFiles);
   };
 
   markAsEdited = () => {
@@ -243,7 +285,7 @@ export class CodeSpaceStore {
 
     const question = this.lab.questions.find(q => q.id === questionId);
     if (question) {
-      this.currentQuestionState = new QuestionState(question, this.monaco);
+      this.currentQuestionState = new QuestionState(question, this.lab, this.monaco);
     }
   };
 

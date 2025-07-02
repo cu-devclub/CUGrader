@@ -14,8 +14,8 @@ import { CodeIcon, PlusIcon, XIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { LanguageSelector } from "./shared";
 import { observer } from 'mobx-react-lite';
-import { useCodeSpaceStore } from './store';
-import { EditorFile } from "./store/page-store";
+import { useCodeSpaceStore } from './data';
+import { EditorFile } from "./data/page-store";
 
 export const FileTabs = observer(() => {
   const store = useCodeSpaceStore();
@@ -84,7 +84,6 @@ export const FileTabs = observer(() => {
           <Tabs.Trigger
             key={file.name}
             value={file.name}
-            onClick={() => console.log(`clicked ${file.name}`)}
             className="group flex items-center rounded pl-1.5 first-of-type:pr-1.5 data-[state=active]:bg-accent hover:bg-accent/50 transition-colors"
             asChild
           >
