@@ -52,6 +52,9 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 
+	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -96,6 +99,32 @@ func initMongoDB() *mongo.Client {
 	return client
 }
 
+func initMinioClient() *minio.Client {
+	endpoint := os.Getenv("MINIO_ENDPOINT")
+	if endpoint == "" {
+		log.Fatal("MINIO_ENDPOINT environment variable is not set")
+	}
+	accessKeyID := os.Getenv("MINIO_ACCESS_KEY")
+	if accessKeyID == "" {
+		log.Fatal("MINIO_ACCESS_KEY environment variable is not set")
+	}
+	secretAccessKey := os.Getenv("MINIO_SECRET_KEY")
+	if secretAccessKey == "" {
+		log.Fatal("MINIO_SECRET_KEY environment variable is not set")
+	}
+	useSSL := false
+	minioClient, err := minio.New(endpoint, &minio.Options{
+		Creds:  credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
+		Secure: useSSL,
+	})
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	return minioClient
+}
+
 func loadPrivateKeyFromEnv() (*rsa.PrivateKey, error) {
 	privKeyPEM := os.Getenv("PRIVATE_KEY")
 	block, _ := pem.Decode([]byte(privKeyPEM))
@@ -112,6 +141,7 @@ func loadPrivateKeyFromEnv() (*rsa.PrivateKey, error) {
 func RegisterRoutes(r *gin.RouterGroup) {
 	db = initDB()
 	mongoClient := initMongoDB()
+	minioClient := initMinioClient()
 
 	var err error
 	privKey, err = loadPrivateKeyFromEnv()
@@ -123,7 +153,7 @@ func RegisterRoutes(r *gin.RouterGroup) {
 
 	is_dev := os.Getenv("SERVICE_ENV") == "development"
 
-	utilsModel := &utilsModel.UtilsModel{DB: db, JWT_KEY: jwt_key}
+	utilsModel := &utilsModel.UtilsModel{DB: db, JWT_KEY: jwt_key, Minio: minioClient}
 
 	classModel := &classModel.ClassModel{DB: db}
 	classService := &classService.ClassService{Model: classModel, Utils: utilsModel}
