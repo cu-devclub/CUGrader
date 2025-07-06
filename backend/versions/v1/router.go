@@ -7,7 +7,7 @@ import (
 	additionalFileController "CUGrader/backend/versions/v1/controllers/file"
 	labController "CUGrader/backend/versions/v1/controllers/lab"
 	languageController "CUGrader/backend/versions/v1/controllers/language"
-	nearduedateController "CUGrader/backend/versions/v1/controllers/near-due-date"
+	nearduedateController "CUGrader/backend/versions/v1/controllers/near_due_date"
 	pictureController "CUGrader/backend/versions/v1/controllers/picture"
 	questionController "CUGrader/backend/versions/v1/controllers/question"
 	studentController "CUGrader/backend/versions/v1/controllers/student"
@@ -19,7 +19,7 @@ import (
 	additionalFileModel "CUGrader/backend/versions/v1/models/file"
 	labModel "CUGrader/backend/versions/v1/models/lab"
 	languageModel "CUGrader/backend/versions/v1/models/language"
-	nearduedateModel "CUGrader/backend/versions/v1/models/near-due-date"
+	nearduedateModel "CUGrader/backend/versions/v1/models/near_due_date"
 	pictureModel "CUGrader/backend/versions/v1/models/picture"
 	questionModel "CUGrader/backend/versions/v1/models/question"
 	studentModel "CUGrader/backend/versions/v1/models/student"
@@ -32,7 +32,7 @@ import (
 	additionalFileService "CUGrader/backend/versions/v1/services/file"
 	labService "CUGrader/backend/versions/v1/services/lab"
 	languageService "CUGrader/backend/versions/v1/services/language"
-	nearduedateService "CUGrader/backend/versions/v1/services/near-due-date"
+	nearduedateService "CUGrader/backend/versions/v1/services/near_due_date"
 	pictureService "CUGrader/backend/versions/v1/services/picture"
 	questionService "CUGrader/backend/versions/v1/services/question"
 	studentService "CUGrader/backend/versions/v1/services/student"
@@ -153,8 +153,8 @@ func RegisterRoutes(r *gin.RouterGroup) {
 	additionalFileService := &additionalFileService.AdditionalFileService{Model: additionalFileModel, Utils: utilsModel}
 	additionalFileController := &additionalFileController.AdditionalFileController{Service: additionalFileService}
 
-	nearduedateModel := &nearduedateModel.NearduedateModel{DB: db}
-	nearduedateService := &nearduedateService.NearduedateService{Model: nearduedateModel, Utils: utilsModel}
+	nearduedateModel := &nearduedateModel.NearDueDateModel{DB: db}
+	nearduedateService := &nearduedateService.NearDueDateService{Model: nearduedateModel, Utils: utilsModel}
 	nearduedateController := &nearduedateController.NearDueDateController{Service: nearduedateService, Utils: utilsModel}
 
 	languageModel := &languageModel.LanguageModel{DB: db}
