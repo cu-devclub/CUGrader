@@ -4,6 +4,7 @@ import (
 	// Controllers
 	assistantController "CUGrader/backend/versions/v1/controllers/assistant"
 	classController "CUGrader/backend/versions/v1/controllers/class"
+	exampinController "CUGrader/backend/versions/v1/controllers/exampin"
 	additionalFileController "CUGrader/backend/versions/v1/controllers/file"
 	labController "CUGrader/backend/versions/v1/controllers/lab"
 	languageController "CUGrader/backend/versions/v1/controllers/language"
@@ -16,6 +17,7 @@ import (
 	// Models
 	assistantModel "CUGrader/backend/versions/v1/models/assistant"
 	classModel "CUGrader/backend/versions/v1/models/class"
+	exampinModel "CUGrader/backend/versions/v1/models/exampin"
 	additionalFileModel "CUGrader/backend/versions/v1/models/file"
 	labModel "CUGrader/backend/versions/v1/models/lab"
 	languageModel "CUGrader/backend/versions/v1/models/language"
@@ -29,6 +31,7 @@ import (
 	// Services
 	assistantService "CUGrader/backend/versions/v1/services/assistant"
 	classService "CUGrader/backend/versions/v1/services/class"
+	exampinService "CUGrader/backend/versions/v1/services/exampin"
 	additionalFileService "CUGrader/backend/versions/v1/services/file"
 	labService "CUGrader/backend/versions/v1/services/lab"
 	languageService "CUGrader/backend/versions/v1/services/language"
@@ -171,6 +174,10 @@ func RegisterRoutes(r *gin.RouterGroup) {
 	}
 	labController := &labController.LabController{Service: labService}
 
+	exampinModel := &exampinModel.PinModel{DB: db}
+	exampinService := &exampinService.PinService{Model: exampinModel, Utils: utilsModel}
+	exampinController := &exampinController.PinController{Service: exampinService}
+
 	r.POST("/callback", userController.Callback)
 	r.POST("/test/callback", userController.TestCallback)
 
@@ -210,4 +217,5 @@ func RegisterRoutes(r *gin.RouterGroup) {
 
 	r.GET("/language", languageController.GetLanguagesHandler)
 
+	r.GET("/exam_pin/:lab_id", exampinController.GetExamPinHandler)
 }
