@@ -1,31 +1,26 @@
-import { Badge } from "@/components/ui/badge";
 import { Button } from '@/components/ui/button';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { usePanelControl } from "@/hooks/use-panel-control";
-import { StudentAssignmentDetails, Testcase } from '@/lib/api/type';
+import { StudentAssignmentDetails } from '@/lib/api/type';
 import { cn } from '@/lib/utils';
-import * as Tabs from "@radix-ui/react-tabs";
 import {
   ArrowLeftToLine,
   ArrowRightToLine,
-  ChevronsDown,
   CircleArrowLeft,
-  CircleCheck,
   LayoutPanelLeft,
   PanelBottom,
-  PanelTop,
-  Terminal
+  PanelTop
 } from 'lucide-react';
 import { observer } from "mobx-react-lite";
 import Link from "next/link";
 import { useState } from 'react';
-import Markdown from 'react-markdown';
 import { CodeSpaceStoreContext, useCodeSpaceStore } from "./data";
 import { CodeSpaceStore } from "./data/store";
 import { EditorPanel } from './editor';
-import { QuestionPagination, QuestionPaginationSmall } from "./shared";
+import { QuestionPaginationSmall } from "./shared";
+import { BottomPanelContent, DetailPanel } from './panels';
+
 
 export interface CodeSpaceProps {
   lab: StudentAssignmentDetails;
@@ -135,98 +130,5 @@ export const DesktopCodeSpace = observer(({ lab }: CodeSpaceProps) => {
     <CodeSpaceStoreContext value={store}>
       <DesktopCodeSpaceInternal />
     </CodeSpaceStoreContext>
-  );
-});
-
-// TODO: file downloading
-const DetailPanel = observer(() => {
-  const store = useCodeSpaceStore();
-  const { currentQuestionState, lab } = store;
-
-  return (
-    <div className=" h-full overflow-y-auto flex flex-col gap-2">
-      <div className="p-3 border-b">
-        <QuestionPagination />
-      </div>
-      <div className="p-3 border-b">
-        <div className=" flex justify-between">
-          <Badge variant="secondary">Lab 1 : {lab.name}</Badge>
-          <p className="text-sm font-semibold">Score: {currentQuestionState.question.maxScore}</p>
-        </div>
-        <p className="text-sm mt-2 text-muted-foreground">
-          {lab.publish.toString()}
-          {lab.due.toString()}
-        </p>
-        <Collapsible>
-          <div className="flex justify-end">
-            <CollapsibleTrigger asChild>
-              <Button variant="ghost" size="icon" className="size-8">
-                <ChevronsDown />
-                <span className="sr-only">Lab Details</span>
-              </Button>
-            </CollapsibleTrigger>
-          </div>
-          <CollapsibleContent>
-            we dont have lab description....
-          </CollapsibleContent>
-        </Collapsible>
-      </div>
-      <div className="p-3">
-        <h1 className="text-xl font-bold">1. {currentQuestionState.question.name}</h1>
-        <div className="prose prose-sm dark:prose-invert max-w-none">
-          <Markdown>{currentQuestionState.question.description}</Markdown>
-        </div>
-      </div>
-    </div>
-  );
-});
-
-const BottomPanelContent = observer(() => {
-  const store = useCodeSpaceStore();
-  const testcases = [] as Testcase[]; // TODO: api for this
-
-  return (
-    <Tabs.Root defaultValue="testcase" className="h-full flex flex-col">
-      <Tabs.List className="text-xs border-b p-0.75 flex gap-1">
-        <Tabs.Trigger
-          value="testcase"
-          className="p-1 px-1.5 flex items-center gap-1.5 rounded data-[state=active]:bg-accent hover:bg-accent/50 transition-colors"
-        >
-          <CircleCheck className="size-3" />
-          Test case
-        </Tabs.Trigger>
-        <Tabs.Trigger
-          value="your-testcase"
-          className="p-1 px-1.5 flex items-center gap-1.5 rounded data-[state=active]:bg-accent hover:bg-accent/50 transition-colors"
-        >
-          <Terminal className="size-3" />
-          Your test case
-        </Tabs.Trigger>
-
-      </Tabs.List>
-
-      <Tabs.Content value="testcase" className="flex-1 overflow-y-auto p-2">
-        <div className="flex flex-col gap-2">
-          {testcases.map((testcase: Testcase, i: number) => (
-            <div key={i} className="flex flex-col gap-1 rounded-md border p-2">
-              <p className="text-sm font-semibold">Sample {i + 1}</p>
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <p className="text-xs text-muted-foreground">Input</p>
-                  <div className="text-sm font-mono bg-neutral-100 p-1 rounded-sm">{testcase.input}</div>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Output</p>
-                  <div className="text-sm font-mono bg-neutral-100 p-1 rounded-sm">{testcase.output}</div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </Tabs.Content>
-      <Tabs.Content value="your-testcase" className="flex-1 overflow-y-auto p-2">
-        your-testcase
-      </Tabs.Content>
-    </Tabs.Root>
   );
 });

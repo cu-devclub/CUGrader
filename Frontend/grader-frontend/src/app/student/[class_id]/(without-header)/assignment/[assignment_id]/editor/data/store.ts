@@ -1,7 +1,7 @@
 import { api } from "@/lib/api";
-import { StudentAssignmentDetails, StudentQuestion, SubmissionResult } from "@/lib/api/type";
+import { StudentAssignmentDetails, StudentQuestion, SubmissionResult, type Testcase } from "@/lib/api/type";
 import { Monaco } from "@monaco-editor/react";
-import { makeAutoObservable, reaction, runInAction } from "mobx";
+import { makeAutoObservable, reaction, runInAction, when } from "mobx";
 import { getMonacoLanguageId } from "./constant";
 
 /**
@@ -26,6 +26,18 @@ interface LanguageFiles {
   activeFileId: string;
 }
 
+export interface SystemTestcase {
+  input: string;
+  expectedOutput: string;
+  output?: string;
+  message?: string;
+}
+
+export interface CustomTestcase {
+  input: string;
+  output?: string;
+}
+
 export class QuestionState {
   cachedFiles: Map<LanguageId, LanguageFiles> = new Map();
   activeLanguageId!: number;
@@ -35,11 +47,17 @@ export class QuestionState {
   question: StudentQuestion;
   lab: StudentAssignmentDetails;
 
+  lastSubmissionId: number | null = null;
   lastEdited: number | null = null;
   lastSaved: number | null = null;
   isSubmitting: boolean = false;
   lastEditDebouncingTimeout: ReturnType<typeof setTimeout> | null = null;
   startSavingTimestamp: number = 0;
+
+  testcases: SystemTestcase[] = [];
+  customTestcases: CustomTestcase[] = [];
+
+  ready: Promise<void>;
 
   monaco: Monaco;
 
@@ -51,7 +69,13 @@ export class QuestionState {
     this.submissionResult = null;
 
     makeAutoObservable(this);
-    reaction(
+
+    this.loadSubmission();
+    this.ready = when(() => !!this.activeFile);
+
+
+    // TODO: think about disposing
+    const dispose = reaction(
       () => this.lastEdited,
       () => {
         if (this.lastEditDebouncingTimeout) {
@@ -62,6 +86,33 @@ export class QuestionState {
         }, 500);
       }
     );
+
+  }
+
+  private async loadSubmission() {
+    const submission = await api.questions.getSubmission(this.question.id);
+    if (!submission) {
+      return;
+    }
+
+    runInAction(() => {
+      const { code, language, submissionId } = submission;
+      this.setLanguage(language.id);
+      this.lastSubmissionId = submissionId;
+
+      this.activeLanguageFiles.files = code.map((it, index) => ({
+        content: it.content,
+        id: `${this.pathPrefix}/${it.pageName.includes("main") ? "main" : index}`, // TODO: stop use pagename as marker
+        language: getMonacoLanguageId(language.id),
+        name: it.pageName
+      }));
+
+      this.activeLanguageFiles.activeFileId = `${this.pathPrefix}/main`;
+    });
+  }
+
+  private async pollResult() {
+
   }
 
   private get activeLanguageFiles() {
@@ -107,17 +158,9 @@ export class QuestionState {
   };
 
   addFile = () => {
-    let counter = 1;
-    let newFileName = `untitled${counter}`;
-
-    while (this.files.some(file => file.name === newFileName)) {
-      counter++;
-      newFileName = `untitled${counter}`;
-    }
-
     const newFile: EditorFile = {
-      id: newFileName,
-      name: newFileName,
+      id: `/${this.pathPrefix}/${this.activeLanguageFiles.files.length}`,
+      name: `Untitled`,
       content: '',
       language: 'plaintext'
     };
@@ -160,7 +203,7 @@ export class QuestionState {
 
   setLanguage = (languageId: number) => {
     this.activeLanguageId = languageId;
-    const monacoLanguageId = getMonacoLanguageId({ id: 23, name: 'python' });
+    const monacoLanguageId = getMonacoLanguageId(23);
 
     const cache = this.cachedFiles.get(languageId);
     if (cache) {
@@ -200,8 +243,9 @@ export class QuestionState {
         content: it.content,
         pageName: it.name
       })));
-      // TODO: do something with result
+
       runInAction(() => {
+        this.lastSubmissionId = result.submissionId;
         this.lastSaved = this.startSavingTimestamp;
       });
     } catch (error) {
@@ -230,7 +274,7 @@ export class QuestionState {
   };
 
   // Methods from AssignmentEditorStore
-  disposeModel = (fileName: string) => {
+  private disposeModel = (fileName: string) => {
     if (!this.monaco) return;
     const model = this.monaco.editor.getModels().find(m => m.uri.path.slice(1) === fileName);
     if (model) {
@@ -238,7 +282,7 @@ export class QuestionState {
     }
   };
 
-  disposeModels = () => {
+  private disposeModels = () => {
     this.monaco.editor.getModels().forEach(it => it.dispose());
   };
 
@@ -276,6 +320,34 @@ export class QuestionState {
 
     main?.setValue(this.question.template);
     this.activeLanguageFiles.files = this.activeLanguageFiles.files.filter(it => it.id === mainId);
+  };
+
+  run = async () => {
+    if (!this.lastSubmissionId) {
+      await this.save();
+      return;
+    }
+    await api.questions.requestGrade(this.lastSubmissionId);
+  };
+
+  addCustomTestcase = (input: string) => {
+    const newTestcase: CustomTestcase = {
+      input,
+      output: undefined
+    };
+    this.customTestcases.push(newTestcase);
+  };
+
+  updateCustomTestcaseInput = (index: number, input: string) => {
+    if (this.customTestcases[index]) {
+      this.customTestcases[index].input = input;
+      // Clear output when input changes
+      this.customTestcases[index].output = undefined;
+    }
+  };
+
+  removeCustomTestcase = (index: number) => {
+    this.customTestcases.splice(index, 1);
   };
 }
 

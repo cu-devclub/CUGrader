@@ -3,7 +3,7 @@
 import { api } from "@/lib/api";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { use } from "react";
-import { DesktopCodeSpace } from "./desktop";
+import { DesktopCodeSpace } from "./shell";
 
 interface CodeSpacePageProps {
   params: Promise<{
