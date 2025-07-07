@@ -116,15 +116,12 @@ interface People {
 }
 
 interface SharedSectionProps {
-  // TODO: fix plural form of this and i18n
   title: string;
   onRemove?: (email: string) => unknown;
   onEdit?: (id: string) => unknown; // we dont have this
-  // TODO: seperate endpoint???
   invite?: (email: string) => unknown;
   allowEdit: boolean;
   peoples: (People)[];
-  // TODO: access control
 }
 
 // shared by both instructors and teaching assistants
