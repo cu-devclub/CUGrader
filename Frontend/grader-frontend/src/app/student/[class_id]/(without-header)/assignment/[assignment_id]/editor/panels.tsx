@@ -3,15 +3,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Textarea } from "@/components/ui/textarea";
-import { Testcase } from '@/lib/api/type';
 import * as Tabs from "@radix-ui/react-tabs";
 import { Check, ChevronsDown, CircleCheck, LockIcon, Plus, Terminal, X } from "lucide-react";
 import { observer } from "mobx-react-lite";
-import { useState } from "react";
 import Markdown from 'react-markdown';
 import { useCodeSpaceStore } from "./data";
-import { QuestionPagination } from "./shared";
 import type { CustomTestcase, SystemTestcase } from "./data/store";
+import { QuestionPagination } from "./shared";
 
 // TODO: file downloading
 export const DetailPanel = observer(() => {
