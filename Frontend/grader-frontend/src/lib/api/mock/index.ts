@@ -459,13 +459,13 @@ function createClient(persistence: Storage<Database>): APIClient {
           submissionId: Math.floor(Math.random() * 1000) + 1,
           code: [
             {
-              pageName: "main.py",
-              content: "print('Hello, World!')"
+              pageName: "main.ts",
+              content: "console.log('Hello, World!')"
             }
           ],
           language: {
-            id: 1,
-            name: "Python 3"
+            id: 6,
+            name: "Typescript"
           }
         };
       },

@@ -1,7 +1,7 @@
 import { SupportedLanguage } from "@/lib/api/type";
 
 // TODO: extract this to seperated file
-export function getMonacoLanguageId(language: SupportedLanguage) {
+export function getMonacoLanguageId(languageId: number) {
   // TODO: properly implement this
   return "typescript";
 }

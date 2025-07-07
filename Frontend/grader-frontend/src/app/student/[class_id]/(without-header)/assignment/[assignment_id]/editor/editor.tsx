@@ -6,7 +6,7 @@ import { useDropzoneFrFr } from '@/lib/file';
 import Editor, { useMonaco } from '@monaco-editor/react';
 import { CheckIcon, CopyIcon, DownloadIcon, FileSpreadsheet, RefreshCcwIcon, SaveIcon, UploadCloudIcon, UploadIcon } from 'lucide-react';
 import { observer } from 'mobx-react-lite';
-import { useCallback, useEffect, useState } from 'react';
+import { use, useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { useCodeSpaceStore } from './data';
 import { FileTabs } from './file-tabs';
@@ -15,13 +15,15 @@ import { SubmissionStatusIndicator } from './shared';
 export const EditorPanel = observer(() => {
   const monaco = useMonaco();
   const store = useCodeSpaceStore();
-  const { savingStatus, activeFile, save, replaceEditorContentWithFile, copy, reset, download, } = store.currentQuestionState;
+  use(store.currentQuestionState.ready);
+  const { savingStatus, activeFile, save, replaceEditorContentWithFile, copy, reset, download, run } = store.currentQuestionState;
   const [isUploadDialogOpen, setUploadDialogOpen] = useState(false);
   const dropzone = useDropzoneFrFr({
     multiple: false,
   });
 
   // Set monaco instance in store
+  // TODO: hijack ctrl+s
   useEffect(() => {
     if (monaco) {
       store.setMonaco(monaco);
@@ -30,7 +32,7 @@ export const EditorPanel = observer(() => {
 
   const handleFileUpload = useCallback(async () => {
     // should it replace the current file tho
-    // TODO: and shuold we allow multiple file
+    // TODO: and should we allow multiple file
     const file = dropzone.files[0];
     const succsss = await replaceEditorContentWithFile(file);
     setUploadDialogOpen(false);
@@ -62,6 +64,10 @@ export const EditorPanel = observer(() => {
   const handleSave = useCallback(() => {
     save();
   }, []);
+
+  const handleRun = useCallback(() => {
+    run();
+  }, [store]);
 
   return (
     <>
@@ -120,7 +126,7 @@ export const EditorPanel = observer(() => {
         </div>
         <div className='text-xs border-t flex justify-between p-0.5'>
           <div className='flex gap-1'>
-            <Button size="sm" className='text-xs h-7 m-0.5'> Run </Button>
+            <Button size="sm" className='text-xs h-7 m-0.5' onClick={handleRun}> Run </Button>
             <div className="flex">
               <Tooltip>
                 <TooltipTrigger asChild>

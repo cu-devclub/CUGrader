@@ -281,7 +281,7 @@ export interface APIClient {
     getByIdI: (questionId: number) => Promise<InstructorQuestion>;
 
     submit: (questionId: number, languageId: number, codes: CodePage[]) => Promise<{ submissionId: number; }>;
-    getSubmission: (questionId: number) => Promise<CodeSubmission>;
+    getSubmission: (questionId: number) => Promise<CodeSubmission | null>;
     requestGrade: (submissionId: number) => Promise<void>;
     getSubmissionResult: (submissionId: number) => Promise<SubmissionResult>;
   };
