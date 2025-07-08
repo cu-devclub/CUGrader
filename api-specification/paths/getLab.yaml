@@ -1,0 +1,78 @@
+parameters:
+  - in: header
+    name: Authentication
+    schema:
+      $ref: "../components/schemas/WithJWT.yaml"
+servers:
+  - url: https://apicugrader.sittha.net/v1
+get:
+  summary: lab detail
+  parameters:
+    - name: LabId
+      in: path
+      required: true
+      schema:
+        $ref: "../components/schemas/LabId.yaml"
+  responses:
+    "200":
+      description: lab detail
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              addfiles:
+                type: array
+                items:
+                  $ref: "../components/schemas/AddFileId.yaml"
+              question_ids:
+                type: array
+                items:
+                  $ref: "../components/schemas/QuestionId.yaml"
+              number:
+                type: number
+                description: lab number
+              name:
+                type: string
+                description: lab name
+              publish:
+                description: datetime format
+                type: string
+              due:
+                description: datetime format
+                type: string
+              language:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      description: language name
+                    id:
+                      $ref: "../components/schemas/LanguageId.yaml"
+              exam_mode:
+                type: boolean
+              close_on_due:
+                type: boolean
+              assign_to:
+                type: array
+                items:
+                  type: string
+                  description: group name
+              testcase:
+                type: integer
+                description: testcase_id primary key. null if multilanguage
+              secret_testcase:
+                type: integer
+                description: testcase_id primary key. null if multilanguage
+    "500":
+      $ref: '../components/responses/ErrServerIssue.yaml'
+    "400":
+      $ref: '../components/responses/ErrBadRequest.yaml'
+    "401":
+      $ref: '../components/responses/ErrUnauthorized.yaml'
+    "403":
+      $ref: '../components/responses/ErrPermissionDecline.yaml'
+    "404":
+      $ref: '../components/responses/ErrNotFound.yaml'

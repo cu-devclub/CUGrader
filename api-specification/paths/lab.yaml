@@ -1,0 +1,60 @@
+parameters:
+  - in: header
+    name: Authentication
+    schema:
+      $ref: "../components/schemas/WithJWT.yaml"
+servers:
+  - url: https://apicugrader.sittha.net/v1
+post:
+  summary: create lab
+  requestBody:
+    description: required all
+    content:
+      multipart/form-data:
+        schema:
+          properties:
+            ClassId:
+              $ref: "../components/schemas/ClassId.yaml"
+            lab_data:
+              $ref: "../components/schemas/labEdit.yaml"
+  responses:
+    "200":
+      description: Empty JSON
+      content:
+        application/json:
+          schema:
+            type: object
+    "500":
+      $ref: '../components/responses/ErrServerIssue.yaml'
+    "400":
+      $ref: '../components/responses/ErrBadRequest.yaml'
+    "401":
+      $ref: '../components/responses/ErrUnauthorized.yaml'
+patch:
+  summary: edit lab
+  requestBody:
+    content:
+      multipart/form-data:
+        schema:
+          properties:
+            LabId:
+              $ref: "../components/schemas/LabId.yaml"
+            lab_data:
+              $ref: "../components/schemas/labEdit.yaml"
+  responses:
+    "200":
+      description: Empty JSON
+      content:
+        application/json:
+          schema:
+            type: object
+    "500":
+      $ref: '../components/responses/ErrServerIssue.yaml'
+    "400":
+      $ref: '../components/responses/ErrBadRequest.yaml'
+    "401":
+      $ref: '../components/responses/ErrUnauthorized.yaml'
+    "403":
+      $ref: '../components/responses/ErrPermissionDecline.yaml'
+    "404":
+      $ref: '../components/responses/ErrNotFound.yaml'

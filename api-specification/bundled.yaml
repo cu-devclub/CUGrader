@@ -1,0 +1,1641 @@
+openapi: 3.0.0
+servers:
+  - url: 'https://authcugrader.sittha.net/v1'
+  - url: 'https://apicugrader.sittha.net/v1'
+info:
+  version: 1.0.0
+  title: CUGrader API server
+paths:
+  /ping:
+    get:
+      responses:
+        '200':
+          description: Pong response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pong'
+        '418':
+          $ref: '#/components/responses/ErrPurrmissionDecline'
+  '/picture/{PictureId}':
+    servers:
+      - url: 'https://apicugrader.sittha.net/v1'
+    summary: get
+    get:
+      summary: getting image with picture id
+      parameters:
+        - name: PictureId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/PictureId'
+      responses:
+        '200':
+          description: image file
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - content
+                properties:
+                  content:
+                    type: string
+                    description: The image file in base64 format or a link to the image so you can use directly to <img>
+                    example: 'https://media.cnn.com/api/v1/images/stellar/prod/130604125005-rick-astley-video.jpg?q=x_0,y_152,h_720,w_1280,c_crop/h_653,w_1160/f_avif'
+        '404':
+          $ref: '#/components/responses/ErrNotFound'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+  /login:
+    servers:
+      - url: 'https://authcugrader.sittha.net/v1'
+    summary: redirect to google OAuth2
+    get:
+      responses:
+        '307':
+          description: redirect to google OAuth2
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+  /callback:
+    summary: handle callback from google
+    get:
+      servers:
+        - url: 'https://authcugrader.sittha.net/v1'
+      responses:
+        '307':
+          description: redirect back to frotnend
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+    post:
+      servers:
+        - url: 'https://apicugrader.sittha.net/v1'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - key
+                - credential
+              properties:
+                key:
+                  type: string
+                  description: key for decrypt data
+                credential:
+                  type: string
+                  description: encrypted data
+      responses:
+        '200':
+          description: response access token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access-token:
+                    $ref: '#/components/schemas/WithJWT'
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+  /testcallback:
+    servers:
+      - url: 'https://apicugrader.sittha.net/v1'
+    summary: for getting JWT Token custom email for testing
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - credential
+              properties:
+                key:
+                  type: string
+                  description: unused
+                credential:
+                  type: string
+                  description: email end with @chula.ac.th or @student chula.ac.th
+      responses:
+        '200':
+          description: response access token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access-token:
+                    $ref: '#/components/schemas/WithJWT'
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+  /classes/semesters:
+    parameters:
+      - in: header
+        name: Authentication
+        schema:
+          $ref: '#/components/schemas/WithJWT'
+    servers:
+      - url: 'https://apicugrader.sittha.net/v1'
+    summary: List of year-semester
+    get:
+      responses:
+        '200':
+          description: List year-semester
+          content:
+            application/json:
+              schema:
+                properties:
+                  semesters:
+                    type: array
+                    items:
+                      type: string
+                      description: year-semester
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '403':
+          $ref: '#/components/responses/ErrPermissionDecline'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+  '/classes/classes/{year-semester}':
+    parameters:
+      - in: header
+        name: Authentication
+        schema:
+          $ref: '#/components/schemas/WithJWT'
+    servers:
+      - url: 'https://apicugrader.sittha.net/v1'
+    summary: List of class in year-semester
+    get:
+      parameters:
+        - name: year-semester
+          description: The unique identifier of the class
+          in: path
+          required: true
+          schema:
+            type: string
+            description: year-semester
+      responses:
+        '200':
+          description: List of class object
+          content:
+            application/json:
+              schema:
+                properties:
+                  assistant:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ClassObject'
+                  study:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ClassObject'
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '404':
+          $ref: '#/components/responses/ErrNotFound'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+  /class:
+    parameters:
+      - in: header
+        name: Authentication
+        schema:
+          $ref: '#/components/schemas/WithJWT'
+    servers:
+      - url: 'https://apicugrader.sittha.net/v1'
+    post:
+      summary: Create class
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - course_id
+                - name
+                - semester
+              properties:
+                course_id:
+                  description: course id according to reg cu
+                  type: integer
+                name:
+                  description: Name of class
+                  type: string
+                semester:
+                  description: Semester of class
+                  type: string
+                image:
+                  description: Class image file
+                  type: string
+                  format: binary
+                students:
+                  description: Student csv file
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Empty JSON
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '403':
+          $ref: '#/components/responses/ErrPermissionDecline'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+  '/class/{ClassId}':
+    parameters:
+      - in: header
+        name: Authentication
+        schema:
+          $ref: '#/components/schemas/WithJWT'
+    servers:
+      - url: 'https://apicugrader.sittha.net/v1'
+    get:
+      parameters:
+        - name: ClassId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/ClassId'
+      responses:
+        '200':
+          description: get specific class info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassObject'
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '403':
+          $ref: '#/components/responses/ErrPermissionDecline'
+        '404':
+          $ref: '#/components/responses/ErrNotFound'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+  '/sections/{ClassId}':
+    parameters:
+      - in: header
+        name: Authentication
+        schema:
+          $ref: '#/components/schemas/WithJWT'
+    servers:
+      - url: 'https://apicugrader.sittha.net/v1'
+    get:
+      parameters:
+        - name: ClassId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/ClassId'
+      responses:
+        '200':
+          description: assistants array and instructor array
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - sections
+                properties:
+                  sections:
+                    type: array
+                    items:
+                      type: integer
+                      description: section number
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '403':
+          $ref: '#/components/responses/ErrPermissionDecline'
+        '404':
+          $ref: '#/components/responses/ErrNotFound'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+  '/groups/{ClassId}':
+    parameters:
+      - in: header
+        name: Authentication
+        schema:
+          $ref: '#/components/schemas/WithJWT'
+    servers:
+      - url: 'https://apicugrader.sittha.net/v1'
+    get:
+      parameters:
+        - name: ClassId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/ClassId'
+      responses:
+        '200':
+          description: assistants array and instructor array
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  groups:
+                    type: array
+                    items:
+                      type: string
+                      description: group name
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '403':
+          $ref: '#/components/responses/ErrPermissionDecline'
+        '404':
+          $ref: '#/components/responses/ErrNotFound'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+  /students:
+    parameters:
+      - in: header
+        name: Authentication
+        schema:
+          $ref: '#/components/schemas/WithJWT'
+    servers:
+      - url: 'https://apicugrader.sittha.net/v1'
+    post:
+      summary: Insert student
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ClassId:
+                  $ref: '#/components/schemas/ClassId'
+                email:
+                  description: student's email
+                  type: string
+                section:
+                  description: section of student
+                  type: integer
+                group:
+                  description: group of student
+                  type: string
+              required:
+                - ClassId
+                - email
+                - section
+      responses:
+        '200':
+          description: Empty JSON
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+    delete:
+      summary: Delete student
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ClassId:
+                  $ref: '#/components/schemas/ClassId'
+                StudentId:
+                  description: student id primary key
+                  type: string
+              required:
+                - ClassId
+                - StudentId
+      responses:
+        '200':
+          description: Empty JSON
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '404':
+          $ref: '#/components/responses/ErrNotFound'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+    patch:
+      summary: Edit student info
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ClassId:
+                  $ref: '#/components/schemas/ClassId'
+                StudentId:
+                  description: student id primary key
+                  type: string
+                section:
+                  description: section of student
+                  type: integer
+                group:
+                  description: group of student
+                  type: string
+                withdrawal:
+                  description: is student withdrawn
+                  type: boolean
+              required:
+                - ClassId
+                - StudentId
+      responses:
+        '200':
+          description: Empty JSON
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '403':
+          $ref: '#/components/responses/ErrPermissionDecline'
+        '404':
+          $ref: '#/components/responses/ErrNotFound'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+  '/students/{ClassId}':
+    parameters:
+      - in: header
+        name: Authentication
+        schema:
+          $ref: '#/components/schemas/WithJWT'
+    servers:
+      - url: 'https://apicugrader.sittha.net/v1'
+    get:
+      summary: list student by class
+      parameters:
+        - name: ClassId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/ClassId'
+      responses:
+        '200':
+          description: Array of students
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - students
+                properties:
+                  students:
+                    description: List of student
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        StudentId:
+                          type: string
+                        name:
+                          type: string
+                        section:
+                          type: integer
+                        group:
+                          type: string
+                        picture:
+                          description: url
+                          type: string
+                        score:
+                          type: number
+                        max_score:
+                          type: number
+                        withdrawal:
+                          type: boolean
+                      required:
+                        - StudentId
+                        - name
+                        - section
+                        - group
+                        - picture
+                        - score
+                        - max_score
+                        - withdrawal
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '403':
+          $ref: '#/components/responses/ErrPermissionDecline'
+        '404':
+          $ref: '#/components/responses/ErrNotFound'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+  /TA:
+    parameters:
+      - in: header
+        name: Authentication
+        schema:
+          $ref: '#/components/schemas/WithJWT'
+    servers:
+      - url: 'https://apicugrader.sittha.net/v1'
+    post:
+      summary: Add TA to class
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TAEditBody'
+      responses:
+        '200':
+          description: Empty JSON
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+    delete:
+      summary: Delete TA from class
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TAEditBody'
+      responses:
+        '200':
+          description: Empty JSON
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '403':
+          $ref: '#/components/responses/ErrPermissionDecline'
+        '404':
+          $ref: '#/components/responses/ErrNotFound'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+  '/TA/{ClassId}':
+    parameters:
+      - in: header
+        name: Authentication
+        schema:
+          $ref: '#/components/schemas/WithJWT'
+    servers:
+      - url: 'https://apicugrader.sittha.net/v1'
+    get:
+      summary: list ta and instructor by class
+      parameters:
+        - name: ClassId
+          description: The unique identifier of the class
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/ClassId'
+      responses:
+        '200':
+          description: assistants array and instructor array
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  assistant:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        picture:
+                          description: url
+                          type: string
+                        leader:
+                          type: boolean
+                        email:
+                          type: string
+                      required:
+                        - name
+                        - picture
+                        - leader
+                        - email
+                  instructor:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        picture:
+                          description: url
+                          type: string
+                        email:
+                          type: string
+                      required:
+                        - name
+                        - picture
+                        - email
+                required:
+                  - assistant
+                  - instructor
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '403':
+          $ref: '#/components/responses/ErrPermissionDecline'
+        '404':
+          $ref: '#/components/responses/ErrNotFound'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+  /near_due_date:
+    parameters:
+      - in: header
+        name: Authentication
+        schema:
+          $ref: '#/components/schemas/WithJWT'
+    servers:
+      - url: 'https://apicugrader.sittha.net/v1'
+    summary: get nearly unsubmit due date lab
+    get:
+      responses:
+        '200':
+          description: json of labs array
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  labs:
+                    description: array of labs
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        course_id:
+                          type: integer
+                        course_name:
+                          type: string
+                        LabId:
+                          $ref: '#/components/schemas/LabId'
+                        lab_name:
+                          type: string
+                        lab_due:
+                          type: string
+                          description: date time
+                        lab_max_score:
+                          type: integer
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+  /lab:
+    parameters:
+      - in: header
+        name: Authentication
+        schema:
+          $ref: '#/components/schemas/WithJWT'
+    servers:
+      - url: 'https://apicugrader.sittha.net/v1'
+    post:
+      summary: create lab
+      requestBody:
+        description: required all
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                ClassId:
+                  $ref: '#/components/schemas/ClassId'
+                lab_data:
+                  $ref: '#/components/schemas/labEdit'
+      responses:
+        '200':
+          description: Empty JSON
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+    patch:
+      summary: edit lab
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                LabId:
+                  $ref: '#/components/schemas/LabId'
+                lab_data:
+                  $ref: '#/components/schemas/labEdit'
+      responses:
+        '200':
+          description: Empty JSON
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '403':
+          $ref: '#/components/responses/ErrPermissionDecline'
+        '404':
+          $ref: '#/components/responses/ErrNotFound'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+  '/labs/{ClassId}':
+    parameters:
+      - in: header
+        name: Authentication
+        schema:
+          $ref: '#/components/schemas/WithJWT'
+    servers:
+      - url: 'https://apicugrader.sittha.net/v1'
+    get:
+      parameters:
+        - name: ClassId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/ClassId'
+      responses:
+        '200':
+          description: list lab in class
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    LabId:
+                      $ref: '#/components/schemas/LabId'
+                    lab_number:
+                      type: integer
+                    lab_name:
+                      type: string
+                    publish:
+                      type: string
+                      description: datetime
+                    due:
+                      type: string
+                      description: datetime
+                    score:
+                      type: integer
+                    max_score:
+                      type: integer
+                    status:
+                      type: string
+                      enum:
+                        - new
+                        - partial_complete
+                        - complete
+                        - late
+                        - due_soon
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '403':
+          $ref: '#/components/responses/ErrPermissionDecline'
+        '404':
+          $ref: '#/components/responses/ErrNotFound'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+  '/lab/{LabId}':
+    parameters:
+      - in: header
+        name: Authentication
+        schema:
+          $ref: '#/components/schemas/WithJWT'
+    servers:
+      - url: 'https://apicugrader.sittha.net/v1'
+    get:
+      summary: lab detail
+      parameters:
+        - name: LabId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/LabId'
+      responses:
+        '200':
+          description: lab detail
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  addfiles:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AddFileId'
+                  question_ids:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/QuestionId'
+                  number:
+                    type: number
+                    description: lab number
+                  name:
+                    type: string
+                    description: lab name
+                  publish:
+                    description: datetime format
+                    type: string
+                  due:
+                    description: datetime format
+                    type: string
+                  language:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          description: language name
+                        id:
+                          $ref: '#/components/schemas/LanguageId'
+                  exam_mode:
+                    type: boolean
+                  close_on_due:
+                    type: boolean
+                  assign_to:
+                    type: array
+                    items:
+                      type: string
+                      description: group name
+                  testcase:
+                    type: integer
+                    description: testcase_id primary key. null if multilanguage
+                  secret_testcase:
+                    type: integer
+                    description: testcase_id primary key. null if multilanguage
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '403':
+          $ref: '#/components/responses/ErrPermissionDecline'
+        '404':
+          $ref: '#/components/responses/ErrNotFound'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+  '/addfile/{AddFileId}':
+    parameters:
+      - in: header
+        name: Authentication
+        schema:
+          $ref: '#/components/schemas/WithJWT'
+    servers:
+      - url: 'https://apicugrader.sittha.net/v1'
+    get:
+      parameters:
+        - name: AddFileId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/AddFileId'
+      responses:
+        '200':
+          description: download file
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '403':
+          $ref: '#/components/responses/ErrPermissionDecline'
+        '404':
+          $ref: '#/components/responses/ErrNotFound'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+    delete:
+      parameters:
+        - name: AddFileId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/AddFileId'
+      responses:
+        '200':
+          description: Empty JSON
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '403':
+          $ref: '#/components/responses/ErrPermissionDecline'
+        '404':
+          $ref: '#/components/responses/ErrNotFound'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+  '/question/{QuestionId}':
+    parameters:
+      - in: header
+        name: Authentication
+        schema:
+          $ref: '#/components/schemas/WithJWT'
+    servers:
+      - url: 'https://apicugrader.sittha.net/v1'
+    get:
+      summary: getting image with picture id
+      parameters:
+        - name: QuestionId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/QuestionId'
+      responses:
+        '200':
+          description: question detail
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  number:
+                    type: integer
+                    description: question number
+                  name:
+                    type: string
+                    description: question name
+                  description:
+                    type: string
+                    description: markdown format
+                  predefine:
+                    type: string
+                    description: predefine function
+                  max_score:
+                    type: integer
+                  testcase:
+                    type: integer
+                    description: testcase_id primary key. null if multilanguage
+                  secret_testcase:
+                    type: integer
+                    description: testcase_id primary key. null if multilanguage
+                  submission:
+                    type: object
+                    properties:
+                      score:
+                        type: integer
+                      timestamp:
+                        type: string
+                        description: datetime
+                      submission_id:
+                        type: integer
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '403':
+          $ref: '#/components/responses/ErrPermissionDecline'
+        '404':
+          $ref: '#/components/responses/ErrNotFound'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+  '/exam_pin/{LabId}':
+    parameters:
+      - in: header
+        name: Authentication
+        schema:
+          $ref: '#/components/schemas/WithJWT'
+    servers:
+      - url: 'https://apicugrader.sittha.net/v1'
+    get:
+      summary: get exam pin
+      parameters:
+        - name: LabId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/LabId'
+      responses:
+        '200':
+          description: exam pin
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  exam_pin:
+                    type: integer
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '403':
+          $ref: '#/components/responses/ErrPermissionDecline'
+        '404':
+          $ref: '#/components/responses/ErrNotFound'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+  '/testcase/{TestCaseId}':
+    servers:
+      - url: 'https://apicugrader.sittha.net/v1'
+    parameters:
+      - in: header
+        name: Authentication
+        schema:
+          $ref: '#/components/schemas/WithJWT'
+    get:
+      summary: get testcase
+      parameters:
+        - name: TestCaseId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/TestCaseId'
+      responses:
+        '200':
+          description: get testcase
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  testcase:
+                    type: string
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '403':
+          $ref: '#/components/responses/ErrPermissionDecline'
+        '404':
+          $ref: '#/components/responses/ErrNotFound'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+  '/multilang_testcase/{QuestionId}':
+    parameters:
+      - in: header
+        name: Authentication
+        schema:
+          $ref: '#/components/schemas/WithJWT'
+    servers:
+      - url: 'https://apicugrader.sittha.net/v1'
+    get:
+      summary: get multi language testcase
+      parameters:
+        - name: QuestionId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/QuestionId'
+      responses:
+        '200':
+          description: get multi language testcase
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  testcase:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        input:
+                          type: string
+                        output:
+                          type: string
+                  secret_testcase:
+                    description: null if student
+                    type: array
+                    items:
+                      properties:
+                        input:
+                          type: string
+                        output:
+                          type: string
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '403':
+          $ref: '#/components/responses/ErrPermissionDecline'
+        '404':
+          $ref: '#/components/responses/ErrNotFound'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+  /code:
+    parameters:
+      - in: header
+        name: Authentication
+        schema:
+          $ref: '#/components/schemas/WithJWT'
+    servers:
+      - url: 'https://apicugrader.sittha.net/v1'
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - question_id
+                - code
+                - language_id
+              properties:
+                LanguageId:
+                  $ref: '#/components/schemas/LanguageId'
+                QuestionId:
+                  $ref: '#/components/schemas/QuestionId'
+                code:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - page_name
+                      - content
+                    properties:
+                      page_name:
+                        type: string
+                      content:
+                        type: string
+      responses:
+        '200':
+          description: save into database
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - submission_id
+                properties:
+                  SubmissionId:
+                    $ref: '#/components/schemas/SubmissionId'
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '403':
+          $ref: '#/components/responses/ErrPermissionDecline'
+        '404':
+          $ref: '#/components/responses/ErrNotFound'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+  '/code/{QuestionId}':
+    parameters:
+      - in: header
+        name: Authentication
+        schema:
+          $ref: '#/components/schemas/WithJWT'
+    servers:
+      - url: 'https://apicugrader.sittha.net/v1'
+    get:
+      parameters:
+        - name: QuestionId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/QuestionId'
+      responses:
+        '200':
+          description: code content
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - code
+                  - submission_id
+                properties:
+                  SubmissionId:
+                    $ref: '#/components/schemas/SubmissionId'
+                  language:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        description: language primary key
+                      name:
+                        type: string
+                        description: language name
+                  code:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - page_name
+                        - content
+                      properties:
+                        page_name:
+                          type: string
+                        content:
+                          type: string
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '403':
+          $ref: '#/components/responses/ErrPermissionDecline'
+        '404':
+          $ref: '#/components/responses/ErrNotFound'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+  /submit:
+    parameters:
+      - in: header
+        name: Authentication
+        schema:
+          $ref: '#/components/schemas/WithJWT'
+    servers:
+      - url: 'https://apicugrader.sittha.net/v1'
+    post:
+      operationId: requestGrade
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: this is to prevent codegen from merging type
+              required:
+                - SubmissionId
+              properties:
+                SubmissionId:
+                  $ref: '#/components/schemas/SubmissionId'
+      responses:
+        '200':
+          description: request grader to grade submission
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Empty json
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '403':
+          $ref: '#/components/responses/ErrPermissionDecline'
+        '404':
+          $ref: '#/components/responses/ErrNotFound'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+  '/result/{SubmissionId}':
+    parameters:
+      - in: header
+        name: Authentication
+        schema:
+          $ref: '#/components/schemas/WithJWT'
+    servers:
+      - url: 'https://apicugrader.sittha.net/v1'
+    get:
+      parameters:
+        - name: SubmissionId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/SubmissionId'
+      responses:
+        '200':
+          description: return result array
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  normal:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        input:
+                          type: string
+                        output:
+                          type: string
+                          description: expected result (nil in somecase)
+                        message:
+                          type: string
+                          description: message result
+                        status:
+                          type: string
+                          enum:
+                            - fail
+                            - pass
+                            - pending
+                  secret:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+                          description: message result
+                        status:
+                          type: string
+                          enum:
+                            - fail
+                            - pass
+                            - pending
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '403':
+          $ref: '#/components/responses/ErrPermissionDecline'
+        '404':
+          $ref: '#/components/responses/ErrNotFound'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+  /language:
+    servers:
+      - url: 'https://apicugrader.sittha.net/v1'
+    get:
+      responses:
+        '200':
+          description: get list of language that system support
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  languages:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: language primary key
+                        name:
+                          type: string
+                          description: language name
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+components:
+  schemas:
+    Pong:
+      type: object
+      required:
+        - ping
+      properties:
+        ping:
+          type: string
+          example: pong
+    LabId:
+      description: 'A unique identifier for a lab, typically used to retrieve or reference a specific lab in a system.'
+      type: integer
+      example: 1
+    QuestionId:
+      description: 'A unique identifier for a question, typically used to retrieve or reference a specific question in a system.'
+      type: integer
+      example: 1
+    AddFileId:
+      description: 'A unique identifier for a additional file, typically used to retrieve or reference a specific additional file in a system.'
+      type: integer
+      example: 1
+    SubmissionId:
+      description: 'A unique identifier for a submission, typically used to retrieve or reference a specific submission in a system.'
+      type: integer
+      example: 1
+    TestCaseId:
+      description: 'A unique identifier for a testcase, typically used to retrieve or reference a specific testcase in a system.'
+      type: integer
+      example: 1
+    PictureId:
+      description: 'A unique identifier for a picture, typically used to retrieve or reference an image in a system.'
+      type: integer
+      example: 12345
+    ClassId:
+      description: 'A unique identifier for a class, typically used to retrieve or reference a specific class in a system.'
+      type: integer
+      example: 1
+    LanguageId:
+      description: 'A unique identifier for a language, typically used to retrieve or reference an language in a system.'
+      type: integer
+      example: 12345
+    WithJWT:
+      type: string
+      description: JWT token for authentication
+      example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30
+    ClassObject:
+      type: object
+      properties:
+        ClassId:
+          $ref: '#/components/schemas/ClassId'
+        course_id:
+          description: id of corse from reg
+          type: string
+          example: 2301102
+        course_name:
+          type: string
+          example: การเขียนโปรแกรมเชิงวัตถุ
+        PictureId:
+          $ref: '#/components/schemas/PictureId'
+      required:
+        - ClassId
+        - course_id
+        - course_name
+        - PictureId
+    TAEditBody:
+      type: object
+      properties:
+        ClassId:
+          $ref: '#/components/schemas/ClassId'
+        email:
+          description: TA's email
+          type: string
+      required:
+        - ClassId
+        - email
+    labEdit:
+      type: object
+      properties:
+        number:
+          type: integer
+        name:
+          type: string
+        publish:
+          type: string
+          description: datetime
+        due:
+          type: string
+          description: datetime
+        language_ids:
+          type: array
+          items:
+            type: integer
+        close_on_due:
+          type: boolean
+        exam_mode:
+          type: boolean
+        show_score_on_lock:
+          type: boolean
+        assign_to:
+          type: array
+          items:
+            type: string
+            description: group name
+        exam_pin:
+          type: integer
+        testcase:
+          type: string
+        secret_testcase:
+          type: string
+        questions:
+          type: array
+          items:
+            type: object
+            properties:
+              number:
+                type: integer
+              name:
+                type: string
+              description:
+                type: string
+              answer:
+                type: string
+              predefine:
+                type: string
+              score:
+                type: integer
+              testcase:
+                type: string
+              secret_testcase:
+                type: string
+              multilang_testcase:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    input:
+                      type: string
+                    output:
+                      type: string
+              multilang_secret_testcase:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    input:
+                      type: string
+                    output:
+                      type: string
+        addfiles:
+          type: array
+          items:
+            type: string
+            format: binary
+          description: Multiple additional files
+  responses:
+    ErrServerIssue:
+      description: Server ran into an error while processing the request
+      content:
+        application/json:
+          schema:
+            required:
+              - human_message
+              - debug_message
+            properties:
+              human_message:
+                type: string
+                description: A message for the user to understand the error
+              debug_message:
+                type: string
+                description: A message for developers to understand the error
+    ErrNotFound:
+      description: Server cannot find the requested resource
+      content:
+        application/json:
+          schema:
+            required:
+              - human_message
+            properties:
+              human_message:
+                type: string
+                description: A message for the user to understand the error
+                example: The requested resource was not found
+    ErrBadRequest:
+      description: Server cannot process with the request due to a client error
+      content:
+        application/json:
+          schema:
+            required:
+              - human_message
+            properties:
+              human_message:
+                type: string
+                description: A message for the user to understand the error
+                example: The request was invalid or cannot be served. The request should not be repeated without modification.
+    ErrPermissionDecline:
+      description: Server rejected the request due to insufficient permissions
+      content:
+        application/json:
+          schema:
+            required:
+              - human_message
+            properties:
+              human_message:
+                type: string
+                description: A message for the user to understand the error
+                example: Permission denied. You do not have the required permissions to access this resource.
+    ErrPurrmissionDecline:
+      description: Server rejected the request due to insufficient purrmissions
+      content:
+        application/json:
+          schema:
+            required:
+              - cat_message
+            properties:
+              human_message:
+                type: string
+                description: A message for the cat to understand the error
+                example: Meeeeoowww! WRAAAWWRRR!
+    ErrUnauthorized:
+      description: Server rejected the request due to insufficient authorization
+      content:
+        application/json:
+          schema:
+            required:
+              - human_message
+            properties:
+              human_message:
+                type: string
+                description: A message for the user to understand the error
+                example: Unauthorized access. Please provide valid credentials to access this resource.

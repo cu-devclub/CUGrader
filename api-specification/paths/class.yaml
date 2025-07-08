@@ -1,0 +1,51 @@
+parameters:
+  - in: header
+    name: Authentication
+    schema:
+      $ref: "../components/schemas/WithJWT.yaml"
+servers:
+  - url: https://apicugrader.sittha.net/v1
+post:
+  summary: Create class
+  requestBody:
+    content:
+      multipart/form-data:
+        schema:
+          type: object
+          required:
+            - course_id
+            - name
+            - semester
+          properties:
+            course_id:
+              description: course id according to reg cu
+              type: integer
+            name:
+              description: Name of class
+              type: string
+            semester:
+              description: Semester of class
+              type: string
+            image:
+              description: Class image file
+              type: string
+              format: binary
+            students:
+              description: Student csv file
+              type: string
+              format: binary
+  responses:
+    "200":
+      description: Empty JSON
+      content:
+        application/json:
+          schema:
+            type: object
+    "400":
+      $ref: '../components/responses/ErrBadRequest.yaml'
+    "401":
+      $ref: '../components/responses/ErrUnauthorized.yaml'
+    "403":
+      $ref: '../components/responses/ErrPermissionDecline.yaml'
+    "500":
+      $ref: '../components/responses/ErrServerIssue.yaml'

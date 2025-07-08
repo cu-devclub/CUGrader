@@ -1,0 +1,18 @@
+type: object
+properties:
+  ClassId:
+    $ref: "./ClassId.yaml"
+  course_id:
+    description: id of corse from reg
+    type: string
+    example: 2301102
+  course_name:
+    type: string
+    example: "การเขียนโปรแกรมเชิงวัตถุ"
+  PictureId:
+    $ref: "./PictureId.yaml"
+required:
+  - ClassId
+  - course_id
+  - course_name
+  - PictureId

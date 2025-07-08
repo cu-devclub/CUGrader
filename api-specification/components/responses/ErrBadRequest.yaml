@@ -1,0 +1,11 @@
+description: Server cannot process with the request due to a client error
+content:
+  application/json:
+    schema:
+      required:
+        - human_message
+      properties:
+        human_message:
+          type: string
+          description: A message for the user to understand the error
+          example: "The request was invalid or cannot be served. The request should not be repeated without modification."

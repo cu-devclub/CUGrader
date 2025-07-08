@@ -1,0 +1,3 @@
+description: A unique identifier for a lab, typically used to retrieve or reference a specific lab in a system.
+type: integer
+example: 1

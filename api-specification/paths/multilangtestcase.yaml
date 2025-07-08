@@ -1,0 +1,51 @@
+parameters:
+  - in: header
+    name: Authentication
+    schema:
+      $ref: "../components/schemas/WithJWT.yaml"
+servers:
+  - url: https://apicugrader.sittha.net/v1
+get:
+  summary: get multi language testcase
+  parameters:
+    - name: QuestionId
+      in: path
+      required: true
+      schema:
+        $ref: "../components/schemas/QuestionId.yaml"
+  responses:
+    "200":
+      description: get multi language testcase
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              testcase:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    input:
+                      type: string
+                    output:
+                      type: string
+              secret_testcase:
+                description: null if student
+                type: array
+                items:
+                  properties:
+                    input:
+                      type: string
+                    output:
+                      type: string
+    "500":
+      $ref: '../components/responses/ErrServerIssue.yaml'
+    "400":
+      $ref: '../components/responses/ErrBadRequest.yaml'
+    "401":
+      $ref: '../components/responses/ErrUnauthorized.yaml'
+    "403":
+      $ref: '../components/responses/ErrPermissionDecline.yaml'
+    "404":
+      $ref: '../components/responses/ErrNotFound.yaml'

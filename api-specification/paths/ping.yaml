@@ -1,0 +1,10 @@
+get:
+  responses:
+    '200':
+      description: Pong response
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/pong.yaml'
+    "418":
+      $ref: '../components/responses/ErrPurrmissionDecline.yaml'

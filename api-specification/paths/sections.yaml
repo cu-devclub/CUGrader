@@ -1,0 +1,39 @@
+parameters:
+  - in: header
+    name: Authentication
+    schema:
+      $ref: "../components/schemas/WithJWT.yaml"
+servers:
+  - url: https://apicugrader.sittha.net/v1
+get:
+  parameters:
+    - name: ClassId
+      in: path
+      required: true
+      schema:
+        $ref: "../components/schemas/ClassId.yaml"
+  responses:
+    "200":
+      description: assistants array and instructor array
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - sections
+            properties:
+              sections:
+                type: array
+                items:
+                  type: integer
+                  description: section number
+    "500":
+      $ref: '../components/responses/ErrServerIssue.yaml'
+    "400":
+      $ref: '../components/responses/ErrBadRequest.yaml'
+    "401":
+      $ref: '../components/responses/ErrUnauthorized.yaml'
+    "403":
+      $ref: '../components/responses/ErrPermissionDecline.yaml'
+    "404":
+      $ref: '../components/responses/ErrNotFound.yaml'

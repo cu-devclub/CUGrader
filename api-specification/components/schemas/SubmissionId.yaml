@@ -1,0 +1,3 @@
+description: A unique identifier for a submission, typically used to retrieve or reference a specific submission in a system.
+type: integer
+example: 1
