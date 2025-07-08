@@ -223,6 +223,16 @@ export interface TestcallbackPostOperationRequest {
     testcallbackPostRequest?: TestcallbackPostRequest;
 }
 
+export interface UpdateClassRequest {
+    authentication?: string;
+    classId?: number;
+    courseId?: number;
+    name?: string;
+    semester?: string;
+    image?: Blob;
+    students?: Blob;
+}
+
 export interface UpdateLabRequest {
     authentication?: string;
     labId?: number;
@@ -498,7 +508,7 @@ export class DefaultApi extends runtime.BaseAPI {
     async createLab(requestParameters: CreateLabRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
         const response = await this.createLabRaw(requestParameters, initOverrides);
         return await response.value();
-    }
+    };
 
     /**
      */
@@ -533,7 +543,7 @@ export class DefaultApi extends runtime.BaseAPI {
     async getClassById(requestParameters: GetClassByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ClassObject> {
         const response = await this.getClassByIdRaw(requestParameters, initOverrides);
         return await response.value();
-    }
+    };
 
     /**
      */
@@ -568,7 +578,7 @@ export class DefaultApi extends runtime.BaseAPI {
     async getCodeByQuestionId(requestParameters: GetCodeByQuestionIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetCodeByQuestionId200Response> {
         const response = await this.getCodeByQuestionIdRaw(requestParameters, initOverrides);
         return await response.value();
-    }
+    };
 
     /**
      * get exam pin
@@ -605,7 +615,7 @@ export class DefaultApi extends runtime.BaseAPI {
     async getExamPinByLabId(requestParameters: GetExamPinByLabIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetExamPinByLabId200Response> {
         const response = await this.getExamPinByLabIdRaw(requestParameters, initOverrides);
         return await response.value();
-    }
+    };
 
     /**
      */
@@ -640,7 +650,7 @@ export class DefaultApi extends runtime.BaseAPI {
     async getFileById(requestParameters: GetFileByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Blob> {
         const response = await this.getFileByIdRaw(requestParameters, initOverrides);
         return await response.value();
-    }
+    };
 
     /**
      */
@@ -675,7 +685,7 @@ export class DefaultApi extends runtime.BaseAPI {
     async getGroupsByClassId(requestParameters: GetGroupsByClassIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetGroupsByClassId200Response> {
         const response = await this.getGroupsByClassIdRaw(requestParameters, initOverrides);
         return await response.value();
-    }
+    };
 
     /**
      * list ta and instructor by class
@@ -712,7 +722,7 @@ export class DefaultApi extends runtime.BaseAPI {
     async getInstructorsByClassId(requestParameters: GetInstructorsByClassIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetInstructorsByClassId200Response> {
         const response = await this.getInstructorsByClassIdRaw(requestParameters, initOverrides);
         return await response.value();
-    }
+    };
 
     /**
      * lab detail
@@ -749,7 +759,7 @@ export class DefaultApi extends runtime.BaseAPI {
     async getLabById(requestParameters: GetLabByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetLabById200Response> {
         const response = await this.getLabByIdRaw(requestParameters, initOverrides);
         return await response.value();
-    }
+    };
 
     /**
      */
@@ -784,7 +794,7 @@ export class DefaultApi extends runtime.BaseAPI {
     async getLabsByClassId(requestParameters: GetLabsByClassIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<GetLabsByClassId200ResponseInner>> {
         const response = await this.getLabsByClassIdRaw(requestParameters, initOverrides);
         return await response.value();
-    }
+    };
 
     /**
      */
@@ -812,7 +822,7 @@ export class DefaultApi extends runtime.BaseAPI {
     async getNearDues(requestParameters: GetNearDuesRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetNearDues200Response> {
         const response = await this.getNearDuesRaw(requestParameters, initOverrides);
         return await response.value();
-    }
+    };
 
     /**
      */
@@ -847,7 +857,7 @@ export class DefaultApi extends runtime.BaseAPI {
     async getParticipatingClassBySemester(requestParameters: GetParticipatingClassBySemesterRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetParticipatingClassBySemester200Response> {
         const response = await this.getParticipatingClassBySemesterRaw(requestParameters, initOverrides);
         return await response.value();
-    }
+    };
 
     /**
      * getting image with picture id
@@ -880,7 +890,7 @@ export class DefaultApi extends runtime.BaseAPI {
     async getPictureById(requestParameters: GetPictureByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetPictureById200Response> {
         const response = await this.getPictureByIdRaw(requestParameters, initOverrides);
         return await response.value();
-    }
+    };
 
     /**
      * getting image with picture id
@@ -917,7 +927,7 @@ export class DefaultApi extends runtime.BaseAPI {
     async getQuestionById(requestParameters: GetQuestionByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetQuestionById200Response> {
         const response = await this.getQuestionByIdRaw(requestParameters, initOverrides);
         return await response.value();
-    }
+    };
 
     /**
      */
@@ -952,7 +962,7 @@ export class DefaultApi extends runtime.BaseAPI {
     async getSectionsByClassId(requestParameters: GetSectionsByClassIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetSectionsByClassId200Response> {
         const response = await this.getSectionsByClassIdRaw(requestParameters, initOverrides);
         return await response.value();
-    }
+    };
 
     /**
      */
@@ -980,7 +990,7 @@ export class DefaultApi extends runtime.BaseAPI {
     async getSemesters(requestParameters: GetSemestersRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetSemesters200Response> {
         const response = await this.getSemestersRaw(requestParameters, initOverrides);
         return await response.value();
-    }
+    };
 
     /**
      * list student by class
@@ -1017,7 +1027,7 @@ export class DefaultApi extends runtime.BaseAPI {
     async getStudentsByClassId(requestParameters: GetStudentsByClassIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetStudentsByClassId200Response> {
         const response = await this.getStudentsByClassIdRaw(requestParameters, initOverrides);
         return await response.value();
-    }
+    };
 
     /**
      */
@@ -1052,7 +1062,7 @@ export class DefaultApi extends runtime.BaseAPI {
     async getSubmissionResultBySubmissionId(requestParameters: GetSubmissionResultBySubmissionIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetSubmissionResultBySubmissionId200Response> {
         const response = await this.getSubmissionResultBySubmissionIdRaw(requestParameters, initOverrides);
         return await response.value();
-    }
+    };
 
     /**
      */
@@ -1069,14 +1079,14 @@ export class DefaultApi extends runtime.BaseAPI {
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => GetSupportedLanguages200ResponseFromJSON(jsonValue));
-    }
+    };
 
     /**
      */
     async getSupportedLanguages(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetSupportedLanguages200Response> {
         const response = await this.getSupportedLanguagesRaw(initOverrides);
         return await response.value();
-    }
+    };
 
     /**
      * get multi language testcase
@@ -1113,7 +1123,7 @@ export class DefaultApi extends runtime.BaseAPI {
     async getTestcasesByQuestionId(requestParameters: GetTestcasesByQuestionIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetTestcasesByQuestionId200Response> {
         const response = await this.getTestcasesByQuestionIdRaw(requestParameters, initOverrides);
         return await response.value();
-    }
+    };
 
     /**
      * get testcase
@@ -1150,7 +1160,7 @@ export class DefaultApi extends runtime.BaseAPI {
     async getUnitTestById(requestParameters: GetUnitTestByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetUnitTestById200Response> {
         const response = await this.getUnitTestByIdRaw(requestParameters, initOverrides);
         return await response.value();
-    }
+    };
 
     /**
      */
@@ -1167,13 +1177,13 @@ export class DefaultApi extends runtime.BaseAPI {
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);
-    }
+    };
 
     /**
      */
     async loginGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.loginGetRaw(initOverrides);
-    }
+    };
 
     /**
      */
@@ -1190,14 +1200,14 @@ export class DefaultApi extends runtime.BaseAPI {
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => PongFromJSON(jsonValue));
-    }
+    };
 
     /**
      */
     async pingGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Pong> {
         const response = await this.pingGetRaw(initOverrides);
         return await response.value();
-    }
+    };
 
     /**
      */
@@ -1232,7 +1242,7 @@ export class DefaultApi extends runtime.BaseAPI {
     async removeFile(requestParameters: RemoveFileRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
         const response = await this.removeFileRaw(requestParameters, initOverrides);
         return await response.value();
-    }
+    };
 
     /**
      * Delete TA from class
@@ -1265,7 +1275,7 @@ export class DefaultApi extends runtime.BaseAPI {
     async removeInstructorFromClass(requestParameters: RemoveInstructorFromClassRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
         const response = await this.removeInstructorFromClassRaw(requestParameters, initOverrides);
         return await response.value();
-    }
+    };
 
     /**
      * Delete student
@@ -1298,7 +1308,7 @@ export class DefaultApi extends runtime.BaseAPI {
     async removeStudentFromClass(requestParameters: RemoveStudentFromClassOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
         const response = await this.removeStudentFromClassRaw(requestParameters, initOverrides);
         return await response.value();
-    }
+    };
 
     /**
      */
@@ -1329,7 +1339,7 @@ export class DefaultApi extends runtime.BaseAPI {
     async requestGrade(requestParameters: RequestGradeOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
         const response = await this.requestGradeRaw(requestParameters, initOverrides);
         return await response.value();
-    }
+    };
 
     /**
      */
@@ -1360,7 +1370,7 @@ export class DefaultApi extends runtime.BaseAPI {
     async submitCode(requestParameters: SubmitCodeOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SubmitCode200Response> {
         const response = await this.submitCodeRaw(requestParameters, initOverrides);
         return await response.value();
-    }
+    };
 
     /**
      */
@@ -1380,14 +1390,87 @@ export class DefaultApi extends runtime.BaseAPI {
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => CallbackPost200ResponseFromJSON(jsonValue));
-    }
+    };
 
     /**
      */
     async testcallbackPost(requestParameters: TestcallbackPostOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CallbackPost200Response> {
         const response = await this.testcallbackPostRaw(requestParameters, initOverrides);
         return await response.value();
+    };
+
+    /**
+     * partially edit class information
+     */
+    async updateClassRaw(requestParameters: UpdateClassRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters['authentication'] != null) {
+            headerParameters['Authentication'] = String(requestParameters['authentication']);
+        }
+
+        const consumes: runtime.Consume[] = [
+            { contentType: 'multipart/form-data' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any; };
+        let useForm = false;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters['classId'] != null) {
+            formParams.append('ClassId', requestParameters['classId'] as any);
+        }
+
+        if (requestParameters['courseId'] != null) {
+            formParams.append('course_id', requestParameters['courseId'] as any);
+        }
+
+        if (requestParameters['name'] != null) {
+            formParams.append('name', requestParameters['name'] as any);
+        }
+
+        if (requestParameters['semester'] != null) {
+            formParams.append('semester', requestParameters['semester'] as any);
+        }
+
+        if (requestParameters['image'] != null) {
+            formParams.append('image', requestParameters['image'] as any);
+        }
+
+        if (requestParameters['students'] != null) {
+            formParams.append('students', requestParameters['students'] as any);
+        }
+
+        const response = await this.request({
+            path: `/class`,
+            method: 'PATCH',
+            headers: headerParameters,
+            query: queryParameters,
+            body: formParams,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse<any>(response);
     }
+
+    /**
+     * partially edit class information
+     */
+    async updateClass(requestParameters: UpdateClassRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+        const response = await this.updateClassRaw(requestParameters, initOverrides);
+        return await response.value();
+    };
 
     /**
      * edit lab
@@ -1420,6 +1503,7 @@ export class DefaultApi extends runtime.BaseAPI {
         }
 
         if (requestParameters['labData'] != null) {
+            // TODO: make this not
             console.warn("[api] updateLab spec is invalid");
             // formParams.append('lab_data', new Blob([JSON.stringify(objectToJSON(requestParameters['labData']))], { type: "application/json", }));
         }
@@ -1441,7 +1525,7 @@ export class DefaultApi extends runtime.BaseAPI {
     async updateLab(requestParameters: UpdateLabRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
         const response = await this.updateLabRaw(requestParameters, initOverrides);
         return await response.value();
-    }
+    };
 
     /**
      * Edit student info
@@ -1475,4 +1559,5 @@ export class DefaultApi extends runtime.BaseAPI {
         const response = await this.updateStudentInfoRaw(requestParameters, initOverrides);
         return await response.value();
     }
+
 }
