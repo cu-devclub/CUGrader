@@ -255,6 +255,50 @@ paths:
           $ref: '#/components/responses/ErrPermissionDecline'
         '500':
           $ref: '#/components/responses/ErrServerIssue'
+    patch:
+      summary: partially edit class information
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                ClassId:
+                  $ref: '#/components/schemas/ClassId'
+                course_id:
+                  description: course id according to reg cu
+                  type: integer
+                name:
+                  description: Name of class
+                  type: string
+                semester:
+                  description: Semester of class
+                  type: string
+                image:
+                  description: Class image file
+                  type: string
+                  format: binary
+                students:
+                  description: Student csv file
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Empty JSON
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '403':
+          $ref: '#/components/responses/ErrPermissionDecline'
+        '404':
+          $ref: '#/components/responses/ErrNotFound'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
   '/class/{ClassId}':
     parameters:
       - in: header
