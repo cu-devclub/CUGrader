@@ -31,7 +31,7 @@ export const FileTabs = observer(() => {
     addFile,
     renameFile,
     deleteFile,
-    setLanguage,
+    selectLanguage,
     activeLanguageId: selectedLanguageId,
   } = currentQuestionState;
 
@@ -79,7 +79,7 @@ export const FileTabs = observer(() => {
         <LanguageSelector
           supportedLanguages={currentQuestionState.question.languages}
           selectedLanguageId={selectedLanguageId}
-          onLanguageChange={setLanguage}
+          onLanguageChange={selectLanguage}
         />
         {files.map((file) => (
           <Tabs.Trigger
@@ -134,7 +134,7 @@ export const FileTabs = observer(() => {
             </div>
           </Tabs.Trigger>
         ))}
-        <button className="w-6 aspect-square flex items-center justify-center rounded hover:bg-accent" onClick={addFile}>
+        <button className="w-6 aspect-square flex items-center justify-center rounded hover:bg-accent" onClick={() => addFile()}>
           <PlusIcon className="size-3.5" />
         </button>
       </Tabs.List>
