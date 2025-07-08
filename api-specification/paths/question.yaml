@@ -1,0 +1,63 @@
+parameters:
+  - in: header
+    name: Authentication
+    schema:
+      $ref: "../components/schemas/WithJWT.yaml"
+servers:
+  - url: https://apicugrader.sittha.net/v1
+get:
+  summary: getting image with picture id
+  parameters:
+    - name: QuestionId
+      in: path
+      required: true
+      schema:
+        $ref: "../components/schemas/QuestionId.yaml"
+  responses:
+    "200":
+      description: question detail
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              number:
+                type: integer
+                description: question number
+              name:
+                type: string
+                description: question name
+              description:
+                type: string
+                description: markdown format
+              predefine:
+                type: string
+                description: predefine function
+              max_score:
+                type: integer
+              testcase:
+                type: integer
+                description: testcase_id primary key. null if multilanguage
+              secret_testcase:
+                type: integer
+                description: testcase_id primary key. null if multilanguage
+              submission:
+                type: object
+                properties:
+                  score:
+                    type: integer
+                  timestamp:
+                    type: string
+                    description: datetime
+                  submission_id:
+                    type: integer
+    "500":
+      $ref: '../components/responses/ErrServerIssue.yaml'
+    "400":
+      $ref: '../components/responses/ErrBadRequest.yaml'
+    "401":
+      $ref: '../components/responses/ErrUnauthorized.yaml'
+    "403":
+      $ref: '../components/responses/ErrPermissionDecline.yaml'
+    "404":
+      $ref: '../components/responses/ErrNotFound.yaml'

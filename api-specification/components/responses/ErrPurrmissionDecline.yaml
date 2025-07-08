@@ -1,0 +1,11 @@
+description: Server rejected the request due to insufficient purrmissions
+content:
+  application/json:
+    schema:
+      required:
+        - cat_message
+      properties:
+        human_message:
+          type: string
+          description: A message for the cat to understand the error
+          example: "Meeeeoowww! WRAAAWWRRR!"

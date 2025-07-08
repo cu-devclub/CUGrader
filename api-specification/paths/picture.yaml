@@ -1,0 +1,29 @@
+servers:
+  - url: https://apicugrader.sittha.net/v1
+summary: get
+get:
+  summary: getting image with picture id
+  parameters:
+    - name: PictureId
+      in: path
+      required: true
+      schema:
+        $ref: '../components/schemas/PictureId.yaml'
+  responses:
+    "200":
+      description: image file
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - content
+            properties:
+              content:
+                type: string
+                description: The image file in base64 format or a link to the image so you can use directly to <img>
+                example: "https://media.cnn.com/api/v1/images/stellar/prod/130604125005-rick-astley-video.jpg?q=x_0,y_152,h_720,w_1280,c_crop/h_653,w_1160/f_avif"
+    "500":
+      $ref: '../components/responses/ErrServerIssue.yaml'
+    "404":
+      $ref: '../components/responses/ErrNotFound.yaml'

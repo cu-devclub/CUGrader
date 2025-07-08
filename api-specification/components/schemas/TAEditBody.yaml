@@ -1,0 +1,10 @@
+type: object
+properties:
+  ClassId:
+    $ref: "./ClassId.yaml"
+  email:
+    description: TA's email
+    type: string
+required:
+  - "ClassId"
+  - "email"

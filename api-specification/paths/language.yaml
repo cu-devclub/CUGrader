@@ -1,0 +1,24 @@
+servers:
+  - url: https://apicugrader.sittha.net/v1
+get:
+  responses:
+    "200":
+      description: get list of language that system support
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              languages:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: language primary key
+                    name:
+                      type: string
+                      description: language name
+    "500":
+      $ref: '../components/responses/ErrServerIssue.yaml'

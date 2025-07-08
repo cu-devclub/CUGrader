@@ -1,0 +1,14 @@
+description: Server ran into an error while processing the request
+content:
+  application/json:
+    schema:
+      required:
+        - human_message
+        - debug_message
+      properties:
+        human_message:
+          type: string
+          description: A message for the user to understand the error
+        debug_message:
+          type: string
+          description: A message for developers to understand the error
