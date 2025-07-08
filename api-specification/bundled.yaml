@@ -260,6 +260,7 @@ paths:
         '500':
           $ref: '#/components/responses/ErrServerIssue'
     patch:
+      operationId: updateClass
       summary: partially edit class information
       requestBody:
         content:
