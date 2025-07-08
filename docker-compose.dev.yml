@@ -33,6 +33,19 @@ services:
         environment:
             - NODE_ENV=development
 
+    minio:
+        image: minio/minio:latest
+        ports:
+         - "8000:8000"
+         - "8001:8001"
+        environment:
+        MINIO_ROOT_USER: minioadmin
+        MINIO_ROOT_PASSWORD: miniopassword
+        volumes:
+         - ./volume:/data
+        command: server --address ":8001" --console-address ":8000" /data
+        restart: always
+
     yugabytedb:
         image: yugabytedb/yugabyte
         container_name: yugabyte
