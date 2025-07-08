@@ -13,119 +13,70 @@
  */
 
 
-import * as runtime from '../runtime';
 import type {
-  AddStudentToClassRequest,
-  CallbackPost200Response,
-  CallbackPost400Response,
-  CallbackPostRequest,
-  ClassObject,
-  GetCodeByQuestionId200Response,
-  GetExamPinByLabId200Response,
-  GetGroupsByClassId200Response,
-  GetInstructorsByClassId200Response,
-  GetLabById200Response,
-  GetLabsByClassId200ResponseInner,
-  GetNearDues200Response,
-  GetParticipatingClassBySemester200Response,
-  GetPictureById200Response,
-  GetPictureById404Response,
-  GetPictureById500Response,
-  GetQuestionById200Response,
-  GetSectionsByClassId200Response,
-  GetSemesters200Response,
-  GetSemesters401Response,
-  GetSemesters403Response,
-  GetStudentsByClassId200Response,
-  GetSubmissionResultBySubmissionId200Response,
-  GetSupportedLanguages200Response,
-  GetTestcasesByQuestionId200Response,
-  GetUnitTestById200Response,
-  LabEdit,
-  PingGet418Response,
-  Pong,
-  RemoveStudentFromClassRequest,
-  RequestGradeRequest,
-  SubmitCode200Response,
-  SubmitCodeRequest,
-  TAEditBody,
-  TestcallbackPostRequest,
-  UpdateStudentInfoRequest,
+    AddStudentToClassRequest,
+    CallbackPost200Response,
+    CallbackPostRequest,
+    ClassObject,
+    GetCodeByQuestionId200Response,
+    GetExamPinByLabId200Response,
+    GetGroupsByClassId200Response,
+    GetInstructorsByClassId200Response,
+    GetLabById200Response,
+    GetLabsByClassId200ResponseInner,
+    GetNearDues200Response,
+    GetParticipatingClassBySemester200Response,
+    GetPictureById200Response,
+    GetQuestionById200Response,
+    GetSectionsByClassId200Response,
+    GetSemesters200Response,
+    GetStudentsByClassId200Response,
+    GetSubmissionResultBySubmissionId200Response,
+    GetSupportedLanguages200Response,
+    GetTestcasesByQuestionId200Response,
+    GetUnitTestById200Response,
+    LabEdit,
+    Pong,
+    RemoveStudentFromClassRequest,
+    RequestGradeRequest,
+    SubmitCode200Response,
+    SubmitCodeRequest,
+    TAEditBody,
+    TestcallbackPostRequest,
+    UpdateStudentInfoRequest
 } from '../models/index';
 import {
-    AddStudentToClassRequestFromJSON,
     AddStudentToClassRequestToJSON,
     CallbackPost200ResponseFromJSON,
-    CallbackPost200ResponseToJSON,
-    CallbackPost400ResponseFromJSON,
-    CallbackPost400ResponseToJSON,
-    CallbackPostRequestFromJSON,
     CallbackPostRequestToJSON,
     ClassObjectFromJSON,
-    ClassObjectToJSON,
     GetCodeByQuestionId200ResponseFromJSON,
-    GetCodeByQuestionId200ResponseToJSON,
     GetExamPinByLabId200ResponseFromJSON,
-    GetExamPinByLabId200ResponseToJSON,
     GetGroupsByClassId200ResponseFromJSON,
-    GetGroupsByClassId200ResponseToJSON,
     GetInstructorsByClassId200ResponseFromJSON,
-    GetInstructorsByClassId200ResponseToJSON,
     GetLabById200ResponseFromJSON,
-    GetLabById200ResponseToJSON,
     GetLabsByClassId200ResponseInnerFromJSON,
-    GetLabsByClassId200ResponseInnerToJSON,
     GetNearDues200ResponseFromJSON,
-    GetNearDues200ResponseToJSON,
     GetParticipatingClassBySemester200ResponseFromJSON,
-    GetParticipatingClassBySemester200ResponseToJSON,
     GetPictureById200ResponseFromJSON,
-    GetPictureById200ResponseToJSON,
-    GetPictureById404ResponseFromJSON,
-    GetPictureById404ResponseToJSON,
-    GetPictureById500ResponseFromJSON,
-    GetPictureById500ResponseToJSON,
     GetQuestionById200ResponseFromJSON,
-    GetQuestionById200ResponseToJSON,
     GetSectionsByClassId200ResponseFromJSON,
-    GetSectionsByClassId200ResponseToJSON,
     GetSemesters200ResponseFromJSON,
-    GetSemesters200ResponseToJSON,
-    GetSemesters401ResponseFromJSON,
-    GetSemesters401ResponseToJSON,
-    GetSemesters403ResponseFromJSON,
-    GetSemesters403ResponseToJSON,
     GetStudentsByClassId200ResponseFromJSON,
-    GetStudentsByClassId200ResponseToJSON,
     GetSubmissionResultBySubmissionId200ResponseFromJSON,
-    GetSubmissionResultBySubmissionId200ResponseToJSON,
     GetSupportedLanguages200ResponseFromJSON,
-    GetSupportedLanguages200ResponseToJSON,
     GetTestcasesByQuestionId200ResponseFromJSON,
-    GetTestcasesByQuestionId200ResponseToJSON,
     GetUnitTestById200ResponseFromJSON,
-    GetUnitTestById200ResponseToJSON,
-    LabEditFromJSON,
-    LabEditToJSON,
-    PingGet418ResponseFromJSON,
-    PingGet418ResponseToJSON,
     PongFromJSON,
-    PongToJSON,
-    RemoveStudentFromClassRequestFromJSON,
     RemoveStudentFromClassRequestToJSON,
-    RequestGradeRequestFromJSON,
     RequestGradeRequestToJSON,
     SubmitCode200ResponseFromJSON,
-    SubmitCode200ResponseToJSON,
-    SubmitCodeRequestFromJSON,
     SubmitCodeRequestToJSON,
-    TAEditBodyFromJSON,
     TAEditBodyToJSON,
-    TestcallbackPostRequestFromJSON,
     TestcallbackPostRequestToJSON,
-    UpdateStudentInfoRequestFromJSON,
-    UpdateStudentInfoRequestToJSON,
+    UpdateStudentInfoRequestToJSON
 } from '../models/index';
+import * as runtime from '../runtime';
 
 export interface AddInstructorToClassRequest {
     authentication?: string;
@@ -443,7 +394,7 @@ export class DefaultApi extends runtime.BaseAPI {
         // @ts-ignore: canConsumeForm may be unused
         const canConsumeForm = runtime.canConsumeForm(consumes);
 
-        let formParams: { append(param: string, value: any): any };
+        let formParams: { append(param: string, value: any): any; };
         let useForm = false;
         // use FormData to transmit files using content-type "multipart/form-data"
         useForm = canConsumeForm;
@@ -512,7 +463,7 @@ export class DefaultApi extends runtime.BaseAPI {
         // @ts-ignore: canConsumeForm may be unused
         const canConsumeForm = runtime.canConsumeForm(consumes);
 
-        let formParams: { append(param: string, value: any): any };
+        let formParams: { append(param: string, value: any): any; };
         let useForm = false;
         if (useForm) {
             formParams = new FormData();
@@ -525,8 +476,10 @@ export class DefaultApi extends runtime.BaseAPI {
         }
 
         if (requestParameters['labData'] != null) {
-            formParams.append('lab_data', new Blob([JSON.stringify(objectToJSON(requestParameters['labData']))], { type: "application/json", }));
-                    }
+            // TODO: make this not
+            console.warn("[api] createLab spec is invalid");
+            // formParams.append('lab_data', new Blob([JSON.stringify(objectToJSON(requestParameters['labData']))], { type: "application/json", }));
+        }
 
         const response = await this.request({
             path: `/lab`,
@@ -1454,7 +1407,7 @@ export class DefaultApi extends runtime.BaseAPI {
         // @ts-ignore: canConsumeForm may be unused
         const canConsumeForm = runtime.canConsumeForm(consumes);
 
-        let formParams: { append(param: string, value: any): any };
+        let formParams: { append(param: string, value: any): any; };
         let useForm = false;
         if (useForm) {
             formParams = new FormData();
@@ -1467,8 +1420,9 @@ export class DefaultApi extends runtime.BaseAPI {
         }
 
         if (requestParameters['labData'] != null) {
-            formParams.append('lab_data', new Blob([JSON.stringify(objectToJSON(requestParameters['labData']))], { type: "application/json", }));
-                    }
+            console.warn("[api] updateLab spec is invalid");
+            // formParams.append('lab_data', new Blob([JSON.stringify(objectToJSON(requestParameters['labData']))], { type: "application/json", }));
+        }
 
         const response = await this.request({
             path: `/lab`,
@@ -1521,5 +1475,4 @@ export class DefaultApi extends runtime.BaseAPI {
         const response = await this.updateStudentInfoRaw(requestParameters, initOverrides);
         return await response.value();
     }
-
 }
