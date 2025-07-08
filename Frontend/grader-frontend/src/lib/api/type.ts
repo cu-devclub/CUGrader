@@ -222,7 +222,7 @@ export interface PublicTestcaseResult {
   input: string; // TODO: request output if ui need it
   expectedOutput: string | null; // ????
   message: string;
-  status: "pass" | "fail";
+  status: "pass" | "fail" | "pending";
 }
 
 export type SecretTestcaseResult = Omit<PublicTestcaseResult, "input" | "expectedOutput">;
