@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "openapi:generate-client": "openapi-generator-cli generate -i ../../openapi.yaml -g typescript-fetch -o ./src/lib/api/generated"
+    "openapi:generate-client": "openapi-generator-cli generate -i ../../api-specification/bundled.yaml -g typescript-fetch -o ./src/lib/api/generated"
   },
   "dependencies": {
     "@ant-design/nextjs-registry": "^1.0.2",
