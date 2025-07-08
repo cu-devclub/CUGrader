@@ -1,8 +1,10 @@
 import { api } from "@/lib/api";
-import { StudentAssignmentDetails, StudentQuestion, SubmissionResult, type Testcase } from "@/lib/api/type";
+import { StudentAssignmentDetails, StudentQuestion, SubmissionResult, type Testcase, type TestcaseResult } from "@/lib/api/type";
 import { Monaco } from "@monaco-editor/react";
 import { makeAutoObservable, reaction, runInAction, when } from "mobx";
 import { getMonacoLanguageId } from "./constant";
+import { sleep } from "@/lib/async";
+import { zip } from "@/lib/array";
 
 /**
  * Represents a single file (a tab) in the code editor.
@@ -26,38 +28,53 @@ interface LanguageFiles {
   activeFileId: string;
 }
 
-export interface SystemTestcase {
+export interface UiPublicTestcase {
   input: string;
   expectedOutput: string;
   output?: string;
   message?: string;
+  status: TestcaseResult | "not-start";
 }
 
+export interface UiSecretTestcase {
+  status: TestcaseResult;
+  message?: string;
+}
+
+// TODO: api for this
 export interface CustomTestcase {
   input: string;
+}
+
+export interface UiCustomTestcase extends CustomTestcase {
   output?: string;
 }
 
+// We are not going to persist thise, RECREATE ONLY
+// TODO: might do later tho
 export class QuestionState {
   cachedFiles: Map<LanguageId, LanguageFiles> = new Map();
   activeLanguageId!: number;
 
-  submissionResult: SubmissionResult | null;
+  private submissionResult: SubmissionResult | null;
   submissionStatus: "submitted" | "outdated" | "not-yet" = "not-yet"; // TODO: restore previous submission
   question: StudentQuestion;
   lab: StudentAssignmentDetails;
 
-  lastSubmissionId: number | null = null;
-  lastEdited: number | null = null;
-  lastSaved: number | null = null;
-  isSubmitting: boolean = false;
-  lastEditDebouncingTimeout: ReturnType<typeof setTimeout> | null = null;
-  startSavingTimestamp: number = 0;
+  private lastSubmissionId: number | null = null;
+  private lastEdited: number | null = null;
+  private lastSaved: number | null = null;
+  private isSubmitting: boolean = false;
+  private lastEditDebouncingTimeout: ReturnType<typeof setTimeout> | null = null;
+  private startSavingTimestamp: number = 0;
 
-  testcases: SystemTestcase[] = [];
-  customTestcases: CustomTestcase[] = [];
+  private publicTestcases: Testcase[] = [];
+  // testcases: SystemTestcase[] = [];
+  private customTestcases: UiCustomTestcase[] = [];
 
-  ready: Promise<void>;
+  ready: Promise<unknown>;
+
+  private disposables: (() => unknown)[] = [];
 
   monaco: Monaco;
 
@@ -71,10 +88,15 @@ export class QuestionState {
     makeAutoObservable(this);
 
     this.loadSubmission();
-    this.ready = when(() => !!this.activeFile);
+    this.startPolling();
+    // const loaded = this.loadTestcases();
 
+    this.ready = Promise.all([
+      when(() => !!this.activeFile),
+      // loaded
+    ]);
 
-    // TODO: think about disposing
+    // this is for throtling bruhhh
     const dispose = reaction(
       () => this.lastEdited,
       () => {
@@ -87,11 +109,23 @@ export class QuestionState {
       }
     );
 
+    this.disposables.push(dispose);
+  }
+
+  private async loadTestcases() {
+    const testcases = await api.testcase.listByQuestionId(this.question.id);
+    runInAction(() => {
+      this.publicTestcases = testcases.public.map(it => ({
+        input: it.input,
+        expectedOutput: it.expectedOutput,
+      }));
+    });
   }
 
   private async loadSubmission() {
     const submission = await api.questions.getSubmission(this.question.id);
     if (!submission) {
+      // use defualt
       return;
     }
 
@@ -111,8 +145,32 @@ export class QuestionState {
     });
   }
 
-  private async pollResult() {
+  private startPolling() {
+    const { promise, resolve } = Promise.withResolvers<void>();
+    // fuck, race condition, should i pull in rxjs
+    this.poll(resolve);
+    return promise;
+  }
 
+  private async poll(onFirstResolve: () => unknown) {
+    let stopped = false;
+    let resolved = false;
+    this.disposables.push(() => stopped = true);
+    while (!stopped) {
+      if (this.lastSubmissionId) {
+        const result = await api.questions.getSubmissionResult(this.lastSubmissionId);
+
+        runInAction(() => {
+          this.submissionResult = result;
+        });
+      }
+
+      await sleep(2000);
+
+      if (!resolved) {
+        onFirstResolve();
+      }
+    }
   }
 
   private get activeLanguageFiles() {
@@ -151,6 +209,32 @@ export class QuestionState {
 
   private get isSaved() {
     return this.lastEdited === null || (this.lastSaved !== null && this.lastSaved >= this.lastEdited);
+  }
+
+  get uiPublicTestcases(): UiPublicTestcase[] {
+    if (!this.submissionResult) {
+      return this.publicTestcases.map(it => ({
+        input: it.input,
+        expectedOutput: it.expectedOutput,
+        status: "not-start" as const,
+      }));
+    }
+    
+    if (this.publicTestcases.length !== this.submissionResult?.public.length) {
+      console.log(this.publicTestcases, this.submissionResult.public)
+      throw new Error("what");
+    }
+    // we match these based on index because we only have that
+    return zip(this.submissionResult.public, this.publicTestcases)
+      .map(([result, testcase]) => {
+        return {
+          expectedOutput: testcase.expectedOutput,
+          input: testcase.input,
+          status: result.status,
+          message: result.message,
+          output: result.message
+        };
+      });
   }
 
   selectFile = (fileId: string) => {
@@ -197,7 +281,7 @@ export class QuestionState {
     }
   };
 
-  get pathPrefix() {
+  private get pathPrefix() {
     return `/${this.lab.id}/${this.question.id}/${this.activeLanguageId}`;
   }
 
@@ -273,6 +357,10 @@ export class QuestionState {
       }));
   };
 
+  dispose() {
+    this.disposables.forEach(fn => fn());
+  }
+
   // Methods from AssignmentEditorStore
   private disposeModel = (fileName: string) => {
     if (!this.monaco) return;
@@ -280,10 +368,6 @@ export class QuestionState {
     if (model) {
       model.dispose();
     }
-  };
-
-  private disposeModels = () => {
-    this.monaco.editor.getModels().forEach(it => it.dispose());
   };
 
   get activeModel() {
@@ -318,7 +402,11 @@ export class QuestionState {
       model.dispose();
     }
 
-    main?.setValue(this.question.template);
+    if (!main) {
+      throw new Error("Main file not founded");
+    }
+
+    main.setValue(this.question.template);
     this.activeLanguageFiles.files = this.activeLanguageFiles.files.filter(it => it.id === mainId);
   };
 
@@ -327,11 +415,13 @@ export class QuestionState {
       await this.save();
       return;
     }
+
+    // TODO: We need to submit custom testcase somehow 
     await api.questions.requestGrade(this.lastSubmissionId);
   };
 
   addCustomTestcase = (input: string) => {
-    const newTestcase: CustomTestcase = {
+    const newTestcase: UiCustomTestcase = {
       input,
       output: undefined
     };
@@ -360,14 +450,15 @@ export class CodeSpaceStore {
   private monaco!: Monaco;
 
   constructor(lab: StudentAssignmentDetails) {
-    makeAutoObservable(this);
+    
     this.lab = lab;
     if (lab.questions.length > 0) {
-      // Initialize with the first question
       this.selectQuestion(lab.questions[0].id);
     } else {
       console.error("No questions found for this assignment");
     }
+
+    makeAutoObservable(this);
   }
 
   setMonaco = (monaco: Monaco) => {
@@ -395,6 +486,10 @@ export class CodeSpaceStore {
 
   // TODO: wait until saved or show a dialog
   selectQuestion = (questionId: number) => {
+    // TODO: this is not working in prod for some fucking reason
+    console.log(`Select question ${questionId}`);
+    // this.currentQuestionState.dispose();
+
     const existing = this.cachedQuestionStates.get(questionId);
     if (existing) {
       this.currentQuestionState = existing;

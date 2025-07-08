@@ -8,7 +8,7 @@ import { Check, ChevronsDown, CircleCheck, LockIcon, Plus, Terminal, X } from "l
 import { observer } from "mobx-react-lite";
 import Markdown from 'react-markdown';
 import { useCodeSpaceStore } from "./data";
-import type { CustomTestcase, SystemTestcase } from "./data/store";
+import type { UiCustomTestcase, UiPublicTestcase } from "./data/store";
 import { QuestionPagination } from "./shared";
 
 // TODO: file downloading
@@ -55,7 +55,6 @@ export const DetailPanel = observer(() => {
 });
 
 export const BottomPanelContent = observer(() => {
-
   return (
     <Tabs.Root defaultValue="testcase" className="h-full flex flex-col">
       <Tabs.List className="text-xs border-b p-0.75 flex gap-1">
@@ -88,7 +87,7 @@ export const BottomPanelContent = observer(() => {
 const TestcaseList = observer(() => {
   const store = useCodeSpaceStore();
   const { currentQuestionState } = store;
-  const testcases: SystemTestcase[] = currentQuestionState.testcases;
+  const testcases: UiPublicTestcase[] = currentQuestionState.uiPublicTestcases;
 
   return (
     <Tabs.Root defaultValue="0" className="h-full flex flex-col">
@@ -218,7 +217,7 @@ const TestcaseList = observer(() => {
 const CustomTestcaseList = observer(() => {
   const store = useCodeSpaceStore();
   const { currentQuestionState } = store;
-  const testcases: CustomTestcase[] = currentQuestionState.customTestcases;
+  const testcases: UiCustomTestcase[] = currentQuestionState.customTestcases;
 
   const handleRemove = (index: number) => {
     currentQuestionState.removeCustomTestcase(index);

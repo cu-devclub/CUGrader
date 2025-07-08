@@ -56,7 +56,7 @@ export interface LabNotification {
 
 export interface Testcase {
   input: string;
-  output: string;
+  expectedOutput: string;
 }
 
 // TODO: map this to api type
@@ -230,11 +230,13 @@ export interface SubmissionResult {
   secret: SecretTestcaseResult[];
 }
 
+export type TestcaseResult = "pass" | "fail" | "pending";
+
 export interface PublicTestcaseResult {
   input: string; // TODO: request output if ui need it
-  expectedOutput: string | null; // ????
+  output: string | null; // ????
   message: string;
-  status: "pass" | "fail" | "pending";
+  status: TestcaseResult;
 }
 
 export type SecretTestcaseResult = Omit<

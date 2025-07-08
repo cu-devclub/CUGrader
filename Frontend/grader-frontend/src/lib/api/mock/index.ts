@@ -479,7 +479,7 @@ function createClient(persistence: Storage<Database>): APIClient {
           public: [
             {
               input: "test input",
-              expectedOutput: "expected output",
+              output: "output",
               message: "Test passed",
               status: "pass" as const
             }
@@ -546,8 +546,8 @@ function createClient(persistence: Storage<Database>): APIClient {
       listByQuestionId: async (questionId: number) => {
         const question = questions.find(q => q.id === questionId);
         return {
-          public: question?.testcases || [{ input: "public in", output: "public out" }],
-          secret: question?.secretTestCases || [{ input: "secret in", output: "secret out" }],
+          public: question?.testcases || [{ input: "public in", expectedOutput: "public out" }],
+          secret: question?.secretTestCases || [{ input: "secret in", expectedOutput: "secret out" }],
         };
       }
     }
