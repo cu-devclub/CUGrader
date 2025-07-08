@@ -127,15 +127,15 @@ export function createClient() {
         });
       },
       update: async (classId: number, { courseId, image, name, semester, students }: UpdateClassPayload) => {
-        unimplemented("หาย");
-        // await generatedClient.classPatch({
-        //   classId,
-        //   courseId: courseId ? parseInt(courseId) : undefined,
-        //   image,
-        //   name,
-        //   semester,
-        //   students
-        // });
+        // unimplemented("หาย");
+        await generatedClient.updateClass({
+          classId,
+          courseId: courseId ? parseInt(courseId) : undefined,
+          image,
+          name,
+          semester,
+          students
+        });
       },
     },
     sections: {
