@@ -1,29 +1,32 @@
 import { parseDateTime } from "@internationalized/date";
-import { ClassObject, Configuration, DefaultApi } from "./generated";
-import { LabsClassIdGet200ResponseInnerStatusEnum } from "./generated/models/LabsClassIdGet200ResponseInner";
-import { APIClient, AssignmentStatus, Class, CreateAssignmentPayload, CreateClassPayload, CreateStudentPayload, Instructor, InstructorAssignment, InstructorAssignmentDetails, InstructorQuestion, NearDueAssignment, Semester, Student, StudentAssignment, StudentAssignmentDetails, UpdateAssignmentPayload, UpdateClassPayload, UpdateStudentPayload } from "./type";
 import { getCookie } from "cookies-next/client";
+import { unimplemented } from "../utils";
+import { ClassObject, Configuration, DefaultApi, GetLabsByClassId200ResponseInnerStatusEnum } from "./generated";
+import { APIClient, AssignmentStatus, Class, CreateAssignmentPayload, CreateClassPayload, CreateStudentPayload, Instructor, InstructorAssignment, InstructorAssignmentDetails, InstructorQuestion, NearDueAssignment, Semester, Student, StudentAssignment, StudentAssignmentDetails, UpdateAssignmentPayload, UpdateClassPayload, UpdateStudentPayload } from "./type";
 
 function toClass(input: ClassObject): Class {
   return {
     classId: input.classId!,
     courseId: String(input.courseId!),
     courseName: input.courseName!,
-    imageUrl: input.image
+    get imageUrl() {
+      return unimplemented("TODO: wait i need to fetch again????");
+    },
+    set imageUrl(_) { }
   };
 }
 
-function toStatus(status: LabsClassIdGet200ResponseInnerStatusEnum | undefined): AssignmentStatus {
+function toStatus(status: GetLabsByClassId200ResponseInnerStatusEnum | undefined): AssignmentStatus {
   switch (status) {
-    case LabsClassIdGet200ResponseInnerStatusEnum.New:
+    case GetLabsByClassId200ResponseInnerStatusEnum.New:
       return "new";
-    case LabsClassIdGet200ResponseInnerStatusEnum.PartialComplete:
+    case GetLabsByClassId200ResponseInnerStatusEnum.PartialComplete:
       return "partially-completed";
-    case LabsClassIdGet200ResponseInnerStatusEnum.Complete:
+    case GetLabsByClassId200ResponseInnerStatusEnum.Complete:
       return "completed";
-    case LabsClassIdGet200ResponseInnerStatusEnum.Late:
+    case GetLabsByClassId200ResponseInnerStatusEnum.Late:
       return "lated";
-    case LabsClassIdGet200ResponseInnerStatusEnum.DueSoon:
+    case GetLabsByClassId200ResponseInnerStatusEnum.DueSoon:
       return "due-soon";
     default:
       return "new";
@@ -44,8 +47,8 @@ export function createClient() {
   const client: APIClient = {
     students: {
       addToClass: async (classId: number, { email, section, group }: CreateStudentPayload) => {
-        await generatedClient.studentPost({
-          createStudent: {
+        await generatedClient.addStudentToClass({
+          addStudentToClassRequest: {
             classId,
             email,
             section,
@@ -54,7 +57,7 @@ export function createClient() {
         });
       },
       listByClass: async (classId: number) => {
-        const { students } = await generatedClient.studentClassIdGet({ classId });
+        const { students } = await generatedClient.getStudentsByClassId({ classId });
         return students?.map(it => ({
           studentId: it.studentId!,
           name: it.name!,
@@ -67,16 +70,16 @@ export function createClient() {
         } satisfies Student)) ?? [];
       },
       removeFromClass: async (classId: number, studentId: string) => {
-        await generatedClient.studentDelete({
-          deleteStudent: {
+        await generatedClient.removeStudentFromClass({
+          removeStudentFromClassRequest: {
             classId,
             studentId
           }
         });
       },
       update: async (classId: number, studentId: string, { withdrawed, group, section }: UpdateStudentPayload) => {
-        await generatedClient.studentPatch({
-          editStudent: {
+        await generatedClient.updateStudentInfo({
+          updateStudentInfoRequest: {
             classId,
             studentId,
             group,
@@ -90,8 +93,8 @@ export function createClient() {
         // TODO: async queue maybe
         await Promise.all(
           studentIds.map(studentId =>
-            generatedClient.studentPatch({
-              editStudent: {
+            generatedClient.updateStudentInfo({
+              updateStudentInfoRequest: {
                 classId,
                 studentId,
                 group: data.group,
@@ -105,17 +108,17 @@ export function createClient() {
     },
     classes: {
       getById: async (classId: number) => {
-        const c = await generatedClient.classClassIdGet({ classId });
+        const c = await generatedClient.getClassById({ classId });
         return toClass(c);
       },
       listParticipatingBySemester: async (semester: Semester) => {
-        const { assistant, study } = await generatedClient.classesClassesYearSemesterGet({ yearSemester: semester }); return {
+        const { assistant, study } = await generatedClient.getParticipatingClassBySemester({ yearSemester: semester }); return {
           assisting: assistant?.map(toClass) ?? [],
           studying: study?.map(toClass) ?? []
         };
       },
       create: async ({ courseId, name, semester, image, students }: CreateClassPayload) => {
-        await generatedClient.classPost({
+        await generatedClient.createClass({
           courseId: parseInt(courseId),
           name,
           semester,
@@ -124,32 +127,33 @@ export function createClient() {
         });
       },
       update: async (classId: number, { courseId, image, name, semester, students }: UpdateClassPayload) => {
-        await generatedClient.classPatch({
-          classId,
-          courseId: courseId ? parseInt(courseId) : undefined,
-          image,
-          name,
-          semester,
-          students
-        });
+        unimplemented("หาย");
+        // await generatedClient.classPatch({
+        //   classId,
+        //   courseId: courseId ? parseInt(courseId) : undefined,
+        //   image,
+        //   name,
+        //   semester,
+        //   students
+        // });
       },
     },
     sections: {
       getByClass: async (classId: number) => {
-        const { sections } = await generatedClient.sectionClassIdGet({ classId });
+        const { sections } = await generatedClient.getSectionsByClassId({ classId });
         return sections ?? [];
       }
     },
     semesters: {
       list: async () => {
-        const { semesters } = await generatedClient.classesSemestersGet();
+        const { semesters } = await generatedClient.getSemesters();
         // TODO: validate formatting
         return (semesters ?? []) as Semester[];
       },
     },
     instructorsAndTAs: {
       listByClass: async (classId: number) => {
-        const { assistant, instructor } = await generatedClient.tAClassIdGet({ classId }); return {
+        const { assistant, instructor } = await generatedClient.getInstructorsByClassId({ classId }); return {
           instructors: instructor?.map(it => ({
             name: it.name!,
             imageUrl: it.picture,
@@ -164,16 +168,16 @@ export function createClient() {
         };
       },
       addToClass: async (classId: number, email: string) => {
-        await generatedClient.tAPost({
-          tAeditBody: {
+        await generatedClient.addInstructorToClass({
+          tAEditBody: {
             classId,
             email
           }
         });
       },
       removeFromClass: async (classId: number, email: string) => {
-        await generatedClient.tADelete({
-          tAeditBody: {
+        await generatedClient.removeInstructorFromClass({
+          tAEditBody: {
             classId,
             email
           }
@@ -182,7 +186,7 @@ export function createClient() {
     },
     assignments: {
       listNearDue: async () => {
-        const { labs } = await generatedClient.nearDueDateGet(); return labs?.map(it => ({
+        const { labs } = await generatedClient.getNearDues(); return labs?.map(it => ({
           id: it.labId!,
           due: parseDateTime(it.labDue!),
           name: it.labName!,
@@ -194,7 +198,7 @@ export function createClient() {
       },
 
       listByClass: async (classId: number) => {
-        const labs = await generatedClient.labsClassIdGet({ classId });
+        const labs = await generatedClient.getLabsByClassId({ classId });
         return labs.map((lab) => ({
           id: lab.labId!,
           name: lab.labName!,
@@ -207,7 +211,7 @@ export function createClient() {
       },
 
       listByClassI: async (classId: number) => {
-        const labs = await generatedClient.labsClassIdGet({ classId });
+        const labs = await generatedClient.getLabsByClassId({ classId });
         return labs.map((lab) => {
           return {
             id: lab.labId!,
@@ -220,7 +224,7 @@ export function createClient() {
       },
 
       create: async (classId: number, p: CreateAssignmentPayload) => {
-        await generatedClient.labPost({
+        await generatedClient.createLab({
           classId,
           labData: {
             assignTo: p.assignedGroupIds,
@@ -246,7 +250,7 @@ export function createClient() {
       },
 
       update: async (labId: number, p: UpdateAssignmentPayload) => {
-        await generatedClient.labPatch({
+        await generatedClient.updateLab({
           labId,
           labData: {
             assignTo: p.assignedGroupIds,
@@ -268,7 +272,7 @@ export function createClient() {
         });
       },
       getById: async (labId: number) => {
-        const lab = await generatedClient.labLabIdGet({ labId });
+        const lab = await generatedClient.getLabById({ labId });
 
         const questionPromises = (lab.questionIds ?? []).map(async questionId => client.questions.getById(questionId));
         const questions = await Promise.all(questionPromises);
@@ -297,7 +301,7 @@ export function createClient() {
       getByIdI: async (labId: number) => {
         // TODO: refactor this to avoid code duplication
         const [lab, examPin] = await Promise.all([
-          generatedClient.labLabIdGet({ labId }),
+          generatedClient.getLabById({ labId }),
           client.examPin.getByAssignmentId(labId),
         ]);
 
@@ -332,20 +336,20 @@ export function createClient() {
       },
 
       downloadFile: async (fileId: number) => {
-        const c = await generatedClient.addfileAddfileIdGet({ addfileId: fileId });
+        const c = await generatedClient.getFileById({ addFileId: fileId });
         return c;
       },
 
       removeFile: async (fileId: number) => {
-        await generatedClient.addfileAddfileIdDelete({
-          addfileId: fileId
+        await generatedClient.removeFile({
+          addFileId: fileId
         });
       },
     },
 
     questions: {
       getById: async (questionId: number) => {
-        const q = await generatedClient.questionQuestionIdGet({ questionId });
+        const q = await generatedClient.getQuestionById({ questionId });
 
         return {
           id: questionId,
@@ -386,7 +390,7 @@ export function createClient() {
       },
 
       async getSubmission(questionId) {
-        const submission = await generatedClient.codeQuestionIdGet({ questionId });
+        const submission = await generatedClient.getCodeByQuestionId({ questionId });
         return {
           language: {
             id: submission.language!.id!,
@@ -401,8 +405,8 @@ export function createClient() {
       },
 
       async submit(questionId, languageId, codes) {
-        const { submissionId } = await generatedClient.codePost({
-          codePostRequest: {
+        const { submissionId } = await generatedClient.submitCode({
+          submitCodeRequest: {
             questionId,
             code: codes.map(it => ({
               pageName: it.pageName,
@@ -412,11 +416,11 @@ export function createClient() {
           }
         });
 
-        return { submissionId };
+        return { submissionId: submissionId! };
       },
 
       async getSubmissionResult(submissionId) {
-        const { normal, secret } = await generatedClient.resultSubmissionIdGet({ submissionId });
+        const { normal, secret } = await generatedClient.getSubmissionResultBySubmissionId({ submissionId });
         return {
           public: normal?.map(it => ({
             input: it.input!,
@@ -437,31 +441,35 @@ export function createClient() {
     },
     supportedLanguages: {
       list: async () => {
-        const response = await generatedClient.languageGet();
+        const response = await generatedClient.getSupportedLanguages();
         return response.languages?.map(lang => ({ id: lang.id!, name: lang.name! })) || [];
       },
     },
     groups: {
       listByClassId: async (classId: number) => {
-        const response = await generatedClient.groupClassIdGet({ classId });
-        return response || [];
+        const { groups } = await generatedClient.getGroupsByClassId({ classId });
+        return groups || [];
       },
     },
     examPin: {
-      async getByAssignmentId(assignmentId) {
-        const { examPin } = await generatedClient.examPinLabIdGet({ labId: assignmentId });
+      async getByAssignmentId(labId) {
+        const { examPin } = await generatedClient.getExamPinByLabId({ labId });
         return String(examPin);
       },
     },
     testCode: {
-      async getById(testCodeId) {
-        const { testcase } = await generatedClient.testcaseTestcaseIdGet({ testcaseId: testCodeId });
-        return testcase!;
+      async getById(id) {
+        const { testcase } = await generatedClient.getUnitTestById({ testCaseId: id });
+        if (!testcase) {
+          throw new Error("what");
+        }
+        return testcase;
       },
     },
     testcase: {
       async listByQuestionId(questionId) {
-        const { secretTestcase, testcase } = await generatedClient.multilangTestcaseQuestionIdGet({ questionId }); return {
+        const { secretTestcase, testcase } = await generatedClient.getTestcasesByQuestionId({ questionId });
+        return {
           public: testcase?.map(it => ({ input: it.input!, output: it.output! })) ?? [],
           secret: secretTestcase?.map(it => ({ input: it.input!, output: it.output! })) ?? []
         };
