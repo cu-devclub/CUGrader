@@ -2,6 +2,7 @@ servers:
   - url: https://apicugrader.sittha.net/v1
 summary: get
 get:
+  operationId: getPictureById
   summary: getting image with picture id
   parameters:
     - name: PictureId
@@ -21,6 +22,7 @@ get:
             properties:
               content:
                 type: string
+                # TODO: WTF
                 description: The image file in base64 format or a link to the image so you can use directly to <img>
                 example: "https://media.cnn.com/api/v1/images/stellar/prod/130604125005-rick-astley-video.jpg?q=x_0,y_152,h_720,w_1280,c_crop/h_653,w_1160/f_avif"
     "500":

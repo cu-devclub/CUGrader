@@ -6,6 +6,7 @@ parameters:
 servers:
   - url: https://apicugrader.sittha.net/v1
 post:
+  operationId: addInstructorToClass
   summary: Add TA to class
   requestBody:
     content:
@@ -28,6 +29,7 @@ post:
 
 delete:
   summary: Delete TA from class
+  operationId: removeInstructorFromClass
   requestBody:
     content:
       application/json:

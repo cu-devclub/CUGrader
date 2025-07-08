@@ -7,6 +7,7 @@ servers:
   - url: https://apicugrader.sittha.net/v1
 post:
   summary: Insert student
+  operationId: addStudentToClass
   requestBody:
     content:
       application/json:
@@ -36,13 +37,14 @@ post:
           schema:
             type: object
     "400":
-      $ref: '../components/responses/ErrBadRequest.yaml'
+      $ref: "../components/responses/ErrBadRequest.yaml"
     "401":
-      $ref: '../components/responses/ErrUnauthorized.yaml'
+      $ref: "../components/responses/ErrUnauthorized.yaml"
     "500":
-      $ref: '../components/responses/ErrServerIssue.yaml'
+      $ref: "../components/responses/ErrServerIssue.yaml"
 
 delete:
+  operationId: removeStudentFromClass
   summary: Delete student
   requestBody:
     content:
@@ -66,15 +68,16 @@ delete:
           schema:
             type: object
     "500":
-      $ref: '../components/responses/ErrServerIssue.yaml'
+      $ref: "../components/responses/ErrServerIssue.yaml"
     "400":
-      $ref: '../components/responses/ErrBadRequest.yaml'
+      $ref: "../components/responses/ErrBadRequest.yaml"
     "401":
-      $ref: '../components/responses/ErrUnauthorized.yaml'
+      $ref: "../components/responses/ErrUnauthorized.yaml"
     "404":
-      $ref: '../components/responses/ErrNotFound.yaml'
+      $ref: "../components/responses/ErrNotFound.yaml"
 
 patch:
+  operationId: updateStudentInfo
   summary: Edit student info
   requestBody:
     content:
@@ -107,12 +110,12 @@ patch:
           schema:
             type: object
     "500":
-      $ref: '../components/responses/ErrServerIssue.yaml'
+      $ref: "../components/responses/ErrServerIssue.yaml"
     "400":
-      $ref: '../components/responses/ErrBadRequest.yaml'
+      $ref: "../components/responses/ErrBadRequest.yaml"
     "401":
-      $ref: '../components/responses/ErrUnauthorized.yaml'
+      $ref: "../components/responses/ErrUnauthorized.yaml"
     "403":
-      $ref: '../components/responses/ErrPermissionDecline.yaml'
+      $ref: "../components/responses/ErrPermissionDecline.yaml"
     "404":
-      $ref: '../components/responses/ErrNotFound.yaml'
+      $ref: "../components/responses/ErrNotFound.yaml"

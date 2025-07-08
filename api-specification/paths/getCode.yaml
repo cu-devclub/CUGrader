@@ -6,6 +6,7 @@ parameters:
 servers:
   - url: https://apicugrader.sittha.net/v1
 get:
+  operationId: getCodeByQuestionId
   parameters:
     - name: QuestionId
       in: path

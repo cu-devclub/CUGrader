@@ -6,6 +6,7 @@ parameters:
 servers:
   - url: https://apicugrader.sittha.net/v1
 get:
+  operationId: getSubmissionResultBySubmissionId
   parameters:
     - name: SubmissionId
       in: path
@@ -54,12 +55,12 @@ get:
                         - "pass"
                         - "pending"
     "500":
-      $ref: '../components/responses/ErrServerIssue.yaml'
+      $ref: "../components/responses/ErrServerIssue.yaml"
     "400":
-      $ref: '../components/responses/ErrBadRequest.yaml'
+      $ref: "../components/responses/ErrBadRequest.yaml"
     "401":
-      $ref: '../components/responses/ErrUnauthorized.yaml'
+      $ref: "../components/responses/ErrUnauthorized.yaml"
     "403":
-      $ref: '../components/responses/ErrPermissionDecline.yaml'
+      $ref: "../components/responses/ErrPermissionDecline.yaml"
     "404":
-      $ref: '../components/responses/ErrNotFound.yaml'
+      $ref: "../components/responses/ErrNotFound.yaml"

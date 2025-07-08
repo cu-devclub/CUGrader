@@ -1,6 +1,7 @@
 servers:
   - url: https://apicugrader.sittha.net/v1
 get:
+  operationId: getSupportedLanguages
   responses:
     "200":
       description: get list of language that system support
@@ -21,4 +22,4 @@ get:
                       type: string
                       description: language name
     "500":
-      $ref: '../components/responses/ErrServerIssue.yaml'
+      $ref: "../components/responses/ErrServerIssue.yaml"

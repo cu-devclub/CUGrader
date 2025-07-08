@@ -22,6 +22,7 @@ paths:
       - url: 'https://apicugrader.sittha.net/v1'
     summary: get
     get:
+      operationId: getPictureById
       summary: getting image with picture id
       parameters:
         - name: PictureId
@@ -142,6 +143,7 @@ paths:
       - url: 'https://apicugrader.sittha.net/v1'
     summary: List of year-semester
     get:
+      operationId: getSemesters
       responses:
         '200':
           description: List year-semester
@@ -172,6 +174,7 @@ paths:
       - url: 'https://apicugrader.sittha.net/v1'
     summary: List of class in year-semester
     get:
+      operationId: getParticipatingClassBySemester
       parameters:
         - name: year-semester
           description: The unique identifier of the class
@@ -213,6 +216,7 @@ paths:
       - url: 'https://apicugrader.sittha.net/v1'
     post:
       summary: Create class
+      operationId: createClass
       requestBody:
         content:
           multipart/form-data:
@@ -308,6 +312,7 @@ paths:
     servers:
       - url: 'https://apicugrader.sittha.net/v1'
     get:
+      operationId: getClassById
       parameters:
         - name: ClassId
           in: path
@@ -340,6 +345,7 @@ paths:
     servers:
       - url: 'https://apicugrader.sittha.net/v1'
     get:
+      operationId: getSectionsByClassId
       parameters:
         - name: ClassId
           in: path
@@ -380,6 +386,7 @@ paths:
     servers:
       - url: 'https://apicugrader.sittha.net/v1'
     get:
+      operationId: getGroupsByClassId
       parameters:
         - name: ClassId
           in: path
@@ -419,6 +426,7 @@ paths:
       - url: 'https://apicugrader.sittha.net/v1'
     post:
       summary: Insert student
+      operationId: addStudentToClass
       requestBody:
         content:
           application/json:
@@ -454,6 +462,7 @@ paths:
         '500':
           $ref: '#/components/responses/ErrServerIssue'
     delete:
+      operationId: removeStudentFromClass
       summary: Delete student
       requestBody:
         content:
@@ -485,6 +494,7 @@ paths:
         '500':
           $ref: '#/components/responses/ErrServerIssue'
     patch:
+      operationId: updateStudentInfo
       summary: Edit student info
       requestBody:
         content:
@@ -535,6 +545,7 @@ paths:
     servers:
       - url: 'https://apicugrader.sittha.net/v1'
     get:
+      operationId: getStudentsByClassId
       summary: list student by class
       parameters:
         - name: ClassId
@@ -603,6 +614,7 @@ paths:
     servers:
       - url: 'https://apicugrader.sittha.net/v1'
     post:
+      operationId: addInstructorToClass
       summary: Add TA to class
       requestBody:
         content:
@@ -624,6 +636,7 @@ paths:
           $ref: '#/components/responses/ErrServerIssue'
     delete:
       summary: Delete TA from class
+      operationId: removeInstructorFromClass
       requestBody:
         content:
           application/json:
@@ -655,6 +668,7 @@ paths:
     servers:
       - url: 'https://apicugrader.sittha.net/v1'
     get:
+      operationId: getInstructorsByClassId
       summary: list ta and instructor by class
       parameters:
         - name: ClassId
@@ -729,6 +743,7 @@ paths:
       - url: 'https://apicugrader.sittha.net/v1'
     summary: get nearly unsubmit due date lab
     get:
+      operationId: getNearDues
       responses:
         '200':
           description: json of labs array
@@ -771,6 +786,7 @@ paths:
     servers:
       - url: 'https://apicugrader.sittha.net/v1'
     post:
+      operationId: createLab
       summary: create lab
       requestBody:
         description: required all
@@ -797,6 +813,7 @@ paths:
           $ref: '#/components/responses/ErrServerIssue'
     patch:
       summary: edit lab
+      operationId: updateLab
       requestBody:
         content:
           multipart/form-data:
@@ -832,6 +849,7 @@ paths:
     servers:
       - url: 'https://apicugrader.sittha.net/v1'
     get:
+      operationId: getLabsByClassId
       parameters:
         - name: ClassId
           in: path
@@ -891,6 +909,7 @@ paths:
     servers:
       - url: 'https://apicugrader.sittha.net/v1'
     get:
+      operationId: getLabById
       summary: lab detail
       parameters:
         - name: LabId
@@ -970,6 +989,7 @@ paths:
     servers:
       - url: 'https://apicugrader.sittha.net/v1'
     get:
+      operationId: getFileById
       parameters:
         - name: AddFileId
           in: path
@@ -995,6 +1015,7 @@ paths:
         '500':
           $ref: '#/components/responses/ErrServerIssue'
     delete:
+      operationId: removeFile
       parameters:
         - name: AddFileId
           in: path
@@ -1027,6 +1048,7 @@ paths:
     servers:
       - url: 'https://apicugrader.sittha.net/v1'
     get:
+      operationId: getQuestionById
       summary: getting image with picture id
       parameters:
         - name: QuestionId
@@ -1091,6 +1113,7 @@ paths:
     servers:
       - url: 'https://apicugrader.sittha.net/v1'
     get:
+      operationId: getExamPinByLabId
       summary: get exam pin
       parameters:
         - name: LabId
@@ -1127,6 +1150,7 @@ paths:
         schema:
           $ref: '#/components/schemas/WithJWT'
     get:
+      operationId: getUnitTestById
       summary: get testcase
       parameters:
         - name: TestCaseId
@@ -1163,6 +1187,7 @@ paths:
     servers:
       - url: 'https://apicugrader.sittha.net/v1'
     get:
+      operationId: getTestcasesByQuestionId
       summary: get multi language testcase
       parameters:
         - name: QuestionId
@@ -1215,6 +1240,7 @@ paths:
     servers:
       - url: 'https://apicugrader.sittha.net/v1'
     post:
+      operationId: submitCode
       requestBody:
         content:
           application/json:
@@ -1272,6 +1298,7 @@ paths:
     servers:
       - url: 'https://apicugrader.sittha.net/v1'
     get:
+      operationId: getCodeByQuestionId
       parameters:
         - name: QuestionId
           in: path
@@ -1370,6 +1397,7 @@ paths:
     servers:
       - url: 'https://apicugrader.sittha.net/v1'
     get:
+      operationId: getSubmissionResultBySubmissionId
       parameters:
         - name: SubmissionId
           in: path
@@ -1431,6 +1459,7 @@ paths:
     servers:
       - url: 'https://apicugrader.sittha.net/v1'
     get:
+      operationId: getSupportedLanguages
       responses:
         '200':
           description: get list of language that system support
