@@ -3,7 +3,7 @@ import type { PublicTestcaseResult, SecretTestcaseResult, StudentAssignmentDetai
 import { toObservable } from '@/lib/reactivity';
 import { makeAutoObservable, reaction, runInAction } from 'mobx';
 import { firstValueFrom, interval, Subject } from 'rxjs';
-import { debounceTime, filter, switchMap } from 'rxjs/operators';
+import { debounceTime, filter, switchMap, tap } from 'rxjs/operators';
 import type { MonacoWrapper } from './monaco';
 import { getMonacoLanguageId } from './constant';
 
@@ -48,6 +48,7 @@ export class QuestionState {
   private disposables: (() => unknown)[] = [];
 
   // Save status tracking
+  private startSavingTimestamp: number | null = null;
   private lastEdited: number | null = null;
   private lastSaved: number | null = null;
   private isSaving: boolean = false;
@@ -90,12 +91,19 @@ export class QuestionState {
       this.selectLanguage(language.id);
       this.submissionId = submissionId;
 
-      this.activeLanguageFiles.files = code.map((it, index) => ({
-        content: it.content,
-        id: `${this.pathPrefix}/${it.pageName.includes("main") ? "main" : index}`, // TODO: stop use pagename as marker
-        language: getMonacoLanguageId(language.id),
-        name: it.pageName
-      }));
+      this.activeLanguageFiles.files = [];
+      for (const file of code) {
+        // TODO: stop use pagename as marker
+        const id = `${this.pathPrefix}/${file.pageName.includes("main") ? "main" : file.pageName + "_"}`;
+        const language = getMonacoLanguageId(submission.language.id)
+        this.monaco.removeFile(id);
+        this.monaco.createFile(id, file.content, language)
+        this.activeLanguageFiles.files.push({
+          id,
+          language,
+          name: file.pageName
+        });
+      }
 
       this.activeLanguageFiles.activeFileId = `${this.pathPrefix}/main`;
     });
@@ -103,12 +111,13 @@ export class QuestionState {
   }
 
   private setupAutoSave() {
-    const autoSave$ = this.fileChange$.pipe(
-      debounceTime(500) // wait 500ms after last change
-    ).subscribe(() => {
-      this.lastEdited = Date.now();
-      this.save();
-    });
+    const autoSave$ = this.fileChange$
+      .pipe(
+        tap(_ => this.lastEdited = Date.now()),
+        debounceTime(1000) // wait 500ms after last change
+      ).subscribe(() => {
+        this.save();
+      });
 
     this.disposables.push(() => autoSave$.unsubscribe());
   }
@@ -127,11 +136,11 @@ export class QuestionState {
   }
 
   get savingStatus(): "saving" | "unsaved" | "saved" {
+    if (this.lastEdited && (!this.startSavingTimestamp || this.lastEdited > this.startSavingTimestamp)) {
+      return "unsaved";
+    }
     if (this.isSaving) {
       return "saving";
-    }
-    if (this.lastEdited && (!this.lastSaved || this.lastEdited > this.lastSaved)) {
-      return "unsaved";
     }
     return "saved";
   }
@@ -162,7 +171,7 @@ export class QuestionState {
       return "not-yet";
     }
 
-    // If there's unsaved changes since the last submission
+    // TODO: track this properly
     if (this.lastEdited && this.lastSaved && this.lastEdited > this.lastSaved) {
       return "outdated";
     }
@@ -185,11 +194,12 @@ export class QuestionState {
         pageName: file.name
       }));
 
+      this.startSavingTimestamp = Date.now();
       const result = await api.questions.submit(this.question.id, this.activeLanguageId, codes);
 
       runInAction(() => {
         this.submissionId = result.submissionId;
-        this.lastSaved = Date.now();
+        this.lastSaved = this.startSavingTimestamp;
       });
 
       console.log('Files saved successfully');
@@ -272,7 +282,7 @@ export class QuestionState {
       withSuffix = `${name}${index}`;
       index += 1;
     }
-    
+
     const newFile: EditorFile = {
       id: `${this.pathPrefix}/${withSuffix}`,
       name: withSuffix,
