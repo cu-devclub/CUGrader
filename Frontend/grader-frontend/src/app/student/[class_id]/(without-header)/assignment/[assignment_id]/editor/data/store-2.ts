@@ -1,11 +1,12 @@
 import { api } from '@/lib/api';
 import type { PublicTestcaseResult, SecretTestcaseResult, StudentAssignmentDetails, StudentQuestion, SubmissionResult, Testcase } from '@/lib/api/type';
-import { toObservable } from '@/lib/reactivity';
-import { makeAutoObservable, reaction, runInAction } from 'mobx';
-import { firstValueFrom, interval, Subject } from 'rxjs';
-import { debounceTime, filter, switchMap, tap } from 'rxjs/operators';
-import type { MonacoWrapper } from './monaco';
+import { toObservable, toSignal } from '@/lib/reactivity';
+import { makeAutoObservable, runInAction, when } from 'mobx';
+import { firstValueFrom, interval, Subject, type Observable } from 'rxjs';
+import { debounceTime, filter, share, switchMap, tap } from 'rxjs/operators';
 import { getMonacoLanguageId } from './constant';
+import type { MonacoWrapper } from './monaco';
+import type { IResource } from 'mobx-utils';
 
 export interface EditorFile {
   id: string;
@@ -34,15 +35,17 @@ export class QuestionState {
   private cachedFiles: Map<LanguageId, LanguageFiles> = new Map();
   public activeLanguageId!: number;
 
-  private submissionId = this.question.submission?.id ?? null;
+  private submissionId: number | null;
   private submissionResult$ = toObservable(() => this.submissionId).pipe(
     filter(id => id !== null),
     switchMap(id => interval(5000)
       .pipe(
-        switchMap(() => api.questions.getSubmissionResult(id))
+        switchMap(() => api.questions.getSubmissionResult(id)),
+        // share()
       )
     )
   );
+  private submissionResult: IResource<SubmissionResult | undefined> = toSignal(this.submissionResult$);
 
   private fileChange$ = new Subject<void>();
   private disposables: (() => unknown)[] = [];
@@ -58,9 +61,6 @@ export class QuestionState {
   private secretTestcases: Testcase[] = [];
   private customTestcases: CustomTestcase[] = [];
 
-  // Combined submission results with test case data
-  private testcaseResults: SubmissionResult | null = null;
-
   constructor(
     public question: StudentQuestion,
     private lab: StudentAssignmentDetails,
@@ -70,12 +70,13 @@ export class QuestionState {
 
     this.selectLanguage(question.languages[0]?.id ?? 0);
     this.submissionId = question.submission?.id ?? null;
+    // this.submissionResult = toSignal(this.submissionResult$);
 
     this.setupAutoSave();
     this.ready = Promise.all([
       this.fetchTestcases(),
       this.restorePreviousSubmission(),
-      firstValueFrom(this.submissionResult$)
+      when(() => !!this.submissionResult.current())
     ]);
   }
 
@@ -95,9 +96,9 @@ export class QuestionState {
       for (const file of code) {
         // TODO: stop use pagename as marker
         const id = `${this.pathPrefix}/${file.pageName.includes("main") ? "main" : file.pageName + "_"}`;
-        const language = getMonacoLanguageId(submission.language.id)
+        const language = getMonacoLanguageId(submission.language.id);
         this.monaco.removeFile(id);
-        this.monaco.createFile(id, file.content, language)
+        this.monaco.createFile(id, file.content, language);
         this.activeLanguageFiles.files.push({
           id,
           language,
@@ -147,7 +148,7 @@ export class QuestionState {
 
   // Test case related computed properties
   get uiPublicTestcases(): (Testcase & { result?: PublicTestcaseResult; })[] {
-    const currentResults = this.testcaseResults;
+    const currentResults = this.submissionResult.current();
     return this.publicTestcases.map((testcase, index) => ({
       ...testcase,
       result: currentResults?.public?.[index]
@@ -155,7 +156,7 @@ export class QuestionState {
   }
 
   get uiSecretTestcases(): (Omit<Testcase, 'input' | 'expectedOutput'> & { result?: SecretTestcaseResult; })[] {
-    const currentResults = this.testcaseResults;
+    const currentResults = this.submissionResult.current();
     return this.secretTestcases.map((testcase, index) => ({
       // Hide input and expected output for secret test cases
       result: currentResults?.secret?.[index]
@@ -364,11 +365,6 @@ export class QuestionState {
       await this.save();
       return;
     }
-
-    // Reset previous results when starting a new run
-    runInAction(() => {
-      this.testcaseResults = null;
-    });
 
     await api.questions.requestGrade(this.submissionId);
   };
