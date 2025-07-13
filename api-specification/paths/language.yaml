@@ -1,6 +1,8 @@
 servers:
   - url: https://apicugrader.sittha.net/v1
 get:
+  operationId: getSystemSupportedLanguage
+  tags: [system]
   responses:
     "200":
       description: get list of language that system support

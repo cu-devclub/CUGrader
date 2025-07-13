@@ -1,0 +1,4 @@
+output: ./api-gen/server.gen.go
+package: gen
+generate:
+  - gin

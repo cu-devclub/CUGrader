@@ -6,6 +6,8 @@ parameters:
 servers:
   - url: https://apicugrader.sittha.net/v1
 get:
+  operationId: getMultilanguageTestcaseInformation
+  tags: [lab]
   summary: get multi language testcase
   parameters:
     - name: QuestionId

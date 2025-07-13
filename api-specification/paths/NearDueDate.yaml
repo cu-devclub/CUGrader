@@ -8,6 +8,8 @@ servers:
 
 summary: get nearly unsubmit due date lab
 get:
+  operationId: getNearDueDateLabs
+  tags: [lab]
   responses:
     "200":
       description: json of labs array

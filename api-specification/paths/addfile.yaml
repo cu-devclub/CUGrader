@@ -6,6 +6,8 @@ parameters:
 servers:
   - url: https://apicugrader.sittha.net/v1
 get:
+  operationId: getAdditionalFileContent
+  tags: [lab]
   parameters:
     - name: AddFileId
       in: path
@@ -31,6 +33,8 @@ get:
     "404":
       $ref: '../components/responses/ErrNotFound.yaml'
 delete:
+  operationId: deleteAdditionalFile
+  tags: [lab]
   parameters:
     - name: AddFileId
       in: path

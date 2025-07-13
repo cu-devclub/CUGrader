@@ -6,6 +6,8 @@ parameters:
 servers:
   - url: https://apicugrader.sittha.net/v1
 get:
+  operationId: getCodeFromSystem
+  tags: [submission]
   parameters:
     - name: QuestionId
       in: path

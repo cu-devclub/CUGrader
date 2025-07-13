@@ -6,6 +6,8 @@ parameters:
     schema:
       $ref: "../components/schemas/WithJWT.yaml"
 get:
+  operationId: getTestcaseInfomation
+  tags: [lab]
   summary: get testcase
   parameters:
     - name: TestCaseId

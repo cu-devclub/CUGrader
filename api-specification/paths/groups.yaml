@@ -6,6 +6,8 @@ parameters:
 servers:
   - url: https://apicugrader.sittha.net/v1
 get:
+  operationId: getGroupsInClass
+  tags: [class]
   parameters:
     - name: ClassId
       in: path

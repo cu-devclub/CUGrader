@@ -6,6 +6,8 @@ parameters:
 servers:
   - url: https://apicugrader.sittha.net/v1
 get:
+  operationId: getLabInformation
+  tags: [lab]
   summary: lab detail
   parameters:
     - name: LabId

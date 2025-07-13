@@ -6,7 +6,8 @@ parameters:
 servers:
   - url: https://apicugrader.sittha.net/v1
 get:
-  summary: getting image with picture id
+  operationId: getQuestionInformation
+  tags: [lab]
   parameters:
     - name: QuestionId
       in: path
