@@ -21,20 +21,28 @@ import { LocaleSwitcher } from "@/components/locale-switcher"
 import { api } from "@/lib/api"
 import { useSuspenseQuery } from "@tanstack/react-query"
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 
 export function StudentSidebar() {
     const { open, setOpen } = useSidebar()
+    const router = useRouter()
 
-    const handleSignOut = () => {
-        // TODO : When the backend is ready, make an API call to sign out + handle middleware for auth
-        // For now, just clear local storage and redirect to login page
+    const handleSignOut = async () => {
+        try {
+            const response = await fetch('/api/auth/logout', {
+                method: 'POST',
+            });
 
-        // Clear auth token and user data
-        //localStorage.removeItem('auth_token')
-        //localStorage.removeItem('user_data')
-
-        // Redirect to login page -> Don't directly redirect to login page, Change this to a proper API call when ready
-        window.location.href = '/login'
+            if (response.ok) {
+                router.push('/login');
+                router.refresh(); // Ensures the page is reloaded and all state is cleared
+            } else {
+                console.error('Logout failed');
+                // Optionally, show an error message to the user
+            }
+        } catch (error) {
+            console.error('An error occurred during logout:', error);
+        }
     }
 
     // Fetch semester list and classes data

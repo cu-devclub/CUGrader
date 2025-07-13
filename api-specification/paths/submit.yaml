@@ -1,0 +1,39 @@
+
+parameters:
+  - in: header
+    name: Authentication
+    schema:
+      $ref: "../components/schemas/WithJWT.yaml"
+servers:
+  - url: https://apicugrader.sittha.net/v1
+post:
+  operationId: requestGrade
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          description: this is to prevent codegen from merging type
+          required:
+            - "SubmissionId"
+          properties:
+            SubmissionId:
+              $ref: "../components/schemas/SubmissionId.yaml"
+  responses:
+    "200":
+      description: request grader to grade submission
+      content:
+        application/json:
+          schema:
+            type: object
+            description: Empty json
+    "500":
+      $ref: '../components/responses/ErrServerIssue.yaml'
+    "400":
+      $ref: '../components/responses/ErrBadRequest.yaml'
+    "401":
+      $ref: '../components/responses/ErrUnauthorized.yaml'
+    "403":
+      $ref: '../components/responses/ErrPermissionDecline.yaml'
+    "404":
+      $ref: '../components/responses/ErrNotFound.yaml'

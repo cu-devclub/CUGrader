@@ -1,0 +1,43 @@
+parameters:
+  - in: header
+    name: Authentication
+    schema:
+      $ref: "../components/schemas/WithJWT.yaml"
+servers:
+  - url: https://apicugrader.sittha.net/v1
+
+summary: get nearly unsubmit due date lab
+get:
+  responses:
+    "200":
+      description: json of labs array
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              labs:
+                description: array of labs
+                type: array
+                items:
+                  type: object
+                  properties:
+                    course_id:
+                      type: integer
+                    course_name:
+                      type: string
+                    LabId:
+                      $ref: "../components/schemas/LabId.yaml"
+                    lab_name:
+                      type: string
+                    lab_due:
+                      type: string
+                      description: date time
+                    lab_max_score:
+                      type: integer
+    "500":
+      $ref: '../components/responses/ErrServerIssue.yaml'
+    "400":
+      $ref: '../components/responses/ErrBadRequest.yaml'
+    "401":
+      $ref: '../components/responses/ErrUnauthorized.yaml'

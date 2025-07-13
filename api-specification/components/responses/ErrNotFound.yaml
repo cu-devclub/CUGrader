@@ -1,0 +1,11 @@
+description: Server cannot find the requested resource
+content:
+  application/json:
+    schema:
+      required:
+        - human_message
+      properties:
+        human_message:
+          type: string
+          description: A message for the user to understand the error
+          example: "The requested resource was not found"

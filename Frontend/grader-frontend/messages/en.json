@@ -2,6 +2,204 @@
     "HomePage": {
         "title": "Hello world!"
     },
+    "assignment": {
+        "form": {
+            "sections": {
+                "basicInfo": "Basic Information",
+                "languages": "Supported Languages",
+                "settings": "Assignment Settings",
+                "testing": "Testing Configuration",
+                "globalTestCode": "Global Test Code",
+                "questions": "Questions",
+                "assignedGroups": "Assigned Groups",
+                "attachments": "File Attachments"
+            },
+            "fields": {
+                "name": {
+                    "label": "Lab Name",
+                    "placeholder": "Lab 1: Hello World"
+                },
+                "number": {
+                    "label": "Lab Number"
+                },
+                "publish": {
+                    "label": "Publish Date & Time",
+                    "description": "When students can start seeing this assignment"
+                },
+                "due": {
+                    "label": "Due Date & Time",
+                    "description": "When the assignment is due"
+                },
+                "maxScore": {
+                    "label": "Maximum Score"
+                },
+                "languages": {
+                    "description": "Select which programming languages students can use for this assignment."
+                },
+                "assignedGroups": {
+                    "description": "Select which groups should receive this assignment. Leave empty to assign to all groups."
+                },
+                "attachedFiles": {
+                    "label": "Attached Files"
+                },
+                "examMode": {
+                    "label": "Exam Mode",
+                    "description": "Enable exam mode for stricter security"
+                },
+                "allowLateSubmission": {
+                    "label": "Allow Late Submission",
+                    "description": "Allow students to submit after the due date"
+                },
+                "showScoreOnLock": {
+                    "label": "Reveal score after submission closure",
+                    "description": "Show students their score after the assignment is closed"
+                },
+                "examPin": {
+                    "label": "Exam PIN",
+                    "description": "PIN required for students to access the assignment",
+                    "placeholder": "123456"
+                },
+                "testCode": {
+                    "label": "Test Code",
+                    "description": "Code that will be run to test submissions",
+                    "placeholder": "// Global test code that will be used for all questions",
+                    "disabledMultipleLanguages": "Global test code is disabled when multiple languages are selected"
+                },
+                "secretTestCode": {
+                    "label": "Secret Test Code",
+                    "description": "Hidden test code that students cannot see",
+                    "placeholder": "// Secret test code that will not be visible to students",
+                    "disabledMultipleLanguages": "Global secret test code is disabled when multiple languages are selected"
+                }
+            },
+            "question": {
+                "no": "Question No.",
+                "title": "Question Title",
+                "titlePlaceholder": "Enter question title...",
+                "fields": {
+                    "name": {
+                        "label": "Question Name",
+                        "placeholder": "Problem 1"
+                    },
+                    "description": {
+                        "label": "Description",
+                        "placeholder": "Describe what the student needs to do..."
+                    },
+                    "template": {
+                        "label": "Code Template",
+                        "placeholder": "Initial code that students will see..."
+                    },
+                    "maxScore": {
+                        "label": "Maximum Score"
+                    },
+                    "answer": {
+                        "label": "Answer",
+                        "placeholder": "Reference solution..."
+                    },
+                    "testCode": {
+                        "label": "Test Code",
+                        "placeholder": "Code to test student solutions..."
+                    },
+                    "secretTestCode": {
+                        "label": "Secret Test Code",
+                        "placeholder": "Hidden tests..."
+                    }
+                },
+                "testCases": {
+                    "title": "Test Cases",
+                    "add": "Add Test Case",
+                    "testCase": "Test Case {number}",
+                    "input": "Input",
+                    "inputPlaceholder": "Input data",
+                    "output": "Expected Output",
+                    "outputPlaceholder": "Expected output"
+                },
+                "secretTestCases": {
+                    "title": "Secret Test Cases",
+                    "add": "Add Secret Test Case",
+                    "testCase": "Secret Test Case {number}",
+                    "input": "Input",
+                    "inputPlaceholder": "Input data",
+                    "output": "Expected Output",
+                    "outputPlaceholder": "Expected output"
+                }
+            },
+            "buttons": {
+                "addQuestion": "Add Question",
+                "removeQuestion": "Remove Question",
+                "addTestcase": "Add Test Case",
+                "removeTestcase": "Remove",
+                "cancel": "Cancel",
+                "save": "Save Assignment",
+                "create": "Create Assignment",
+                "saving": "Saving...",
+                "creating": "Creating...",
+                "selectFiles": "Select Files"
+            },
+            "validation": {
+                "name": {
+                    "required": "Assignment name is required"
+                },
+                "number": {
+                    "min": "Assignment number must be at least 1"
+                },
+                "publish": {
+                    "required": "Publish date is required"
+                },
+                "due": {
+                    "required": "Due date is required"
+                },
+                "maxScore": {
+                    "min": "Max score must be at least 0"
+                },
+                "languages": {
+                    "min": "At least one language must be selected"
+                },
+                "testCode": {
+                    "required": "Test code is required"
+                },
+                "secretTestCode": {
+                    "required": "Secret test code is required"
+                },
+                "questions": {
+                    "min": "At least one question is required"
+                },
+                "question": {
+                    "name": {
+                        "required": "Question name is required"
+                    },
+                    "description": {
+                        "required": "Description is required"
+                    },
+                    "template": {
+                        "required": "Template is required"
+                    },
+                    "maxScore": {
+                        "min": "Max score must be at least 0"
+                    },
+                    "answer": {
+                        "required": "Answer is required"
+                    },
+                    "testCode": {
+                        "required": "Test code is required"
+                    },
+                    "secretTestCode": {
+                        "required": "Secret test code is required"
+                    },
+                    "testcases": {
+                        "min": "At least one testcase is required"
+                    },
+                    "secretTestcases": {
+                        "min": "At least one secret testcase is required"
+                    }
+                }
+            },
+            "messages": {
+                "createSuccess": "Assignment created successfully",
+                "createError": "Failed to create assignment"
+            }
+        }
+    },
     "example": {
         "title": "Next-intl Example Page",
         "description": "This page demonstrates how to use next-intl for internationalization in your React/Next.js application. Switch between English and Thai to see the translations in action.",
@@ -74,5 +272,35 @@
                 "title": "4. Locale Detection"
             }
         }
+    },
+    "student": {
+        "allClass": "All Classes",
+        "ta": "Teacher Assistant",
+        "student": "Student",
+        "assignment": "Assignment",
+        "profile-text": "Profile"
+    },
+    "assignment-page": {
+        "assign-title": "Assigned",
+        "done-title": "Done",
+        "assign": "Assignment",
+        "labNum": "Lab No.",
+        "publish": "Publish Date",
+        "due": "Due Date",
+        "score": "Score"
+    },
+    "profile-page": {
+        "scoreSum": "Score Summary",
+        "midterm": "midterm",
+        "final": "final",
+        "ranking": "Ranking",
+        "avg": "Average",
+        "max": "Max Score",
+        "sd": "S.D."
+    },
+    "notification-page": {
+        "noti-title": "Notification Center",
+        "notification": "Course Notification",
+        "max": "Max Score"
     }
 }

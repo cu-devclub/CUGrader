@@ -1,0 +1,29 @@
+parameters:
+  - in: header
+    name: Authentication
+    schema:
+      $ref: "../components/schemas/WithJWT.yaml"
+servers:
+  - url: https://apicugrader.sittha.net/v1
+summary: List of year-semester
+get:
+  responses:
+    "200":
+      description: List year-semester
+      content:
+        application/json:
+          schema:
+            properties:
+              semesters:
+                type: array
+                items:
+                  type: string
+                  description: "year-semester"
+    "500":
+      $ref: '../components/responses/ErrServerIssue.yaml'
+    "400":
+      $ref: '../components/responses/ErrBadRequest.yaml'
+    "401":
+      $ref: '../components/responses/ErrUnauthorized.yaml'
+    "403":
+      $ref: '../components/responses/ErrPermissionDecline.yaml'

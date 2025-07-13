@@ -1,56 +1,55 @@
-import { APIClient } from "../type";
+import { CalendarDateTime, parseDateTime } from "@internationalized/date";
+import { APIClient, SupportedLanguage } from "../type";
 import { generateName } from "./name";
-import { DbClass, Persistence } from "./persistence";
+import { DbClass, InMemoryStorage, PersistenceStorage, Storage } from "./persistence";
+import { seed } from "./seed";
 
 interface Database {
   classes: DbClass[];
+  assignments: DbAssignment[];
+  questions: DbQuestion[];
 }
 
-async function init(client: APIClient) {
-  await client.classes.create({
-    courseId: "1",
-    name: "Programming",
-    semester: "2025/1",
-  });
-
-  await client.classes.create({
-    courseId: "758",
-    name: "sone",
-    semester: "2024/2",
-  });
-
-  await client.instructorsAndTAs.addToClass(420, "ame@student.chula.ac.th");
-  await client.instructorsAndTAs.addToClass(420, "suisei@student.chula.ac.th");
-  await client.instructorsAndTAs.addToClass(420, "mark45@chula.ac.th");
-
-  await client.instructorsAndTAs.addToClass(421, "71382213@student.chula.ac.th");
-  await client.instructorsAndTAs.addToClass(421, "wave@chula.ac.th");
-  await client.instructorsAndTAs.addToClass(421, "ajarn@chula.ac.th");
-
-  await client.students.addToClass(420, {
-    email: "12@student.chula.ac.th",
-    section: 0,
-  });
-
-  await client.students.addToClass(420, {
-    email: "45@student.chula.ac.th",
-    section: 0,
-  });
-
-  await client.students.addToClass(420, {
-    email: "2223@student.chula.ac.th",
-    section: 0,
-  });
-
-  await client.students.addToClass(420, {
-    email: "12313@student.chula.ac.th",
-    section: 0,
-  });
+interface DbAssignment {
+  id: number;
+  classId: number;
+  number: number;
+  name: string;
+  publish: CalendarDateTime;
+  due: CalendarDateTime;
+  questionIds: number[];
+  assignedGroupIds: string[];
+  closeOnDue: boolean;
+  examMode: boolean;
+  languageIds: number[];
+  additionalFileIds: number[];
+  examPin: string;
+  secretTestCode: string;
+  showScoreOnLock: boolean;
+  testCode: string;
 }
 
-function createClient(persistence: Persistence<Database>): APIClient {
+interface DbQuestion {
+  id: number;
+  number: number;
+  name: string;
+  description: string;
+  template: string;
+  maxScore: number;
+  answer: string;
+  testCode: string;
+  secretTestCode: string;
+  testcases: { input: string; output: string; }[];
+  secretTestCases: { input: string; output: string; }[];
+}
+
+function createClient(persistence: Storage<Database>): APIClient {
   let currentClassId = 420;
+  let currentAssignmentId = 10;
+  let currentQuestionId = 0;
   const classes = persistence.data.classes;
+  const assignments = persistence.data.assignments;
+  const questions = persistence.data.questions;
 
   function getClassById(id: number) {
     const target = persistence.data.classes.find(it => it.classId === id);
@@ -68,7 +67,6 @@ function createClient(persistence: Persistence<Database>): APIClient {
     students: {
       async addToClass(classId, { email, section, group }) {
         const c = getClassById(classId);
-        console.log({ email });
         c.students.push({
           group: group ?? "Default",
           section,
@@ -144,7 +142,6 @@ function createClient(persistence: Persistence<Database>): APIClient {
           courseId: String(courseId),
           courseName: name,
           classId: currentClassId++,
-          // TODO: this wont work on the server
           imageFileId: fileId,
           students: [],
           semester,
@@ -155,7 +152,6 @@ function createClient(persistence: Persistence<Database>): APIClient {
       },
       async getById(classId) {
         const c = getClassById(classId);
-        console.log(c);
         return {
           ...c,
           imageUrl: await getUrl(c.imageFileId)
@@ -234,6 +230,317 @@ function createClient(persistence: Persistence<Database>): APIClient {
         const s = classes.map(it => it.semester);
         return [...new Set(s)]; // remove duplicated
       }
+    },
+    assignments: {
+      listNearDue: async () => {
+        const nearDueAssignments = assignments.filter(a => {
+          const now = new Date();
+          const due = a.due.toDate("UTC");
+          const timeDiff = due.getTime() - now.getTime();
+          return timeDiff > 0 && timeDiff <= 7 * 24 * 60 * 60 * 1000; // within 7 days
+        });
+
+        return nearDueAssignments.map(a => {
+          const c = getClassById(a.classId);
+          return {
+            id: a.id,
+            courseId: c.courseId,
+            courseName: c.courseName,
+            due: a.due,
+            maxScore: 100,
+            name: a.name
+          };
+        });
+      },
+      getById: async (labId) => {
+        const assignment = assignments.find(a => a.id === labId);
+        if (!assignment) throw new Error(`Assignment ${labId} not found`);
+
+        const assignmentQuestions = await Promise.all(assignment.questionIds.map(id => client.questions.getById(id)));
+
+        // Map languageIds to supported languages
+        const supportedLanguages = await client.supportedLanguages.list();
+        const languages = assignment.languageIds
+          .map(id => supportedLanguages.find(lang => lang.id === id))
+          .filter((lang): lang is SupportedLanguage => lang !== undefined);
+
+        return {
+          id: assignment.id,
+          number: assignment.number,
+          name: assignment.name,
+          publish: assignment.publish,
+          due: assignment.due,
+          questions: assignmentQuestions,
+          questionIds: assignment.questionIds,
+          assignedGroupIds: assignment.assignedGroupIds,
+          closeOnDue: assignment.closeOnDue,
+          examMode: assignment.examMode,
+          languages,
+          additionalFileIds: assignment.additionalFileIds,
+          score: Math.floor(Math.random() * 100),
+          status: "completed"
+        };
+      },
+
+      getByIdI: async (labId) => {
+        const assignment = assignments.find(a => a.id === labId);
+        if (!assignment) throw new Error(`Assignment ${labId} not found`);
+
+        const assignmentQuestions = await Promise.all(assignment.questionIds.map(id => client.questions.getByIdI(id)));
+
+        // Map languageIds to supported languages
+        const supportedLanguages = await client.supportedLanguages.list();
+        const languages = assignment.languageIds
+          .map(id => supportedLanguages.find(lang => lang.id === id))
+          .filter((lang): lang is SupportedLanguage => lang !== undefined);
+
+        return {
+          id: assignment.id,
+          number: assignment.number,
+          publish: assignment.publish,
+          due: assignment.due,
+          name: assignment.name,
+          questionIds: assignment.questionIds,
+          assignedGroupIds: assignment.assignedGroupIds,
+          closeOnDue: assignment.closeOnDue,
+          examMode: assignment.examMode,
+          languages,
+          additionalFileIds: assignment.additionalFileIds,
+          examPin: assignment.examPin,
+          secretTestCode: assignment.secretTestCode,
+          showScoreOnLock: assignment.showScoreOnLock,
+          testCode: assignment.testCode,
+          questions: assignmentQuestions
+        };
+      },
+
+      listByClass: async (classId) => {
+        const classAssignments = assignments.filter(a => a.classId === classId);
+
+        return classAssignments.map(a => ({
+          id: a.id,
+          number: a.number,
+          publish: a.publish,
+          due: a.due,
+          name: a.name,
+          score: Math.floor(Math.random() * 100),
+          status: "due-soon" as const
+        }));
+      },
+
+      listByClassI: async (classId) => {
+        const classAssignments = assignments.filter(a => a.classId === classId);
+
+        return classAssignments.map(a => ({
+          id: a.id,
+          number: a.number,
+          publish: a.publish,
+          due: a.due,
+          name: a.name
+        }));
+      },
+
+      create: async (classId, payload) => {
+        const newAssignment: DbAssignment = {
+          id: currentAssignmentId++,
+          classId,
+          number: payload.number,
+          name: payload.name,
+          publish: payload.publish,
+          due: payload.due,
+          questionIds: [],
+          assignedGroupIds: payload.assignedGroupIds,
+          closeOnDue: payload.closeOnDue,
+          examMode: payload.examMode,
+          languageIds: payload.languageIds,
+          additionalFileIds: [],
+          examPin: payload.examPin,
+          secretTestCode: payload.secretTestCode,
+          showScoreOnLock: payload.showScoreOnLock,
+          testCode: payload.testCode
+        };
+
+        // Create questions and link them
+        const questionIds: number[] = [];
+        for (let i = 0; i < payload.questions.length; i++) {
+          const q = payload.questions[i];
+          const newQuestion: DbQuestion = {
+            id: currentQuestionId++,
+            number: i + 1,
+            name: q.name,
+            description: q.description,
+            template: q.template,
+            maxScore: q.maxScore,
+            answer: q.answer,
+            testCode: q.testCode,
+            secretTestCode: q.secretTestCode,
+            testcases: q.testcases,
+            secretTestCases: q.secretTestCases
+          };
+          questions.push(newQuestion);
+          questionIds.push(newQuestion.id);
+        }
+
+        newAssignment.questionIds = questionIds;
+        assignments.push(newAssignment);
+        persistence.persist();
+      },
+
+      update: async (labId, payload) => {
+        const assignment = assignments.find(a => a.id === labId);
+        if (!assignment) throw new Error(`Assignment ${labId} not found`);
+
+        if (payload.number !== undefined) assignment.number = payload.number;
+        if (payload.name !== undefined) assignment.name = payload.name;
+        if (payload.publish !== undefined) assignment.publish = payload.publish;
+        if (payload.due !== undefined) assignment.due = payload.due;
+        if (payload.assignedGroupIds !== undefined) assignment.assignedGroupIds = payload.assignedGroupIds;
+        if (payload.closeOnDue !== undefined) assignment.closeOnDue = payload.closeOnDue;
+        if (payload.examMode !== undefined) assignment.examMode = payload.examMode;
+        if (payload.languageIds !== undefined) assignment.languageIds = payload.languageIds;
+        if (payload.examPin !== undefined) assignment.examPin = payload.examPin;
+        if (payload.secretTestCode !== undefined) assignment.secretTestCode = payload.secretTestCode;
+        if (payload.showScoreOnLock !== undefined) assignment.showScoreOnLock = payload.showScoreOnLock;
+        if (payload.testCode !== undefined) assignment.testCode = payload.testCode;
+
+        persistence.persist();
+      },
+
+      attachFile: async (assignmentId: number, file: File) => {
+        const assignment = assignments.find(a => a.id === assignmentId);
+        if (!assignment) throw new Error(`Assignment ${assignmentId} not found`);
+        const fileId = await persistence.saveFile(file);
+        assignment.additionalFileIds.push(parseInt(fileId));
+        persistence.persist();
+      },
+
+      removeFile: async (fileId) => {
+        await persistence.deleteFile(String(fileId));
+        persistence.persist();
+      },
+
+      downloadFile: async (fileId) => {
+        return new Blob([`This is file ${fileId}`], {
+          type: "text/plain"
+        });
+      },
+    },
+
+    questions: {
+      getById: async (questionId) => {
+        const question = questions.find(q => q.id === questionId);
+        if (!question) throw new Error(`Question ${questionId} not found`);
+
+        return {
+          id: questionId,
+          number: question.number,
+          name: question.name,
+          description: question.description,
+          template: question.template,
+          maxScore: question.maxScore,
+        };
+      },
+
+      getByIdI: async (questionId) => {
+        const question = questions.find(q => q.id === questionId);
+        if (!question) throw new Error(`Question ${questionId} not found`);
+
+        return question;
+      },
+
+      submit: async (questionId, languageId, codes) => {
+        return { submissionId: Math.floor(Math.random() * 1000) + 1 };
+      },
+
+      getSubmission: async (questionId) => {
+        return {
+          submissionId: Math.floor(Math.random() * 1000) + 1,
+          code: [
+            {
+              pageName: "main.py",
+              content: "print('Hello, World!')"
+            }
+          ],
+          language: {
+            id: 1,
+            name: "Python 3"
+          }
+        };
+      },
+
+      requestGrade: async (submissionId) => {
+        console.log(`[mock] Requesting grade for submission ${submissionId}`);
+      },
+
+      getSubmissionResult: async (submissionId) => {
+        return {
+          public: [
+            {
+              input: "test input",
+              expectedOutput: "expected output",
+              message: "Test passed",
+              status: "pass" as const
+            }
+          ],
+          secret: [
+            {
+              message: "Secret test passed",
+              status: "pass" as const
+            }
+          ]
+        };
+      },
+    },
+    sections: {
+      getByClass: async (classId) => {
+        const c = getClassById(classId);
+        return [...new Set(c.students.map(it => it.section))];
+      },
+    },
+
+    supportedLanguages: {
+      list: async () => {
+        return [
+          { id: 1, name: "Python 3" },
+          { id: 2, name: "C++" },
+          { id: 3, name: "C" },
+          { id: 4, name: "Java" },
+          { id: 5, name: "JavaScript" },
+          { id: 6, name: "TypeScript" },
+        ];
+      }
+    },
+
+    groups: {
+      listByClassId: async (classId) => {
+        const c = getClassById(classId);
+        const groups = c.students.map(it => it.group);
+        return [...new Set(groups)];
+      },
+    },
+
+    examPin: {
+      getByAssignmentId: async (assignmentId: number) => {
+        const assignment = assignments.find(a => a.id === assignmentId);
+        return assignment?.examPin || "123456";
+      }
+    },
+
+    testCode: {
+      getById: async (testCodeId: number) => {
+        const assignment = assignments.find(a => a.id === testCodeId);
+        return assignment?.testCode || "test code content";
+      }
+    },
+
+    testcase: {
+      listByQuestionId: async (questionId: number) => {
+        const question = questions.find(q => q.id === questionId);
+        return {
+          public: question?.testcases || [{ input: "public in", output: "public out" }],
+          secret: question?.secretTestCases || [{ input: "secret in", output: "secret out" }],
+        };
+      }
     }
   };
 
@@ -241,17 +548,22 @@ function createClient(persistence: Persistence<Database>): APIClient {
 }
 
 
-const persistence = new Persistence<Database>("default", {
-  classes: []
-});
-
 const preserveMockState = process.env.NEXT_PUBLIC_MOCK_PRESERVE_STATE === "true";
-export function createMockClient() {
-  const client = createClient(persistence);
 
-  // to make hydration error less painful
-  if (persistence.fresh || !globalThis.window || !preserveMockState) {
-    init(client);
+export async function createMockClient() {
+  const initialData: Database = {
+    classes: [],
+    assignments: [],
+    questions: []
+  };
+  const storage = preserveMockState
+    ? new PersistenceStorage("default", initialData)
+    : new InMemoryStorage(initialData);
+
+  const client = createClient(storage);
+
+  if (storage.data.classes.length === 0 || !globalThis.window) {
+    await seed(client);
   }
 
   return client;

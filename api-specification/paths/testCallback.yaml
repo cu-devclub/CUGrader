@@ -1,0 +1,32 @@
+servers:
+  - url: https://apicugrader.sittha.net/v1
+summary: for getting JWT Token custom email for testing
+post:
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - "credential"
+          properties:
+            key:
+              type: string
+              description: unused
+            credential:
+              type: string
+              description: email end with @chula.ac.th or @student chula.ac.th
+  responses:
+    "200":
+      description: response access token
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              access-token:
+                $ref: '../components/schemas/WithJWT.yaml'
+    "500":
+      $ref: '../components/responses/ErrServerIssue.yaml'
+    "400":
+      $ref: '../components/responses/ErrBadRequest.yaml'

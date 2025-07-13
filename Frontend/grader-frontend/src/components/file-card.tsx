@@ -3,7 +3,7 @@ import { Button } from "./ui/button";
 
 export interface FileCardProps {
   file: File;
-  remove: () => any;
+  remove: () => unknown;
   icon: LucideIcon;
 }
 

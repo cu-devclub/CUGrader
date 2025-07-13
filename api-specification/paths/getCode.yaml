@@ -1,0 +1,58 @@
+parameters:
+  - in: header
+    name: Authentication
+    schema:
+      $ref: "../components/schemas/WithJWT.yaml"
+servers:
+  - url: https://apicugrader.sittha.net/v1
+get:
+  parameters:
+    - name: QuestionId
+      in: path
+      required: true
+      schema:
+        $ref: "../components/schemas/QuestionId.yaml"
+  responses:
+    "200":
+      description: code content
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - "code"
+              - "submission_id"
+            properties:
+              SubmissionId:
+                $ref: "../components/schemas/SubmissionId.yaml"
+              language:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: language primary key
+                  name:
+                    type: string
+                    description: language name
+              code:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - "page_name"
+                    - "content"
+                  properties:
+                    page_name:
+                      type: string
+                    content:
+                      type: string
+    "500":
+      $ref: '../components/responses/ErrServerIssue.yaml'
+    "400":
+      $ref: '../components/responses/ErrBadRequest.yaml'
+    "401":
+      $ref: '../components/responses/ErrUnauthorized.yaml'
+    "403":
+      $ref: '../components/responses/ErrPermissionDecline.yaml'
+    "404":
+      $ref: '../components/responses/ErrNotFound.yaml'

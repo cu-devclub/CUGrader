@@ -1,0 +1,12 @@
+ErrServerIssue:
+  $ref: './ErrServerIssue.yaml'
+ErrNotFound:
+  $ref: './ErrNotFound.yaml'
+ErrBadRequest:
+  $ref: './ErrBadRequest.yaml'
+ErrPermissionDecline:
+  $ref: './ErrPermissionDecline.yaml'
+ErrPurrmissionDecline:
+  $ref: './ErrPurrmissionDecline.yaml'
+ErrUnauthorized:
+  $ref: './ErrUnauthorized.yaml'

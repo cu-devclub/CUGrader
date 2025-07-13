@@ -1,0 +1,11 @@
+description: Server rejected the request due to insufficient authorization
+content:
+  application/json:
+    schema:
+      required:
+        - human_message
+      properties:
+        human_message:
+          type: string
+          description: A message for the user to understand the error
+          example: "Unauthorized access. Please provide valid credentials to access this resource."

@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { api } from "@/lib/api";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { ChevronDown, ChevronRight, Edit2, Plus, Trash2, User } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 interface InviteFormProps {
-  onAdd: (email: string) => any;
+  onAdd: (email: string) => unknown;
   title: string;
 }
 
@@ -77,8 +77,8 @@ interface RowProps {
   name: string,
   email: string;
   imageUrl?: string,
-  onRemove?: () => any;
-  onEdit?: () => any;
+  onRemove?: () => unknown;
+  onEdit?: () => unknown;
 }
 
 function Row({ imageUrl, name, onEdit, onRemove }: RowProps) {
@@ -118,10 +118,10 @@ interface People {
 interface SharedSectionProps {
   // TODO: fix plural form of this and i18n
   title: string;
-  onRemove?: (email: string) => any;
-  onEdit?: (id: string) => any; // we dont have this
+  onRemove?: (email: string) => unknown;
+  onEdit?: (id: string) => unknown; // we dont have this
   // TODO: seperate endpoint???
-  invite?: (email: string) => any;
+  invite?: (email: string) => unknown;
   allowEdit: boolean;
   peoples: (People)[];
   // TODO: access control
