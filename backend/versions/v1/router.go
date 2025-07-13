@@ -1,22 +1,44 @@
 package v1
 
 import (
+	// Controllers
 	assistantController "CUGrader/backend/versions/v1/controllers/assistant"
 	classController "CUGrader/backend/versions/v1/controllers/class"
+	additionalFileController "CUGrader/backend/versions/v1/controllers/file"
+	labController "CUGrader/backend/versions/v1/controllers/lab"
+	languageController "CUGrader/backend/versions/v1/controllers/language"
+	nearduedateController "CUGrader/backend/versions/v1/controllers/near_due_date"
 	pictureController "CUGrader/backend/versions/v1/controllers/picture"
+	questionController "CUGrader/backend/versions/v1/controllers/question"
 	studentController "CUGrader/backend/versions/v1/controllers/student"
 	userController "CUGrader/backend/versions/v1/controllers/user"
+
+	// Models
 	assistantModel "CUGrader/backend/versions/v1/models/assistant"
 	classModel "CUGrader/backend/versions/v1/models/class"
+	additionalFileModel "CUGrader/backend/versions/v1/models/file"
+	labModel "CUGrader/backend/versions/v1/models/lab"
+	languageModel "CUGrader/backend/versions/v1/models/language"
+	nearduedateModel "CUGrader/backend/versions/v1/models/near_due_date"
 	pictureModel "CUGrader/backend/versions/v1/models/picture"
+	questionModel "CUGrader/backend/versions/v1/models/question"
 	studentModel "CUGrader/backend/versions/v1/models/student"
 	userModel "CUGrader/backend/versions/v1/models/user"
 	utilsModel "CUGrader/backend/versions/v1/models/utils"
+
+	// Services
 	assistantService "CUGrader/backend/versions/v1/services/assistant"
 	classService "CUGrader/backend/versions/v1/services/class"
+	additionalFileService "CUGrader/backend/versions/v1/services/file"
+	labService "CUGrader/backend/versions/v1/services/lab"
+	languageService "CUGrader/backend/versions/v1/services/language"
+	nearduedateService "CUGrader/backend/versions/v1/services/near_due_date"
 	pictureService "CUGrader/backend/versions/v1/services/picture"
+	questionService "CUGrader/backend/versions/v1/services/question"
 	studentService "CUGrader/backend/versions/v1/services/student"
 	userService "CUGrader/backend/versions/v1/services/user"
+
+	"context"
 	"crypto/rsa"
 	"crypto/x509"
 	"database/sql"
@@ -27,6 +49,8 @@ import (
 	"os"
 
 	_ "github.com/lib/pq"
+	"go.mongodb.org/mongo-driver/v2/mongo"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 
 	"github.com/gin-gonic/gin"
 )
@@ -52,6 +76,26 @@ func initDB() *sql.DB {
 	return database
 }
 
+func initMongoDB() *mongo.Client {
+	uri := os.Getenv("MONGODB_URI")
+	if uri == "" {
+		log.Fatal("MONGODB_URI environment variable is not set")
+	}
+
+	client, err := mongo.Connect(options.Client().ApplyURI(uri))
+
+	if err != nil {
+		panic(err)
+	}
+	defer func() {
+		if err := client.Disconnect(context.TODO()); err != nil {
+			panic(err)
+		}
+	}()
+
+	return client
+}
+
 func loadPrivateKeyFromEnv() (*rsa.PrivateKey, error) {
 	privKeyPEM := os.Getenv("PRIVATE_KEY")
 	block, _ := pem.Decode([]byte(privKeyPEM))
@@ -67,6 +111,8 @@ func loadPrivateKeyFromEnv() (*rsa.PrivateKey, error) {
 
 func RegisterRoutes(r *gin.RouterGroup) {
 	db = initDB()
+	mongoClient := initMongoDB()
+
 	var err error
 	privKey, err = loadPrivateKeyFromEnv()
 	if err != nil {
@@ -99,6 +145,32 @@ func RegisterRoutes(r *gin.RouterGroup) {
 	pictureService := &pictureService.PictureService{Model: pictureModel}
 	pictureController := &pictureController.PictureController{Service: pictureService}
 
+	questionModel := &questionModel.QuestionModel{DB: db, MongoDB: mongoClient}
+	questionService := &questionService.QuestionService{Model: questionModel, Utils: utilsModel}
+	questionController := &questionController.QuestionController{Service: questionService}
+
+	additionalFileModel := &additionalFileModel.AdditionalFileModel{DB: db}
+	additionalFileService := &additionalFileService.AdditionalFileService{Model: additionalFileModel, Utils: utilsModel}
+	additionalFileController := &additionalFileController.AdditionalFileController{Service: additionalFileService}
+
+	nearduedateModel := &nearduedateModel.NearDueDateModel{DB: db}
+	nearduedateService := &nearduedateService.NearDueDateService{Model: nearduedateModel, Utils: utilsModel}
+	nearduedateController := &nearduedateController.NearDueDateController{Service: nearduedateService, Utils: utilsModel}
+
+	languageModel := &languageModel.LanguageModel{DB: db}
+	languageService := &languageService.LanguageService{Model: languageModel}
+	languageController := &languageController.LanguageController{Service: languageService}
+
+	labModel := &labModel.LabModel{DB: db}
+	labService := &labService.LabService{
+		Model:               labModel,
+		Utils:               utilsModel,
+		QuestionModel:       questionModel,
+		LanguageModel:       languageModel,
+		AdditionalFileModel: additionalFileModel,
+	}
+	labController := &labController.LabController{Service: labService}
+
 	r.POST("/callback", userController.Callback)
 	r.POST("/test/callback", userController.TestCallback)
 
@@ -119,5 +191,23 @@ func RegisterRoutes(r *gin.RouterGroup) {
 	r.GET("/student/:classId", studentController.GetStudentsHandler)
 
 	r.GET("/picture/:pictureId", pictureController.GetPicture)
+
+	r.GET("/labs:classId", labController.GetLabsByClassIDHandler)
+	r.GET("/lab/:lab_id", labController.GetLabByIDHandler)
+	r.POST("/lab", labController.AddLabHandler)
+	r.PATCH("/lab", labController.EditLabHandler)
+
+	r.GET("/question/:questionId", questionController.GetQuestionForStudentController)
+
+	r.GET("/testcase/:testcaseId", questionController.GetTestcaseCodeByTestcaseIDHandler)
+
+	r.GET("/multilang_testcase/:questionId", questionController.GetMultilangTestcaseCodeByQuestionIDHandler)
+
+	r.GET("/addfile/:addfile_id", additionalFileController.GetAdditionalFileByIDHandler)
+	r.DELETE("/addfile/:addfile_id", additionalFileController.DeleteAdditionalFileByIDHandler)
+
+	r.GET("/near_due_date", nearduedateController.GetNearDueDateHandler)
+
+	r.GET("/language", languageController.GetLanguagesHandler)
 
 }

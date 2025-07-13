@@ -1,5 +1,7 @@
 package class
 
+import "database/sql"
+
 func (m *ClassModel) Insert(courseID int, name string, semester int, year int, pictureID int, creatorUserID int) (int, error) {
 	var classID int
 	query := `
@@ -21,6 +23,10 @@ func (m *ClassModel) InsertUserIfNotExist(email, name string) (int, error) {
 	err := m.DB.QueryRow(`SELECT id FROM "user" WHERE email = $1`, email).Scan(&userID)
 	if err == nil {
 		return userID, nil
+	}
+
+	if err != sql.ErrNoRows {
+		return 0, err
 	}
 	// Insert if not exist
 	err = m.DB.QueryRow(
