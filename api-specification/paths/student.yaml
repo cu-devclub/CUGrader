@@ -6,6 +6,8 @@ parameters:
 servers:
   - url: https://apicugrader.sittha.net/v1
 post:
+  operationId: insertStudentToClass
+  tags: [student]
   summary: Insert student
   requestBody:
     content:
@@ -43,6 +45,8 @@ post:
       $ref: '../components/responses/ErrServerIssue.yaml'
 
 delete:
+  operationId: deleteStudentFromClass
+  tags: [student]
   summary: Delete student
   requestBody:
     content:
@@ -75,6 +79,8 @@ delete:
       $ref: '../components/responses/ErrNotFound.yaml'
 
 patch:
+  operationId: editStudentInClass
+  tags: [student]
   summary: Edit student info
   requestBody:
     content:

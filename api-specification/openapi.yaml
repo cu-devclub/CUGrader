@@ -81,3 +81,12 @@ components:
     $ref: './components/schemas/schemas.yaml'
   responses:
     $ref: './components/responses/responses.yaml'
+
+tags:
+  - $ref: './tags/assistant.yaml'
+  - $ref: './tags/class.yaml'
+  - $ref: './tags/lab.yaml'
+  - $ref: './tags/student.yaml'
+  - $ref: './tags/submission.yaml'
+  - $ref: './tags/system.yaml'
+  - $ref: './tags/user.yaml'

@@ -1,4 +1,6 @@
 get:
+  operationId: testPing
+  tags: [system]
   responses:
     '200':
       description: Pong response

@@ -7,6 +7,8 @@ servers:
   - url: https://apicugrader.sittha.net/v1
 summary: List of year-semester
 get:
+  operationId: getSemesterOfUser
+  tags: [class]
   responses:
     "200":
       description: List year-semester

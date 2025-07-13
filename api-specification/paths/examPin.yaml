@@ -6,6 +6,8 @@ parameters:
 servers:
   - url: https://apicugrader.sittha.net/v1
 get:
+  operationId: getExaminationPin
+  tags: [lab]
   summary: get exam pin
   parameters:
     - name: LabId

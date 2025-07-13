@@ -2,6 +2,8 @@ servers:
   - url: https://apicugrader.sittha.net/v1
 summary: for getting JWT Token custom email for testing
 post:
+  operationId: userForCreateTestUser
+  tags: [user]
   requestBody:
     content:
       application/json:

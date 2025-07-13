@@ -8,6 +8,8 @@ get:
     "500":
       $ref: '../components/responses/ErrServerIssue.yaml'
 post:
+  operationId: getUserDataFromGoogle
+  tags: [user]
   servers:
     - url: https://apicugrader.sittha.net/v1
   requestBody:

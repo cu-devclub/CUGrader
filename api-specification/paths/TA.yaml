@@ -6,6 +6,8 @@ parameters:
 servers:
   - url: https://apicugrader.sittha.net/v1
 post:
+  operationId: insertAssistantToClass
+  tags: [assistant]
   summary: Add TA to class
   requestBody:
     content:
@@ -27,6 +29,8 @@ post:
       $ref: '../components/responses/ErrUnauthorized.yaml'
 
 delete:
+  operationId: deleteAssistantFromClass
+  tags: [assistant]
   summary: Delete TA from class
   requestBody:
     content:

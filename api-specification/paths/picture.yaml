@@ -2,6 +2,8 @@ servers:
   - url: https://apicugrader.sittha.net/v1
 summary: get
 get:
+  operationId: getUserAndClassPicture
+  tags: [user]
   summary: getting image with picture id
   parameters:
     - name: PictureId

@@ -6,6 +6,8 @@ parameters:
 servers:
   - url: https://apicugrader.sittha.net/v1
 post:
+  operationId: saveCodeToSystem
+  tags: [submission]
   requestBody:
     content:
       application/json:

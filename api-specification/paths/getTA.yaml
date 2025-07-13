@@ -6,6 +6,8 @@ parameters:
 servers:
   - url: https://apicugrader.sittha.net/v1
 get:
+  operationId: getAssistantsInClass
+  tags: [assistant]
   summary: "list ta and instructor by class"
   parameters:
     - name: ClassId
