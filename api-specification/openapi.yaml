@@ -76,6 +76,15 @@ paths:
   /language:
     $ref: './paths/language.yaml'
 
+  /score/{ClassId}:
+    $ref: './paths/score.yaml'
+  /rank/{ClassId}:
+    $ref: './paths/rank.yaml'
+  /progress/{ClassId}:
+    $ref: './paths/progress.yaml'
+  /student_score/{LabId}:
+    $ref: './paths/student_score.yaml'
+
 components:
   schemas:
     $ref: './components/schemas/schemas.yaml'
