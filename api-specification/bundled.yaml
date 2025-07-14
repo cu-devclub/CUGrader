@@ -1560,6 +1560,213 @@ paths:
                           description: language name
         '500':
           $ref: '#/components/responses/ErrServerIssue'
+  '/score/{ClassId}':
+    parameters:
+      - in: header
+        name: Authentication
+        schema:
+          $ref: '#/components/schemas/WithJWT'
+    servers:
+      - url: 'https://apicugrader.sittha.net/v1'
+    get:
+      operationId: getUserScore
+      tags:
+        - user
+      parameters:
+        - name: ClassId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/ClassId'
+      responses:
+        '200':
+          description: get specific class info
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  score:
+                    type: integer
+                    description: class sum score
+                  max_score:
+                    type: integer
+                    description: max class sum score
+                  ratio_score:
+                    type: integer
+                    description: calculated score according ratio to teacher setting (x0.3 for now)
+                  max_ratio_score:
+                    type: integer
+                    description: max calculated score according ratio to teacher setting (x0.3 for now)
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '403':
+          $ref: '#/components/responses/ErrPermissionDecline'
+        '404':
+          $ref: '#/components/responses/ErrNotFound'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+  '/rank/{ClassId}':
+    parameters:
+      - in: header
+        name: Authentication
+        schema:
+          $ref: '#/components/schemas/WithJWT'
+    servers:
+      - url: 'https://apicugrader.sittha.net/v1'
+    get:
+      operationId: getUserRank
+      tags:
+        - user
+      parameters:
+        - name: ClassId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/ClassId'
+      responses:
+        '200':
+          description: get specific class info
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  rank:
+                    type: integer
+                    description: User's rank
+                  students:
+                    type: integer
+                    description: number of students in class
+                  rank_graph:
+                    type: array
+                    items:
+                      type: integer
+                      description: number of student in each bar (10% range)
+                      minimum: 0
+                    minItems: 10
+                    maxItems: 10
+                  rank_graph_position:
+                    type: integer
+                    minimum: 0
+                    maximum: 9
+                    description: bar inedex position
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '403':
+          $ref: '#/components/responses/ErrPermissionDecline'
+        '404':
+          $ref: '#/components/responses/ErrNotFound'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+  '/progress/{ClassId}':
+    parameters:
+      - in: header
+        name: Authentication
+        schema:
+          $ref: '#/components/schemas/WithJWT'
+    servers:
+      - url: 'https://apicugrader.sittha.net/v1'
+    get:
+      operationId: getUserProgress
+      tags:
+        - user
+      parameters:
+        - name: ClassId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/ClassId'
+      responses:
+        '200':
+          description: get specific class info
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  done:
+                    type: integer
+                    description: number of lab done (min 1 question submit)
+                  max_lab:
+                    type: integer
+                    description: number of labs in class
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '403':
+          $ref: '#/components/responses/ErrPermissionDecline'
+        '404':
+          $ref: '#/components/responses/ErrNotFound'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+  '/student_score/{LabId}':
+    parameters:
+      - in: header
+        name: Authentication
+        schema:
+          $ref: '#/components/schemas/WithJWT'
+    servers:
+      - url: 'https://apicugrader.sittha.net/v1'
+    get:
+      operationId: getUserLabScore
+      tags:
+        - lab
+      parameters:
+        - name: LabId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/LabId'
+      responses:
+        '200':
+          description: get specific class info
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  max_score:
+                    type: integer
+                    description: max lab score
+                  question_max_score:
+                    type: array
+                    items:
+                      type: integer
+                      description: max question score
+                  students:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        score:
+                          type: integer
+                          description: student's sum lab score
+                        questions:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              score:
+                                type: integer
+                                description: student's question score
+                              SubmissionId:
+                                $ref: '#/components/schemas/SubmissionId'
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '403':
+          $ref: '#/components/responses/ErrPermissionDecline'
+        '404':
+          $ref: '#/components/responses/ErrNotFound'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
 components:
   schemas:
     Pong:

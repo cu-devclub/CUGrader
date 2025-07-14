@@ -1,0 +1,61 @@
+parameters:
+  - in: header
+    name: Authentication
+    schema:
+      $ref: "../components/schemas/WithJWT.yaml"
+servers:
+  - url: https://apicugrader.sittha.net/v1
+get:
+  operationId: getUserLabScore
+  tags: [lab]
+  parameters:
+    - name: LabId
+      in: path
+      required: true
+      schema:
+        $ref: "../components/schemas/LabId.yaml"
+  responses:
+    "200":
+      description: get specific class info
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              max_score:
+                type: integer
+                description: max lab score
+              question_max_score:
+                type: array
+                items:
+                  type: integer
+                  description: max question score
+              students:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    score:
+                      type: integer
+                      description: student's sum lab score
+                    questions:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          score:
+                            type: integer
+                            description: student's question score
+                          SubmissionId:
+                            $ref: "../components/schemas/SubmissionId.yaml"
+
+    "500":
+      $ref: '../components/responses/ErrServerIssue.yaml'
+    "400":
+      $ref: '../components/responses/ErrBadRequest.yaml'
+    "401":
+      $ref: '../components/responses/ErrUnauthorized.yaml'
+    "403":
+      $ref: '../components/responses/ErrPermissionDecline.yaml'
+    "404":
+      $ref: '../components/responses/ErrNotFound.yaml'
