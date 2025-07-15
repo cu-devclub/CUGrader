@@ -6,7 +6,7 @@ parameters:
 servers:
   - url: https://apicugrader.sittha.net/v1
 get:
-  operationId: getUserLabScore
+  operationId: getStudentLabScore
   tags: [lab]
   parameters:
     - name: LabId

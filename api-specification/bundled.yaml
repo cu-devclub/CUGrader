@@ -1714,7 +1714,7 @@ paths:
     servers:
       - url: 'https://apicugrader.sittha.net/v1'
     get:
-      operationId: getUserLabScore
+      operationId: getStudentLabScore
       tags:
         - lab
       parameters:
@@ -1767,6 +1767,214 @@ paths:
           $ref: '#/components/responses/ErrNotFound'
         '500':
           $ref: '#/components/responses/ErrServerIssue'
+  '/ticket/{TicketId}':
+    parameters:
+      - in: header
+        name: Authentication
+        schema:
+          $ref: '#/components/schemas/WithJWT'
+    servers:
+      - url: 'https://apicugrader.sittha.net/v1'
+    get:
+      operationId: getTicketInformation
+      tags:
+        - lab
+      summary: ticket info
+      parameters:
+        - name: TicketId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/TicketId'
+      responses:
+        '200':
+          description: ticket info
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  student:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        description: 10 characters student id
+                      name:
+                        type: string
+                        description: student's full name
+                      isCheckIn:
+                        type: boolean
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '403':
+          $ref: '#/components/responses/ErrPermissionDecline'
+        '404':
+          $ref: '#/components/responses/ErrNotFound'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+    patch:
+      operationId: getConfirmTicket
+      tags:
+        - lab
+      summary: confirm ticket request
+      parameters:
+        - name: TicketId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/TicketId'
+      responses:
+        '200':
+          description: Empty JSON
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '403':
+          $ref: '#/components/responses/ErrPermissionDecline'
+        '404':
+          $ref: '#/components/responses/ErrNotFound'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+  /ticket:
+    parameters:
+      - in: header
+        name: Authentication
+        schema:
+          $ref: '#/components/schemas/WithJWT'
+    servers:
+      - url: 'https://apicugrader.sittha.net/v1'
+    post:
+      operationId: createTicket
+      tags:
+        - lab
+      summary: create ticket
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - LabId
+                - isCheckIn
+              properties:
+                LabId:
+                  $ref: '#/components/schemas/LabId'
+                isCheckIn:
+                  description: input pin from student
+                  type: string
+      responses:
+        '200':
+          description: create ticket
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: string
+                    description: The image file in base64 format or a link to the image so you can use directly to <img>
+                    example: 'https://media.cnn.com/api/v1/images/stellar/prod/130604125005-rick-astley-video.jpg?q=x_0,y_152,h_720,w_1280,c_crop/h_653,w_1160/f_avif'
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '403':
+          $ref: '#/components/responses/ErrPermissionDecline'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+  '/session/{LabId}':
+    parameters:
+      - in: header
+        name: Authentication
+        schema:
+          $ref: '#/components/schemas/WithJWT'
+    servers:
+      - url: 'https://apicugrader.sittha.net/v1'
+    get:
+      operationId: getLabSession
+      tags:
+        - lab
+      summary: Leb exam session
+      parameters:
+        - name: LabId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/LabId'
+      responses:
+        '200':
+          description: Leb exam session
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '403':
+          $ref: '#/components/responses/ErrPermissionDecline'
+        '404':
+          $ref: '#/components/responses/ErrNotFound'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+  /checkpin:
+    parameters:
+      - in: header
+        name: Authentication
+        schema:
+          $ref: '#/components/schemas/WithJWT'
+    servers:
+      - url: 'https://apicugrader.sittha.net/v1'
+    post:
+      operationId: checkPin
+      tags:
+        - lab
+      summary: check pin
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - LabId
+                - pin
+              properties:
+                LabId:
+                  $ref: '#/components/schemas/LabId'
+                pin:
+                  description: input pin from student
+                  type: string
+      responses:
+        '200':
+          description: check pin
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: pin correctness
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '403':
+          $ref: '#/components/responses/ErrPermissionDecline'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
 components:
   schemas:
     Pong:
@@ -1809,6 +2017,10 @@ components:
       description: 'A unique identifier for a language, typically used to retrieve or reference an language in a system.'
       type: integer
       example: 12345
+    TicketId:
+      description: 'A unique identifier for a ticket, typically used to retrieve or reference a specific ticket in a system.'
+      type: integer
+      example: 1
     WithJWT:
       type: string
       description: JWT token for authentication

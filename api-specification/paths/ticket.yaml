@@ -1,0 +1,45 @@
+parameters:
+  - in: header
+    name: Authentication
+    schema:
+      $ref: "../components/schemas/WithJWT.yaml"
+servers:
+  - url: https://apicugrader.sittha.net/v1
+post:
+  operationId: createTicket
+  tags: [lab]
+  summary: create ticket
+  requestBody:
+    content:
+      multipart/form-data:
+        schema:
+          type: object
+          required:
+            - LabId
+            - isCheckIn
+          properties:
+            LabId:
+              $ref: "../components/schemas/LabId.yaml"
+            isCheckIn:
+              description: input pin from student
+              type: string
+  responses:
+    "200":
+      description: create ticket
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              content:
+                type: string
+                description: The image file in base64 format or a link to the image so you can use directly to <img>
+                example: "https://media.cnn.com/api/v1/images/stellar/prod/130604125005-rick-astley-video.jpg?q=x_0,y_152,h_720,w_1280,c_crop/h_653,w_1160/f_avif"
+    "400":
+      $ref: '../components/responses/ErrBadRequest.yaml'
+    "401":
+      $ref: '../components/responses/ErrUnauthorized.yaml'
+    "403":
+      $ref: '../components/responses/ErrPermissionDecline.yaml'
+    "500":
+      $ref: '../components/responses/ErrServerIssue.yaml'

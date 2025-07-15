@@ -1,0 +1,74 @@
+parameters:
+  - in: header
+    name: Authentication
+    schema:
+      $ref: "../components/schemas/WithJWT.yaml"
+servers:
+  - url: https://apicugrader.sittha.net/v1
+get:
+  operationId: getTicketInformation
+  tags: [lab]
+  summary: ticket info
+  parameters:
+    - name: TicketId
+      in: path
+      required: true
+      schema:
+        $ref: "../components/schemas/TicketId.yaml"
+  responses:
+    "200":
+      description: ticket info
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              student:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: 10 characters student id
+                  name:
+                    type: string
+                    description: student's full name
+                  isCheckIn:
+                    type: boolean 
+    "500":
+      $ref: '../components/responses/ErrServerIssue.yaml'
+    "400":
+      $ref: '../components/responses/ErrBadRequest.yaml'
+    "401":
+      $ref: '../components/responses/ErrUnauthorized.yaml'
+    "403":
+      $ref: '../components/responses/ErrPermissionDecline.yaml'
+    "404":
+      $ref: '../components/responses/ErrNotFound.yaml'
+
+patch:
+  operationId: getConfirmTicket
+  tags: [lab]
+  summary: confirm ticket request
+  parameters:
+    - name: TicketId
+      in: path
+      required: true
+      schema:
+        $ref: "../components/schemas/TicketId.yaml"
+  responses:
+    "200":
+      description: Empty JSON
+      content:
+        application/json:
+          schema:
+            type: object
+    "500":
+      $ref: '../components/responses/ErrServerIssue.yaml'
+    "400":
+      $ref: '../components/responses/ErrBadRequest.yaml'
+    "401":
+      $ref: '../components/responses/ErrUnauthorized.yaml'
+    "403":
+      $ref: '../components/responses/ErrPermissionDecline.yaml'
+    "404":
+      $ref: '../components/responses/ErrNotFound.yaml'

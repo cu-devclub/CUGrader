@@ -1,0 +1,44 @@
+parameters:
+  - in: header
+    name: Authentication
+    schema:
+      $ref: "../components/schemas/WithJWT.yaml"
+servers:
+  - url: https://apicugrader.sittha.net/v1
+post:
+  operationId: checkPin
+  tags: [lab]
+  summary: check pin
+  requestBody:
+    content:
+      multipart/form-data:
+        schema:
+          type: object
+          required:
+            - LabId
+            - pin
+          properties:
+            LabId:
+              $ref: "../components/schemas/LabId.yaml"
+            pin:
+              description: input pin from student
+              type: string
+  responses:
+    "200":
+      description: check pin
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                description: pin correctness
+    "400":
+      $ref: '../components/responses/ErrBadRequest.yaml'
+    "401":
+      $ref: '../components/responses/ErrUnauthorized.yaml'
+    "403":
+      $ref: '../components/responses/ErrPermissionDecline.yaml'
+    "500":
+      $ref: '../components/responses/ErrServerIssue.yaml'
