@@ -85,6 +85,16 @@ paths:
   /student_score/{LabId}:
     $ref: './paths/student_score.yaml'
 
+  /ticket/{TicketId}:
+    $ref: './paths/paramTicket.yaml'
+  /ticket:
+    $ref: './paths/ticket.yaml'
+
+  /session/{LabId}:
+    $ref: './paths/session.yaml'
+  /checkpin:
+    $ref: './paths/checkpin.yaml'
+
 components:
   schemas:
     $ref: './components/schemas/schemas.yaml'

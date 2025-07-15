@@ -1,0 +1,37 @@
+parameters:
+  - in: header
+    name: Authentication
+    schema:
+      $ref: "../components/schemas/WithJWT.yaml"
+servers:
+  - url: https://apicugrader.sittha.net/v1
+get:
+  operationId: getLabSession
+  tags: [lab]
+  summary: Leb exam session
+  parameters:
+    - name: LabId
+      in: path
+      required: true
+      schema:
+        $ref: "../components/schemas/LabId.yaml"
+  responses:
+    "200":
+      description: Leb exam session
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+    "500":
+      $ref: '../components/responses/ErrServerIssue.yaml'
+    "400":
+      $ref: '../components/responses/ErrBadRequest.yaml'
+    "401":
+      $ref: '../components/responses/ErrUnauthorized.yaml'
+    "403":
+      $ref: '../components/responses/ErrPermissionDecline.yaml'
+    "404":
+      $ref: '../components/responses/ErrNotFound.yaml'

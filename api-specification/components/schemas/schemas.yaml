@@ -17,6 +17,8 @@ ClassId:
   $ref: './ClassId.yaml'
 LanguageId:
   $ref: './LanguageId.yaml'
+TicketId:
+  $ref: './TicketId.yaml'
 
 WithJWT:
   $ref: './WithJWT.yaml'
