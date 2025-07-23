@@ -2,8 +2,8 @@ package lab
 
 import "cugrader/repository/lab"
 
-func GetTestcaseCodeByTestcaseID(questionId int) (*lab.TestcaseCodeResponseModel, error) {
-	testcase, err := lab.GetTestcaseByQuestionID(questionId)
+func GetTestcaseCodeByTestcaseID(testCaseId int, withSecret bool) (*lab.TestcaseCodeResponseModel, error) {
+	testcase, err := lab.GetTestcaseCodeByTestcaseID(testCaseId)
 	if err != nil {
 		return nil, err
 	}
@@ -11,12 +11,14 @@ func GetTestcaseCodeByTestcaseID(questionId int) (*lab.TestcaseCodeResponseModel
 	if testcase == nil {
 		// No testcase found, return empty response
 		return &lab.TestcaseCodeResponseModel{
-			Testcase: "",
+			Testcase:       "",
+			SecretTestcase: "",
 		}, nil
 	}
-	testcaseCodeResponse := &lab.TestcaseCodeResponseModel{
-		Testcase: testcase.TestcaseObjectID,
+
+	if !withSecret {
+		testcase.SecretTestcase = ""
 	}
 
-	return testcaseCodeResponse, nil
+	return testcase, nil
 }

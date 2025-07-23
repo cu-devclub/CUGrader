@@ -84,11 +84,10 @@ func GetLabByIdForInstructor(labId int) (*lab.LabInstructorDetailModel, error) {
 
 	lab := &lab.LabInstructorDetailModel{
 		// sorted by apperance in API spec
-		ClassID:                labFull.ClassID,
-		ExamPin:                labFull.ExamPin,
-		ShowScoreOnLock:        labFull.ShowScoreOnLock,
-		TestcaseObjectID:       labFull.TestcaseObjectID,
-		SecretTestcaseObjectID: labFull.SecretTestcaseObjectID,
+		ClassID:         labFull.ClassID,
+		ExamPin:         labFull.ExamPin,
+		ShowScoreOnLock: labFull.ShowScoreOnLock,
+		TestcaseID:      labFull.TestcaseID,
 
 		LabStudentDetailModel: lab.LabStudentDetailModel{
 			AdditionalFiles: additionalFileIDs,
@@ -101,6 +100,7 @@ func GetLabByIdForInstructor(labId int) (*lab.LabInstructorDetailModel, error) {
 			ExamMode:        labFull.ExamMode,
 			CloseOnDue:      labFull.CloseOnDue,
 			AssignTo:        assignedGroups,
+			Description:     labFull.Description,
 		},
 	}
 

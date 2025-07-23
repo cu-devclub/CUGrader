@@ -7,8 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (s *Server) DeleteAssistantFromClass(c *gin.Context, params gen.DeleteAssistantFromClassParams) {
-	assistant.RemoveAssistantHandler(c, params)
+func (s *Server) DeleteAssistantFromClass(c *gin.Context, assistantId gen.AssistantId, params gen.DeleteAssistantFromClassParams) {
+	assistant.RemoveAssistantHandler(c, assistantId, params)
 }
 func (s *Server) InsertAssistantToClass(c *gin.Context, params gen.InsertAssistantToClassParams) {
 	assistant.InsertAssistantHandler(c, params)

@@ -1,21 +1,15 @@
 package student
 
 type StudentInput struct {
-	ClassID   int  `json:"class_id"`
-	Email     int  `json:"email"`
-	SectionID int  `json:"section_id"`
-	GroupID   *int `json:"group_id"` // optional
-}
-
-type deleteStudentRequest struct {
-	ClassID int `json:"class_id"`
-	UserID  int `json:"user_id"`
+	ClassID int    `json:"ClassId"`
+	Email   string `json:"email"`
+	Section int    `json:"section"`
+	Group   string `json:"group"`
 }
 
 type EditStudentRequest struct {
-	ClassID   int    `json:"class_id" binding:"required"`
-	StudentID int    `json:"student_id" binding:"required"`
-	Section   string `json:"section,omitempty"`
-	Group     string `json:"group,omitempty"`
-	Withdrawn string `json:"withdrawn,omitempty"`
+	StudentID  int    `json:"StudentId" binding:"required"`
+	Section    *int   `json:"section,omitempty"`
+	Group      string `json:"group,omitempty"`
+	Withdrawal *bool  `json:"withdrawal,omitempty"`
 }

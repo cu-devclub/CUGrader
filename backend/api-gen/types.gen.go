@@ -10,6 +10,9 @@ import (
 // AddFileId A unique identifier for a additional file, typically used to retrieve or reference a specific additional file in a system.
 type AddFileId = int
 
+// AssistantId A unique identifier for a assistant, typically used to retrieve or reference a specific assistant in a system.
+type AssistantId = int
+
 // ClassId A unique identifier for a class, typically used to retrieve or reference a specific class in a system.
 type ClassId = int
 
@@ -43,6 +46,9 @@ type Pong struct {
 // QuestionId A unique identifier for a question, typically used to retrieve or reference a specific question in a system.
 type QuestionId = int
 
+// StudentId A unique identifier for a class_student, typically used to retrieve or reference an class_student in a system.
+type StudentId = int
+
 // SubmissionId A unique identifier for a submission, typically used to retrieve or reference a specific submission in a system.
 type SubmissionId = int
 
@@ -57,6 +63,9 @@ type TAEditBody struct {
 
 // TestCaseId A unique identifier for a testcase, typically used to retrieve or reference a specific testcase in a system.
 type TestCaseId = int
+
+// TicketId A unique identifier for a ticket, typically used to retrieve or reference a specific ticket in a system.
+type TicketId = int
 
 // WithJWT JWT token for authentication
 type WithJWT = string
@@ -140,13 +149,13 @@ type ErrUnauthorized struct {
 	HumanMessage string `json:"human_message"`
 }
 
-// DeleteAssistantFromClassParams defines parameters for DeleteAssistantFromClass.
-type DeleteAssistantFromClassParams struct {
+// InsertAssistantToClassParams defines parameters for InsertAssistantToClass.
+type InsertAssistantToClassParams struct {
 	Authentication *WithJWT `json:"Authentication,omitempty"`
 }
 
-// InsertAssistantToClassParams defines parameters for InsertAssistantToClass.
-type InsertAssistantToClassParams struct {
+// DeleteAssistantFromClassParams defines parameters for DeleteAssistantFromClass.
+type DeleteAssistantFromClassParams struct {
 	Authentication *WithJWT `json:"Authentication,omitempty"`
 }
 
@@ -172,6 +181,20 @@ type GetUserDataFromGoogleJSONBody struct {
 
 	// Key key for decrypt data
 	Key string `json:"key"`
+}
+
+// CheckPinMultipartBody defines parameters for CheckPin.
+type CheckPinMultipartBody struct {
+	// LabId A unique identifier for a lab, typically used to retrieve or reference a specific lab in a system.
+	LabId LabId `json:"LabId"`
+
+	// Pin input pin from student
+	Pin string `json:"pin"`
+}
+
+// CheckPinParams defines parameters for CheckPin.
+type CheckPinParams struct {
+	Authentication *WithJWT `json:"Authentication,omitempty"`
 }
 
 // EditClassMultipartBody defines parameters for EditClass.
@@ -315,8 +338,18 @@ type GetNearDueDateLabsParams struct {
 	Authentication *WithJWT `json:"Authentication,omitempty"`
 }
 
+// GetUserProgressParams defines parameters for GetUserProgress.
+type GetUserProgressParams struct {
+	Authentication *WithJWT `json:"Authentication,omitempty"`
+}
+
 // GetQuestionInformationParams defines parameters for GetQuestionInformation.
 type GetQuestionInformationParams struct {
+	Authentication *WithJWT `json:"Authentication,omitempty"`
+}
+
+// GetUserRankParams defines parameters for GetUserRank.
+type GetUserRankParams struct {
 	Authentication *WithJWT `json:"Authentication,omitempty"`
 }
 
@@ -325,18 +358,19 @@ type GetGradedReultParams struct {
 	Authentication *WithJWT `json:"Authentication,omitempty"`
 }
 
+// GetUserScoreParams defines parameters for GetUserScore.
+type GetUserScoreParams struct {
+	Authentication *WithJWT `json:"Authentication,omitempty"`
+}
+
 // GetSectionInClassParams defines parameters for GetSectionInClass.
 type GetSectionInClassParams struct {
 	Authentication *WithJWT `json:"Authentication,omitempty"`
 }
 
-// DeleteStudentFromClassJSONBody defines parameters for DeleteStudentFromClass.
-type DeleteStudentFromClassJSONBody struct {
-	// ClassId A unique identifier for a class, typically used to retrieve or reference a specific class in a system.
-	ClassId ClassId `json:"ClassId"`
-
-	// StudentId student id primary key
-	StudentId string `json:"StudentId"`
+// GetLabSessionParams defines parameters for GetLabSession.
+type GetLabSessionParams struct {
+	Authentication *WithJWT `json:"Authentication,omitempty"`
 }
 
 // DeleteStudentFromClassParams defines parameters for DeleteStudentFromClass.
@@ -344,11 +378,13 @@ type DeleteStudentFromClassParams struct {
 	Authentication *WithJWT `json:"Authentication,omitempty"`
 }
 
+// GetStudentLabScoreParams defines parameters for GetStudentLabScore.
+type GetStudentLabScoreParams struct {
+	Authentication *WithJWT `json:"Authentication,omitempty"`
+}
+
 // EditStudentInClassJSONBody defines parameters for EditStudentInClass.
 type EditStudentInClassJSONBody struct {
-	// ClassId A unique identifier for a class, typically used to retrieve or reference a specific class in a system.
-	ClassId ClassId `json:"ClassId"`
-
 	// StudentId student id primary key
 	StudentId string `json:"StudentId"`
 
@@ -417,14 +453,38 @@ type GetTestcaseInfomationParams struct {
 	Authentication *WithJWT `json:"Authentication,omitempty"`
 }
 
-// DeleteAssistantFromClassJSONRequestBody defines body for DeleteAssistantFromClass for application/json ContentType.
-type DeleteAssistantFromClassJSONRequestBody = TAEditBody
+// CreateTicketMultipartBody defines parameters for CreateTicket.
+type CreateTicketMultipartBody struct {
+	// LabId A unique identifier for a lab, typically used to retrieve or reference a specific lab in a system.
+	LabId LabId `json:"LabId"`
+
+	// IsCheckIn input pin from student
+	IsCheckIn string `json:"isCheckIn"`
+}
+
+// CreateTicketParams defines parameters for CreateTicket.
+type CreateTicketParams struct {
+	Authentication *WithJWT `json:"Authentication,omitempty"`
+}
+
+// GetTicketInformationParams defines parameters for GetTicketInformation.
+type GetTicketInformationParams struct {
+	Authentication *WithJWT `json:"Authentication,omitempty"`
+}
+
+// GetConfirmTicketParams defines parameters for GetConfirmTicket.
+type GetConfirmTicketParams struct {
+	Authentication *WithJWT `json:"Authentication,omitempty"`
+}
 
 // InsertAssistantToClassJSONRequestBody defines body for InsertAssistantToClass for application/json ContentType.
 type InsertAssistantToClassJSONRequestBody = TAEditBody
 
 // GetUserDataFromGoogleJSONRequestBody defines body for GetUserDataFromGoogle for application/json ContentType.
 type GetUserDataFromGoogleJSONRequestBody GetUserDataFromGoogleJSONBody
+
+// CheckPinMultipartRequestBody defines body for CheckPin for multipart/form-data ContentType.
+type CheckPinMultipartRequestBody CheckPinMultipartBody
 
 // EditClassMultipartRequestBody defines body for EditClass for multipart/form-data ContentType.
 type EditClassMultipartRequestBody EditClassMultipartBody
@@ -441,9 +501,6 @@ type UpdateLabMultipartRequestBody UpdateLabMultipartBody
 // CreateLabMultipartRequestBody defines body for CreateLab for multipart/form-data ContentType.
 type CreateLabMultipartRequestBody CreateLabMultipartBody
 
-// DeleteStudentFromClassJSONRequestBody defines body for DeleteStudentFromClass for application/json ContentType.
-type DeleteStudentFromClassJSONRequestBody DeleteStudentFromClassJSONBody
-
 // EditStudentInClassJSONRequestBody defines body for EditStudentInClass for application/json ContentType.
 type EditStudentInClassJSONRequestBody EditStudentInClassJSONBody
 
@@ -455,3 +512,6 @@ type GradeUsersCodeJSONRequestBody GradeUsersCodeJSONBody
 
 // UserForCreateTestUserJSONRequestBody defines body for UserForCreateTestUser for application/json ContentType.
 type UserForCreateTestUserJSONRequestBody UserForCreateTestUserJSONBody
+
+// CreateTicketMultipartRequestBody defines body for CreateTicket for multipart/form-data ContentType.
+type CreateTicketMultipartRequestBody CreateTicketMultipartBody

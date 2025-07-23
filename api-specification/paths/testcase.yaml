@@ -25,6 +25,9 @@ get:
             properties:
               testcase:
                 type: string
+              secret_testcase:
+                type: string
+                description: null if not student
     "500":
       $ref: '../components/responses/ErrServerIssue.yaml'
     "400":

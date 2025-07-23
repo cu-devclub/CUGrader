@@ -9,7 +9,7 @@ func GetLabsNearDueDateByRole(userID int, role string) ([]NearDueDate, error) {
 	baseQuery := `
 	SELECT
 		c.course_id,
-		c.course_name,
+		c.name,
 		l.id AS lab_id,
 		l.name AS lab_name,
 		l.due AS lab_due,
@@ -28,7 +28,7 @@ func GetLabsNearDueDateByRole(userID int, role string) ([]NearDueDate, error) {
 	case "admin":
 		// no additional filter
 		rows, err = db.YSQL.Query(baseQuery + `
-		GROUP BY c.course_id, c.course_name, l.id, l.name, l.due
+		GROUP BY c.course_id, c.name, l.id, l.name, l.due
 		ORDER BY l.due ASC
 		`)
 
@@ -37,36 +37,38 @@ func GetLabsNearDueDateByRole(userID int, role string) ([]NearDueDate, error) {
 		AND c.id IN (
 			SELECT class_id FROM class_teacher WHERE user_id = $1
 		)
-		GROUP BY c.course_id, c.course_name, l.id, l.name, l.due
+		GROUP BY c.course_id, c.name, l.id, l.name, l.due
 		ORDER BY l.due ASC
 		`, userID)
 
-	case "ta":
-		rows, err = db.YSQL.Query(baseQuery+`
-	AND (
-		c.id IN (
-			SELECT class_id FROM class_assistant WHERE user_id = $1
-		)
-		OR l.id IN (
-			SELECT a.lab_id
-			FROM assign_to a
-			JOIN group_student gs ON a.group_id = gs.group_id
-			WHERE gs.student_id = $1
-		)
-	)
-	GROUP BY c.course_id, c.course_name, l.id, l.name, l.due
-	ORDER BY l.due ASC
-	`, userID)
+	// case "ta":
+	// 	rows, err = db.YSQL.Query(baseQuery+`
+	// AND (
+	// 	c.id IN (
+	// 		SELECT class_id FROM class_assistant WHERE user_id = $1
+	// 	)
+	// 	OR l.id IN (
+	// 		SELECT a.lab_id
+	// 		FROM assign_to a
+	// 		JOIN "group" gs ON a.group_id = gs.id
+	// 		WHERE gs.student_id = $1
+	// 	)
+	// )
+	// GROUP BY c.course_id, c.name, l.id, l.name, l.due
+	// ORDER BY l.due ASC
+	// `, userID)
+
+	// rewrite ta case
 
 	case "student":
 		rows, err = db.YSQL.Query(baseQuery+`
 		AND l.id IN (
 			SELECT a.lab_id
 			FROM assign_to a
-			JOIN group_student gs ON a.group_id = gs.group_id
-			WHERE gs.student_id = $1
+			JOIN class_student cs ON a.group_id = cs.group_id
+			WHERE cs.user_id = $1
 		)
-		GROUP BY c.course_id, c.course_name, l.id, l.name, l.due
+		GROUP BY c.course_id, c.name, l.id, l.name, l.due
 		ORDER BY l.due ASC
 		`, userID)
 	}

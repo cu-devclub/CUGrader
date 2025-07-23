@@ -1,6 +1,16 @@
 package lab
 
-import "time"
+import (
+	"context"
+	"cugrader/connection/db"
+	"database/sql"
+	"fmt"
+	"time"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+)
 
 type LabResponse struct {
 	LabID     int       `json:"lab_id"`
@@ -17,18 +27,18 @@ type LabResponse struct {
 // It includes all the necessary fields to describe a lab, such as its ID, class ID,
 // number, name, publish and due dates, exam mode settings, and associated test cases.
 type LabFullModel struct {
-	ID                     int    `json:"id"`                        // Unique identifier for the lab
-	ClassID                int    `json:"class_id"`                  // ID of the class this lab belongs to
-	Number                 int    `json:"number"`                    // Number of the lab, used for ordering and identification
-	Name                   string `json:"name"`                      // Name of the lab
-	Publish                string `json:"publish"`                   // RFC3339 format (e.g., "1996-12-19T16:39:57+07:00")
-	Due                    string `json:"due"`                       // RFC3339 format (e.g., "1996-12-19T16:39:57+07:00")
-	CloseOnDue             bool   `json:"close_on_due"`              // Whether to close (not allow submissions) the lab when it is due
-	ExamMode               bool   `json:"exam_mode"`                 // Whether this lab is in exam mode
-	ExamPin                string `json:"exam_pin,omitempty"`        // Optional, only used in exam mode
-	ShowScoreOnLock        bool   `json:"show_score_on_lock"`        // ? idk no idea lmao
-	TestcaseObjectID       string `json:"testcase_object_id"`        // Object ID for the main test cases
-	SecretTestcaseObjectID string `json:"secret_testcase_object_id"` // Object ID for the secret test cases
+	ID              int            `json:"id"`                    // Unique identifier for the lab
+	ClassID         int            `json:"class_id"`              // ID of the class this lab belongs to
+	Number          int            `json:"number"`                // Number of the lab, used for ordering and identification
+	Name            string         `json:"name"`                  // Name of the lab
+	Publish         string         `json:"publish"`               // RFC3339 format (e.g., "1996-12-19T16:39:57+07:00")
+	Due             string         `json:"due"`                   // RFC3339 format (e.g., "1996-12-19T16:39:57+07:00")
+	CloseOnDue      bool           `json:"close_on_due"`          // Whether to close (not allow submissions) the lab when it is due
+	ExamMode        bool           `json:"exam_mode"`             // Whether this lab is in exam mode
+	ExamPin         sql.NullString `json:"exam_pin,omitempty"`    // Optional, only used in exam mode
+	Description     string         `json:"description_object_id"` // Object ID for the lab description in MongoDB
+	ShowScoreOnLock bool           `json:"show_score_on_lock"`    // ? idk no idea lmao
+	TestcaseID      string         `json:"testcase_id"`           // Object ID for the main test cases
 }
 
 // LabStudentDetailModel represents the detailed information about a lab for students.
@@ -41,6 +51,7 @@ type LabStudentDetailModel struct {
 	Language        []string `json:"language"`     // List of programming languages supported by this lab
 	ExamMode        bool     `json:"exam_mode"`    // Whether this lab is in exam mode
 	CloseOnDue      bool     `json:"close_on_due"` // Wheather to close (not allow submissions) the lab when it is due
+	Description     string   `json:"description"`  // question content in markdown format
 	AssignTo        []string `json:"assign_to"`    // List of groups assigned this lab to
 	AdditionalFiles []int    `json:"addfiles"`     // Other files associated with this lab (eg. Text file or Image), represented by their IDs
 }
@@ -48,11 +59,10 @@ type LabStudentDetailModel struct {
 type LabInstructorDetailModel struct {
 	LabStudentDetailModel // Embedding LabStudentDetailModel to inherit its fields
 
-	ClassID                int    `json:"class_id"`                  // ID of the class this lab belongs to
-	ExamPin                string `json:"exam_pin,omitempty"`        // Optional, only used in exam mode
-	ShowScoreOnLock        bool   `json:"show_score_on_lock"`        // ? idk no idea lmao
-	TestcaseObjectID       string `json:"testcase_object_id"`        // Object ID for the main test cases
-	SecretTestcaseObjectID string `json:"secret_testcase_object_id"` // Object ID for the secret test cases
+	ClassID         int            `json:"class_id"`           // ID of the class this lab belongs to
+	ExamPin         sql.NullString `json:"exam_pin,omitempty"` // Optional, only used in exam mode
+	ShowScoreOnLock bool           `json:"show_score_on_lock"` // ? idk no idea lmao
+	TestcaseID      string         `json:"testcaseId"`         // Object ID for the main test cases
 }
 
 type LabEditModel struct {
@@ -64,7 +74,7 @@ type LabEditModel struct {
 	ExamMode        *bool               `json:"exam_mode"`          // Whether this lab is in exam mode
 	ShowScoreOnLock *bool               `json:"show_score_on_lock"` // ? idk no idea lmao
 	AssignTo        []string            `json:"assign_to"`          // List of groups assigned this lab to
-	ExamPin         *string             `json:"exam_pin,omitempty"` // Optional, only used in exam mode
+	ExamPin         *sql.NullString     `json:"exam_pin,omitempty"` // Optional, only used in exam mode
 	Testcase        *string             `json:"testcase"`           // Object ID for the main test cases
 	SecretTestcase  *string             `json:"secret_testcase"`    // Object ID for the secret test cases
 	Questions       []QuestionEditModel `json:"questions"`          // List of questions associated with this lab
@@ -112,16 +122,15 @@ type QuestionStudentResponseModel struct {
 }
 
 type QuestionFullModel struct {
-	ID                     int    `json:"id"`                        // question ID
-	LabID                  int    `json:"lab_id"`                    // lab ID associated with the question
-	Number                 int    `json:"number"`                    // question number
-	Name                   string `json:"name"`                      // question name
-	Score                  int    `json:"score"`                     // maximum score for the question
-	Description            string `json:"description"`               // question content in markdown format
-	Answer                 string `json:"answer"`                    // answer to the question
-	Predefine              string `json:"predefine"`                 // pre-filled code for the question
-	TestcaseObjectID       string `json:"testcase_object_id"`        // testcase_id primary key, null if multilanguage
-	SecretTestcaseObjectID string `json:"secret_testcase_object_id"` // Secret testcase_id primary key, null if multilanguage
+	ID          int    `json:"id"`          // question ID
+	LabID       int    `json:"lab_id"`      // lab ID associated with the question
+	Number      int    `json:"number"`      // question number
+	Name        string `json:"name"`        // question name
+	Score       int    `json:"score"`       // maximum score for the question
+	Description string `json:"description"` // question content in markdown format
+	Answer      string `json:"answer"`      // answer to the question
+	Predefine   string `json:"predefine"`   // pre-filled code for the question
+	TestcaseID  string `json:"testcase_id"` // testcase_id primary key, null if multilanguage
 }
 
 type TestcaseModel struct {
@@ -131,7 +140,8 @@ type TestcaseModel struct {
 }
 
 type TestcaseCodeResponseModel struct {
-	Testcase string `json:"testcase"` // Test case code
+	Testcase       string `json:"testcase"` // Test case code
+	SecretTestcase string `json:"secret_testcase"`
 }
 
 type TestcaseWithSecretModel struct {
@@ -146,4 +156,32 @@ type NearDueDate struct {
 	LabName     string    `json:"lab_name"`
 	LabDue      time.Time `json:"lab_due"`
 	LabMaxScore int       `json:"lab_max_score"`
+}
+
+type MDModel struct {
+	ID      string `bson:"_id"`
+	Content string `bson:"content"`
+}
+
+func GetDescriptionByID(codeID string) (string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	objectID, err := primitive.ObjectIDFromHex(codeID)
+	if err != nil {
+		return "", fmt.Errorf("invalid ObjectID: %w", err)
+	}
+
+	collection := db.MongoClient.Database("cugrader").Collection("markdown")
+	filter := bson.M{"_id": objectID}
+
+	var code MDModel
+	err = collection.FindOne(ctx, filter).Decode(&code)
+	if err == mongo.ErrNoDocuments {
+		return "", nil
+	}
+	if err != nil {
+		return "", err
+	}
+	return code.Content, nil
 }

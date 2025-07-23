@@ -4,8 +4,10 @@ import (
 	gen "cugrader/api-gen"
 	"cugrader/logic/lab"
 	"cugrader/logic/utils"
+	labStuct "cugrader/structure/lab"
+	"encoding/json"
 	"net/http"
-	"time"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,39 +19,42 @@ func AddLabHandler(c *gin.Context, params gen.CreateLabParams) {
 		return
 	}
 
-	type AddLabLabData struct {
-		QuestionNumber  int       `json:"number" binding:"required"`
-		Name            string    `json:"name" binding:"required"`
-		PublishDate     time.Time `json:"publish" binding:"required"`
-		DueDate         time.Time `json:"due" binding:"required"`
-		CloseOnDue      bool      `json:"close_on_due" binding:"required"`
-		ExamMode        bool      `json:"exam_mode" binding:"required"`
-		ShowScoreOnLock bool      `json:"show_score_on_lock" binding:"required"`
-		ExamPin         int       `json:"exam_pin" binding:"required"` // 6 digits with leading zeroes
-		Testcase        string    `json:"testcase" binding:"required"`
-		SecretTestcase  string    `json:"secret_testcase" binding:"required"`
+	ClassId, err := strconv.Atoi(c.PostForm("ClassId"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ClassId"})
+		return
 	}
 
-	type AddLabRequest struct {
-		ClassID int           `json:"class_id" binding:"required"`
-		LabData AddLabLabData `json:"lab_data" binding:"required"`
+	exist, err := utils.ClassIDExists(ClassId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Error while checking class existence: " + err.Error()})
+		return
+	}
+	if !exist {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Class not found"})
+		return
 	}
 
-	var req AddLabRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	labDataStr := c.PostForm("lab_data")
+	var labData labStuct.LabData
+	err = json.Unmarshal([]byte(labDataStr), &labData)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request: " + err.Error()})
 		return
 	}
 
-	if req.LabData.ExamPin < 0 || req.LabData.ExamPin > 999999 {
+	req := labStuct.AddLab{ClassID: ClassId, LabData: labData}
+
+	if req.LabData.ExamMode && (req.LabData.ExamPin == nil || *req.LabData.ExamPin < 0 || *req.LabData.ExamPin > 999999) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Exam pin must be a 6-digit number"})
 		return
 	}
+
 	if req.LabData.PublishDate.After(req.LabData.DueDate) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Publish date must be before due date"})
 		return
 	}
-	if req.LabData.QuestionNumber < 1 {
+	if len(req.LabData.Questions) < 1 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Question number must be greater than 0"})
 		return
 	}
@@ -60,17 +65,10 @@ func AddLabHandler(c *gin.Context, params gen.CreateLabParams) {
 		return
 	}
 
-	_, err = lab.AddLab(
-		req.ClassID,
-		req.LabData.QuestionNumber,
-		req.LabData.Name,
-		req.LabData.PublishDate,
-		req.LabData.DueDate,
-		req.LabData.CloseOnDue,
-		req.LabData.ExamMode,
-		req.LabData.ShowScoreOnLock,
-		req.LabData.ExamPin,
-	)
+	f, _ := c.MultipartForm()
+	addfiles := f.File["addfiles"]
+
+	_, err = lab.AddLab(req.ClassID, req.LabData, addfiles)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to add lab: " + err.Error()})
 		return

@@ -7,8 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (s *Server) DeleteStudentFromClass(c *gin.Context, params gen.DeleteStudentFromClassParams) {
-	student.DeleteStudentHandler(c, params)
+func (s *Server) DeleteStudentFromClass(c *gin.Context, studentId gen.StudentId, params gen.DeleteStudentFromClassParams) {
+	student.DeleteStudentHandler(c, studentId, params)
 }
 
 func (s *Server) EditStudentInClass(c *gin.Context, params gen.EditStudentInClassParams) {

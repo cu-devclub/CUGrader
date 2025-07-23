@@ -10,28 +10,25 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RemoveAssistantHandler(c *gin.Context, params gen.DeleteAssistantFromClassParams) {
+func RemoveAssistantHandler(c *gin.Context, assistantId gen.AssistantId, params gen.DeleteAssistantFromClassParams) {
 	claims, err := utils.GetJWTClaims(*params.Authentication)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
 		return
 	}
 
-	var req struct {
-		ClassID int    `json:"class_id"`
-		Email   string `json:"email"`
-	}
-	if err := c.ShouldBindJSON(&req); err != nil || req.ClassID == 0 || req.Email == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+	ClassId, err := utils.GetClassIDWithAssistantId(assistantId)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Assistant not found"})
 		return
 	}
 
-	if allow := utils.IsUserTeacherAdminOrAssistant(req.ClassID, claims.UserID); !allow {
+	if allow := utils.IsUserTeacherAdminOrAssistant(ClassId, claims.UserID); !allow {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "You dont have permission"})
 		return
 	}
 
-	err = assistant.RemoveAssistant(req.ClassID, req.Email)
+	err = assistant.RemoveAssistant(assistantId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

@@ -63,6 +63,20 @@ func IsUserTeacherAdminOrAssistant(classID int, userID int) bool {
 	return false
 }
 
+func IsUserCanAccessClass(classID int, userID int) bool {
+	if IsUserTeacherAdminOrAssistant(classID, userID) {
+		return true
+	}
+
+	var exists bool
+	err := db.YSQL.QueryRow("SELECT EXISTS(SELECT 1 FROM class_student WHERE class_id = $1 AND user_id = $2)", classID, userID).Scan(&exists)
+	if err == nil && exists {
+		return true
+	}
+
+	return false
+}
+
 func IsUserAnAssistantToTestcase(testcaseID int, userID int) (bool, error) {
 	// Check if user is assistant in the class of the testcase
 	var exists bool

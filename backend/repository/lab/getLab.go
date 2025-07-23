@@ -10,20 +10,20 @@ import (
 func GetLab(labId int) (*LabFullModel, error) {
 	lab := &LabFullModel{}
 	query := `SELECT 
-		id,
-		class_id,
-		number,
-		name,
-		publish,
-		due,
-		close_on_due,
-		exam_mode,
-		exam_pin,
-		show_score_on_lock,
-		testcase_object_id,
-		secret_testcase_object_id
-	FROM lab
-	WHERE id = $1`
+		l.id,
+		l.class_id,
+		l.number,
+		l.name,
+		l.publish,
+		l.due,
+		l.close_on_due,
+		l.exam_mode,
+		l.exam_pin,
+		l.show_score_on_lock,
+		l.description_object_id,
+		l.testcase_id
+	FROM lab l
+	WHERE l.id = $1`
 	row := db.YSQL.QueryRow(query, labId)
 	if err := row.Scan(
 		&lab.ID,
@@ -36,17 +36,25 @@ func GetLab(labId int) (*LabFullModel, error) {
 		&lab.ExamMode,
 		&lab.ExamPin,
 		&lab.ShowScoreOnLock,
-		&lab.TestcaseObjectID,
-		&lab.SecretTestcaseObjectID,
+		&lab.Description,
+		&lab.TestcaseID,
 	); err != nil {
 		return nil, err
 	}
+
+	Description, err := GetDescriptionByID(lab.Description)
+	if err != nil {
+		return nil, nil
+	}
+
+	lab.Description = Description
+
 	return lab, nil
 }
 
 // GetLabStudentDetail retrieves detailed information about a lab for students, including questions, languages, and assigned groups.
 func GetLabAssignedGroupNames(labId int) ([]string, error) {
-	query := `SELECT DISTINCT g.name FROM group g LEFT JOIN assign_to at ON g.id = at.group_id WHERE at.lab_id = $1`
+	query := `SELECT DISTINCT g.group_name FROM "group" g LEFT JOIN assign_to at ON g.id = at.group_id WHERE at.lab_id = $1`
 	rows, err := db.YSQL.Query(query, labId)
 	if err != nil {
 		return nil, err

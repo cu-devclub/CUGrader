@@ -27,7 +27,7 @@ func AddStudentHandler(c *gin.Context, params gen.InsertStudentToClassParams) {
 		return
 	}
 
-	err = student.AddStudent(input.ClassID, input.Email, input.SectionID, input.GroupID)
+	err = student.AddStudent(input.ClassID, input.Email, input.Section, input.Group)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert student"})
 		return

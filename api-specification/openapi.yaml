@@ -36,11 +36,16 @@ paths:
     $ref: './paths/student.yaml'
   /students/{ClassId}:
     $ref: './paths/getStudent.yaml'
+  /student/{StudentId}:
+    $ref: './paths/deleteStudent.yaml'
+  
 
   /TA:
     $ref: './paths/TA.yaml'
-  /TA/{ClassId}:
+  /TAs/{ClassId}:
     $ref: './paths/getTA.yaml'
+  /TA/{AssistantId}:
+    $ref: './paths/deleteTA.yaml'
 
   /near_due_date:
     $ref: './paths/NearDueDate.yaml'

@@ -17,7 +17,7 @@ func InsertAssistantHandler(c *gin.Context, params gen.InsertAssistantToClassPar
 	}
 
 	var req struct {
-		ClassID int    `json:"class_id"`
+		ClassID int    `json:"ClassId"`
 		Email   string `json:"email"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil || req.ClassID == 0 || req.Email == "" {
@@ -30,7 +30,13 @@ func InsertAssistantHandler(c *gin.Context, params gen.InsertAssistantToClassPar
 		return
 	}
 
-	err = assistant.InsertAssistant(req.ClassID, req.Email)
+	UserId, err := utils.GetUserIDorInsert(req.Email)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = assistant.InsertAssistant(req.ClassID, UserId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

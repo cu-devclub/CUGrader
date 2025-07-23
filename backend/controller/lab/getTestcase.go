@@ -5,7 +5,6 @@ import (
 	"cugrader/logic/lab"
 	"cugrader/logic/utils"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,25 +16,18 @@ func GetTestcaseCodeByTestcaseIDHandler(c *gin.Context, testCaseId gen.TestCaseI
 		return
 	}
 
-	testcaseIDStr := c.Param("testcaseId")
-	testcaseID, err := strconv.Atoi(testcaseIDStr)
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid testcase_id"})
-		return
-	}
-
+	var isAssistant bool
 	// Check access permissions (admin/teacher have full access)
 	if claims.Role != "teacher" && claims.Role != "admin" {
 		// For non-admin/teacher users, check if they have access via assistant role or student assignment
-		isAssistant, err := utils.IsUserAnAssistantToTestcase(testcaseID, claims.UserID)
+		isAssistant, err = utils.IsUserAnAssistantToTestcase(testCaseId, claims.UserID)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to check access"})
 			return
 		}
 
 		if !isAssistant {
-			isAssigned, err := utils.IsStudentAssignedToLabByTestcaseID(claims.UserID, testcaseID)
+			isAssigned, err := utils.IsStudentAssignedToLabByTestcaseID(claims.UserID, testCaseId)
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to check access"})
 				return
@@ -48,7 +40,9 @@ func GetTestcaseCodeByTestcaseIDHandler(c *gin.Context, testCaseId gen.TestCaseI
 		}
 	}
 
-	testcaseCode, err := lab.GetTestcaseCodeByTestcaseID(testcaseID)
+	with_secret := isAssistant || claims.Role == "teacher" || claims.Role == "admin"
+
+	testcaseCode, err := lab.GetTestcaseCodeByTestcaseID(testCaseId, with_secret)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to get testcase code"})
 		return
@@ -59,7 +53,7 @@ func GetTestcaseCodeByTestcaseIDHandler(c *gin.Context, testCaseId gen.TestCaseI
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"testcase": testcaseCode.Testcase})
+	c.JSON(http.StatusOK, testcaseCode)
 }
 
 func GetMultilangTestcaseCodeByQuestionIDHandler(c *gin.Context, questionId gen.QuestionId, params gen.GetMultilanguageTestcaseInformationParams) {
@@ -68,25 +62,17 @@ func GetMultilangTestcaseCodeByQuestionIDHandler(c *gin.Context, questionId gen.
 		c.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
 		return
 	}
-
-	questionIDStr := c.Param("questionId")
-	questionID, err := strconv.Atoi(questionIDStr)
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid question_id"})
-		return
-	}
-
-	isGetSecretTestcase := false
+	var isAssistant bool
+	// isGetSecretTestcase := false
 	if claims.Role != "teacher" && claims.Role != "admin" {
-		isAssistant, err := utils.IsUserAnAssistantToQuestion(questionID, claims.UserID)
+		isAssistant, err := utils.IsUserAnAssistantToQuestion(questionId, claims.UserID)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to check access"})
 			return
 		}
 
 		if !isAssistant {
-			isAssigned, err := utils.IsStudentAssignedToQuestion(claims.UserID, questionID)
+			isAssigned, err := utils.IsStudentAssignedToQuestion(claims.UserID, questionId)
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to check access"})
 				return
@@ -99,9 +85,11 @@ func GetMultilangTestcaseCodeByQuestionIDHandler(c *gin.Context, questionId gen.
 		}
 	}
 
-	testcase, err := lab.GetMultilangTestcaseByQuestionID(questionID, isGetSecretTestcase)
+	with_secret := isAssistant || claims.Role == "teacher" || claims.Role == "admin"
+
+	testcase, err := lab.GetMultilangTestcaseByQuestionID(questionId, with_secret)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to get testcase code"})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to get testcase code: " + err.Error()})
 		return
 	}
 

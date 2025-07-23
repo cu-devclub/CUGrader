@@ -1,6 +1,7 @@
 package lab
 
 import (
+	"cugrader/connection/config"
 	"cugrader/repository/lab"
 	"os"
 	"path/filepath"
@@ -15,7 +16,7 @@ func DeleteAdditionalFileByID(additionalFileID int) error {
 	}
 
 	// Delete the file from the filesystem
-	path = filepath.Join(os.Getenv("FILES_PATH"), path)
+	path = filepath.Join(config.Path, path)
 
 	// Delete the file from the database
 	err = lab.DeleteAdditionalFileByID(additionalFileID)

@@ -31,3 +31,15 @@ func (s *Server) UserForCreateTestUser(c *gin.Context) {
 	}
 	user.TestCallback(c)
 }
+
+func (s *Server) GetUserProgress(c *gin.Context, classId gen.ClassId, params gen.GetUserProgressParams) {
+	c.JSON(http.StatusInternalServerError, gin.H{"message": "waiting for implement"})
+}
+
+func (s *Server) GetUserRank(c *gin.Context, classId gen.ClassId, params gen.GetUserRankParams) {
+	c.JSON(http.StatusInternalServerError, gin.H{"message": "waiting for implement"})
+}
+
+func (s *Server) GetUserScore(c *gin.Context, classId gen.ClassId, params gen.GetUserScoreParams) {
+	c.JSON(http.StatusInternalServerError, gin.H{"message": "waiting for implement"})
+}

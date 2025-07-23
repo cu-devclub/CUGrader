@@ -13,14 +13,14 @@ import (
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
-	// Delete TA from class
-	// (DELETE /TA)
-	DeleteAssistantFromClass(c *gin.Context, params DeleteAssistantFromClassParams)
 	// Add TA to class
 	// (POST /TA)
 	InsertAssistantToClass(c *gin.Context, params InsertAssistantToClassParams)
+
+	// (DELETE /TA/{AssistantId})
+	DeleteAssistantFromClass(c *gin.Context, assistantId AssistantId, params DeleteAssistantFromClassParams)
 	// list ta and instructor by class
-	// (GET /TA/{ClassId})
+	// (GET /TAs/{ClassId})
 	GetAssistantsInClass(c *gin.Context, classId ClassId, params GetAssistantsInClassParams)
 
 	// (DELETE /addfile/{AddFileId})
@@ -34,6 +34,9 @@ type ServerInterface interface {
 
 	// (POST /callback)
 	GetUserDataFromGoogle(c *gin.Context)
+	// check pin
+	// (POST /checkpin)
+	CheckPin(c *gin.Context, params CheckPinParams)
 	// partially edit class information
 	// (PATCH /class)
 	EditClass(c *gin.Context, params EditClassParams)
@@ -92,17 +95,32 @@ type ServerInterface interface {
 	// (GET /ping)
 	TestPing(c *gin.Context)
 
+	// (GET /progress/{ClassId})
+	GetUserProgress(c *gin.Context, classId ClassId, params GetUserProgressParams)
+
 	// (GET /question/{QuestionId})
 	GetQuestionInformation(c *gin.Context, questionId QuestionId, params GetQuestionInformationParams)
+
+	// (GET /rank/{ClassId})
+	GetUserRank(c *gin.Context, classId ClassId, params GetUserRankParams)
 
 	// (GET /result/{SubmissionId})
 	GetGradedReult(c *gin.Context, submissionId SubmissionId, params GetGradedReultParams)
 
+	// (GET /score/{ClassId})
+	GetUserScore(c *gin.Context, classId ClassId, params GetUserScoreParams)
+
 	// (GET /sections/{ClassId})
 	GetSectionInClass(c *gin.Context, classId ClassId, params GetSectionInClassParams)
-	// Delete student
-	// (DELETE /students)
-	DeleteStudentFromClass(c *gin.Context, params DeleteStudentFromClassParams)
+	// Leb exam session
+	// (GET /session/{LabId})
+	GetLabSession(c *gin.Context, labId LabId, params GetLabSessionParams)
+
+	// (DELETE /student/{StudentId})
+	DeleteStudentFromClass(c *gin.Context, studentId StudentId, params DeleteStudentFromClassParams)
+
+	// (GET /student_score/{LabId})
+	GetStudentLabScore(c *gin.Context, labId LabId, params GetStudentLabScoreParams)
 	// Edit student info
 	// (PATCH /students)
 	EditStudentInClass(c *gin.Context, params EditStudentInClassParams)
@@ -121,6 +139,15 @@ type ServerInterface interface {
 	// get testcase
 	// (GET /testcase/{TestCaseId})
 	GetTestcaseInfomation(c *gin.Context, testCaseId TestCaseId, params GetTestcaseInfomationParams)
+	// create ticket
+	// (POST /ticket)
+	CreateTicket(c *gin.Context, params CreateTicketParams)
+	// ticket info
+	// (GET /ticket/{TicketId})
+	GetTicketInformation(c *gin.Context, ticketId TicketId, params GetTicketInformationParams)
+	// confirm ticket request
+	// (PATCH /ticket/{TicketId})
+	GetConfirmTicket(c *gin.Context, ticketId TicketId, params GetConfirmTicketParams)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -131,45 +158,6 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(c *gin.Context)
-
-// DeleteAssistantFromClass operation middleware
-func (siw *ServerInterfaceWrapper) DeleteAssistantFromClass(c *gin.Context) {
-
-	var err error
-
-	// Parameter object where we will unmarshal all parameters from the context
-	var params DeleteAssistantFromClassParams
-
-	headers := c.Request.Header
-
-	// ------------- Optional header parameter "Authentication" -------------
-	if valueList, found := headers[http.CanonicalHeaderKey("Authentication")]; found {
-		var Authentication WithJWT
-		n := len(valueList)
-		if n != 1 {
-			siw.ErrorHandler(c, fmt.Errorf("Expected one value for Authentication, got %d", n), http.StatusBadRequest)
-			return
-		}
-
-		err = runtime.BindStyledParameterWithOptions("simple", "Authentication", valueList[0], &Authentication, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false})
-		if err != nil {
-			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter Authentication: %w", err), http.StatusBadRequest)
-			return
-		}
-
-		params.Authentication = &Authentication
-
-	}
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.DeleteAssistantFromClass(c, params)
-}
 
 // InsertAssistantToClass operation middleware
 func (siw *ServerInterfaceWrapper) InsertAssistantToClass(c *gin.Context) {
@@ -208,6 +196,54 @@ func (siw *ServerInterfaceWrapper) InsertAssistantToClass(c *gin.Context) {
 	}
 
 	siw.Handler.InsertAssistantToClass(c, params)
+}
+
+// DeleteAssistantFromClass operation middleware
+func (siw *ServerInterfaceWrapper) DeleteAssistantFromClass(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "AssistantId" -------------
+	var assistantId AssistantId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "AssistantId", c.Param("AssistantId"), &assistantId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter AssistantId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params DeleteAssistantFromClassParams
+
+	headers := c.Request.Header
+
+	// ------------- Optional header parameter "Authentication" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Authentication")]; found {
+		var Authentication WithJWT
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for Authentication, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Authentication", valueList[0], &Authentication, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter Authentication: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.Authentication = &Authentication
+
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.DeleteAssistantFromClass(c, assistantId, params)
 }
 
 // GetAssistantsInClass operation middleware
@@ -378,6 +414,45 @@ func (siw *ServerInterfaceWrapper) GetUserDataFromGoogle(c *gin.Context) {
 	}
 
 	siw.Handler.GetUserDataFromGoogle(c)
+}
+
+// CheckPin operation middleware
+func (siw *ServerInterfaceWrapper) CheckPin(c *gin.Context) {
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CheckPinParams
+
+	headers := c.Request.Header
+
+	// ------------- Optional header parameter "Authentication" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Authentication")]; found {
+		var Authentication WithJWT
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for Authentication, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Authentication", valueList[0], &Authentication, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter Authentication: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.Authentication = &Authentication
+
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.CheckPin(c, params)
 }
 
 // EditClass operation middleware
@@ -1100,6 +1175,54 @@ func (siw *ServerInterfaceWrapper) TestPing(c *gin.Context) {
 	siw.Handler.TestPing(c)
 }
 
+// GetUserProgress operation middleware
+func (siw *ServerInterfaceWrapper) GetUserProgress(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "ClassId" -------------
+	var classId ClassId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "ClassId", c.Param("ClassId"), &classId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter ClassId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetUserProgressParams
+
+	headers := c.Request.Header
+
+	// ------------- Optional header parameter "Authentication" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Authentication")]; found {
+		var Authentication WithJWT
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for Authentication, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Authentication", valueList[0], &Authentication, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter Authentication: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.Authentication = &Authentication
+
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetUserProgress(c, classId, params)
+}
+
 // GetQuestionInformation operation middleware
 func (siw *ServerInterfaceWrapper) GetQuestionInformation(c *gin.Context) {
 
@@ -1146,6 +1269,54 @@ func (siw *ServerInterfaceWrapper) GetQuestionInformation(c *gin.Context) {
 	}
 
 	siw.Handler.GetQuestionInformation(c, questionId, params)
+}
+
+// GetUserRank operation middleware
+func (siw *ServerInterfaceWrapper) GetUserRank(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "ClassId" -------------
+	var classId ClassId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "ClassId", c.Param("ClassId"), &classId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter ClassId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetUserRankParams
+
+	headers := c.Request.Header
+
+	// ------------- Optional header parameter "Authentication" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Authentication")]; found {
+		var Authentication WithJWT
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for Authentication, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Authentication", valueList[0], &Authentication, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter Authentication: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.Authentication = &Authentication
+
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetUserRank(c, classId, params)
 }
 
 // GetGradedReult operation middleware
@@ -1196,6 +1367,54 @@ func (siw *ServerInterfaceWrapper) GetGradedReult(c *gin.Context) {
 	siw.Handler.GetGradedReult(c, submissionId, params)
 }
 
+// GetUserScore operation middleware
+func (siw *ServerInterfaceWrapper) GetUserScore(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "ClassId" -------------
+	var classId ClassId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "ClassId", c.Param("ClassId"), &classId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter ClassId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetUserScoreParams
+
+	headers := c.Request.Header
+
+	// ------------- Optional header parameter "Authentication" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Authentication")]; found {
+		var Authentication WithJWT
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for Authentication, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Authentication", valueList[0], &Authentication, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter Authentication: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.Authentication = &Authentication
+
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetUserScore(c, classId, params)
+}
+
 // GetSectionInClass operation middleware
 func (siw *ServerInterfaceWrapper) GetSectionInClass(c *gin.Context) {
 
@@ -1244,10 +1463,67 @@ func (siw *ServerInterfaceWrapper) GetSectionInClass(c *gin.Context) {
 	siw.Handler.GetSectionInClass(c, classId, params)
 }
 
+// GetLabSession operation middleware
+func (siw *ServerInterfaceWrapper) GetLabSession(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "LabId" -------------
+	var labId LabId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "LabId", c.Param("LabId"), &labId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter LabId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetLabSessionParams
+
+	headers := c.Request.Header
+
+	// ------------- Optional header parameter "Authentication" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Authentication")]; found {
+		var Authentication WithJWT
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for Authentication, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Authentication", valueList[0], &Authentication, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter Authentication: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.Authentication = &Authentication
+
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetLabSession(c, labId, params)
+}
+
 // DeleteStudentFromClass operation middleware
 func (siw *ServerInterfaceWrapper) DeleteStudentFromClass(c *gin.Context) {
 
 	var err error
+
+	// ------------- Path parameter "StudentId" -------------
+	var studentId StudentId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "StudentId", c.Param("StudentId"), &studentId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter StudentId: %w", err), http.StatusBadRequest)
+		return
+	}
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params DeleteStudentFromClassParams
@@ -1280,7 +1556,55 @@ func (siw *ServerInterfaceWrapper) DeleteStudentFromClass(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.DeleteStudentFromClass(c, params)
+	siw.Handler.DeleteStudentFromClass(c, studentId, params)
+}
+
+// GetStudentLabScore operation middleware
+func (siw *ServerInterfaceWrapper) GetStudentLabScore(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "LabId" -------------
+	var labId LabId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "LabId", c.Param("LabId"), &labId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter LabId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetStudentLabScoreParams
+
+	headers := c.Request.Header
+
+	// ------------- Optional header parameter "Authentication" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Authentication")]; found {
+		var Authentication WithJWT
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for Authentication, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Authentication", valueList[0], &Authentication, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter Authentication: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.Authentication = &Authentication
+
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetStudentLabScore(c, labId, params)
 }
 
 // EditStudentInClass operation middleware
@@ -1509,6 +1833,141 @@ func (siw *ServerInterfaceWrapper) GetTestcaseInfomation(c *gin.Context) {
 	siw.Handler.GetTestcaseInfomation(c, testCaseId, params)
 }
 
+// CreateTicket operation middleware
+func (siw *ServerInterfaceWrapper) CreateTicket(c *gin.Context) {
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CreateTicketParams
+
+	headers := c.Request.Header
+
+	// ------------- Optional header parameter "Authentication" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Authentication")]; found {
+		var Authentication WithJWT
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for Authentication, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Authentication", valueList[0], &Authentication, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter Authentication: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.Authentication = &Authentication
+
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.CreateTicket(c, params)
+}
+
+// GetTicketInformation operation middleware
+func (siw *ServerInterfaceWrapper) GetTicketInformation(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "TicketId" -------------
+	var ticketId TicketId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "TicketId", c.Param("TicketId"), &ticketId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter TicketId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetTicketInformationParams
+
+	headers := c.Request.Header
+
+	// ------------- Optional header parameter "Authentication" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Authentication")]; found {
+		var Authentication WithJWT
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for Authentication, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Authentication", valueList[0], &Authentication, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter Authentication: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.Authentication = &Authentication
+
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetTicketInformation(c, ticketId, params)
+}
+
+// GetConfirmTicket operation middleware
+func (siw *ServerInterfaceWrapper) GetConfirmTicket(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "TicketId" -------------
+	var ticketId TicketId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "TicketId", c.Param("TicketId"), &ticketId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter TicketId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetConfirmTicketParams
+
+	headers := c.Request.Header
+
+	// ------------- Optional header parameter "Authentication" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Authentication")]; found {
+		var Authentication WithJWT
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for Authentication, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Authentication", valueList[0], &Authentication, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter Authentication: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.Authentication = &Authentication
+
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetConfirmTicket(c, ticketId, params)
+}
+
 // GinServerOptions provides options for the Gin server.
 type GinServerOptions struct {
 	BaseURL      string
@@ -1536,13 +1995,14 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 		ErrorHandler:       errorHandler,
 	}
 
-	router.DELETE(options.BaseURL+"/TA", wrapper.DeleteAssistantFromClass)
 	router.POST(options.BaseURL+"/TA", wrapper.InsertAssistantToClass)
-	router.GET(options.BaseURL+"/TA/:ClassId", wrapper.GetAssistantsInClass)
+	router.DELETE(options.BaseURL+"/TA/:AssistantId", wrapper.DeleteAssistantFromClass)
+	router.GET(options.BaseURL+"/TAs/:ClassId", wrapper.GetAssistantsInClass)
 	router.DELETE(options.BaseURL+"/addfile/:AddFileId", wrapper.DeleteAdditionalFile)
 	router.GET(options.BaseURL+"/addfile/:AddFileId", wrapper.GetAdditionalFileContent)
 	router.GET(options.BaseURL+"/callback", wrapper.GetCallback)
 	router.POST(options.BaseURL+"/callback", wrapper.GetUserDataFromGoogle)
+	router.POST(options.BaseURL+"/checkpin", wrapper.CheckPin)
 	router.PATCH(options.BaseURL+"/class", wrapper.EditClass)
 	router.POST(options.BaseURL+"/class", wrapper.CreateClass)
 	router.GET(options.BaseURL+"/class/:ClassId", wrapper.GetClassInformation)
@@ -1562,14 +2022,22 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/near_due_date", wrapper.GetNearDueDateLabs)
 	router.GET(options.BaseURL+"/picture/:PictureId", wrapper.GetUserAndClassPicture)
 	router.GET(options.BaseURL+"/ping", wrapper.TestPing)
+	router.GET(options.BaseURL+"/progress/:ClassId", wrapper.GetUserProgress)
 	router.GET(options.BaseURL+"/question/:QuestionId", wrapper.GetQuestionInformation)
+	router.GET(options.BaseURL+"/rank/:ClassId", wrapper.GetUserRank)
 	router.GET(options.BaseURL+"/result/:SubmissionId", wrapper.GetGradedReult)
+	router.GET(options.BaseURL+"/score/:ClassId", wrapper.GetUserScore)
 	router.GET(options.BaseURL+"/sections/:ClassId", wrapper.GetSectionInClass)
-	router.DELETE(options.BaseURL+"/students", wrapper.DeleteStudentFromClass)
+	router.GET(options.BaseURL+"/session/:LabId", wrapper.GetLabSession)
+	router.DELETE(options.BaseURL+"/student/:StudentId", wrapper.DeleteStudentFromClass)
+	router.GET(options.BaseURL+"/student_score/:LabId", wrapper.GetStudentLabScore)
 	router.PATCH(options.BaseURL+"/students", wrapper.EditStudentInClass)
 	router.POST(options.BaseURL+"/students", wrapper.InsertStudentToClass)
 	router.GET(options.BaseURL+"/students/:ClassId", wrapper.GetStudentsIncClass)
 	router.POST(options.BaseURL+"/submit", wrapper.GradeUsersCode)
 	router.POST(options.BaseURL+"/testcallback", wrapper.UserForCreateTestUser)
 	router.GET(options.BaseURL+"/testcase/:TestCaseId", wrapper.GetTestcaseInfomation)
+	router.POST(options.BaseURL+"/ticket", wrapper.CreateTicket)
+	router.GET(options.BaseURL+"/ticket/:TicketId", wrapper.GetTicketInformation)
+	router.PATCH(options.BaseURL+"/ticket/:TicketId", wrapper.GetConfirmTicket)
 }

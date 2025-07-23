@@ -1,7 +1,8 @@
 package class
 
 import (
-	"crypto/rand"
+	"cugrader/connection/config"
+	"cugrader/logic/utils"
 	"cugrader/repository/class"
 	"encoding/csv"
 	"fmt"
@@ -22,8 +23,8 @@ func CreateClass(courseID int, name string, semester int, year int, pictureFile 
 		default:
 			return fmt.Errorf("unsupported file extension: %s", ext)
 		}
-		uuidName := fmt.Sprintf("%s%s", generateUUID(), ext)
-		savePath := filepath.Join(os.Getenv("FILES_PATH"), uuidName)
+		uuidName := fmt.Sprintf("%s%s", utils.GenerateUUID(), ext)
+		savePath := filepath.Join(config.Path, uuidName)
 		src, err := pictureFile.Open()
 		if err != nil {
 			return fmt.Errorf("failed to open uploaded file: %v", err)
@@ -121,18 +122,4 @@ func CreateClass(courseID int, name string, semester int, year int, pictureFile 
 
 func GetAllClasses() ([]class.ClassObjectModel, error) {
 	return class.GetAllClasses()
-}
-
-// generateUUID generates a random UUID v4 string.
-func generateUUID() string {
-	b := make([]byte, 16)
-	_, err := rand.Read(b)
-	if err != nil {
-		return ""
-	}
-	// Set version (4) and variant bits as per RFC 4122
-	b[6] = (b[6] & 0x0f) | 0x40
-	b[8] = (b[8] & 0x3f) | 0x80
-	return fmt.Sprintf("%08x-%04x-%04x-%04x-%012x",
-		b[0:4], b[4:6], b[6:8], b[8:10], b[10:16])
 }

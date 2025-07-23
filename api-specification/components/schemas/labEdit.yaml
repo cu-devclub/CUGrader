@@ -70,6 +70,12 @@ properties:
                 type: string
               output:
                 type: string
+  description:
+    type: string
+    description: Lab description
+  score:
+    type: integer
+    description: Score for lab testcase
   addfiles:
     type: array
     items:

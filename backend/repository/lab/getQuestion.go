@@ -29,7 +29,7 @@ func GetQuestionIdsByLabId(labId int) ([]int, error) {
 
 func GetQuestionByID(questionId int) (*QuestionFullModel, error) {
 	query := `SELECT 
-		id,
+		question.id,
 		lab_id,
 		number,
 		name,
@@ -37,10 +37,9 @@ func GetQuestionByID(questionId int) (*QuestionFullModel, error) {
 		description,
 		answer,
 		predefine,
-		testcase_object_id,
-		secret_testcase_object_id
+		testcase_id
 	FROM question
-	WHERE id = $1`
+	WHERE question.id = $1`
 	row := db.YSQL.QueryRow(query, questionId)
 	question := &QuestionFullModel{}
 	if err := row.Scan(
@@ -52,13 +51,20 @@ func GetQuestionByID(questionId int) (*QuestionFullModel, error) {
 		&question.Description,
 		&question.Answer,
 		&question.Predefine,
-		&question.TestcaseObjectID,
-		&question.SecretTestcaseObjectID,
+		&question.TestcaseID,
 	); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil // No question found
 		}
 		return nil, err // Other error
 	}
+
+	Description, err := GetDescriptionByID(question.Description)
+	if err != nil {
+		return nil, nil
+	}
+
+	question.Description = Description
+
 	return question, nil
 }

@@ -2,7 +2,7 @@ package utils
 
 import "cugrader/connection/db"
 
-func UserIDorInsert(Email string) (int, error) {
+func GetUserIDorInsert(Email string) (int, error) {
 	var userID int
 	err := db.YSQL.QueryRow(`SELECT id FROM "user" WHERE email = $1`, Email).Scan(&userID)
 	if err == nil {

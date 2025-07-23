@@ -11,7 +11,7 @@ func GetAdditionalFileByIDHandler(c *gin.Context, addFileId gen.AddFileId, param
 	// TODO: add authen
 	contentType, data, err := lab.GetAdditionalFileByID(addFileId)
 	if err != nil {
-		c.JSON(404, gin.H{"message": "Additional file(s) not found"})
+		c.JSON(404, gin.H{"message": "Additional file not found"})
 		return
 	}
 
