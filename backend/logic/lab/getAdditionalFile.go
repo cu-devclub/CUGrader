@@ -1,6 +1,7 @@
 package lab
 
 import (
+	"cugrader/connection/config"
 	"cugrader/repository/lab"
 	"mime"
 	"net/http"
@@ -14,7 +15,7 @@ func GetAdditionalFileByID(additionalFileID int) (string, []byte, error) {
 		return "", nil, err
 	}
 
-	path = filepath.Join(os.Getenv("FILES_PATH"), path)
+	path = filepath.Join(config.Path, path)
 
 	data, err := os.ReadFile(path)
 	if err != nil {

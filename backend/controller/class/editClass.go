@@ -19,14 +19,14 @@ func EditClassHandler(c *gin.Context, params gen.EditClassParams) {
 		return
 	}
 
-	classIDStr := c.PostForm("class_id")
+	classIDStr := c.PostForm("ClassId")
 	if classIDStr == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "class_id is required"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ClassId is required"})
 		return
 	}
 	classID, err := strconv.Atoi(classIDStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid class_id"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ClassId"})
 		return
 	}
 

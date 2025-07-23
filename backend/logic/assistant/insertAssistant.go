@@ -2,6 +2,6 @@ package assistant
 
 import "cugrader/repository/assistant"
 
-func InsertAssistant(classID int, email string) error {
-	return assistant.Insert(classID, email)
+func InsertAssistant(classID int, UserId int) error {
+	return assistant.Insert(classID, UserId)
 }

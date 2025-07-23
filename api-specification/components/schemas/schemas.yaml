@@ -19,6 +19,10 @@ LanguageId:
   $ref: './LanguageId.yaml'
 TicketId:
   $ref: './TicketId.yaml'
+StudentId:
+  $ref: './StudentId.yaml'
+AssistantId:
+  $ref: './AssistantId.yaml'
 
 WithJWT:
   $ref: './WithJWT.yaml'

@@ -35,7 +35,7 @@ func GetAllSections(classId int) ([]int, error) {
 func GetSectionsForUser(classId int, userId int) ([]int, error) {
 	query := `
 	SELECT 
-   	s.section_number
+   		s.section_number
 	FROM 
 		section s
 	JOIN class c ON s.class_id = c.id

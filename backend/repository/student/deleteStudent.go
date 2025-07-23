@@ -2,11 +2,11 @@ package student
 
 import "cugrader/connection/db"
 
-func Delete(classID int, userID int) error {
+func Delete(StudentID int) error {
 	query := `
 		DELETE FROM class_student
-		WHERE class_id = $1 AND user_id = $2
+		WHERE id = $1
 	`
-	_, err := db.YSQL.Exec(query, classID, userID)
+	_, err := db.YSQL.Exec(query, StudentID)
 	return err
 }

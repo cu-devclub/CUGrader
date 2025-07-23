@@ -4,6 +4,7 @@ import (
 	gen "cugrader/api-gen"
 	"cugrader/logic/lab"
 	"cugrader/logic/utils"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -16,13 +17,14 @@ func GetNearDueDateHandler(c *gin.Context, params gen.GetNearDueDateLabsParams) 
 		return
 	}
 
-	if claims.Role != "teacher" && claims.Role != "admin" && claims.Role != "student" && claims.Role != "ta" {
+	if claims.Role != "teacher" && claims.Role != "admin" && claims.Role != "student" && claims.Role != "ta" { // TODO: we dont have role ta
 		c.JSON(http.StatusUnauthorized, gin.H{"message": "invalid role"})
 		return
 	}
 
 	labs, err := lab.GetLabsNearDueDate(claims.UserID, claims.Role)
 	if err != nil {
+		fmt.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "failed to get labs"})
 		return
 	}

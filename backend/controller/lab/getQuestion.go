@@ -4,6 +4,7 @@ import (
 	gen "cugrader/api-gen"
 	"cugrader/logic/lab"
 	"cugrader/logic/utils"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -35,6 +36,7 @@ func GetQuestionForStudentController(c *gin.Context, questionId gen.QuestionId, 
 	if isInstructor {
 		question, err := lab.GetQuestionByIDForInstructor(questionId)
 		if err != nil {
+			fmt.Println(err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
 			return
 		}
@@ -54,9 +56,9 @@ func GetQuestionForStudentController(c *gin.Context, questionId gen.QuestionId, 
 		return
 	}
 
-	question, err := lab.GetQuestionByIDForStudent(questionId)
+	question, err := lab.GetQuestionByIDForStudent(questionId, claims.UserID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error: " + err.Error()})
 		return
 	}
 	if question == nil {

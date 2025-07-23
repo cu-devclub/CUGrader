@@ -4,8 +4,8 @@ import (
 	gen "cugrader/api-gen"
 	"cugrader/logic/lab"
 	"cugrader/logic/utils"
+	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,6 +15,16 @@ func GetLabByIDHandler(c *gin.Context, labId gen.LabId, params gen.GetLabInforma
 
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
+		return
+	}
+
+	exist, err := utils.LabIDExists(labId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Error while checking lab existence: " + err.Error()})
+		return
+	}
+	if !exist {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Lab not found"})
 		return
 	}
 
@@ -35,15 +45,13 @@ func GetLabByIDHandler(c *gin.Context, labId gen.LabId, params gen.GetLabInforma
 		// More detailed lab information for instructors
 		lab, err := lab.GetLabByIdForInstructor(labId)
 		if err != nil {
+			fmt.Println(err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch lab"})
-			return
-		}
-		if lab == nil {
-			c.JSON(http.StatusNotFound, gin.H{"message": "Lab not found"})
 			return
 		}
 
 		c.JSON(http.StatusOK, lab)
+		return
 	}
 
 	// If the user is a student, fetch the lab details for students
@@ -51,11 +59,6 @@ func GetLabByIDHandler(c *gin.Context, labId gen.LabId, params gen.GetLabInforma
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch lab"})
-		return
-	}
-
-	if lab == nil {
-		c.JSON(http.StatusNotFound, gin.H{"message": "Lab not found"})
 		return
 	}
 
@@ -73,17 +76,20 @@ func GetLabsByClassIDHandler(ctx *gin.Context, classId gen.ClassId, params gen.G
 		return
 	}
 
-	role := claims.Role
-	userID := claims.UserID
-
-	classIDStr := ctx.Param("class_id")
-	classID, err := strconv.Atoi(classIDStr)
+	exist, err := utils.ClassIDExists(classId)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid class_id"})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "Error while checking class existence: " + err.Error()})
+		return
+	}
+	if !exist {
+		ctx.JSON(http.StatusNotFound, gin.H{"error": "Class not found"})
 		return
 	}
 
-	labs, err := lab.GetLabs(classID, userID, role)
+	role := claims.Role
+	userID := claims.UserID
+
+	labs, err := lab.GetLabs(classId, userID, role)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "cannot fetch labs"})
 		return

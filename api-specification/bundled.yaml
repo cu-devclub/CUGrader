@@ -497,40 +497,6 @@ paths:
           $ref: '#/components/responses/ErrUnauthorized'
         '500':
           $ref: '#/components/responses/ErrServerIssue'
-    delete:
-      operationId: deleteStudentFromClass
-      tags:
-        - student
-      summary: Delete student
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                ClassId:
-                  $ref: '#/components/schemas/ClassId'
-                StudentId:
-                  description: student id primary key
-                  type: string
-              required:
-                - ClassId
-                - StudentId
-      responses:
-        '200':
-          description: Empty JSON
-          content:
-            application/json:
-              schema:
-                type: object
-        '400':
-          $ref: '#/components/responses/ErrBadRequest'
-        '401':
-          $ref: '#/components/responses/ErrUnauthorized'
-        '404':
-          $ref: '#/components/responses/ErrNotFound'
-        '500':
-          $ref: '#/components/responses/ErrServerIssue'
     patch:
       operationId: editStudentInClass
       tags:
@@ -542,8 +508,6 @@ paths:
             schema:
               type: object
               properties:
-                ClassId:
-                  $ref: '#/components/schemas/ClassId'
                 StudentId:
                   description: student id primary key
                   type: string
@@ -557,7 +521,6 @@ paths:
                   description: is student withdrawn
                   type: boolean
               required:
-                - ClassId
                 - StudentId
       responses:
         '200':
@@ -647,6 +610,41 @@ paths:
           $ref: '#/components/responses/ErrNotFound'
         '500':
           $ref: '#/components/responses/ErrServerIssue'
+  '/student/{StudentId}':
+    parameters:
+      - in: header
+        name: Authentication
+        schema:
+          $ref: '#/components/schemas/WithJWT'
+    servers:
+      - url: 'https://apicugrader.sittha.net/v1'
+    delete:
+      operationId: deleteStudentFromClass
+      tags:
+        - student
+      parameters:
+        - name: StudentId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/StudentId'
+      responses:
+        '200':
+          description: Empty JSON
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '403':
+          $ref: '#/components/responses/ErrPermissionDecline'
+        '404':
+          $ref: '#/components/responses/ErrNotFound'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
   /TA:
     parameters:
       - in: header
@@ -678,34 +676,7 @@ paths:
           $ref: '#/components/responses/ErrUnauthorized'
         '500':
           $ref: '#/components/responses/ErrServerIssue'
-    delete:
-      operationId: deleteAssistantFromClass
-      tags:
-        - assistant
-      summary: Delete TA from class
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TAEditBody'
-      responses:
-        '200':
-          description: Empty JSON
-          content:
-            application/json:
-              schema:
-                type: object
-        '400':
-          $ref: '#/components/responses/ErrBadRequest'
-        '401':
-          $ref: '#/components/responses/ErrUnauthorized'
-        '403':
-          $ref: '#/components/responses/ErrPermissionDecline'
-        '404':
-          $ref: '#/components/responses/ErrNotFound'
-        '500':
-          $ref: '#/components/responses/ErrServerIssue'
-  '/TA/{ClassId}':
+  '/TAs/{ClassId}':
     parameters:
       - in: header
         name: Authentication
@@ -771,6 +742,41 @@ paths:
                 required:
                   - assistant
                   - instructor
+        '400':
+          $ref: '#/components/responses/ErrBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrUnauthorized'
+        '403':
+          $ref: '#/components/responses/ErrPermissionDecline'
+        '404':
+          $ref: '#/components/responses/ErrNotFound'
+        '500':
+          $ref: '#/components/responses/ErrServerIssue'
+  '/TA/{AssistantId}':
+    parameters:
+      - in: header
+        name: Authentication
+        schema:
+          $ref: '#/components/schemas/WithJWT'
+    servers:
+      - url: 'https://apicugrader.sittha.net/v1'
+    delete:
+      operationId: deleteAssistantFromClass
+      tags:
+        - assistant
+      parameters:
+        - name: AssistantId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/AssistantId'
+      responses:
+        '200':
+          description: Empty JSON
+          content:
+            application/json:
+              schema:
+                type: object
         '400':
           $ref: '#/components/responses/ErrBadRequest'
         '401':
@@ -1234,6 +1240,8 @@ paths:
                 type: object
                 properties:
                   testcase:
+                    type: string
+                  secret_testcase:
                     type: string
         '400':
           $ref: '#/components/responses/ErrBadRequest'
@@ -2019,6 +2027,14 @@ components:
       example: 12345
     TicketId:
       description: 'A unique identifier for a ticket, typically used to retrieve or reference a specific ticket in a system.'
+      type: integer
+      example: 1
+    StudentId:
+      description: 'A unique identifier for a class_student, typically used to retrieve or reference an class_student in a system.'
+      type: integer
+      example: 12345
+    AssistantId:
+      description: 'A unique identifier for a assistant, typically used to retrieve or reference a specific assistant in a system.'
       type: integer
       example: 1
     WithJWT:

@@ -41,7 +41,7 @@ db("cugrader").createCollection("submission", {
                         required: ["name", "code_object_id"],
                         properties: {
                             name: {
-                                basonType: "string",
+                                bsonType: "string",
                                 description: "name of the code page"
                             },
                             code_object_id: {
@@ -51,6 +51,25 @@ db("cugrader").createCollection("submission", {
                         }
                     },
                     description: "list of code pages"
+                }
+            }
+        }
+    }
+});
+
+db("cugrader").createCollection("multilang_testcase", {
+    validator: {
+        $jsonSchema: {
+            bsonType: "object",
+            required: ["input", "output"],
+            properties: {
+                input: {
+                    bsonType: "objectId",
+                    description: "code object id"
+                },
+                output: {
+                    bsonType: "objectId",
+                    description: "code object id"
                 }
             }
         }

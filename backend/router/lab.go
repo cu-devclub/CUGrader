@@ -41,7 +41,7 @@ func (s *Server) GetQuestionInformation(c *gin.Context, questionId gen.QuestionI
 }
 
 func (s *Server) GetExaminationPin(c *gin.Context, labId gen.LabId, params gen.GetExaminationPinParams) {
-	c.JSON(http.StatusInternalServerError, gin.H{"message": "waiting for implement"})
+	lab.GetExaminationPin(c, labId, params)
 }
 
 func (s *Server) GetTestcaseInfomation(c *gin.Context, testCaseId gen.TestCaseId, params gen.GetTestcaseInfomationParams) {
@@ -50,4 +50,28 @@ func (s *Server) GetTestcaseInfomation(c *gin.Context, testCaseId gen.TestCaseId
 
 func (s *Server) GetMultilanguageTestcaseInformation(c *gin.Context, questionId gen.QuestionId, params gen.GetMultilanguageTestcaseInformationParams) {
 	lab.GetMultilangTestcaseCodeByQuestionIDHandler(c, questionId, params)
+}
+
+func (s *Server) CheckPin(c *gin.Context, params gen.CheckPinParams) {
+	c.JSON(http.StatusInternalServerError, gin.H{"message": "waiting for implement"})
+}
+
+func (s *Server) CreateTicket(c *gin.Context, params gen.CreateTicketParams) {
+	c.JSON(http.StatusInternalServerError, gin.H{"message": "waiting for implement"})
+}
+
+func (s *Server) GetTicketInformation(c *gin.Context, ticketId gen.TicketId, params gen.GetTicketInformationParams) {
+	c.JSON(http.StatusInternalServerError, gin.H{"message": "waiting for implement"})
+}
+
+func (s *Server) GetConfirmTicket(c *gin.Context, ticketId gen.TicketId, params gen.GetConfirmTicketParams) {
+	c.JSON(http.StatusInternalServerError, gin.H{"message": "waiting for implement"})
+}
+
+func (s *Server) GetLabSession(c *gin.Context, labId gen.LabId, params gen.GetLabSessionParams) {
+	c.JSON(http.StatusInternalServerError, gin.H{"message": "waiting for implement"})
+}
+
+func (s *Server) GetStudentLabScore(c *gin.Context, labId gen.LabId, params gen.GetStudentLabScoreParams) {
+	c.JSON(http.StatusInternalServerError, gin.H{"message": "waiting for implement"})
 }

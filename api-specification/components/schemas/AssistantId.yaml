@@ -1,0 +1,3 @@
+description: A unique identifier for a assistant, typically used to retrieve or reference a specific assistant in a system.
+type: integer
+example: 1

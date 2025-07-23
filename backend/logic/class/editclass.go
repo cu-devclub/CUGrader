@@ -1,6 +1,8 @@
 package class
 
 import (
+	"cugrader/connection/config"
+	"cugrader/logic/utils"
 	"cugrader/repository/class"
 	"encoding/csv"
 	"errors"
@@ -29,8 +31,8 @@ func EditClass(id int, pictureFile *multipart.FileHeader, csvFile *multipart.Fil
 			return fmt.Errorf("failed to load picture path from DB: %s", err)
 		}
 		if picture_id == 0 {
-			uuidName := fmt.Sprintf("%s%s", generateUUID(), ext)
-			savePath := filepath.Join(os.Getenv("FILES_PATH"), uuidName)
+			uuidName := fmt.Sprintf("%s%s", utils.GenerateUUID(), ext)
+			savePath := filepath.Join(config.Path, uuidName)
 			src, err := pictureFile.Open()
 			if err != nil {
 				return fmt.Errorf("failed to open uploaded file: %v", err)
@@ -59,7 +61,7 @@ func EditClass(id int, pictureFile *multipart.FileHeader, csvFile *multipart.Fil
 			oldExt := filepath.Ext(path)
 			uuidName := filepath.Base(path[:len(path)-len(filepath.Ext(path))])
 
-			filesPath := os.Getenv("FILES_PATH")
+			filesPath := config.Path
 			var savePath string
 
 			if ext == oldExt {

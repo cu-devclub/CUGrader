@@ -27,30 +27,3 @@ post:
       $ref: '../components/responses/ErrBadRequest.yaml'
     "401":
       $ref: '../components/responses/ErrUnauthorized.yaml'
-
-delete:
-  operationId: deleteAssistantFromClass
-  tags: [assistant]
-  summary: Delete TA from class
-  requestBody:
-    content:
-      application/json:
-        schema:
-          $ref: "../components/schemas/TAEditBody.yaml"
-  responses:
-    "200":
-      description: Empty JSON
-      content:
-        application/json:
-          schema:
-            type: object
-    "500":
-      $ref: '../components/responses/ErrServerIssue.yaml'
-    "400":
-      $ref: '../components/responses/ErrBadRequest.yaml'
-    "401":
-      $ref: '../components/responses/ErrUnauthorized.yaml'
-    "403":
-      $ref: '../components/responses/ErrPermissionDecline.yaml'
-    "404":
-      $ref: '../components/responses/ErrNotFound.yaml'

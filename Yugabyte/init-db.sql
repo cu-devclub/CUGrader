@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS "section" (
     section_number INT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS "groups" (
+CREATE TABLE IF NOT EXISTS "group" (
     id SERIAL PRIMARY KEY,
     class_id INT NOT NULL REFERENCES "class" (id) ON DELETE CASCADE,
     group_name VARCHAR(30) NOT NULL
@@ -109,21 +109,10 @@ CREATE TABLE IF NOT EXISTS "lab_language" (
 );
 
 CREATE TABLE IF NOT EXISTS "assign_to" (
-    id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,  
     lab_id INT NOT NULL REFERENCES "lab" (id) ON DELETE CASCADE,
-    group_id INT NOT NULL REFERENCES "groups" (id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS "question" (
-    id SERIAL PRIMARY KEY,
-    lab_id INT NOT NULL REFERENCES "lab" (id) ON DELETE CASCADE,
-    number INT NOT NULL,
-    name VARCHAR(100) NOT NULL,
-    score INT NOT NULL,
-    description VARCHAR(24) NOT NULL,
-    answer VARCHAR(24) NOT NULL,
-    predefine VARCHAR(24) NOT NULL,
-    testcase_id INT NOT NULL REFERENCES "testcase" (id) ON DELETE CASCADE
+    group_id INT NOT NULL REFERENCES "groups" (id) ON DELETE CASCADE,
+    PRIMARY KEY (lab_id, group_id)
 );
 
 CREATE TABLE IF NOT EXISTS "question" (
@@ -141,19 +130,22 @@ CREATE TABLE IF NOT EXISTS "question" (
 CREATE TABLE IF NOT EXISTS "multilang_testcase" (
     id SERIAL PRIMARY KEY,
     question_id INT NOT NULL REFERENCES "question" (id) ON DELETE CASCADE,
-    object_id CHAR(24) NOT NULL
+    object_id CHAR(24) NOT NULL,
+    PRIMARY KEY (question_id, object_id)
 );
 
 CREATE TABLE IF NOT EXISTS "multilang_secret_testcase" (
     id SERIAL PRIMARY KEY,
     question_id INT NOT NULL REFERENCES "question" (id) ON DELETE CASCADE,
-    object_id CHAR(24) NOT NULL
+    object_id CHAR(24) NOT NULL,
+    PRIMARY KEY (question_id, object_id)
 );
 
 CREATE TABLE IF NOT EXISTS "addition_files" (
     id SERIAL PRIMARY KEY,
     lab_id INT NOT NULL REFERENCES "lab" (id) ON DELETE CASCADE,
-    path VARCHAR(255) NOT NULL
+    path VARCHAR(255) NOT NULL,
+    UNIQUE(lab_id, path)
 );
 
 CREATE TABLE IF NOT EXISTS "submission" (

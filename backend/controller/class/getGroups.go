@@ -4,6 +4,7 @@ import (
 	gen "cugrader/api-gen"
 	"cugrader/logic/class"
 	"cugrader/logic/utils"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -20,8 +21,15 @@ func GetGroupsHandler(c *gin.Context, classId gen.ClassId, params gen.GetGroupsI
 		return
 	}
 
+	ClassExist, _ := utils.ClassIDExists(classId)
+	if !ClassExist {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Class not found"})
+		return
+	}
+
 	groups, err := class.GetGroups(classId)
 	if err != nil {
+		fmt.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to retrieve groups"})
 		return
 	}

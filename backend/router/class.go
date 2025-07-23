@@ -3,7 +3,6 @@ package router
 import (
 	gen "cugrader/api-gen"
 	"cugrader/controller/class"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,7 +16,7 @@ func (s *Server) EditClass(c *gin.Context, params gen.EditClassParams) {
 }
 
 func (s *Server) GetClassInformation(c *gin.Context, classId gen.ClassId, params gen.GetClassInformationParams) {
-	c.JSON(http.StatusInternalServerError, gin.H{"message": "waiting for implement"})
+	class.GetClassInformation(c, classId, params)
 }
 
 func (s *Server) GetClasses(c *gin.Context, yearSemester string, params gen.GetClassesParams) {

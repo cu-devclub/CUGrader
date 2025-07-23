@@ -2,23 +2,23 @@ package router
 
 import (
 	gen "cugrader/api-gen"
-	"net/http"
+	"cugrader/controller/submission"
 
 	"github.com/gin-gonic/gin"
 )
 
 func (s *Server) GradeUsersCode(c *gin.Context, params gen.GradeUsersCodeParams) {
-	c.JSON(http.StatusInternalServerError, gin.H{"message": "waiting for implement"})
+	submission.GradeUsersCode(c, params)
 }
 
 func (s *Server) SaveCodeToSystem(c *gin.Context, params gen.SaveCodeToSystemParams) {
-	c.JSON(http.StatusInternalServerError, gin.H{"message": "waiting for implement"})
+	submission.SaveCodeToSystem(c, params)
 }
 
 func (s *Server) GetCodeFromSystem(c *gin.Context, questionId gen.QuestionId, params gen.GetCodeFromSystemParams) {
-	c.JSON(http.StatusInternalServerError, gin.H{"message": "waiting for implement"})
+	submission.GetCodeFromSystem(c, questionId, params)
 }
 
 func (s *Server) GetGradedReult(c *gin.Context, submissionId gen.SubmissionId, params gen.GetGradedReultParams) {
-	c.JSON(http.StatusInternalServerError, gin.H{"message": "waiting for implement"})
+	submission.GetGradedReult(c, submissionId, params)
 }

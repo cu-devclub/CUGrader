@@ -44,40 +44,6 @@ post:
     "500":
       $ref: '../components/responses/ErrServerIssue.yaml'
 
-delete:
-  operationId: deleteStudentFromClass
-  tags: [student]
-  summary: Delete student
-  requestBody:
-    content:
-      application/json:
-        schema:
-          type: object
-          properties:
-            ClassId:
-              $ref: "../components/schemas/ClassId.yaml"
-            StudentId:
-              description: student id primary key
-              type: string
-          required:
-            - "ClassId"
-            - "StudentId"
-  responses:
-    "200":
-      description: Empty JSON
-      content:
-        application/json:
-          schema:
-            type: object
-    "500":
-      $ref: '../components/responses/ErrServerIssue.yaml'
-    "400":
-      $ref: '../components/responses/ErrBadRequest.yaml'
-    "401":
-      $ref: '../components/responses/ErrUnauthorized.yaml'
-    "404":
-      $ref: '../components/responses/ErrNotFound.yaml'
-
 patch:
   operationId: editStudentInClass
   tags: [student]
@@ -88,11 +54,8 @@ patch:
         schema:
           type: object
           properties:
-            ClassId:
-              $ref: "../components/schemas/ClassId.yaml"
             StudentId:
-              description: student id primary key
-              type: string
+              $ref: "../components/schemas/StudentId.yaml"
             section:
               description: section of student
               type: integer
@@ -103,7 +66,6 @@ patch:
               description: is student withdrawn
               type: boolean
           required:
-            - "ClassId"
             - "StudentId"
   responses:
     "200":
