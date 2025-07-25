@@ -5,6 +5,7 @@ import (
 	"cugrader/connection/db"
 	"cugrader/connection/message"
 	"cugrader/router"
+	"fmt"
 )
 
 func main() {
@@ -20,5 +21,6 @@ func main() {
 		port = "5000"
 	}
 
-	r.Run(":" + port)
+	err := r.Run(":" + port)
+	fmt.Println("Error while listening on port " + port + " :" + err.Error())
 }

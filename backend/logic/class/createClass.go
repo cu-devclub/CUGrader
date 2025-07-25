@@ -10,6 +10,7 @@ import (
 	"mime/multipart"
 	"os"
 	"path/filepath"
+	"strconv"
 )
 
 func CreateClass(courseID int, name string, semester int, year int, pictureFile *multipart.FileHeader, csvFile *multipart.FileHeader, creatorUserID int) error {
@@ -97,8 +98,10 @@ func CreateClass(courseID int, name string, semester int, year int, pictureFile 
 			if err := class.InsertStudentIfNotExist(userID, id); err != nil {
 				return fmt.Errorf("insert student: %w", err)
 			}
-			sectionNumber := 0
-			fmt.Sscanf(sectionStr, "%d", &sectionNumber)
+			sectionNumber, err := strconv.Atoi(sectionStr)
+			if err != nil {
+				return fmt.Errorf("convert section number: %w", err)
+			}
 			sectionID, err := class.InsertSectionIfNotExist(classID, sectionNumber)
 			if err != nil {
 				return fmt.Errorf("insert section: %w", err)

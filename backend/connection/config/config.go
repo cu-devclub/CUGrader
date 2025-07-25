@@ -36,7 +36,8 @@ func LoadEnv() {
 	}
 	PrivKey = privKey
 
-	Path = os.Getenv("FILES_PATH")
+	// Path = os.Getenv("FILES_PATH")
+	Path = "temp"
 
 	if MongoURI == "" || RabbitURI == "" || YSQLDSN == "" {
 		log.Fatal("Missing one or more required environment variables")
