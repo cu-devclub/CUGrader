@@ -73,14 +73,15 @@ func InsertGroup(labId int, GroupId int) error {
 	return nil
 }
 
-func InsertAddfile(labId int, path string) error {
+func InsertAddfile(labId int, path string, filename string) error {
 	query := `INSERT INTO addition_files (
 		lab_id,
-		path
-	) VALUES ($1, $2)
+		path,
+		filename
+	) VALUES ($1, $2, $3)
 	ON CONFLICT (lab_id, path) DO NOTHING`
 
-	_, err := db.YSQL.Exec(query, labId, path)
+	_, err := db.YSQL.Exec(query, labId, path, filename)
 	if err != nil {
 		return err
 	}
