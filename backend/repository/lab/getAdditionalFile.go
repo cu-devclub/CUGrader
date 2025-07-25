@@ -3,13 +3,14 @@ package lab
 import "cugrader/connection/db"
 
 // GetPathByID retrieves the file path for a given additional file ID from the database.
-func GetPathByID(additionalFileId int) (string, error) {
+func GetPathByID(additionalFileId int) (string, string, error) {
 	var path string
-	err := db.YSQL.QueryRow("SELECT path FROM addition_files WHERE id = $1", additionalFileId).Scan(&path)
+	var filename string
+	err := db.YSQL.QueryRow("SELECT path FROM addition_files, filename WHERE id = $1", additionalFileId).Scan(&path, &filename)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
-	return path, nil
+	return path, filename, nil
 }
 
 // GetFileIdByLabID retrieves all additional file IDs associated with a specific lab ID.

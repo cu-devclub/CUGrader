@@ -118,6 +118,7 @@ CREATE TABLE IF NOT EXISTS "assign_to" (
 CREATE TABLE IF NOT EXISTS "question" (
     id SERIAL PRIMARY KEY,
     lab_id INT NOT NULL REFERENCES "lab" (id) ON DELETE CASCADE,
+    require_question_id INT REFERENCES "question" (id) ON DELETE CASCADE DEFAULT NULL,
     number INT NOT NULL,
     name VARCHAR(100) NOT NULL,
     score INT NOT NULL,

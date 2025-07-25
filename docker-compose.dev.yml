@@ -92,6 +92,19 @@ services:
         container_name: judge_service_python
         # environment:
         #     - SERVICE_ENV=development
+        restart: unless-stopped
+        tty: true
+        stdin_open: true
+        privileged: true
+        cap_drop:
+        - ALL
+        cap_add:
+        - SYS_ADMIN
+        security_opt:
+        - seccomp=unconfined
+        - apparmor=unconfined
+        # volumes:
+        # - isolate-data:/var/local/lib/isolate
         depends_on:
             - yugabytedb
             - rabbitmq

@@ -13,19 +13,23 @@ import (
 	"strings"
 	"time"
 
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/streadway/amqp"
 )
 
 type Submission struct {
-	TimeoutSeconds    int      `json:"timeout_seconds"`
-	QuestionID        int      `json:"question_id"`
-	SubmissionID      int      `json:"submission_id"`
-	Code              []string `json:"code"`
-	IsMultilang       bool     `json:"is_multilang"`
-	TestcaseID        *int     `json:"testcase_id"`
-	Testcase          string   `json:"testcase"`
-	SecretTestcase    string   `json:"secret_testcase"`
+	TimeoutSeconds int `json:"timeout_seconds"`
+	QuestionID     int `json:"question_id"`
+	SubmissionID   int `json:"submission_id"`
+	Codes          []struct {
+		Filename string `json:"filename"`
+		Content  string `json:"content"`
+	} `json:"codes"`
+	IsMultilang       bool   `json:"is_multilang"`
+	TestcaseID        *int   `json:"testcase_id"`
+	Testcase          string `json:"testcase"`
+	SecretTestcase    string `json:"secret_testcase"`
 	MultilangTestcase []struct {
 		Input  string `json:"input"`
 		Output string `json:"output"`
@@ -36,7 +40,7 @@ type Submission struct {
 	} `json:"multilang_secret_testcase"`
 	AdditionFiles []struct {
 		Filename string `json:"filename"`
-		Content  string `json:"content"`
+		Content  []byte `json:"content"`
 	} `json:"addition_files"`
 	Score int `json:"score"`
 }
@@ -49,20 +53,22 @@ func IfThenElse(condition bool, a interface{}, b interface{}) interface{} {
 }
 
 func main() {
-	db, err := sql.Open("postgres", "postgres://yugabyte:yugabyte@yugabytedb:5433/cugrader?sslmode=disable")
+	_ = godotenv.Load()
+
+	db, err := sql.Open("postgres", os.Getenv("YSQL_DSN"))
 	// update host later
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
 
-	conn, err := amqp.Dial("amqp://guest:guest@rabbitmq:5672/")
+	conn, err := amqp.Dial(os.Getenv("RABBIT_URI"))
 	// update host later
 	if err != nil {
 		log.Fatal(err)
 	}
 	ch, _ := conn.Channel()
-	msgs, _ := ch.Consume("submission_queue", "", true, false, false, false, nil)
+	msgs, _ := ch.Consume(os.Getenv("CHANNEL"), "", true, false, false, false, nil)
 
 	forever := make(chan bool)
 	log.Println("Waiting for messages...")
@@ -131,8 +137,9 @@ func processSubmission(sub Submission, testcase string) (string, bool, bool, int
 	exec.Command("isolate", "--box-id="+boxID, "--cleanup").Run()
 	exec.Command("isolate", "--box-id="+boxID, "--init").Run()
 
-	code := strings.Join(sub.Code, "\n\n")
-	os.WriteFile(boxPath+"/main.py", []byte(code), 0644)
+	for _, code := range sub.Codes {
+		os.WriteFile(boxPath+"/"+code.Filename+".py", []byte(code.Content), 0644)
+	}
 	os.WriteFile(boxPath+"/testcase.py", []byte("from main import *\n"+testcase), 0644)
 
 	for _, file := range sub.AdditionFiles {
