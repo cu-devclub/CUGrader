@@ -1,6 +1,6 @@
 import { Editor, useMonaco, type Monaco } from "@monaco-editor/react";
 import { useEffect } from "react";
-import { useCodeSpaceStore } from ".";
+import { useCodeSpaceStore } from "./data";
 import { observer } from "mobx-react-lite";
 import { makeAutoObservable, makeObservable } from "mobx";
 

@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 import { useCodeSpaceStore } from './data';
 import { FileTabs } from './file-tabs';
 import { SubmissionStatusIndicator } from './shared';
-import { MonacoEditor } from './data/monaco';
+import { MonacoEditor } from './monaco';
 
 export const EditorPanel = observer(() => {
   const store = useCodeSpaceStore();
@@ -139,14 +139,15 @@ export const EditorPanel = observer(() => {
                 </TooltipContent>
               </Tooltip>
 
-              <Tooltip>
+              {/* TODO: enable download */}
+              {/* <Tooltip>
                 <TooltipTrigger asChild>
                   <Button size="icon" variant="ghost" className='size-8'> <DownloadIcon /> </Button>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>t.download</p>
                 </TooltipContent>
-              </Tooltip>
+              </Tooltip> */}
 
               <Tooltip>
                 <TooltipTrigger asChild>

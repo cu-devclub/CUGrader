@@ -1,7 +1,7 @@
 export { QuestionState, type CustomTestcase, type EditorFile, type UiCustomTestcase } from './store-2';
 import type { StudentAssignmentDetails } from '@/lib/api/type';
 import { makeAutoObservable } from 'mobx';
-import { MonacoWrapper } from './monaco';
+import { MonacoWrapper } from '../monaco';
 import { QuestionState } from './store-2';
 
 export class CodeSpaceStore {

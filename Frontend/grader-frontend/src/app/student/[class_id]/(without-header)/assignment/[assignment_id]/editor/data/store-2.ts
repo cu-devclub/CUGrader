@@ -5,7 +5,7 @@ import { makeAutoObservable, runInAction, when } from 'mobx';
 import { firstValueFrom, interval, Subject, type Observable } from 'rxjs';
 import { debounceTime, filter, share, switchMap, tap } from 'rxjs/operators';
 import { getMonacoLanguageId } from './constant';
-import type { MonacoWrapper } from './monaco';
+import type { MonacoWrapper } from '../monaco';
 import type { IResource } from 'mobx-utils';
 
 export interface EditorFile {
