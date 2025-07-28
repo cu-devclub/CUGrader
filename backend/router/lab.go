@@ -73,5 +73,5 @@ func (s *Server) GetLabSession(c *gin.Context, labId gen.LabId, params gen.GetLa
 }
 
 func (s *Server) GetStudentLabScore(c *gin.Context, labId gen.LabId, params gen.GetStudentLabScoreParams) {
-	c.JSON(http.StatusInternalServerError, gin.H{"message": "waiting for implement"})
+	lab.GetStudentLabScore(c, labId, params)
 }

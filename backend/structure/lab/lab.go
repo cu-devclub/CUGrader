@@ -79,3 +79,30 @@ type EditLab struct {
 	LabID   int         `json:"ClassId" binding:"required"`
 	LabData EditLabData `json:"lab_data" binding:"required"`
 }
+
+// lab score
+
+type QuestionMaxScore struct {
+	QuestionID int `json:"question_id"`
+	MaxScore   int `json:"max_score"`
+}
+
+type Question struct {
+	Number       int    `json:"number"`
+	Score        int    `json:"score"`
+	SubmissionID int    `json:"submissionId"`
+	Timestamp    string `json:"timestamp"`
+}
+
+type Student struct {
+	Name      string     `json:"name"`
+	Group     string     `json:"group"`
+	Score     int        `json:"score"`
+	Questions []Question `json:"questions"`
+}
+
+type FinalLabScoreJSON struct {
+	MaxScore          int       `json:"max_score"`
+	QuestionMaxScores []int     `json:"question_max_score"`
+	Students          []Student `json:"students"`
+}
