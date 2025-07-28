@@ -26,6 +26,7 @@ export const FileTabs = observer(() => {
 
   const {
     activeFile,
+    activeFileId,
     selectFile,
     files,
     addFile,
@@ -71,8 +72,8 @@ export const FileTabs = observer(() => {
   return (
     <Tabs.Root
       className="flex flex-col"
-      defaultValue={activeFile.id}
-      value={activeFile.id}
+      defaultValue={activeFileId}
+      value={activeFileId}
       onValueChange={selectFile}
     >
       <Tabs.List className="flex gap-1 border-b p-0.75 text-xs">

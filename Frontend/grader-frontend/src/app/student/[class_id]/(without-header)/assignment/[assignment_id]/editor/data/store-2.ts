@@ -239,7 +239,7 @@ export class QuestionState {
 
   private async createMonacoFile(file: EditorFile, content: string = "") {
     const model = await this.monaco.createFile(file.id, content, file.language);
-    const disposable = model.onDidChangeContent(() => {
+    const disposable = model!.onDidChangeContent(() => {
       this.fileChange$.next();
     });
 

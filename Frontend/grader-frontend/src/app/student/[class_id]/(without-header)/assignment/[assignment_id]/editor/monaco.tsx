@@ -127,7 +127,7 @@ export const MonacoEditor = observer(() => {
     }
   }, [m, store]);
 
-  console.log(store.currentQuestionState.activeFile);
+  // console.log(store.currentQuestionState.activeFile);
 
   return (
     <Editor
