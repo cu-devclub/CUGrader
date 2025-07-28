@@ -81,6 +81,7 @@ const DesktopCodeSpaceInternal = observer(() => {
             isAtEnd={store.currentQuestionIndex === store.lab.questions.length - 1}
             onNext={store.nextQuestion}
             onPrevious={store.previousQuestion}
+            onDone={() => store.onDone()}
           />
         </div>
       </nav>

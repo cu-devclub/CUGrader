@@ -62,4 +62,8 @@ export class CodeSpaceStore {
     }
   };
 
+  onDone = () => {
+    this.currentQuestionState.run()
+  }
+
 }

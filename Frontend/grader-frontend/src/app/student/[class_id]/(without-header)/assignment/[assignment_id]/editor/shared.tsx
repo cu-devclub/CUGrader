@@ -80,17 +80,18 @@ export const QuestionPagination = observer(() => {
 export interface QuestionPaginationSmallProps {
   isAtEnd: boolean,
   onNext: () => unknown;
+  onDone: () => unknown;
   onPrevious: () => unknown;
 }
 
-export function QuestionPaginationSmall({ isAtEnd, onNext, onPrevious }: QuestionPaginationSmallProps) {
+export function QuestionPaginationSmall({ isAtEnd, onNext, onDone, onPrevious }: QuestionPaginationSmallProps) {
   return (
     <div className="flex gap-2">
       <Button size="icon" onClick={onPrevious}>
         <ChevronLeft />
       </Button>
       {isAtEnd
-        ? <Button>
+        ? <Button onClick={onDone}>
           Done
         </Button>
         : <Button size="icon" onClick={onNext}>

@@ -106,7 +106,7 @@ export class QuestionState {
         });
       }
 
-      this.activeLanguageFiles.activeFileId = `${this.pathPrefix}/main`;
+      this.selectFile(`${this.pathPrefix}/main`);
     });
 
   }
@@ -341,18 +341,16 @@ export class QuestionState {
     // Remove all Monaco models for this language
     this.files.forEach(file => {
       if (file.id === mainFile.id) {
-        this.monaco.getModel(file.id)?.setValue(this.question.template)
+        this.monaco.getModel(file.id)?.setValue(this.question.template);
       } else {
         this.monaco.removeFile(file.id);
       }
     });
 
     // Reset files array to just main
-    this.activeLanguageFiles.files = [mainFile];
-    this.activeLanguageFiles.activeFileId = mainFile.id;
-
-    // Create new Monaco model with template
     this.createMonacoFile(mainFile, this.question.template);
+    this.activeLanguageFiles.files = [mainFile];
+    this.selectFile(mainFile.id);
   };
 
   replaceEditorContentWithFile = async (file: File) => {
