@@ -94,7 +94,6 @@ export class QuestionState {
 
       this.activeLanguageFiles.files = [];
       for (const file of code) {
-        // TODO: stop use pagename as marker
         const id = `${this.pathPrefix}/${file.pageName.includes("main") ? "main" : file.pageName + "_"}`;
         const language = getMonacoLanguageId(submission.language.id);
         this.monaco.removeFile(id);
@@ -172,7 +171,6 @@ export class QuestionState {
       return "not-yet";
     }
 
-    // TODO: track this properly
     if (this.lastEdited && this.lastSaved && this.lastEdited > this.lastSaved) {
       return "outdated";
     }
@@ -257,8 +255,8 @@ export class QuestionState {
 
     const initialFile: EditorFile = {
       id: `${this.pathPrefix}/main`,
-      name: 'main.ts', // TODO: use proper extension based on language
-      language: 'typescript', // TODO: map languageId to monaco language
+      name: 'main.py', // TODO: use proper extension based on language
+      language: 'python', // TODO: map languageId to monaco language
     };
 
     const languageFiles: LanguageFiles = {

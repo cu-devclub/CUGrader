@@ -15,8 +15,7 @@ import { StudentAddDialog, useStudentAddDialogState } from "./student-add-dialog
 import { Student as DialogStudent, StudentBatchEditDialog, StudentEditDialog, StudentWithoutIdAndName, useEditDialogState, useStudentBatchEditDialog, useStudentEditDialog } from "./student-edit-dialog";
 import { Student } from "@/lib/api/type";
 
-// TODO: deal with this later
-// import '@ant-design/v5-patch-for-react-19';
+import '@ant-design/v5-patch-for-react-19';
 
 
 function createColumnDefs(editDialog: ReturnType<typeof useEditDialogState<DialogStudent, StudentWithoutIdAndName>>) {

@@ -49,6 +49,7 @@ export const DetailPanel = observer(() => {
         <div className="prose prose-sm dark:prose-invert max-w-none">
           <Markdown>{currentQuestionState.question.description}</Markdown>
         </div>
+        {/* TODO: files */}
       </div>
     </div>
   );

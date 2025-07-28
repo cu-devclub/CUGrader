@@ -42,7 +42,7 @@ export const FileTabs = observer(() => {
 
   const handleRenameFile = (file: EditorFile, newName: string) => {
     console.log(newName);
-    if (newName.trim() === "") { // TODO: validate file name
+    if (newName.trim() === "") {
       toast.error("t.invalid-name");
       return;
     }
