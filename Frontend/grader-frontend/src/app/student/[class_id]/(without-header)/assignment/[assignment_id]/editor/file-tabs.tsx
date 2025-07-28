@@ -76,11 +76,11 @@ export const FileTabs = observer(() => {
       onValueChange={selectFile}
     >
       <Tabs.List className="flex gap-1 border-b p-0.75 text-xs">
-        <LanguageSelector
+        {/* <LanguageSelector
           supportedLanguages={currentQuestionState.question.languages}
           selectedLanguageId={selectedLanguageId}
           onLanguageChange={selectLanguage}
-        />
+        /> */}
         {files.map((file) => (
           <Tabs.Trigger
             key={file.id}

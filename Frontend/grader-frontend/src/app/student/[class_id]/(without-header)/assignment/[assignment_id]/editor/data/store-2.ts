@@ -340,7 +340,11 @@ export class QuestionState {
 
     // Remove all Monaco models for this language
     this.files.forEach(file => {
-      this.monaco.removeFile(file.id);
+      if (file.id === mainFile.id) {
+        this.monaco.getModel(file.id)?.setValue(this.question.template)
+      } else {
+        this.monaco.removeFile(file.id);
+      }
     });
 
     // Reset files array to just main
