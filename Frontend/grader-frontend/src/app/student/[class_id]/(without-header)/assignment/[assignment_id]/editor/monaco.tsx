@@ -32,12 +32,18 @@ export class MonacoWrapper {
 
   private flushPendingOperations() {
     if (this.instance && this.pendingOperations.length > 0) {
+      console.log(this.pendingOperations);
       this.pendingOperations.forEach(op => op());
       this.pendingOperations = [];
     }
   }
 
+  hasInstance() {
+    return !!this.instance;
+  }
+
   setInstance(instance: Monaco) {
+    const previous = this.instance;
     this.instance = instance;
     this.flushPendingOperations();
   }
@@ -71,7 +77,13 @@ export class MonacoWrapper {
 
   createFile(path: string, initialContent = "", language = "typescript") {
     return this.executeWhenReady(() => {
-      return this.instance!.editor.createModel(initialContent, language, this.instance!.Uri.file(path));
+      try {
+        return this.instance!.editor.createModel(initialContent, language, this.instance!.Uri.file(path));
+      } catch (e) {
+        // most likely due to file already exist
+        console.warn(e)
+        return null;
+      }
     });
   }
 
@@ -115,7 +127,7 @@ export const MonacoEditor = observer(() => {
     }
   }, [m, store]);
 
-  console.log(store.currentQuestionState.activeFile)
+  console.log(store.currentQuestionState.activeFile);
 
   return (
     <Editor
