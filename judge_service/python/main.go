@@ -23,7 +23,7 @@ type Submission struct {
 	QuestionID     int `json:"question_id"`
 	SubmissionID   int `json:"submission_id"`
 	Codes          []struct {
-		Filename string `json:"filename"`
+		Filename string `json:"page_name"`
 		Content  string `json:"content"`
 	} `json:"codes"`
 	IsMultilang       bool   `json:"is_multilang"`
@@ -83,34 +83,35 @@ func main() {
 			deleteResults(db, sub.SubmissionID)
 
 			// Process normal testcase
-			message, isFailed, timeout, passed, total := processSubmission(sub, sub.Testcase)
-			var score int
-			if total == 0 {
-				score = 0
-			} else {
-				score = (passed / total) * sub.Score
+			Nmessage, NisFailed, Ntimeout, Npassed, Ntotal := processSubmission(sub, sub.Testcase)
+			if Ntimeout {
+				Nmessage = "running timeout " + strconv.Itoa(sub.TimeoutSeconds) + "s"
+				NisFailed = true
 			}
-
-			if timeout {
-				message = "running timeout " + strconv.Itoa(sub.TimeoutSeconds) + "s"
-				isFailed = true
-			}
-			saveResult(db, sub, message, isFailed, sub.TestcaseID, nil, score)
 
 			// Process secret testcase
-			message, isFailed, timeout, passed, total = processSubmission(sub, sub.SecretTestcase)
-			if total == 0 {
-				score = 0
-			} else {
-				score = (passed / total) * sub.Score
+			Smessage, SisFailed, Stimeout, Spassed, Stotal := processSubmission(sub, sub.SecretTestcase)
+			var Nscore int
+			var Sscore int
+			if Ntotal == 0 {
+				Nscore = 0
 			}
-			if timeout {
-				message = "running timeout " + strconv.Itoa(sub.TimeoutSeconds) + "s"
-				isFailed = true
-			} else if isFailed {
-				message = "" // hide details
+			if Stotal == 0 {
+				Sscore = 0
 			}
-			saveResult(db, sub, message, isFailed, nil, sub.TestcaseID, score)
+			if !(Ntotal == 0 && Stotal == 0) {
+				Sscore = int(float64(sub.Score) * (float64(Spassed) / float64(Ntotal+Stotal)))
+				Nscore = int(float64(sub.Score) * (float64(Npassed) / float64(Ntotal+Stotal)))
+			}
+
+			if Stimeout {
+				Smessage = "running timeout " + strconv.Itoa(sub.TimeoutSeconds) + "s"
+				SisFailed = true
+			} else if SisFailed {
+				Smessage = "" // hide details
+			}
+			saveResult(db, sub, Nmessage, NisFailed, sub.TestcaseID, nil, Nscore)
+			saveResult(db, sub, Smessage, SisFailed, nil, sub.TestcaseID, Sscore)
 		}
 	}()
 	<-forever
@@ -136,11 +137,12 @@ func processSubmission(sub Submission, testcase string) (string, bool, bool, int
 
 	exec.Command("isolate", "--box-id="+boxID, "--cleanup").Run()
 	exec.Command("isolate", "--box-id="+boxID, "--init").Run()
+	// Traceback (most recent call last):  File "/box/testcase.py", line 1, in <module>    from main import *ModuleNotFoundError: No module named 'main'Exited with error status 1
 
 	for _, code := range sub.Codes {
 		os.WriteFile(boxPath+"/"+code.Filename+".py", []byte(code.Content), 0644)
 	}
-	os.WriteFile(boxPath+"/testcase.py", []byte("from main import *\n"+testcase), 0644)
+	os.WriteFile(boxPath+"/testcase.py", []byte("import unittest\nfrom main import *\n"+testcase+"\n\ntest_result = unittest.main(verbosity=1, exit=False)\nresult_value = test_result.result\n\nprint(result_value.failures)"), 0644)
 
 	for _, file := range sub.AdditionFiles {
 		path := boxPath + "/" + file.Filename
@@ -163,7 +165,6 @@ func processSubmission(sub Submission, testcase string) (string, bool, bool, int
 	if timeout {
 		passed = 0 // if timeout, all tests are considered failed
 	}
-
 	return output, isFailed, timeout, passed, total
 }
 
@@ -224,7 +225,7 @@ func isTimeout(err error) bool {
 
 func saveResult(db *sql.DB, sub Submission, message string, isFailed bool, testcaseID, secretTestcaseID *int, score int) {
 	var finalMessage string
-	if !isFailed && testcaseID != nil {
+	if !isFailed {
 		finalMessage = strings.Join(strings.Split(strings.Split(strings.Split(message, "(")[1], ",")[0], " ")[0:2], " ")
 	} else {
 		finalMessage = message
