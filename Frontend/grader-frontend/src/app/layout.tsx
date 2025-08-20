@@ -48,7 +48,17 @@ export default async function RootLayout({
           <AntdRegistry>
             <NextIntlClientProvider locale={locale} messages={messages}>
               {children}
-              <Toaster />
+              <Toaster 
+                richColors
+                theme="light"
+                closeButton
+                toastOptions={{
+                  style: {
+                    fontFamily: 'RubikFont, sans-serif',
+                  },
+                  className: "RubikFont",
+                }}
+              />
             </NextIntlClientProvider>
           </AntdRegistry>
         </Providers>
