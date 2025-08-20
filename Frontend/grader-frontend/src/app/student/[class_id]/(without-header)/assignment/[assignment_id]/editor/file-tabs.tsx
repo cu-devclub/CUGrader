@@ -58,7 +58,10 @@ export const FileTabs = observer(() => {
 
   const handleDeleteFile = (file: EditorFile) => {
     deleteFile(file.id);
-    toast.success("File deleted");
+    // toast.success("File deleted");
+    toast.success("File deleted", {
+      icon: <img src={`/logo.svg`}/>,
+    })
   };
 
   const canDeleteFile = (file: EditorFile) => {
