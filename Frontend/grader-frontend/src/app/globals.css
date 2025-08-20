@@ -131,6 +131,10 @@
   background-image: linear-gradient(to right top, #db5f8e, #e3749d, #ea88ac, #f19cbb, #f7afca, #f4bdde, #f0caee, #edd8fb, #dde5ff, #d3f0ff, #d4f9ff, #dffffd);
 }
 
+.RubikFont {
+  font-family: var(--font-sans);
+}
+
 @layer base {
   :root {
     --sidebar: oklch(0.985 0 0);
