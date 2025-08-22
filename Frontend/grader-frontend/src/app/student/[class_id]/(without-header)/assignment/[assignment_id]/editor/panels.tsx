@@ -17,7 +17,7 @@ export const DetailPanel = observer(() => {
   const { currentQuestionState, lab } = store;
 
   return (
-    <div className=" h-full overflow-y-auto flex flex-col gap-2">
+    <div className=" h-full w-full overflow-y-auto flex flex-col gap-2">
       <div className="p-3 border-b">
         <QuestionPagination />
       </div>
