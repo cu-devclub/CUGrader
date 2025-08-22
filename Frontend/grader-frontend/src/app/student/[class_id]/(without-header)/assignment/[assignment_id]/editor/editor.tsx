@@ -18,6 +18,7 @@ export const EditorPanel = observer(() => {
   use(store.currentQuestionState.ready);
   const { savingStatus, activeFile, save, replaceEditorContentWithFile, copy, reset, download, run } = store.currentQuestionState;
   const [isUploadDialogOpen, setUploadDialogOpen] = useState(false);
+  const [ autoComplete, setAutoComplete ] = useState(true);
   const dropzone = useDropzoneFrFr({
     multiple: false,
   });
@@ -111,13 +112,44 @@ export const EditorPanel = observer(() => {
           </DialogContent>
         </Dialog>
 
-        <div className='bg-red-50 overflow-hidden'>
+        <div className='bg-red-50 overflow-hidden hidden lg:block'>
           {activeFile &&
             <Editor
               // key={`${store.lab.id}/${store.currentQuestionState.question.id}`}
               path={activeFile.id}
               options={{
-                automaticLayout: true
+                automaticLayout: true,
+                cursorBlinking: 'expand',
+                smoothScrolling: true,
+              }}
+              defaultLanguage={activeFile.language}
+              defaultValue={activeFile.content}
+            />
+          }
+        </div>
+        <div className='bg-red-50 overflow-hidden lg:hidden'>
+          {activeFile &&
+            <Editor
+              // key={`${store.lab.id}/${store.currentQuestionState.question.id}`}
+              path={activeFile.id}
+              options={{
+                automaticLayout: true,
+                cursorBlinking: 'expand',
+                minimap: { enabled: false },
+                fontSize: 14,
+                ////
+                quickSuggestions: autoComplete ? true : false,
+                suggestOnTriggerCharacters: autoComplete ? true : false,
+                wordBasedSuggestions: autoComplete ? "allDocuments" : "off",
+                suggest: {
+                  snippetsPreventQuickSuggestions: autoComplete ? true : false,
+                  filterGraceful: autoComplete ? true : false,
+                  showWords: autoComplete ? true : false,
+                  showSnippets: autoComplete ? true : false,
+                },
+                codeLens: autoComplete ? true : false,
+                ////
+                smoothScrolling: true,
               }}
               defaultLanguage={activeFile.language}
               defaultValue={activeFile.content}

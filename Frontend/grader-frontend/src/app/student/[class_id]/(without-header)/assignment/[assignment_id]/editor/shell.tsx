@@ -90,7 +90,7 @@ const DesktopCodeSpaceInternal = observer(() => {
           {...infoPanel.panelProps}
           collapsible
           minSize={10}
-          className={cn('rounded-md bg-background m-0.5', infoPanel.isCollapsed ? 'border-transparent' : 'border')}
+          className={cn('rounded-md lg:flex hidden bg-background m-0.5', infoPanel.isCollapsed ? 'border-transparent' : 'border')}
         >
           <DetailPanel />
         </ResizablePanel>
