@@ -134,7 +134,7 @@ export async function seed(client: APIClient) {
       {
         number: 1,
         name: "Prime Number Checker",
-        description: "Implement an efficient prime number checker with proper TypeScript types",
+        description: `Implement an efficient prime number checker with proper TypeScript types`,
         template: "// Implement a function that checks if a number is prime\n// Use proper TypeScript types and handle edge cases\nfunction isPrime(n: number): boolean {\n  // Your implementation here\n}\n\n// Implement a function that finds all primes up to n using Sieve of Eratosthenes\nfunction sieveOfEratosthenes(limit: number): number[] {\n  // Your implementation here\n}",
         maxScore: 80,
         languageIds: [6],

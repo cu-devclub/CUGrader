@@ -54,7 +54,7 @@ const DesktopCodeSpaceInternal = observer(() => {
             </Button>
           </div>
         </DrawerTrigger>
-        <DrawerContent className='!w-[90vw] overflow-auto rounded-tl-xl rounded-bl-xl' >
+        <DrawerContent className='!w-[90vw] overflow-y-auto overflow-x-hidden rounded-tl-xl rounded-bl-xl' >
           <DrawerHeader className='hidden'>
             <DrawerTitle>Are you absolutely sure?</DrawerTitle>
             <DrawerDescription>This action cannot be undone.</DrawerDescription>
