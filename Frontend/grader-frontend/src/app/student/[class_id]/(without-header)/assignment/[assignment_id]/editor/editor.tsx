@@ -18,7 +18,7 @@ export const EditorPanel = observer(() => {
   use(store.currentQuestionState.ready);
   const { savingStatus, activeFile, save, replaceEditorContentWithFile, copy, reset, download, run } = store.currentQuestionState;
   const [isUploadDialogOpen, setUploadDialogOpen] = useState(false);
-  const [ autoComplete, setAutoComplete ] = useState(true);
+  const [ autoComplete, setAutoComplete ] = useState(false);
   const dropzone = useDropzoneFrFr({
     multiple: false,
   });
@@ -112,7 +112,7 @@ export const EditorPanel = observer(() => {
           </DialogContent>
         </Dialog>
 
-        <div className='bg-red-50 overflow-hidden hidden lg:block'>
+        <div className='bg-red-50 overflow-hidden'>
           {activeFile &&
             <Editor
               // key={`${store.lab.id}/${store.currentQuestionState.question.id}`}
@@ -120,22 +120,7 @@ export const EditorPanel = observer(() => {
               options={{
                 automaticLayout: true,
                 cursorBlinking: 'expand',
-                smoothScrolling: true,
-              }}
-              defaultLanguage={activeFile.language}
-              defaultValue={activeFile.content}
-            />
-          }
-        </div>
-        <div className='bg-red-50 overflow-hidden lg:hidden'>
-          {activeFile &&
-            <Editor
-              // key={`${store.lab.id}/${store.currentQuestionState.question.id}`}
-              path={activeFile.id}
-              options={{
-                automaticLayout: true,
-                cursorBlinking: 'expand',
-                minimap: { enabled: false },
+                minimap: { enabled: true },
                 fontSize: 14,
                 ////
                 quickSuggestions: autoComplete ? true : false,
