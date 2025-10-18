@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Inbox, Check, X } from "lucide-react";
+import { toast } from "sonner";
 
 interface NotificationMiniCardProps {
     primaryMessage: string;
@@ -36,8 +37,11 @@ export function NotificationMiniCard({
     courseId,
     secondaryMessage = "General notification detail",
 }: NotificationMiniCardProps) {
+    const handleClick = () => {
+      toast.success("Go to")
+    }
     return (
-        <div className="flex flex-col border rounded-lg bg-white px-4 py-3 w-full shadow-sm">
+        <div onClick={handleClick} className="flex flex-col cursor-pointer *:select-none border rounded-lg bg-white px-4 py-3 w-full shadow-sm">
             <div className="flex justify-between items-start mb-1">
                 <span className="text-pink-500 text-sm font-medium leading-none">{courseId}</span>
                 <span className="text-xs text-muted-foreground mt-0.5">{notificationDate}</span>
