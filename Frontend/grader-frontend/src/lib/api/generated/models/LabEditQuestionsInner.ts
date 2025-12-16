@@ -13,13 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
-import type { GetTestcasesByQuestionId200ResponseTestcaseInner } from './GetTestcasesByQuestionId200ResponseTestcaseInner';
+import type { GetMultilanguageTestcaseInformation200ResponseTestcaseInner } from './GetMultilanguageTestcaseInformation200ResponseTestcaseInner';
 import {
-    GetTestcasesByQuestionId200ResponseTestcaseInnerFromJSON,
-    GetTestcasesByQuestionId200ResponseTestcaseInnerFromJSONTyped,
-    GetTestcasesByQuestionId200ResponseTestcaseInnerToJSON,
-    GetTestcasesByQuestionId200ResponseTestcaseInnerToJSONTyped,
-} from './GetTestcasesByQuestionId200ResponseTestcaseInner';
+    GetMultilanguageTestcaseInformation200ResponseTestcaseInnerFromJSON,
+    GetMultilanguageTestcaseInformation200ResponseTestcaseInnerFromJSONTyped,
+    GetMultilanguageTestcaseInformation200ResponseTestcaseInnerToJSON,
+    GetMultilanguageTestcaseInformation200ResponseTestcaseInnerToJSONTyped,
+} from './GetMultilanguageTestcaseInformation200ResponseTestcaseInner';
 
 /**
  * 
@@ -77,16 +77,16 @@ export interface LabEditQuestionsInner {
     secretTestcase?: string;
     /**
      * 
-     * @type {Array<GetTestcasesByQuestionId200ResponseTestcaseInner>}
+     * @type {Array<GetMultilanguageTestcaseInformation200ResponseTestcaseInner>}
      * @memberof LabEditQuestionsInner
      */
-    multilangTestcase?: Array<GetTestcasesByQuestionId200ResponseTestcaseInner>;
+    multilangTestcase?: Array<GetMultilanguageTestcaseInformation200ResponseTestcaseInner>;
     /**
      * 
-     * @type {Array<GetTestcasesByQuestionId200ResponseTestcaseInner>}
+     * @type {Array<GetMultilanguageTestcaseInformation200ResponseTestcaseInner>}
      * @memberof LabEditQuestionsInner
      */
-    multilangSecretTestcase?: Array<GetTestcasesByQuestionId200ResponseTestcaseInner>;
+    multilangSecretTestcase?: Array<GetMultilanguageTestcaseInformation200ResponseTestcaseInner>;
 }
 
 /**
@@ -114,8 +114,8 @@ export function LabEditQuestionsInnerFromJSONTyped(json: any, ignoreDiscriminato
         'score': json['score'] == null ? undefined : json['score'],
         'testcase': json['testcase'] == null ? undefined : json['testcase'],
         'secretTestcase': json['secret_testcase'] == null ? undefined : json['secret_testcase'],
-        'multilangTestcase': json['multilang_testcase'] == null ? undefined : ((json['multilang_testcase'] as Array<any>).map(GetTestcasesByQuestionId200ResponseTestcaseInnerFromJSON)),
-        'multilangSecretTestcase': json['multilang_secret_testcase'] == null ? undefined : ((json['multilang_secret_testcase'] as Array<any>).map(GetTestcasesByQuestionId200ResponseTestcaseInnerFromJSON)),
+        'multilangTestcase': json['multilang_testcase'] == null ? undefined : ((json['multilang_testcase'] as Array<any>).map(GetMultilanguageTestcaseInformation200ResponseTestcaseInnerFromJSON)),
+        'multilangSecretTestcase': json['multilang_secret_testcase'] == null ? undefined : ((json['multilang_secret_testcase'] as Array<any>).map(GetMultilanguageTestcaseInformation200ResponseTestcaseInnerFromJSON)),
     };
 }
 
@@ -138,8 +138,8 @@ export function LabEditQuestionsInnerToJSONTyped(value?: LabEditQuestionsInner |
         'score': value['score'],
         'testcase': value['testcase'],
         'secret_testcase': value['secretTestcase'],
-        'multilang_testcase': value['multilangTestcase'] == null ? undefined : ((value['multilangTestcase'] as Array<any>).map(GetTestcasesByQuestionId200ResponseTestcaseInnerToJSON)),
-        'multilang_secret_testcase': value['multilangSecretTestcase'] == null ? undefined : ((value['multilangSecretTestcase'] as Array<any>).map(GetTestcasesByQuestionId200ResponseTestcaseInnerToJSON)),
+        'multilang_testcase': value['multilangTestcase'] == null ? undefined : ((value['multilangTestcase'] as Array<any>).map(GetMultilanguageTestcaseInformation200ResponseTestcaseInnerToJSON)),
+        'multilang_secret_testcase': value['multilangSecretTestcase'] == null ? undefined : ((value['multilangSecretTestcase'] as Array<any>).map(GetMultilanguageTestcaseInformation200ResponseTestcaseInnerToJSON)),
     };
 }
 
