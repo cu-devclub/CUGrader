@@ -57,7 +57,7 @@ export function createClient() {
         });
       },
       listByClass: async (classId: number) => {
-        const { students } = await generatedClient.getStudentsByClassId({ classId });
+        const { students } = await generatedClient.getStudentsIncClass({ classId });
         return students?.map(it => ({
           studentId: it.studentId!,
           name: it.name!,
@@ -78,8 +78,8 @@ export function createClient() {
         });
       },
       update: async (classId: number, studentId: string, { withdrawed, group, section }: UpdateStudentPayload) => {
-        await generatedClient.updateStudentInfo({
-          updateStudentInfoRequest: {
+        await generatedClient.editStudentInClass({
+          editStudentInClassRequest: {
             classId,
             studentId,
             group,
@@ -93,8 +93,8 @@ export function createClient() {
         // TODO: async queue maybe
         await Promise.all(
           studentIds.map(studentId =>
-            generatedClient.updateStudentInfo({
-              updateStudentInfoRequest: {
+            generatedClient.editStudentInClass({
+              editStudentInClassRequest: {
                 classId,
                 studentId,
                 group: data.group,
@@ -108,11 +108,11 @@ export function createClient() {
     },
     classes: {
       getById: async (classId: number) => {
-        const c = await generatedClient.getClassById({ classId });
+        const c = await generatedClient.getClassInformation({ classId });
         return toClass(c);
       },
       listParticipatingBySemester: async (semester: Semester) => {
-        const { assistant, study } = await generatedClient.getParticipatingClassBySemester({ yearSemester: semester }); return {
+        const { assistant, study } = await generatedClient.getClasses({ yearSemester: semester }); return {
           assisting: assistant?.map(toClass) ?? [],
           studying: study?.map(toClass) ?? []
         };
@@ -140,20 +140,20 @@ export function createClient() {
     },
     sections: {
       getByClass: async (classId: number) => {
-        const { sections } = await generatedClient.getSectionsByClassId({ classId });
+        const { sections } = await generatedClient.getSectionInClass({ classId });
         return sections ?? [];
       }
     },
     semesters: {
       list: async () => {
-        const { semesters } = await generatedClient.getSemesters();
+        const { semesters } = await generatedClient.getSemesterOfUser();
         // TODO: validate formatting
         return (semesters ?? []) as Semester[];
       },
     },
     instructorsAndTAs: {
       listByClass: async (classId: number) => {
-        const { assistant, instructor } = await generatedClient.getInstructorsByClassId({ classId }); return {
+        const { assistant, instructor } = await generatedClient.getAssistantsInClass({ classId }); return {
           instructors: instructor?.map(it => ({
             name: it.name!,
             imageUrl: it.picture,
@@ -168,7 +168,7 @@ export function createClient() {
         };
       },
       addToClass: async (classId: number, email: string) => {
-        await generatedClient.addInstructorToClass({
+        await generatedClient.insertAssistantToClass({
           tAEditBody: {
             classId,
             email
@@ -186,7 +186,7 @@ export function createClient() {
     },
     assignments: {
       listNearDue: async () => {
-        const { labs } = await generatedClient.getNearDues(); return labs?.map(it => ({
+        const { labs } = await generatedClient.getNearDueDateLabs(); return labs?.map(it => ({
           id: it.labId!,
           due: parseDateTime(it.labDue!),
           name: it.labName!,
@@ -198,7 +198,7 @@ export function createClient() {
       },
 
       listByClass: async (classId: number) => {
-        const labs = await generatedClient.getLabsByClassId({ classId });
+        const labs = await generatedClient.getLabsInClass({ classId });
         return labs.map((lab) => ({
           id: lab.labId!,
           name: lab.labName!,
@@ -211,7 +211,7 @@ export function createClient() {
       },
 
       listByClassI: async (classId: number) => {
-        const labs = await generatedClient.getLabsByClassId({ classId });
+        const labs = await generatedClient.getLabsInClass({ classId });
         return labs.map((lab) => {
           return {
             id: lab.labId!,
@@ -272,7 +272,7 @@ export function createClient() {
         });
       },
       getById: async (labId: number) => {
-        const lab = await generatedClient.getLabById({ labId });
+        const lab = await generatedClient.getLabInformation({ labId });
 
         const questionPromises = (lab.questionIds ?? []).map(async questionId => client.questions.getById(questionId));
         const questions = await Promise.all(questionPromises);
@@ -301,7 +301,7 @@ export function createClient() {
       getByIdI: async (labId: number) => {
         // TODO: refactor this to avoid code duplication
         const [lab, examPin] = await Promise.all([
-          generatedClient.getLabById({ labId }),
+          generatedClient.getLabInformation({ labId }),
           client.examPin.getByAssignmentId(labId),
         ]);
 
@@ -336,12 +336,12 @@ export function createClient() {
       },
 
       downloadFile: async (fileId: number) => {
-        const c = await generatedClient.getFileById({ addFileId: fileId });
+        const c = await generatedClient.getAdditionalFileContent({ addFileId: fileId });
         return c;
       },
 
-      removeFile: async (fileId: number) => {
-        await generatedClient.removeFile({
+      deleteAdditionalFile: async (fileId: number) => {
+        await generatedClient.deleteAdditionalFile({
           addFileId: fileId
         });
       },
@@ -349,7 +349,7 @@ export function createClient() {
 
     questions: {
       getById: async (questionId: number) => {
-        const q = await generatedClient.getQuestionById({ questionId });
+        const q = await generatedClient.getQuestionInformation({ questionId });
 
         return {
           id: questionId,
@@ -390,7 +390,7 @@ export function createClient() {
       },
 
       async getSubmission(questionId) {
-        const submission = await generatedClient.getCodeByQuestionId({ questionId });
+        const submission = await generatedClient.getCodeFromSystem({ questionId });
         return {
           language: {
             id: submission.language!.id!,
@@ -405,8 +405,8 @@ export function createClient() {
       },
 
       async submit(questionId, languageId, codes) {
-        const { submissionId } = await generatedClient.submitCode({
-          submitCodeRequest: {
+        const { submissionId } = await generatedClient.saveCodeToSystem({
+          saveCodeToSystemRequest: {
             questionId,
             code: codes.map(it => ({
               pageName: it.pageName,
@@ -420,7 +420,7 @@ export function createClient() {
       },
 
       async getSubmissionResult(submissionId) {
-        const { normal, secret } = await generatedClient.getSubmissionResultBySubmissionId({ submissionId });
+        const { normal, secret } = await generatedClient.getGradedReult({ submissionId });
         return {
           public: normal?.map(it => ({
             input: it.input!,
@@ -441,25 +441,25 @@ export function createClient() {
     },
     supportedLanguages: {
       list: async () => {
-        const response = await generatedClient.getSupportedLanguages();
+        const response = await generatedClient.getSystemSupportedLanguage();
         return response.languages?.map(lang => ({ id: lang.id!, name: lang.name! })) || [];
       },
     },
     groups: {
       listByClassId: async (classId: number) => {
-        const { groups } = await generatedClient.getGroupsByClassId({ classId });
+        const { groups } = await generatedClient.getGroupsInClass({ classId });
         return groups || [];
       },
     },
     examPin: {
       async getByAssignmentId(labId) {
-        const { examPin } = await generatedClient.getExamPinByLabId({ labId });
+        const { examPin } = await generatedClient.getExaminationPin({ labId });
         return String(examPin);
       },
     },
     testCode: {
       async getById(id) {
-        const { testcase } = await generatedClient.getUnitTestById({ testCaseId: id });
+        const { testcase } = await generatedClient.getTestcaseInfomation({ testCaseId: id });
         if (!testcase) {
           throw new Error("what");
         }
@@ -468,7 +468,7 @@ export function createClient() {
     },
     testcase: {
       async listByQuestionId(questionId) {
-        const { secretTestcase, testcase } = await generatedClient.getTestcasesByQuestionId({ questionId });
+        const { secretTestcase, testcase } = await generatedClient.getMultilanguageTestcaseInformation({ questionId });
         return {
           public: testcase?.map(it => ({ input: it.input!, output: it.output! })) ?? [],
           secret: secretTestcase?.map(it => ({ input: it.input!, output: it.output! })) ?? []
