@@ -3,7 +3,7 @@ import { CalendarDateTime } from "@internationalized/date";
 export type Semester = `${number}/${string}`;
 
 export interface Class {
-  classId: number, // map to class_id
+  classId: number; // map to class_id
   courseId: string;
   courseName: string;
   imageUrl?: string;
@@ -33,9 +33,9 @@ export interface Instructor {
 }
 
 export interface ClassParticipants {
-  instructors: Instructor[],
-  teachingAssistants: TeachingAssistant[],
-  students: Student[],
+  instructors: Instructor[];
+  teachingAssistants: TeachingAssistant[];
+  students: Student[];
 }
 
 export interface TeachingAssistant {
@@ -89,7 +89,8 @@ export interface InstructorQuestion extends Question {
   secretTestCases: Testcase[];
 }
 
-export interface CreateInstructorQuestionPayload extends Omit<InstructorQuestion, "languages" | "id"> {
+export interface CreateInstructorQuestionPayload
+  extends Omit<InstructorQuestion, "languages" | "id"> {
   languageIds: number[];
 }
 
@@ -101,7 +102,7 @@ export type SupportedLanguage = {
 // ===========
 
 export interface InstructorsAndTAs {
-  instructors: Instructor[],
+  instructors: Instructor[];
   teachingAssistant: TeachingAssistant[];
 }
 
@@ -111,19 +112,19 @@ export interface ParticipatingClasses {
 }
 
 export interface CreateStudentPayload {
-  email: string,
-  section: number,
+  email: string;
+  section: number;
   group?: string;
 }
 
 export interface UpdateStudentPayload {
-  section?: number,
-  group?: string,
+  section?: number;
+  group?: string;
   withdrawed?: boolean;
 }
 
 export interface CreateClassPayload {
-  courseId: string;
+  courseId: number;
   name: string;
   semester: Semester;
   image?: File;
@@ -133,10 +134,17 @@ export interface CreateClassPayload {
   students?: File;
 }
 
-export type UpdateClassPayload = Partial<CreateClassPayload>;
+export type UpdateClassPayload = Partial<CreateClassPayload> & {
+  // why
+  courseId: number;
+};
 
-
-export type AssignmentStatus = "new" | "partially-completed" | "completed" | "lated" | "due-soon";
+export type AssignmentStatus =
+  | "new"
+  | "partially-completed"
+  | "completed"
+  | "lated"
+  | "due-soon";
 
 export type NearDueAssignment = {
   id: number;
@@ -176,16 +184,20 @@ export interface StudentAssignment extends Assignment {
   status: AssignmentStatus;
 }
 
-export interface StudentAssignmentDetails extends StudentAssignment, AssignmentDetails {
+export interface StudentAssignmentDetails
+  extends StudentAssignment,
+    AssignmentDetails {
   questions: StudentQuestion[];
 }
 
 export type InstructorAssignment = Assignment;
 
-export interface InstructorAssignmentDetails extends InstructorAssignment, AssignmentDetails, InstructorAssignmentDetailsFields {
+export interface InstructorAssignmentDetails
+  extends InstructorAssignment,
+    AssignmentDetails,
+    InstructorAssignmentDetailsFields {
   questions: InstructorQuestion[];
 }
-
 
 export interface QuestionSubmissionPayload {
   questionId: number;
@@ -207,8 +219,8 @@ export type CreateAssignmentPayload = Omit<InstructorAssignment, "id"> & {
 
 export type UpdateAssignmentPayload = Partial<CreateAssignmentPayload>;
 
-
-export interface CodePage { // ?????
+export interface CodePage {
+  // ?????
   pageName: string;
   content: string;
 }
@@ -225,7 +237,10 @@ export interface PublicTestcaseResult {
   status: "pass" | "fail" | "pending";
 }
 
-export type SecretTestcaseResult = Omit<PublicTestcaseResult, "input" | "expectedOutput">;
+export type SecretTestcaseResult = Omit<
+  PublicTestcaseResult,
+  "input" | "expectedOutput"
+>;
 
 export interface CodeSubmission {
   submissionId: number;
@@ -235,31 +250,44 @@ export interface CodeSubmission {
 
 export interface APIClient {
   students: {
-    addToClass: (classId: number, payload: CreateStudentPayload) => Promise<void>,
-    listByClass: (classId: number) => Promise<Student[]>,
-    removeFromClass: (classId: number, studentId: string) => Promise<void>,
-    update: (classId: number, studentId: string, data: UpdateStudentPayload) => Promise<void>,
-    updateMany: (classId: number, studentIds: string[], data: UpdateStudentPayload) => Promise<void>,
-  },
+    addToClass: (
+      classId: number,
+      payload: CreateStudentPayload
+    ) => Promise<void>;
+    listByClass: (classId: number) => Promise<Student[]>;
+    removeFromClass: (classId: number, studentId: string) => Promise<void>;
+    update: (
+      classId: number,
+      studentId: string,
+      data: UpdateStudentPayload
+    ) => Promise<void>;
+    updateMany: (
+      classId: number,
+      studentIds: string[],
+      data: UpdateStudentPayload
+    ) => Promise<void>;
+  };
   classes: {
-    getById: (classId: number) => Promise<Class>,
-    listParticipatingBySemester: (semester: Semester) => Promise<ParticipatingClasses>,
-    create: (payload: CreateClassPayload) => Promise<void>, // should it tho
-    update: (classId: number, payload: UpdateClassPayload) => Promise<void>,
+    getById: (classId: number) => Promise<Class>;
+    listParticipatingBySemester: (
+      semester: Semester
+    ) => Promise<ParticipatingClasses>;
+    create: (payload: CreateClassPayload) => Promise<void>; // should it tho
+    update: (classId: number, payload: UpdateClassPayload) => Promise<void>;
     // จารย์พลอยไม่เอา
     // delete: (classId: number) => Promise<void>,
-  },
+  };
   sections: {
     getByClass: (classId: number) => Promise<number[]>;
   };
   semesters: {
-    list: () => Promise<Semester[]>,
-  },
+    list: () => Promise<Semester[]>;
+  };
   instructorsAndTAs: {
-    listByClass: (classId: number) => Promise<InstructorsAndTAs>,
-    addToClass: (classId: number, email: string) => Promise<void>,
-    removeFromClass: (classId: number, email: string) => Promise<void>,
-  },
+    listByClass: (classId: number) => Promise<InstructorsAndTAs>;
+    addToClass: (classId: number, email: string) => Promise<void>;
+    removeFromClass: (classId: number, email: string) => Promise<void>;
+  };
 
   assignments: {
     listNearDue: () => Promise<NearDueAssignment[]>;
@@ -269,7 +297,10 @@ export interface APIClient {
     getById: (labId: number) => Promise<StudentAssignmentDetails>;
     getByIdI: (labId: number) => Promise<InstructorAssignmentDetails>;
 
-    create: (classId: number, payload: CreateAssignmentPayload) => Promise<void>;
+    create: (
+      classId: number,
+      payload: CreateAssignmentPayload
+    ) => Promise<void>;
     update: (labId: number, payload: UpdateAssignmentPayload) => Promise<void>;
 
     attachFile: (assignmentId: number, file: File) => Promise<void>;
@@ -280,7 +311,11 @@ export interface APIClient {
     getById: (questionId: number) => Promise<StudentQuestion>;
     getByIdI: (questionId: number) => Promise<InstructorQuestion>;
 
-    submit: (questionId: number, languageId: number, codes: CodePage[]) => Promise<{ submissionId: number; }>;
+    submit: (
+      questionId: number,
+      languageId: number,
+      codes: CodePage[]
+    ) => Promise<{ submissionId: number }>;
     getSubmission: (questionId: number) => Promise<CodeSubmission | null>;
     requestGrade: (submissionId: number) => Promise<void>;
     getSubmissionResult: (submissionId: number) => Promise<SubmissionResult>;
@@ -294,10 +329,14 @@ export interface APIClient {
   examPin: {
     getByAssignmentId: (assignmentId: number) => Promise<string>;
   };
-  testCode: { // TODO: rename this
+  testCode: {
+    // TODO: rename this
     getById: (testCodeId: number) => Promise<string>;
   };
-  testcase: { // TODO: rename this
-    listByQuestionId: (testCodeId: number) => Promise<{ public: Testcase[], secret: Testcase[]; }>;
+  testcase: {
+    // TODO: rename this
+    listByQuestionId: (
+      testCodeId: number
+    ) => Promise<{ public: Testcase[]; secret: Testcase[] }>;
   };
-};
+}
