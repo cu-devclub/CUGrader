@@ -1,6 +1,21 @@
 import { parseDateTime } from "@internationalized/date";
 import { getCookie } from "cookies-next/client";
 import { unimplemented } from "../utils";
+
+/**
+ * 🚨 ARCHITECTURE NOTE - READ BEFORE USING 🚨
+ *
+ * This wrapper serves as the EXCLUSIVE interface for frontend-backend interaction.
+ *
+ * The underlying API specification is complex and contains inconsistencies.
+ * This wrapper purposefully abstracts these "messy" details (auth, type mapping, inconsistent naming).
+ *
+ * - DO NOT use the generated API clients (./generated) directly.
+ * - DO NOT rely on the raw OpenAPI specification.
+ * - ALWAYS use this standardized `APIClient`.
+ *
+ * If you need a new endpoint, add it to this wrapper properly instead of bypassing it.
+ */
 import {
   AssistantApi,
   ClassApi,
@@ -15,6 +30,7 @@ import {
 import {
   APIClient,
   AssignmentStatus,
+  Attendance,
   Class,
   CreateAssignmentPayload,
   CreateClassPayload,
@@ -135,6 +151,9 @@ export function createClient() {
         });
       },
 
+      /**
+       * Updates multiple students' information in bulk
+       */
       updateMany: async (
         classId: number,
         studentIds: string[],
@@ -160,6 +179,14 @@ export function createClient() {
       getById: async (classId: number) => {
         const c = await classApi.getClassInformation({ classId });
         return toClass(c);
+      },
+      getProgressById: async (classId: number) => {
+        // TODO: Implement actual API call
+        throw unimplemented();
+      },
+      getRankById: async (classId: number) => {
+        // TODO: Implement actual API call
+        throw unimplemented();
       },
       listParticipatingBySemester: async (semester: Semester) => {
         const { assistant, study } = await classApi.getClasses({
@@ -194,7 +221,7 @@ export function createClient() {
           classId,
           courseId,
           image,
-          name, // why tf is this required
+          name, // Note: Name is required by backend even for partial updates
           semester,
           students,
         });
@@ -391,7 +418,7 @@ export function createClient() {
         // TODO: refactor this to avoid code duplication
         const [lab, examPin] = await Promise.all([
           labApi.getLabInformation({ labId }),
-          client.examPin.getByAssignmentId(labId),
+          client.exam.getPinByAssignmentId(labId),
         ]);
 
         const questionPromises = (lab.questionIds ?? []).map(
@@ -417,7 +444,7 @@ export function createClient() {
           // Instructor-specific detail fields
           examPin: String(examPin ?? "000000"),
           showScoreOnLock: false,
-          testCode: String(lab.testcase ?? ""), // wtf why did these exist on normal api too
+          testCode: String(lab.testcase ?? ""), // Note: Field exists on student view but unused
           secretTestCode: String(lab.secretTestcase ?? ""),
         } satisfies InstructorAssignmentDetails;
       },
@@ -555,8 +582,17 @@ export function createClient() {
         return groups || [];
       },
     },
-    examPin: {
-      async getByAssignmentId(labId) {
+    exam: {
+      async checkin(examId, pin) {
+        throw unimplemented();
+      },
+      async isCheckedin(examId) {
+        throw unimplemented();
+      },
+      async listAttendance(examId) {
+        throw unimplemented();
+      },
+      async getPinByAssignmentId(labId) {
         const { examPin } = await labApi.getExaminationPin({ labId });
         return String(examPin);
       },
@@ -567,7 +603,7 @@ export function createClient() {
           testCaseId: id,
         });
         if (!testcase) {
-          throw new Error("what");
+          throw new Error("Testcase content not found in response");
         }
         return testcase;
       },
@@ -586,6 +622,11 @@ export function createClient() {
               output: it.output!,
             })) ?? [],
         };
+      },
+    },
+    server: {
+      ping: async () => {
+        await systemApi.testPing();
       },
     },
   };

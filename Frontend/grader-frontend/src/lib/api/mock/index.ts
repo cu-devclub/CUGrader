@@ -1,5 +1,5 @@
 import { CalendarDateTime, parseDateTime } from "@internationalized/date";
-import { APIClient, SupportedLanguage } from "../type";
+import { APIClient, Attendance, SupportedLanguage } from "../type";
 import { generateName } from "./name";
 import { DbClass, InMemoryStorage, PersistenceStorage, Storage } from "./persistence";
 import { seed } from "./seed";
@@ -155,6 +155,20 @@ function createClient(persistence: Storage<Database>): APIClient {
         return {
           ...c,
           imageUrl: await getUrl(c.imageFileId)
+        };
+      },
+      async getProgressById(classId) {
+        return {
+          done: 0,
+          maxLab: 10,
+        };
+      },
+      async getRankById(classId) {
+        return {
+          rank: 1,
+          studentCount: 20,
+          rankGraph: [1, 2, 3, 4, 5, 4, 3, 2, 1, 0],
+          rankGraphPosition: 5,
         };
       },
       async listParticipatingBySemester(semester) {
@@ -528,10 +542,32 @@ function createClient(persistence: Storage<Database>): APIClient {
       },
     },
 
-    examPin: {
-      getByAssignmentId: async (assignmentId: number) => {
+    exam: {
+      checkin: async (examId, pin) => {
+        console.log(`[mock] Checkin ${examId} with pin ${pin}`);
+      },
+      isCheckedin: async (examId) => {
+        return true;
+      },
+      listAttendance: async (examId) => {
+        return [
+          {
+            name: "John Doe",
+            studentId: "643xxxxx21",
+            checkedInTime: new Date(),
+            examName: "Midterm Exam",
+          } satisfies Attendance
+        ];
+      },
+      getPinByAssignmentId: async (assignmentId: number) => {
         const assignment = assignments.find(a => a.id === assignmentId);
         return assignment?.examPin || "123456";
+      }
+    },
+
+    server: {
+      ping: async () => {
+        await new Promise(resolve => setTimeout(resolve, 100));
       }
     },
 
