@@ -258,22 +258,10 @@ export function createClient() {
         });
       },
       removeFromClass: async (classId: number, email: string) => {
-        // Lookup assistant/instructor to get ID
-        const { assistant, instructor } =
-          await assistantApi.getAssistantsInClass({ classId });
-        const target = [...(assistant ?? []), ...(instructor ?? [])].find(
-          (it) => it.email === email
-        );
-
-        if (target && (target as any).id) {
-          await assistantApi.deleteAssistantFromClass({
-            assistantId: (target as any).id,
-          });
-        } else {
-          console.warn(
-            `Could not find assistant/instructor with email ${email} to delete`
-          );
-        }
+        unimplemented("TODO: why is the signature like this")
+        // await assistantApi.deleteAssistantFromClass({
+        //   assistantId: (target as any).id,
+        // });
       },
     },
     assignments: {
