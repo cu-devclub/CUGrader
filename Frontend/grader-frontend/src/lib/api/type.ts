@@ -56,7 +56,7 @@ export interface TeachingAssistant {
 }
 
 export interface LabNotification {
-  courseId: number;
+  courseId: string;
   courseName: string;
   id: number;
   name: string;
@@ -147,7 +147,7 @@ export interface UpdateStudentPayload {
 }
 
 export interface CreateClassPayload {
-  courseId: number;
+  courseId: string;
   name: string;
   semester: Semester;
   image?: File;

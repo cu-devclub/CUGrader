@@ -20,15 +20,6 @@ type Assistant = {
   picture: string;
 };
 
-type ClassType = {
-  classId: number;
-  courseId: number;
-  courseName: string;
-  image: string;
-  semester: string;
-  assistants: Assistant[];
-};
-
 export default function Page() {
   const t = useTranslations("student");
 
