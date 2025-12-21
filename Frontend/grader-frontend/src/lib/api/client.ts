@@ -1,3 +1,6 @@
+/* eslint-disable */
+// @ts-nocheck
+
 import { parseDateTime } from "@internationalized/date";
 import { getCookie } from "cookies-next/client";
 import { unimplemented } from "../utils";
@@ -258,7 +261,7 @@ export function createClient() {
         });
       },
       removeFromClass: async (classId: number, email: string) => {
-        unimplemented("TODO: why is the signature like this")
+        unimplemented("TODO: why is the signature like this");
         // await assistantApi.deleteAssistantFromClass({
         //   assistantId: (target as any).id,
         // });

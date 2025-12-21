@@ -20,4 +20,4 @@ Note that this will make react yell at us for causing hydration mismatch. We can
 ## Known issues
 - At `/instructor`, on initial page load, the `src` property of class card header image are not repatch by react hydration process. It will correct itself after doing some client side navigation (e.g. click a link to go to another page then come back)
 - No permission checking (yet)
-
+- some path expected nested formdata which is impossible and will cause build failure

@@ -264,7 +264,8 @@ export class LabApi extends runtime.BaseAPI {
         }
 
         if (requestParameters['labData'] != null) {
-            formParams.append('lab_data', new Blob([JSON.stringify(objectToJSON(requestParameters['labData']))], { type: "application/json", }));
+            // TODO: fix this
+            // formParams.append('lab_data', new Blob([JSON.stringify(objectToJSON(requestParameters['labData']))], { type: "application/json", }));
                     }
 
         const response = await this.request({
@@ -846,7 +847,7 @@ export class LabApi extends runtime.BaseAPI {
         }
 
         if (requestParameters['labData'] != null) {
-            formParams.append('lab_data', new Blob([JSON.stringify(objectToJSON(requestParameters['labData']))], { type: "application/json", }));
+            // formParams.append('lab_data', new Blob([JSON.stringify(objectToJSON(requestParameters['labData']))], { type: "application/json", }));
                     }
 
         const response = await this.request({
