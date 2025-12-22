@@ -2,20 +2,6 @@ import { parseDateTime } from "@internationalized/date";
 import { getCookie } from "cookies-next/client";
 import { unimplemented } from "../utils";
 
-/**
- * 🚨 ARCHITECTURE NOTE - READ BEFORE USING 🚨
- *
- * This wrapper serves as the EXCLUSIVE interface for frontend-backend interaction.
- *
- * The underlying API specification is complex and contains inconsistencies.
- * This wrapper purposefully abstracts these "messy" details (auth, type mapping, inconsistent naming).
- *
- * - DO NOT use the generated API clients (./generated) directly.
- * - DO NOT rely on the raw OpenAPI specification.
- * - ALWAYS use this standardized `APIClient`.
- *
- * If you need a new endpoint, add it to this wrapper properly instead of bypassing it.
- */
 import {
   AssistantApi,
   ClassApi,
