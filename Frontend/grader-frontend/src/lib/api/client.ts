@@ -578,6 +578,9 @@ export function createClient() {
       async listAttendance(examId) {
         throw unimplemented();
       },
+      async createQrcode(mode) {
+        throw unimplemented()
+      },
       async getPinByAssignmentId(labId) {
         const { examPin } = await labApi.getExaminationPin({ labId });
         return String(examPin);

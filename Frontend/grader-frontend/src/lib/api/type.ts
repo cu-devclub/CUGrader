@@ -403,6 +403,11 @@ export interface APIClient {
     // TODO: i will manage this state
     checkin: (examId: string, pin: string) => Promise<void>;
     isCheckedin: (examId: string) => Promise<boolean>;
+    
+    /**
+     * @returns url ของรูป qrcode 
+     */
+    createQrcode: (mode: "checkin" | "checkout") => Promise<URL>;
 
     // TODO: no api yet
     listAttendance: (examId: string) => Promise<Attendance[]>;
