@@ -159,9 +159,9 @@ export interface CreateClassPayload {
 
 export type UpdateClassPayload = Partial<CreateClassPayload> & {
   // TODO: fix this?
-  name: string;
-  semester: Semester;
-  courseId: number;
+  // name: string;
+  // semester: Semester;
+  // courseId: number;
 };
 
 export type AssignmentStatus =
