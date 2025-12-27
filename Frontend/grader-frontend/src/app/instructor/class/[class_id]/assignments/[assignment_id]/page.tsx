@@ -32,7 +32,7 @@ export default function Page({ params }: { params: Promise<{ assignment_id: stri
         number: data.number,
         publish: parseDateTime(data.publish),
         due: parseDateTime(data.due),
-        languageIds: data.languageIds,
+        // languageIds: data.languageIds,
         examMode: data.examMode,
         closeOnDue: !data.allowLateSubmission,
         showScoreOnLock: data.showScoreOnLock,
@@ -40,18 +40,19 @@ export default function Page({ params }: { params: Promise<{ assignment_id: stri
         assignedGroupIds: data.assignedGroupIds,
         testCode: data.testCode,
         secretTestCode: data.secretTestCode,
-        questions: data.questions.map((q, index) => ({
-          number: index + 1,
-          name: q.name,
-          description: q.description,
-          template: q.template,
-          maxScore: q.maxScore,
-          answer: q.answer,
-          testCode: q.testCode,
-          secretTestCode: q.secretTestCode,
-          testcases: q.testcases,
-          secretTestCases: q.secretTestCases,
-        })),
+        questions: [],
+        // questions: data.questions.map((q, index) => ({
+        //   number: index + 1,
+        //   name: q.name,
+        //   description: q.description,
+        //   template: q.template,
+        //   maxScore: q.maxScore,
+        //   answer: q.answer,
+        //   testCode: q.testCode,
+        //   secretTestCode: q.secretTestCode,
+        //   testcases: q.testcases,
+        //   secretTestCases: q.secretTestCases,
+        // })),
       };
 
       // TODO: handle file uploading again
@@ -60,9 +61,9 @@ export default function Page({ params }: { params: Promise<{ assignment_id: stri
       const promises: Promise<unknown>[] = [];
 
       if (data.toRemoveExistingFileIds.length > 0) {
-        promises.push(...data.toRemoveExistingFileIds.map(fileId =>
-          api.assignments.removeFile(fileId)
-        ));
+        // promises.push(...data.toRemoveExistingFileIds.map(fileId =>
+        //   api.assignments.removeFile(fileId)
+        // ));
       }
 
       promises.push(api.assignments.update(assignmentId, payload));
@@ -93,7 +94,7 @@ export default function Page({ params }: { params: Promise<{ assignment_id: stri
 
   return (
     <main className="space-y-6">
-      <AssignmentForm
+      {/* <AssignmentForm
         classId={classData.id}
         isPending={mutation.isPending}
         submit={submit}
@@ -124,7 +125,7 @@ export default function Page({ params }: { params: Promise<{ assignment_id: stri
             secretTestCases: q.secretTestCases,
           })),
         }}
-      />
+      /> */}
     </main>
   );
 }

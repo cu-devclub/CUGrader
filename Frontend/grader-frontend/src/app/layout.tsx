@@ -6,8 +6,7 @@ import Providers from "./providers";
 import { Toaster } from "@/components/ui/sonner";
 
 import { NextIntlClientProvider } from 'next-intl';
-import { getLocale, getMessages } from 'next-intl/server'
-  ;
+import { getLocale, getMessages } from 'next-intl/server';
 
 // TODO: get thai font
 const rubik = Rubik({
@@ -49,7 +48,17 @@ export default async function RootLayout({
           <AntdRegistry>
             <NextIntlClientProvider locale={locale} messages={messages}>
               {children}
-              <Toaster />
+              <Toaster 
+                richColors
+                theme="light"
+                closeButton
+                toastOptions={{
+                  style: {
+                    fontFamily: 'RubikFont, sans-serif',
+                  },
+                  className: "RubikFont",
+                }}
+              />
             </NextIntlClientProvider>
           </AntdRegistry>
         </Providers>

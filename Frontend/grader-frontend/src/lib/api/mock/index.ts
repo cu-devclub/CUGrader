@@ -1,7 +1,12 @@
 import { CalendarDateTime, parseDateTime } from "@internationalized/date";
-import { APIClient, SupportedLanguage } from "../type";
+import { APIClient, Attendance, SupportedLanguage } from "../type";
 import { generateName } from "./name";
-import { DbClass, InMemoryStorage, PersistenceStorage, Storage } from "./persistence";
+import {
+  DbClass,
+  InMemoryStorage,
+  PersistenceStorage,
+  Storage,
+} from "./persistence";
 import { seed } from "./seed";
 
 interface Database {
@@ -21,7 +26,6 @@ interface DbAssignment {
   assignedGroupIds: string[];
   closeOnDue: boolean;
   examMode: boolean;
-  languageIds: number[];
   additionalFileIds: number[];
   examPin: string;
   secretTestCode: string;
@@ -39,8 +43,9 @@ interface DbQuestion {
   answer: string;
   testCode: string;
   secretTestCode: string;
-  testcases: { input: string; output: string; }[];
-  secretTestCases: { input: string; output: string; }[];
+  testcases: { input: string; output: string }[];
+  secretTestCases: { input: string; output: string }[];
+  languageIds: number[];
 }
 
 function createClient(persistence: Storage<Database>): APIClient {
@@ -52,7 +57,7 @@ function createClient(persistence: Storage<Database>): APIClient {
   const questions = persistence.data.questions;
 
   function getClassById(id: number) {
-    const target = persistence.data.classes.find(it => it.classId === id);
+    const target = persistence.data.classes.find((it) => it.classId === id);
     if (!target) {
       throw new Error(`${id} class not found`);
     }
@@ -79,21 +84,27 @@ function createClient(persistence: Storage<Database>): APIClient {
       },
       async listByClass(classId) {
         const students = getClassById(classId).students;
-        return Promise.all(students.map(async (it) => ({
-          ...it,
-          imageUrl: await getUrl(it.imageFileId),
-          maxScore: 100,
-        })));
+        return Promise.all(
+          students.map(async (it) => ({
+            ...it,
+            imageUrl: await getUrl(it.imageFileId),
+            maxScore: 100,
+          }))
+        );
       },
       async removeFromClass(classId, studentId) {
         const target = getClassById(classId);
-        target.students = target.students.filter(it => it.studentId !== studentId);
+        target.students = target.students.filter(
+          (it) => it.studentId !== studentId
+        );
         persistence.persist();
       },
       async update(classId, studentId, { group, section, withdrawed }) {
         const target = getClassById(classId);
         // console.log(studentId)
-        const student = target.students.find(it => it.studentId === studentId);
+        const student = target.students.find(
+          (it) => it.studentId === studentId
+        );
         if (!student) {
           throw new Error("student not found");
         }
@@ -111,7 +122,7 @@ function createClient(persistence: Storage<Database>): APIClient {
       async updateMany(classId, studentIds, { group, section, withdrawed }) {
         const target = getClassById(classId);
         for (const id of studentIds) {
-          const student = target.students.find(it => it.studentId === id);
+          const student = target.students.find((it) => it.studentId === id);
           if (!student) {
             continue;
             // throw new Error("student not found");
@@ -146,7 +157,7 @@ function createClient(persistence: Storage<Database>): APIClient {
           students: [],
           semester,
           assistants: [],
-          instructors: []
+          instructors: [],
         });
         persistence.persist();
       },
@@ -154,21 +165,37 @@ function createClient(persistence: Storage<Database>): APIClient {
         const c = getClassById(classId);
         return {
           ...c,
-          imageUrl: await getUrl(c.imageFileId)
+          imageUrl: await getUrl(c.imageFileId),
+        };
+      },
+      async getProgressById(classId) {
+        return {
+          done: 0,
+          maxLab: 10,
+        };
+      },
+      async getRankById(classId) {
+        return {
+          rank: 1,
+          studentCount: 20,
+          rankGraph: [1, 2, 3, 4, 5, 4, 3, 2, 1, 0],
+          rankGraphPosition: 5,
         };
       },
       async listParticipatingBySemester(semester) {
-        const classesInSemester = classes.filter(it => it.semester === semester);
+        const classesInSemester = classes.filter(
+          (it) => it.semester === semester
+        );
         const classesWithImages = await Promise.all(
-          classesInSemester.map(async it => ({
+          classesInSemester.map(async (it) => ({
             ...it,
-            imageUrl: await getUrl(it.imageFileId)
+            imageUrl: await getUrl(it.imageFileId),
           }))
         );
 
         return {
           assisting: classesWithImages,
-          studying: classesWithImages
+          studying: classesWithImages,
         };
       },
       async update(classId, payload) {
@@ -198,7 +225,7 @@ function createClient(persistence: Storage<Database>): APIClient {
         const c = getClassById(classId);
         return {
           instructors: c.instructors,
-          teachingAssistant: c.assistants
+          teachingAssistant: c.assistants,
         };
       },
       async addToClass(classId, email) {
@@ -220,27 +247,31 @@ function createClient(persistence: Storage<Database>): APIClient {
       },
       async removeFromClass(classId, email) {
         const target = getClassById(classId);
-        target.instructors = target.instructors.filter(it => it.email !== email);
-        target.assistants = target.assistants.filter(it => it.email !== email);
+        target.instructors = target.instructors.filter(
+          (it) => it.email !== email
+        );
+        target.assistants = target.assistants.filter(
+          (it) => it.email !== email
+        );
         persistence.persist();
       },
     },
     semesters: {
       list: async () => {
-        const s = classes.map(it => it.semester);
+        const s = classes.map((it) => it.semester);
         return [...new Set(s)]; // remove duplicated
-      }
+      },
     },
     assignments: {
       listNearDue: async () => {
-        const nearDueAssignments = assignments.filter(a => {
+        const nearDueAssignments = assignments.filter((a) => {
           const now = new Date();
           const due = a.due.toDate("UTC");
           const timeDiff = due.getTime() - now.getTime();
           return timeDiff > 0 && timeDiff <= 7 * 24 * 60 * 60 * 1000; // within 7 days
         });
 
-        return nearDueAssignments.map(a => {
+        return nearDueAssignments.map((a) => {
           const c = getClassById(a.classId);
           return {
             id: a.id,
@@ -248,21 +279,17 @@ function createClient(persistence: Storage<Database>): APIClient {
             courseName: c.courseName,
             due: a.due,
             maxScore: 100,
-            name: a.name
+            name: a.name,
           };
         });
       },
       getById: async (labId) => {
-        const assignment = assignments.find(a => a.id === labId);
+        const assignment = assignments.find((a) => a.id === labId);
         if (!assignment) throw new Error(`Assignment ${labId} not found`);
 
-        const assignmentQuestions = await Promise.all(assignment.questionIds.map(id => client.questions.getById(id)));
-
-        // Map languageIds to supported languages
-        const supportedLanguages = await client.supportedLanguages.list();
-        const languages = assignment.languageIds
-          .map(id => supportedLanguages.find(lang => lang.id === id))
-          .filter((lang): lang is SupportedLanguage => lang !== undefined);
+        const assignmentQuestions = await Promise.all(
+          assignment.questionIds.map((id) => client.questions.getById(id))
+        );
 
         return {
           id: assignment.id,
@@ -275,24 +302,19 @@ function createClient(persistence: Storage<Database>): APIClient {
           assignedGroupIds: assignment.assignedGroupIds,
           closeOnDue: assignment.closeOnDue,
           examMode: assignment.examMode,
-          languages,
           additionalFileIds: assignment.additionalFileIds,
           score: Math.floor(Math.random() * 100),
-          status: "completed"
+          status: "completed",
         };
       },
 
       getByIdI: async (labId) => {
-        const assignment = assignments.find(a => a.id === labId);
+        const assignment = assignments.find((a) => a.id === labId);
         if (!assignment) throw new Error(`Assignment ${labId} not found`);
 
-        const assignmentQuestions = await Promise.all(assignment.questionIds.map(id => client.questions.getByIdI(id)));
-
-        // Map languageIds to supported languages
-        const supportedLanguages = await client.supportedLanguages.list();
-        const languages = assignment.languageIds
-          .map(id => supportedLanguages.find(lang => lang.id === id))
-          .filter((lang): lang is SupportedLanguage => lang !== undefined);
+        const assignmentQuestions = await Promise.all(
+          assignment.questionIds.map((id) => client.questions.getByIdI(id))
+        );
 
         return {
           id: assignment.id,
@@ -304,39 +326,42 @@ function createClient(persistence: Storage<Database>): APIClient {
           assignedGroupIds: assignment.assignedGroupIds,
           closeOnDue: assignment.closeOnDue,
           examMode: assignment.examMode,
-          languages,
           additionalFileIds: assignment.additionalFileIds,
           examPin: assignment.examPin,
           secretTestCode: assignment.secretTestCode,
           showScoreOnLock: assignment.showScoreOnLock,
           testCode: assignment.testCode,
-          questions: assignmentQuestions
+          questions: assignmentQuestions,
         };
       },
 
       listByClass: async (classId) => {
-        const classAssignments = assignments.filter(a => a.classId === classId);
+        const classAssignments = assignments.filter(
+          (a) => a.classId === classId
+        );
 
-        return classAssignments.map(a => ({
+        return classAssignments.map((a) => ({
           id: a.id,
           number: a.number,
           publish: a.publish,
           due: a.due,
           name: a.name,
           score: Math.floor(Math.random() * 100),
-          status: "due-soon" as const
+          status: "due-soon" as const,
         }));
       },
 
       listByClassI: async (classId) => {
-        const classAssignments = assignments.filter(a => a.classId === classId);
+        const classAssignments = assignments.filter(
+          (a) => a.classId === classId
+        );
 
-        return classAssignments.map(a => ({
+        return classAssignments.map((a) => ({
           id: a.id,
           number: a.number,
           publish: a.publish,
           due: a.due,
-          name: a.name
+          name: a.name,
         }));
       },
 
@@ -352,12 +377,11 @@ function createClient(persistence: Storage<Database>): APIClient {
           assignedGroupIds: payload.assignedGroupIds,
           closeOnDue: payload.closeOnDue,
           examMode: payload.examMode,
-          languageIds: payload.languageIds,
           additionalFileIds: [],
           examPin: payload.examPin,
           secretTestCode: payload.secretTestCode,
           showScoreOnLock: payload.showScoreOnLock,
-          testCode: payload.testCode
+          testCode: payload.testCode,
         };
 
         // Create questions and link them
@@ -375,7 +399,8 @@ function createClient(persistence: Storage<Database>): APIClient {
             testCode: q.testCode,
             secretTestCode: q.secretTestCode,
             testcases: q.testcases,
-            secretTestCases: q.secretTestCases
+            secretTestCases: q.secretTestCases,
+            languageIds: q.languageIds,
           };
           questions.push(newQuestion);
           questionIds.push(newQuestion.id);
@@ -387,28 +412,34 @@ function createClient(persistence: Storage<Database>): APIClient {
       },
 
       update: async (labId, payload) => {
-        const assignment = assignments.find(a => a.id === labId);
+        const assignment = assignments.find((a) => a.id === labId);
         if (!assignment) throw new Error(`Assignment ${labId} not found`);
 
         if (payload.number !== undefined) assignment.number = payload.number;
         if (payload.name !== undefined) assignment.name = payload.name;
         if (payload.publish !== undefined) assignment.publish = payload.publish;
         if (payload.due !== undefined) assignment.due = payload.due;
-        if (payload.assignedGroupIds !== undefined) assignment.assignedGroupIds = payload.assignedGroupIds;
-        if (payload.closeOnDue !== undefined) assignment.closeOnDue = payload.closeOnDue;
-        if (payload.examMode !== undefined) assignment.examMode = payload.examMode;
-        if (payload.languageIds !== undefined) assignment.languageIds = payload.languageIds;
+        if (payload.assignedGroupIds !== undefined)
+          assignment.assignedGroupIds = payload.assignedGroupIds;
+        if (payload.closeOnDue !== undefined)
+          assignment.closeOnDue = payload.closeOnDue;
+        if (payload.examMode !== undefined)
+          assignment.examMode = payload.examMode;
         if (payload.examPin !== undefined) assignment.examPin = payload.examPin;
-        if (payload.secretTestCode !== undefined) assignment.secretTestCode = payload.secretTestCode;
-        if (payload.showScoreOnLock !== undefined) assignment.showScoreOnLock = payload.showScoreOnLock;
-        if (payload.testCode !== undefined) assignment.testCode = payload.testCode;
+        if (payload.secretTestCode !== undefined)
+          assignment.secretTestCode = payload.secretTestCode;
+        if (payload.showScoreOnLock !== undefined)
+          assignment.showScoreOnLock = payload.showScoreOnLock;
+        if (payload.testCode !== undefined)
+          assignment.testCode = payload.testCode;
 
         persistence.persist();
       },
 
       attachFile: async (assignmentId: number, file: File) => {
-        const assignment = assignments.find(a => a.id === assignmentId);
-        if (!assignment) throw new Error(`Assignment ${assignmentId} not found`);
+        const assignment = assignments.find((a) => a.id === assignmentId);
+        if (!assignment)
+          throw new Error(`Assignment ${assignmentId} not found`);
         const fileId = await persistence.saveFile(file);
         assignment.additionalFileIds.push(parseInt(fileId));
         persistence.persist();
@@ -421,15 +452,21 @@ function createClient(persistence: Storage<Database>): APIClient {
 
       downloadFile: async (fileId) => {
         return new Blob([`This is file ${fileId}`], {
-          type: "text/plain"
+          type: "text/plain",
         });
       },
     },
 
     questions: {
       getById: async (questionId) => {
-        const question = questions.find(q => q.id === questionId);
+        const question = questions.find((q) => q.id === questionId);
         if (!question) throw new Error(`Question ${questionId} not found`);
+
+        // Map languageIds to supported languages for StudentQuestion
+        const supportedLanguages = await client.supportedLanguages.list();
+        const languages = question.languageIds
+          .map((id) => supportedLanguages.find((lang) => lang.id === id))
+          .filter((lang): lang is SupportedLanguage => lang !== undefined);
 
         return {
           id: questionId,
@@ -438,17 +475,28 @@ function createClient(persistence: Storage<Database>): APIClient {
           description: question.description,
           template: question.template,
           maxScore: question.maxScore,
+          languages,
         };
       },
 
       getByIdI: async (questionId) => {
-        const question = questions.find(q => q.id === questionId);
+        const question = questions.find((q) => q.id === questionId);
         if (!question) throw new Error(`Question ${questionId} not found`);
 
-        return question;
+        // Map languageIds to supported languages for InstructorQuestion
+        const supportedLanguages = await client.supportedLanguages.list();
+        const languages = question.languageIds
+          .map((id) => supportedLanguages.find((lang) => lang.id === id))
+          .filter((lang): lang is SupportedLanguage => lang !== undefined);
+
+        return {
+          ...question,
+          languages,
+        };
       },
 
       submit: async (questionId, languageId, codes) => {
+        await new Promise((resolve) => setTimeout(resolve, 1500));
         return { submissionId: Math.floor(Math.random() * 1000) + 1 };
       },
 
@@ -457,14 +505,14 @@ function createClient(persistence: Storage<Database>): APIClient {
           submissionId: Math.floor(Math.random() * 1000) + 1,
           code: [
             {
-              pageName: "main.py",
-              content: "print('Hello, World!')"
-            }
+              pageName: "main.ts",
+              content: "console.log('Hello, World!')",
+            },
           ],
           language: {
-            id: 1,
-            name: "Python 3"
-          }
+            id: 6,
+            name: "Typescript",
+          },
         };
       },
 
@@ -479,22 +527,22 @@ function createClient(persistence: Storage<Database>): APIClient {
               input: "test input",
               expectedOutput: "expected output",
               message: "Test passed",
-              status: "pass" as const
-            }
+              status: "pass" as const,
+            },
           ],
           secret: [
             {
               message: "Secret test passed",
-              status: "pass" as const
-            }
-          ]
+              status: "pass" as const,
+            },
+          ],
         };
       },
     },
     sections: {
       getByClass: async (classId) => {
         const c = getClassById(classId);
-        return [...new Set(c.students.map(it => it.section))];
+        return [...new Set(c.students.map((it) => it.section))];
       },
     },
 
@@ -507,54 +555,90 @@ function createClient(persistence: Storage<Database>): APIClient {
           { id: 4, name: "Java" },
           { id: 5, name: "JavaScript" },
           { id: 6, name: "TypeScript" },
+          { id: 7, name: "Swift" },
+          { id: 8, name: "Haskell" },
+          { id: 9, name: "Rust" },
+          { id: 10, name: "Zig" },
+          { id: 11, name: "Kotlin" },
+          { id: 12, name: "Erlang" },
+          { id: 13, name: "Gleam" },
         ];
-      }
+      },
     },
 
     groups: {
       listByClassId: async (classId) => {
         const c = getClassById(classId);
-        const groups = c.students.map(it => it.group);
+        const groups = c.students.map((it) => it.group);
         return [...new Set(groups)];
       },
     },
 
-    examPin: {
-      getByAssignmentId: async (assignmentId: number) => {
-        const assignment = assignments.find(a => a.id === assignmentId);
+    exam: {
+      checkin: async (examId, pin) => {
+        console.log(`[mock] Checkin ${examId} with pin ${pin}`);
+      },
+      isCheckedin: async (examId) => {
+        return true;
+      },
+      listAttendance: async (examId) => {
+        return [
+          {
+            name: "John Doe",
+            studentId: "643xxxxx21",
+            checkedInTime: new Date(),
+            examName: "Midterm Exam",
+          } satisfies Attendance,
+        ];
+      },
+      getPinByAssignmentId: async (assignmentId: number) => {
+        const assignment = assignments.find((a) => a.id === assignmentId);
         return assignment?.examPin || "123456";
-      }
+      },
+      createQrcode: async (mode) => {
+        return new URL("https://placehold.co/400");
+      },
+    },
+
+    server: {
+      ping: async () => {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      },
     },
 
     testCode: {
       getById: async (testCodeId: number) => {
-        const assignment = assignments.find(a => a.id === testCodeId);
+        const assignment = assignments.find((a) => a.id === testCodeId);
         return assignment?.testCode || "test code content";
-      }
+      },
     },
 
     testcase: {
       listByQuestionId: async (questionId: number) => {
-        const question = questions.find(q => q.id === questionId);
+        const question = questions.find((q) => q.id === questionId);
         return {
-          public: question?.testcases || [{ input: "public in", output: "public out" }],
-          secret: question?.secretTestCases || [{ input: "secret in", output: "secret out" }],
+          public: question?.testcases || [
+            { input: "public in", output: "public out" },
+          ],
+          secret: question?.secretTestCases || [
+            { input: "secret in", output: "secret out" },
+          ],
         };
-      }
-    }
+      },
+    },
   };
 
   return client;
 }
 
-
-const preserveMockState = process.env.NEXT_PUBLIC_MOCK_PRESERVE_STATE === "true";
+const preserveMockState =
+  process.env.NEXT_PUBLIC_MOCK_PRESERVE_STATE === "true";
 
 export async function createMockClient() {
   const initialData: Database = {
     classes: [],
     assignments: [],
-    questions: []
+    questions: [],
   };
   const storage = preserveMockState
     ? new PersistenceStorage("default", initialData)

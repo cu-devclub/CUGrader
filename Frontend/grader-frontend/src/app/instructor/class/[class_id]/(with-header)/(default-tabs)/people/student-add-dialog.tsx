@@ -86,7 +86,6 @@ export function StudentAddDialog({ state: { mode, setMode, open, setOpen }, clas
     }
   });
 
-  // TODO: refactor: merge these two 
   const addStudentsMutation = useMutation({
     mutationFn: async (value: z.infer<typeof studentFormSchema>) => {
       // console.log(value.students);
@@ -139,7 +138,6 @@ export function StudentAddDialog({ state: { mode, setMode, open, setOpen }, clas
     }
   }, [open]);
 
-  // TODO: tanstack query this
   const onAdd = async () => {
     if (mode === "file") {
       uploadFileMutation.mutate();

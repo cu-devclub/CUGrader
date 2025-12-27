@@ -99,7 +99,6 @@ export interface StudentSectionProps {
 export function StudentSection({ classId }: StudentSectionProps) {
   const query = useSuspenseQuery({
     queryKey: ["class", classId, "student"],
-    // TODO: get student by class
     queryFn: () => api.students.listByClass(classId)
   });
 
@@ -197,7 +196,6 @@ export function StudentSection({ classId }: StudentSectionProps) {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    {/* TODO: icon maybe? */}
                     <DropdownMenuItem>Download Student list</DropdownMenuItem>
                     <DropdownMenuItem>Download Template</DropdownMenuItem>
                   </DropdownMenuContent>

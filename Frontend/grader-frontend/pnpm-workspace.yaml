@@ -1,0 +1,8 @@
+ignoredBuiltDependencies:
+  - '@openapitools/openapi-generator-cli'
+  - '@tailwindcss/oxide'
+  - sharp
+  - unrs-resolver
+
+onlyBuiltDependencies:
+  - '@nestjs/core'
