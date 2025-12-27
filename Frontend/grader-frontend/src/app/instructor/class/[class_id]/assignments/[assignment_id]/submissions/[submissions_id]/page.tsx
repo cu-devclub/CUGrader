@@ -3,11 +3,13 @@ import { NavSub } from "@/components/page/submissions/navigate"
 import { HeaderSub } from "@/components/page/submissions/header";
 import { CodeSection } from "@/components/page/submissions/codeSection";
 import { CommentScreenSection } from "@/components/page/submissions/comment/screen";
-import { FormInputComment } from "@/components/page/submissions/comment/formInput";
+import { FormInputComment,FeedbackFormData } from "@/components/page/submissions/comment/formInput";
 import dayjs from "dayjs";
 import { mockComments } from "@/variables/page/submissions/mockComment";
+import { useState } from "react";
 
 export default function Page({ params }: { params: Promise<{ submissions_id: string; }>; }) {
+    const [code, setCode] = useState("# Write your Python code here\nprint('Hello, World!')");
     function DayFormat(date:number){
         return dayjs.unix(date).format('DD MMMM YYYY HH:mm');
     }
@@ -25,6 +27,14 @@ export default function Page({ params }: { params: Promise<{ submissions_id: str
         score:20,
         maxScore: 100
     }
+    // mock นะจะ
+    const handleFeedbackSubmit = async (data: FeedbackFormData) => {
+        console.log('Submitting feedback:', data.comment)
+        await fetch('/api/feedback', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        })
+    }
 
     return(
         <div className={` px-4 md:px-8 py-8`}>
@@ -36,9 +46,9 @@ export default function Page({ params }: { params: Promise<{ submissions_id: str
                     />
                 </div>
                 <div className=" px-2 md:px-14 py-6 gap-10 flex flex-col">
-                    <CodeSection/>
+                    <CodeSection code={code} setCode={setCode} language="python"/>
                     <CommentScreenSection data={formattedComments}/>
-                    <FormInputComment/>
+                    <FormInputComment onSubmit={handleFeedbackSubmit}/>
                 </div>
             </div>
         </div>
