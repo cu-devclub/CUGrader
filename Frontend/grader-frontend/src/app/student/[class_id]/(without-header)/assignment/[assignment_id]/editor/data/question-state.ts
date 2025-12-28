@@ -161,6 +161,11 @@ export class QuestionState {
     return "saved";
   }
 
+  get isPending(): boolean {
+    return this.uiPublicTestcases.some(tc => tc.status === "pending") || 
+           this.uiSecretTestcases.some(tc => tc.status === "pending");
+  }
+
   // Test case related computed properties
   get uiPublicTestcases(): UIPublicTestcase[] {
     const currentResults = this.submissionResult.current();
@@ -172,7 +177,7 @@ export class QuestionState {
         actualOutput: (result as any)?.output,
         status:
           // if submissionId exist then we already submitted it and is waiting for result
-          result?.status ?? !!this.submissionId ? "pending" : "not-executed",
+          result?.status ?? (!!this.submissionId ? "pending" : "not-executed"),
         message: result?.message,
       };
     });
@@ -415,7 +420,7 @@ export class QuestionState {
   };
 
   run = async () => {
-    if (!this.submissionId) {
+    if (!this.submissionId || this.submissionStatus === "outdated") {
       await this.save();
       return;
     }

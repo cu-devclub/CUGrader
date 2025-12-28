@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Textarea } from "@/components/ui/textarea";
 import * as Tabs from "@radix-ui/react-tabs";
-import { Check, ChevronsDown, CircleCheck, LockIcon, Plus, Terminal, X } from "lucide-react";
+import { Check, ChevronsDown, CircleCheck, Loader2, LockIcon, Plus, Terminal, X } from "lucide-react";
 import { observer } from "mobx-react-lite";
 import Markdown from 'react-markdown';
 import { useCodeSpaceStore } from "./data";
@@ -102,7 +102,9 @@ const TestcaseList = observer(() => {
               className="data-[state=active]:bg-accent font-normal text-xs h-8"
             >
               <div className="flex items-center gap-1">
-                {testcase.status !== "not-executed" && testcase.status !== "pending" ? (
+                {testcase.status === "pending" ? (
+                  <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
+                ) : testcase.status !== "not-executed" ? (
                   testcase.status === "pass" ? (
                     <Check className="h-3 w-3 text-green-600" />
                   ) : (
@@ -135,7 +137,12 @@ const TestcaseList = observer(() => {
           <Card className="py-4 shadow-xs">
             <CardContent className="px-3">
               <div className="flex items-center gap-2 mb-3">
-                {testcase.status !== "not-executed" && testcase.status !== "pending" ? (
+                {testcase.status === "pending" ? (
+                  <>
+                    <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                    <span className="font-medium text-muted-foreground">Case {index + 1}: Pending...</span>
+                  </>
+                ) : testcase.status !== "not-executed" ? (
                   testcase.status === "pass" ? (
                     <>
                       <Check className="h-5 w-5 text-green-600" />
@@ -148,7 +155,7 @@ const TestcaseList = observer(() => {
                     </>
                   )
                 ) : (
-                  <span className="font-medium text-muted-foreground">Case {index + 1}: Not executed</span>
+                  <span className="font-medium text-muted-foreground">Case {index + 1}: Not submitted</span>
                 )}
               </div>
 
@@ -194,7 +201,12 @@ const TestcaseList = observer(() => {
             <Card key={index} className="py-4 shadow-xs">
               <CardContent className="px-3">
                 <div className="flex items-center gap-2">
-                  {testcase.status !== "not-executed" && testcase.status !== "pending" ? (
+                  {testcase.status === "pending" ? (
+                    <>
+                      <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                      <span className="font-medium text-muted-foreground">Secret Case {index + 1}: Pending...</span>
+                    </>
+                  ) : testcase.status !== "not-executed" ? (
                     testcase.status === "pass" ? (
                       <>
                         <Check className="h-5 w-5 text-green-600" />
@@ -207,7 +219,7 @@ const TestcaseList = observer(() => {
                       </>
                     )
                   ) : (
-                    <span className="font-medium text-muted-foreground">Secret Case {index + 1}: Not executed</span>
+                    <span className="font-medium text-muted-foreground">Secret Case {index + 1}: Not submitted</span>
                   )}
                 </div>
               </CardContent>

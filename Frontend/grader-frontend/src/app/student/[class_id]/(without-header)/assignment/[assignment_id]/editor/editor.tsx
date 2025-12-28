@@ -4,7 +4,7 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useDropzoneFrFr } from '@/lib/file';
 import Editor, { useMonaco } from '@monaco-editor/react';
-import { CheckIcon, CopyIcon, DownloadIcon, FileSpreadsheet, RefreshCcwIcon, SaveIcon, UploadCloudIcon, UploadIcon } from 'lucide-react';
+import { CheckIcon, CopyIcon, DownloadIcon, FileSpreadsheet, Loader2, RefreshCcwIcon, SaveIcon, UploadCloudIcon, UploadIcon } from 'lucide-react';
 import { observer } from 'mobx-react-lite';
 import { use, useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -110,7 +110,16 @@ export const EditorPanel = observer(() => {
         </div>
         <div className='text-xs border-t flex justify-between p-0.5'>
           <div className='flex gap-1'>
-            <Button size="sm" className='text-xs h-7 m-0.5' onClick={handleRun}> Run </Button>
+            <Button
+              size="sm"
+              className='text-xs h-7 m-0.5 min-w-16'
+              onClick={handleRun}
+            >
+              {store.currentQuestionState.isPending && (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              )}
+              Run
+            </Button>
             <div className="flex">
               <Tooltip>
                 <TooltipTrigger asChild>
