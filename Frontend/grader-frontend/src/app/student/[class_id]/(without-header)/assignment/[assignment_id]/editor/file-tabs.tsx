@@ -26,12 +26,13 @@ export const FileTabs = observer(() => {
 
   const {
     activeFile,
+    activeFileId,
     selectFile,
     files,
     addFile,
     renameFile,
     deleteFile,
-    setLanguage,
+    selectLanguage,
     activeLanguageId: selectedLanguageId,
   } = currentQuestionState;
 
@@ -41,7 +42,7 @@ export const FileTabs = observer(() => {
 
   const handleRenameFile = (file: EditorFile, newName: string) => {
     console.log(newName);
-    if (newName.trim() === "") { // TODO: validate file name
+    if (newName.trim() === "") {
       toast.error("t.invalid-name");
       return;
     }
@@ -71,16 +72,16 @@ export const FileTabs = observer(() => {
   return (
     <Tabs.Root
       className="flex flex-col"
-      defaultValue={activeFile.id}
-      value={activeFile.id}
+      defaultValue={activeFileId}
+      value={activeFileId}
       onValueChange={selectFile}
     >
       <Tabs.List className="flex gap-1 border-b p-0.75 text-xs">
-        <LanguageSelector
+        {/* <LanguageSelector
           supportedLanguages={currentQuestionState.question.languages}
           selectedLanguageId={selectedLanguageId}
-          onLanguageChange={setLanguage}
-        />
+          onLanguageChange={selectLanguage}
+        /> */}
         {files.map((file) => (
           <Tabs.Trigger
             key={file.id}
@@ -134,7 +135,7 @@ export const FileTabs = observer(() => {
             </div>
           </Tabs.Trigger>
         ))}
-        <button className="w-6 aspect-square flex items-center justify-center rounded hover:bg-accent" onClick={addFile}>
+        <button className="w-6 aspect-square flex items-center justify-center rounded hover:bg-accent" onClick={() => addFile()}>
           <PlusIcon className="size-3.5" />
         </button>
       </Tabs.List>

@@ -11,24 +11,16 @@ import { toast } from 'sonner';
 import { useCodeSpaceStore } from './data';
 import { FileTabs } from './file-tabs';
 import { SubmissionStatusIndicator } from './shared';
+import { MonacoEditor } from './monaco';
 
 export const EditorPanel = observer(() => {
-  const monaco = useMonaco();
   const store = useCodeSpaceStore();
-  use(store.currentQuestionState.ready);
+
   const { savingStatus, activeFile, save, replaceEditorContentWithFile, copy, reset, download, run } = store.currentQuestionState;
   const [isUploadDialogOpen, setUploadDialogOpen] = useState(false);
   const dropzone = useDropzoneFrFr({
     multiple: false,
   });
-
-  // Set monaco instance in store
-  // TODO: hijack ctrl+s
-  useEffect(() => {
-    if (monaco) {
-      store.setMonaco(monaco);
-    }
-  }, [monaco, store]);
 
   const handleFileUpload = useCallback(async () => {
     // should it replace the current file tho
@@ -113,15 +105,7 @@ export const EditorPanel = observer(() => {
 
         <div className='bg-red-50 overflow-hidden'>
           {activeFile &&
-            <Editor
-              // key={`${store.lab.id}/${store.currentQuestionState.question.id}`}
-              path={activeFile.id}
-              options={{
-                automaticLayout: true
-              }}
-              defaultLanguage={activeFile.language}
-              defaultValue={activeFile.content}
-            />
+            <MonacoEditor />
           }
         </div>
         <div className='text-xs border-t flex justify-between p-0.5'>
@@ -155,14 +139,15 @@ export const EditorPanel = observer(() => {
                 </TooltipContent>
               </Tooltip>
 
-              <Tooltip>
+              {/* TODO: enable download */}
+              {/* <Tooltip>
                 <TooltipTrigger asChild>
                   <Button size="icon" variant="ghost" className='size-8'> <DownloadIcon /> </Button>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>t.download</p>
                 </TooltipContent>
-              </Tooltip>
+              </Tooltip> */}
 
               <Tooltip>
                 <TooltipTrigger asChild>

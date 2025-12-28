@@ -28,4 +28,3 @@ export default function CodeSpacePage({ params }: CodeSpacePageProps) {
     lab={assignment}
   />;
 }
-

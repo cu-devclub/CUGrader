@@ -1,17 +1,16 @@
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink } from "@/components/ui/pagination";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
-import { Pagination, PaginationContent, PaginationItem, PaginationLink } from "@/components/ui/pagination";
-import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { SupportedLanguage } from "@/lib/api/type";
 import { SelectTrigger } from "@radix-ui/react-select";
-import { useCodeSpaceStore } from "./data";
+import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { observer } from "mobx-react-lite";
-import { cn } from "@/lib/utils";
+import { useCodeSpaceStore } from "./data";
 
 type PageState = "done" | "active" | "none";
 
@@ -81,17 +80,18 @@ export const QuestionPagination = observer(() => {
 export interface QuestionPaginationSmallProps {
   isAtEnd: boolean,
   onNext: () => unknown;
+  onDone: () => unknown;
   onPrevious: () => unknown;
 }
 
-export function QuestionPaginationSmall({ isAtEnd, onNext, onPrevious }: QuestionPaginationSmallProps) {
+export function QuestionPaginationSmall({ isAtEnd, onNext, onDone, onPrevious }: QuestionPaginationSmallProps) {
   return (
     <div className="flex gap-2">
       <Button size="icon" onClick={onPrevious}>
         <ChevronLeft />
       </Button>
       {isAtEnd
-        ? <Button>
+        ? <Button onClick={onDone}>
           Done
         </Button>
         : <Button size="icon" onClick={onNext}>

@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { observer } from "mobx-react-lite";
 import Link from "next/link";
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { CodeSpaceStoreContext, useCodeSpaceStore } from "./data";
 import { CodeSpaceStore } from "./data/store";
 import { EditorPanel } from './editor';
@@ -81,6 +81,7 @@ const DesktopCodeSpaceInternal = observer(() => {
             isAtEnd={store.currentQuestionIndex === store.lab.questions.length - 1}
             onNext={store.nextQuestion}
             onPrevious={store.previousQuestion}
+            onDone={() => store.onDone()}
           />
         </div>
       </nav>
@@ -123,12 +124,15 @@ const DesktopCodeSpaceInternal = observer(() => {
   );
 });
 
-export const DesktopCodeSpace = observer(({ lab }: CodeSpaceProps) => {
+export const DesktopCodeSpace = ({ lab }: CodeSpaceProps) => {
   const [store] = useState(() => new CodeSpaceStore(lab));
+  console.log("rerun");
 
   return (
     <CodeSpaceStoreContext value={store}>
-      <DesktopCodeSpaceInternal />
+      <Suspense fallback={"loading..."}>
+        <DesktopCodeSpaceInternal />
+      </Suspense>
     </CodeSpaceStoreContext>
   );
-});
+};

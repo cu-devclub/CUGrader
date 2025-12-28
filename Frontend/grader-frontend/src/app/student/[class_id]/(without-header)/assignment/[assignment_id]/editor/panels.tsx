@@ -8,7 +8,7 @@ import { Check, ChevronsDown, CircleCheck, LockIcon, Plus, Terminal, X } from "l
 import { observer } from "mobx-react-lite";
 import Markdown from 'react-markdown';
 import { useCodeSpaceStore } from "./data";
-import type { CustomTestcase, SystemTestcase } from "./data/store";
+import type { UiCustomTestcase } from "./data/store";
 import { QuestionPagination } from "./shared";
 
 // TODO: file downloading
@@ -49,13 +49,13 @@ export const DetailPanel = observer(() => {
         <div className="prose prose-sm dark:prose-invert max-w-none">
           <Markdown>{currentQuestionState.question.description}</Markdown>
         </div>
+        {/* TODO: files */}
       </div>
     </div>
   );
 });
 
 export const BottomPanelContent = observer(() => {
-
   return (
     <Tabs.Root defaultValue="testcase" className="h-full flex flex-col">
       <Tabs.List className="text-xs border-b p-0.75 flex gap-1">
@@ -88,7 +88,7 @@ export const BottomPanelContent = observer(() => {
 const TestcaseList = observer(() => {
   const store = useCodeSpaceStore();
   const { currentQuestionState } = store;
-  const testcases: SystemTestcase[] = currentQuestionState.testcases;
+  const testcases = currentQuestionState.uiPublicTestcases;
 
   return (
     <Tabs.Root defaultValue="0" className="h-full flex flex-col">
@@ -101,8 +101,8 @@ const TestcaseList = observer(() => {
               className="data-[state=active]:bg-accent font-normal text-xs h-8"
             >
               <div className="flex items-center gap-1">
-                {testcase.output !== undefined ? (
-                  testcase.output === testcase.expectedOutput ? (
+                {testcase.result && testcase.result.status !== "pending" ? (
+                  testcase.result.status === "pass"  ? (
                     <Check className="h-3 w-3 text-green-600" />
                   ) : (
                     <X className="h-3 w-3 text-red-600" />
@@ -134,8 +134,8 @@ const TestcaseList = observer(() => {
           <Card className="py-4 shadow-xs">
             <CardContent className="px-3">
               <div className="flex items-center gap-2 mb-3">
-                {testcase.output !== undefined ? (
-                  testcase.output === testcase.expectedOutput ? (
+                {testcase.result && testcase.result.status !== "pending" ? (
+                  testcase.result.status === "pass" ? (
                     <>
                       <Check className="h-5 w-5 text-green-600" />
                       <span className="font-medium text-green-600">Case {index + 1}: Passed</span>
@@ -162,17 +162,17 @@ const TestcaseList = observer(() => {
                   <pre className="mt-1 p-2 bg-muted rounded text-xs font-mono">{testcase.expectedOutput}</pre>
                 </div>
 
-                {testcase.output !== undefined && (
+                {testcase.result !== undefined && (
                   <div>
                     <span className="font-medium">Your Output:</span>
-                    <pre className="mt-1 p-2 bg-muted rounded text-xs font-mono">{testcase.output}</pre>
+                    <pre className="mt-1 p-2 bg-muted rounded text-xs font-mono">{testcase.result.output}</pre>
                   </div>
                 )}
 
-                {testcase.message && (
+                {testcase.result && testcase.result.status === "fail" && (
                   <div>
                     <span className="font-medium text-red-600">Error:</span>
-                    <pre className="mt-1 p-2 bg-red-50 border border-red-200 rounded text-xs font-mono text-red-700">{testcase.message}</pre>
+                    <pre className="mt-1 p-2 bg-red-50 border border-red-200 rounded text-xs font-mono text-red-700">{testcase.result.message}</pre>
                   </div>
                 )}
               </div>
@@ -218,7 +218,7 @@ const TestcaseList = observer(() => {
 const CustomTestcaseList = observer(() => {
   const store = useCodeSpaceStore();
   const { currentQuestionState } = store;
-  const testcases: CustomTestcase[] = currentQuestionState.customTestcases;
+  const testcases: UiCustomTestcase[] = currentQuestionState.uiCustomTestcases;
 
   const handleRemove = (index: number) => {
     currentQuestionState.removeCustomTestcase(index);
