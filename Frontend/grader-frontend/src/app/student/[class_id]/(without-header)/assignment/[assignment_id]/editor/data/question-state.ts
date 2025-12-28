@@ -10,8 +10,8 @@ import type {
 import { toObservable, toSignal } from "@/lib/reactivity";
 import { makeAutoObservable, runInAction, when } from "mobx";
 import type { IResource } from "mobx-utils";
-import { interval, Subject } from "rxjs";
-import { debounceTime, filter, switchMap, tap } from "rxjs/operators";
+import { interval, Subject, timer } from "rxjs";
+import { debounceTime, filter, startWith, switchMap, takeUntil, takeWhile, tap } from "rxjs";
 import type { MonacoWrapper } from "../monaco";
 import { getMonacoLanguageId } from "./constant";
 import type {
@@ -36,13 +36,27 @@ export class QuestionState {
   private cachedFiles: Map<LanguageId, LanguageFiles> = new Map();
   public activeLanguageId!: number;
 
-  private submissionId: number | null;
+  private submissionId: number | null = null;
   private submissionResult$ = toObservable(() => this.submissionId).pipe(
-    filter((id) => id !== null),
+    // Ensure we start with the current ID to handle cases where a question 
+    // already has a submission when loaded (e.g. returning to the page)
+    startWith(this.submissionId),
+    filter((id): id is number => id !== null),
     switchMap((id) =>
-      interval(5000).pipe(
-        switchMap(() => api.questions.getSubmissionResult(id))
-        // share()
+      timer(0, process.env.NODE_ENV === "development" ? 500 : 3000).pipe(
+        switchMap(() => api.questions.getSubmissionResult(id)),
+        // stop polling if the user modifies their code (results are no longer relevant)
+        takeUntil(
+          toObservable(() => this.submissionStatus).pipe(
+            filter((s) => s === "outdated")
+          )
+        ),
+        // Stop polling once all testcases are no longer pending.
+        // The 'inclusive' argument ensures the final result (where pending is false) is emitted.
+        takeWhile((result) => 
+          result.public.some((r) => r.status === "pending") ||
+          result.secret.some((r) => r.status === "pending")
+        , true)
       )
     )
   );
