@@ -32,7 +32,6 @@ export class MonacoWrapper {
 
   private flushPendingOperations() {
     if (this.instance && this.pendingOperations.length > 0) {
-      console.log(this.pendingOperations);
       this.pendingOperations.forEach(op => op());
       this.pendingOperations = [];
     }
@@ -44,6 +43,11 @@ export class MonacoWrapper {
 
   setInstance(instance: Monaco) {
     const previous = this.instance;
+    if (previous) {
+      // 
+      console.log("react is ass");
+      return;
+    }
     this.instance = instance;
     this.flushPendingOperations();
   }
@@ -75,13 +79,13 @@ export class MonacoWrapper {
     });
   }
 
-  createFile(path: string, initialContent = "", language = "typescript") {
+  createFile(path: string, initialContent = "", language = "python") {
     return this.executeWhenReady(() => {
       try {
         return this.instance!.editor.createModel(initialContent, language, this.instance!.Uri.file(path));
       } catch (e) {
         // most likely due to file already exist
-        console.warn(e)
+        console.warn(e);
         return null;
       }
     });
@@ -119,7 +123,6 @@ export class MonacoWrapper {
 export const MonacoEditor = observer(() => {
   const store = useCodeSpaceStore();
   const m = useMonaco();
-  const wrapper = store.monaco;
 
   useEffect(() => {
     if (m) {
@@ -129,7 +132,7 @@ export const MonacoEditor = observer(() => {
 
   return (
     <Editor
-      path={wrapper.activeFilePath ?? undefined}
+      path={store.monaco.activeFilePath ?? undefined}
       keepCurrentModel={true}
       options={{
         automaticLayout: true

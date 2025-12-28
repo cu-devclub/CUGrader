@@ -1,10 +1,10 @@
 import { createClient } from "./client";
 import { createMockClient } from "./mock";
-import type { APIClient } from "./type";
 
-const mock = process.env.NEXT_PUBLIC_USE_MOCK_API!.toLowerCase() === "true";
-export let api = {} as unknown as APIClient;
+const mock =
+  process.env.NODE_ENV === "development" &&
+  process.env.NEXT_PUBLIC_USE_MOCK_API === "true";
 
-(async () => {
-  api = mock ? await createMockClient() : createClient();
-})();
+// This gonna got tree-shaked anyway
+// FIXME: shut the bundler up
+export const api = mock ? await createMockClient() : createClient();

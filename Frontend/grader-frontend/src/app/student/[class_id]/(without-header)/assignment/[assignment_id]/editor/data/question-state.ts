@@ -87,26 +87,33 @@ export class QuestionState {
     const submission = await api.questions.getSubmission(this.question.id);
     if (!submission) {
       // use defualt
+      // TODO: we need to register onchange to default monaco model
       return;
     }
 
+    // restore previous submission
     runInAction(() => {
       const { code, language, submissionId } = submission;
       this.selectLanguage(language.id);
       this.submissionId = submissionId;
 
-      this.activeLanguageFiles.files = [];
-      for (const file of code) {
+      this.activeLanguageFilesState.files = [];
+      for (const savedFile of code) {
         const id = `${this.pathPrefix}/${
-          file.pageName.includes("main") ? "main" : file.pageName + "_"
+          savedFile.pageName.includes("main")
+            ? "main"
+            : savedFile.pageName + "_"
         }`;
         const language = getMonacoLanguageId(submission.language.id);
         this.monaco.removeFile(id);
-        this.monaco.createFile(id, file.content, language);
-        this.activeLanguageFiles.files.push({
+
+        const file: UIEditorFile = { id, name: savedFile.pageName, language };
+        this.createMonacoFile(file, savedFile.content);
+        // this.monaco.createFile(id, file.content, language);
+        this.activeFiles.push({
           id,
           language,
-          name: file.pageName,
+          name: savedFile.pageName,
         });
       }
 
@@ -118,7 +125,7 @@ export class QuestionState {
     const autoSave$ = this.fileChange$
       .pipe(
         tap((_) => (this.lastEdited = Date.now())),
-        debounceTime(1000) // wait 500ms after last change
+        debounceTime(500) // wait 500ms after last change
       )
       .subscribe(() => {
         this.save();
@@ -163,7 +170,9 @@ export class QuestionState {
         input: testcase.input,
         expectedOutput: testcase.output,
         actualOutput: (result as any)?.output,
-        status: result?.status ?? "not-executed",
+        status:
+          // if submissionId exist then we already submitted it and is waiting for result
+          result?.status ?? !!this.submissionId ? "pending" : "not-executed",
         message: result?.message,
       };
     });
@@ -206,7 +215,7 @@ export class QuestionState {
     this.isSaving = true;
 
     try {
-      const codes = this.files.map((file) => ({
+      const codes = this.activeFiles.map((file) => ({
         content: this.monaco.getContent(file.id),
         pageName: file.name,
       }));
@@ -219,6 +228,7 @@ export class QuestionState {
       );
 
       runInAction(() => {
+        // trigger submission polling
         this.submissionId = result.submissionId;
         this.lastSaved = this.startSavingTimestamp;
       });
@@ -233,20 +243,24 @@ export class QuestionState {
     }
   };
 
-  private get activeLanguageFiles() {
+  private get activeLanguageFilesState() {
     return this.cachedFiles.get(this.activeLanguageId)!;
   }
 
-  get files() {
-    return this.activeLanguageFiles.files;
+  get activeFiles() {
+    return this.activeLanguageFilesState.files;
+  }
+
+  set activeFiles(files: UIEditorFile[]) {
+    this.activeLanguageFilesState.files = files;
   }
 
   get activeFileId() {
-    return this.activeLanguageFiles.activeFileId;
+    return this.activeLanguageFilesState.activeFileId;
   }
 
   get activeFile(): UIEditorFile {
-    return this.files.find((it) => it.id === this.activeFileId)!;
+    return this.activeFiles.find((it) => it.id === this.activeFileId)!;
   }
 
   get questionDetail(): UIQuestionDetail {
@@ -269,9 +283,15 @@ export class QuestionState {
     return `/lab${this.lab.id}/q${this.question.id}/lang${this.activeLanguageId}`;
   }
 
+  /**
+   * dont forget to add the file to our registry (activeFiles)
+   */
   private async createMonacoFile(file: UIEditorFile, content: string = "") {
+    // console.log(`Created ${file.name}`);
+
     const model = await this.monaco.createFile(file.id, content, file.language);
     const disposable = model!.onDidChangeContent(() => {
+      console.log(`change`);
       this.fileChange$.next();
     });
 
@@ -304,7 +324,7 @@ export class QuestionState {
   };
 
   selectFile = (fileId: string) => {
-    this.activeLanguageFiles.activeFileId = fileId;
+    this.activeLanguageFilesState.activeFileId = fileId;
     this.monaco.setActiveFile(fileId);
   };
 
@@ -322,23 +342,23 @@ export class QuestionState {
       language: "python", // TODO: use current language
     };
 
-    this.files.push(newFile);
-    this.selectFile(newFile.id);
+    this.activeFiles.push(newFile);
     this.createMonacoFile(newFile);
+    this.selectFile(newFile.id);
   };
 
   deleteFile = (fileId: string) => {
-    const fileIndex = this.files.findIndex((f) => f.id === fileId);
+    const fileIndex = this.activeFiles.findIndex((f) => f.id === fileId);
     if (fileIndex === -1) return;
 
-    const fileToDelete = this.files[fileIndex];
-    this.files.splice(fileIndex, 1);
+    const fileToDelete = this.activeFiles[fileIndex];
+    this.activeFiles.splice(fileIndex, 1);
 
     if (this.activeFileId === fileToDelete.id) {
-      if (this.files.length === 0) {
+      if (this.activeFiles.length === 0) {
         throw new Error("Cannot delete the last file");
       }
-      const id = this.files[Math.max(0, fileIndex - 1)].id;
+      const id = this.activeFiles[Math.max(0, fileIndex - 1)].id;
       this.selectFile(id);
     }
 
@@ -346,7 +366,7 @@ export class QuestionState {
   };
 
   renameFile = (fileId: string, newName: string) => {
-    const file = this.files.find((f) => f.id === fileId);
+    const file = this.activeFiles.find((f) => f.id === fileId);
     if (file) {
       file.name = newName;
     }
@@ -366,12 +386,12 @@ export class QuestionState {
     // Reset all files to main with template content
     const mainFile: UIEditorFile = {
       id: `${this.pathPrefix}/main`,
-      name: "main.ts",
-      language: "typescript",
+      name: "main.py",
+      language: "python",
     };
 
     // Remove all Monaco models for this language
-    this.files.forEach((file) => {
+    this.activeFiles.forEach((file) => {
       if (file.id === mainFile.id) {
         this.monaco.getModel(file.id)?.setValue(this.question.template);
       } else {
@@ -380,8 +400,8 @@ export class QuestionState {
     });
 
     // Reset files array to just main
+    this.activeFiles = [mainFile];
     this.createMonacoFile(mainFile, this.question.template);
-    this.activeLanguageFiles.files = [mainFile];
     this.selectFile(mainFile.id);
   };
 

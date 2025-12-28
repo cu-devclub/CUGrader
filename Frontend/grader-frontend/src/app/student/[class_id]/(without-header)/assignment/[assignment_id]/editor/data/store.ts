@@ -1,9 +1,9 @@
-export { QuestionState } from './store-2';
+export { QuestionState } from './question-state';
 export * from './ui-types';
 import type { StudentAssignmentDetails } from '@/lib/api/type';
 import { makeAutoObservable } from 'mobx';
 import { MonacoWrapper } from '../monaco';
-import { QuestionState } from './store-2';
+import { QuestionState } from './question-state';
 
 export class CodeSpaceStore {
   lab: StudentAssignmentDetails;
@@ -25,7 +25,6 @@ export class CodeSpaceStore {
   }
 
 
-  // TODO: wait until saved or show a dialog
   selectQuestion = (questionId: number) => {
     // TODO: this is not working in prod for some fucking reason
     console.log(`Select question ${questionId}`);

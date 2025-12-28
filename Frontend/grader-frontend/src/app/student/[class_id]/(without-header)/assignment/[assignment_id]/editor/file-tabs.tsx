@@ -28,7 +28,7 @@ export const FileTabs = observer(() => {
     activeFile,
     activeFileId,
     selectFile,
-    files,
+    activeFiles: files,
     addFile,
     renameFile,
     deleteFile,

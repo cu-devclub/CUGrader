@@ -1,4 +1,3 @@
-import type { PublicTestcaseResult, SecretTestcaseResult } from "@/lib/api/type";
 
 export type UISavingStatus = "saving" | "unsaved" | "saved";
 
