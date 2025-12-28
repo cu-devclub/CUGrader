@@ -8,13 +8,14 @@ import { Check, ChevronsDown, CircleCheck, LockIcon, Plus, Terminal, X } from "l
 import { observer } from "mobx-react-lite";
 import Markdown from 'react-markdown';
 import { useCodeSpaceStore } from "./data";
-import type { UiCustomTestcase } from "./data/store";
+import type { UICustomTestcase } from "./data/store";
 import { QuestionPagination } from "./shared";
 
 // TODO: file downloading
 export const DetailPanel = observer(() => {
   const store = useCodeSpaceStore();
   const { currentQuestionState, lab } = store;
+  const { questionDetail } = currentQuestionState;
 
   return (
     <div className=" h-full overflow-y-auto flex flex-col gap-2">
@@ -24,7 +25,7 @@ export const DetailPanel = observer(() => {
       <div className="p-3 border-b">
         <div className=" flex justify-between">
           <Badge variant="secondary">Lab 1 : {lab.name}</Badge>
-          <p className="text-sm font-semibold">Score: {currentQuestionState.question.maxScore}</p>
+          <p className="text-sm font-semibold">Score: {questionDetail.maxScore}</p>
         </div>
         <p className="text-sm mt-2 text-muted-foreground">
           {lab.publish.toString()}-{lab.due.toString()}
@@ -45,9 +46,9 @@ export const DetailPanel = observer(() => {
         </Collapsible>
       </div>
       <div className="p-3">
-        <h1 className="text-xl font-bold">1. {currentQuestionState.question.name}</h1>
+        <h1 className="text-xl font-bold">{questionDetail.number}. {questionDetail.name}</h1>
         <div className="prose prose-sm dark:prose-invert max-w-none">
-          <Markdown>{currentQuestionState.question.description}</Markdown>
+          <Markdown>{questionDetail.description}</Markdown>
         </div>
         {/* TODO: files */}
       </div>
@@ -95,14 +96,14 @@ const TestcaseList = observer(() => {
       <Tabs.List className="flex gap-2 mb-2 flex-wrap">
         {testcases.map((testcase, index) => (
           <Tabs.Trigger key={index} value={index.toString()} asChild>
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               className="data-[state=active]:bg-accent font-normal text-xs h-8"
             >
               <div className="flex items-center gap-1">
-                {testcase.result && testcase.result.status !== "pending" ? (
-                  testcase.result.status === "pass"  ? (
+                {testcase.status !== "not-executed" && testcase.status !== "pending" ? (
+                  testcase.status === "pass" ? (
                     <Check className="h-3 w-3 text-green-600" />
                   ) : (
                     <X className="h-3 w-3 text-red-600" />
@@ -116,9 +117,9 @@ const TestcaseList = observer(() => {
           </Tabs.Trigger>
         ))}
         <Tabs.Trigger value="secret" asChild>
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             className="data-[state=active]:bg-accent font-normal text-xs h-8 text-destructive hover:text-destructive"
           >
             <div className="flex items-center gap-1">
@@ -134,8 +135,8 @@ const TestcaseList = observer(() => {
           <Card className="py-4 shadow-xs">
             <CardContent className="px-3">
               <div className="flex items-center gap-2 mb-3">
-                {testcase.result && testcase.result.status !== "pending" ? (
-                  testcase.result.status === "pass" ? (
+                {testcase.status !== "not-executed" && testcase.status !== "pending" ? (
+                  testcase.status === "pass" ? (
                     <>
                       <Check className="h-5 w-5 text-green-600" />
                       <span className="font-medium text-green-600">Case {index + 1}: Passed</span>
@@ -162,17 +163,17 @@ const TestcaseList = observer(() => {
                   <pre className="mt-1 p-2 bg-muted rounded text-xs font-mono">{testcase.expectedOutput}</pre>
                 </div>
 
-                {testcase.result !== undefined && (
+                {testcase.actualOutput !== undefined && (
                   <div>
                     <span className="font-medium">Your Output:</span>
-                    <pre className="mt-1 p-2 bg-muted rounded text-xs font-mono">{testcase.result.output}</pre>
+                    <pre className="mt-1 p-2 bg-muted rounded text-xs font-mono">{testcase.actualOutput}</pre>
                   </div>
                 )}
 
-                {testcase.result && testcase.result.status === "fail" && (
+                {testcase.status === "fail" && testcase.message && (
                   <div>
                     <span className="font-medium text-red-600">Error:</span>
-                    <pre className="mt-1 p-2 bg-red-50 border border-red-200 rounded text-xs font-mono text-red-700">{testcase.result.message}</pre>
+                    <pre className="mt-1 p-2 bg-red-50 border border-red-200 rounded text-xs font-mono text-red-700">{testcase.message}</pre>
                   </div>
                 )}
               </div>
@@ -189,20 +190,24 @@ const TestcaseList = observer(() => {
           </div>
            */}
           {/* Mock secret test cases - replace with actual data when available */}
-          {[1, 2, 3].map((caseNum) => (
-            <Card key={caseNum} className="py-4 shadow-xs">
+          {currentQuestionState.uiSecretTestcases.map((testcase, index) => (
+            <Card key={index} className="py-4 shadow-xs">
               <CardContent className="px-3">
                 <div className="flex items-center gap-2">
-                  {Math.random() > 0.5 ? (
-                    <>
-                      <Check className="h-5 w-5 text-green-600" />
-                      <span className="font-medium text-green-600">Secret Case {caseNum}: Passed</span>
-                    </>
+                  {testcase.status !== "not-executed" && testcase.status !== "pending" ? (
+                    testcase.status === "pass" ? (
+                      <>
+                        <Check className="h-5 w-5 text-green-600" />
+                        <span className="font-medium text-green-600">Secret Case {index + 1}: Passed</span>
+                      </>
+                    ) : (
+                      <>
+                        <X className="h-5 w-5 text-red-600" />
+                        <span className="font-medium text-red-600">Secret Case {index + 1}: Failed</span>
+                      </>
+                    )
                   ) : (
-                    <>
-                      <X className="h-5 w-5 text-red-600" />
-                      <span className="font-medium text-red-600">Secret Case {caseNum}: Failed</span>
-                    </>
+                    <span className="font-medium text-muted-foreground">Secret Case {index + 1}: Not executed</span>
                   )}
                 </div>
               </CardContent>
@@ -218,7 +223,7 @@ const TestcaseList = observer(() => {
 const CustomTestcaseList = observer(() => {
   const store = useCodeSpaceStore();
   const { currentQuestionState } = store;
-  const testcases: UiCustomTestcase[] = currentQuestionState.uiCustomTestcases;
+  const testcases: UICustomTestcase[] = currentQuestionState.uiCustomTestcases;
 
   const handleRemove = (index: number) => {
     currentQuestionState.removeCustomTestcase(index);
@@ -253,9 +258,9 @@ const CustomTestcaseList = observer(() => {
         <Tabs.List className="flex gap-2 flex-wrap">
           {testcases.map((testcase, index) => (
             <Tabs.Trigger key={index} value={index.toString()} asChild>
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 className="data-[state=active]:bg-accent font-normal text-xs h-8"
               >
                 <div className="flex items-center gap-1">

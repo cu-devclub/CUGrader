@@ -48,6 +48,7 @@ const DesktopCodeSpaceInternal = observer(() => {
                 <LayoutPanelLeft />
               </Button>
             </PopoverTrigger>
+            {/* TODO: better panels toggle */}
             <PopoverContent className="w-auto p-1">
               <div className='flex flex-col gap-2'>
                 <Button

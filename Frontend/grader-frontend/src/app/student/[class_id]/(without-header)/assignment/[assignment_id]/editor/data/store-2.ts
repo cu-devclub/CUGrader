@@ -9,29 +9,24 @@ import type {
 } from "@/lib/api/type";
 import { toObservable, toSignal } from "@/lib/reactivity";
 import { makeAutoObservable, runInAction, when } from "mobx";
-import { firstValueFrom, interval, Subject, type Observable } from "rxjs";
-import { debounceTime, filter, share, switchMap, tap } from "rxjs/operators";
-import { getMonacoLanguageId } from "./constant";
-import type { MonacoWrapper } from "../monaco";
 import type { IResource } from "mobx-utils";
-
-export interface EditorFile {
-  id: string;
-  name: string;
-  language: string;
-}
-
-export interface CustomTestcase {
-  input: string;
-}
-
-export interface UiCustomTestcase extends CustomTestcase {
-  output?: string;
-}
+import { interval, Subject } from "rxjs";
+import { debounceTime, filter, switchMap, tap } from "rxjs/operators";
+import type { MonacoWrapper } from "../monaco";
+import { getMonacoLanguageId } from "./constant";
+import type {
+  UICustomTestcase,
+  UIEditorFile,
+  UIPublicTestcase,
+  UIQuestionDetail,
+  UISavingStatus,
+  UISecretTestcase,
+  UISubmissionStatus,
+} from "./ui-types";
 
 type LanguageId = number;
 interface LanguageFiles {
-  files: EditorFile[];
+  files: UIEditorFile[];
   activeFileId: string;
 }
 
@@ -67,7 +62,7 @@ export class QuestionState {
   // Test case data
   private publicTestcases: Testcase[] = [];
   private secretTestcases: Testcase[] = [];
-  private customTestcases: CustomTestcase[] = [];
+  private customTestcases: { input: string; output?: string }[] = [];
 
   constructor(
     public question: StudentQuestion,
@@ -145,7 +140,7 @@ export class QuestionState {
     }
   }
 
-  get savingStatus(): "saving" | "unsaved" | "saved" {
+  get savingStatus(): UISavingStatus {
     if (
       this.lastEdited &&
       (!this.startSavingTimestamp ||
@@ -160,29 +155,36 @@ export class QuestionState {
   }
 
   // Test case related computed properties
-  get uiPublicTestcases(): (Testcase & { result?: PublicTestcaseResult })[] {
+  get uiPublicTestcases(): UIPublicTestcase[] {
     const currentResults = this.submissionResult.current();
-    return this.publicTestcases.map((testcase, index) => ({
-      ...testcase,
-      result: currentResults?.public?.[index],
-    }));
+    return this.publicTestcases.map((testcase, index) => {
+      const result = currentResults?.public?.[index];
+      return {
+        input: testcase.input,
+        expectedOutput: testcase.output,
+        actualOutput: (result as any)?.output,
+        status: result?.status ?? "not-executed",
+        message: result?.message,
+      };
+    });
   }
 
-  get uiSecretTestcases(): (Omit<Testcase, "input" | "expectedOutput"> & {
-    result?: SecretTestcaseResult;
-  })[] {
+  get uiSecretTestcases(): UISecretTestcase[] {
     const currentResults = this.submissionResult.current();
-    return this.secretTestcases.map((testcase, index) => ({
-      // Hide input and expected output for secret test cases
-      result: currentResults?.secret?.[index],
-    }));
+    return this.secretTestcases.map((testcase, index) => {
+      const result = currentResults?.secret?.[index];
+      return {
+        status: result?.status ?? "not-executed",
+        message: result?.message,
+      };
+    });
   }
 
-  get uiCustomTestcases(): UiCustomTestcase[] {
+  get uiCustomTestcases(): UICustomTestcase[] {
     return this.customTestcases;
   }
 
-  get submissionStatus(): "submitted" | "outdated" | "not-yet" {
+  get submissionStatus(): UISubmissionStatus {
     if (!this.submissionId) {
       return "not-yet";
     }
@@ -243,8 +245,18 @@ export class QuestionState {
     return this.activeLanguageFiles.activeFileId;
   }
 
-  get activeFile() {
+  get activeFile(): UIEditorFile {
     return this.files.find((it) => it.id === this.activeFileId)!;
+  }
+
+  get questionDetail(): UIQuestionDetail {
+    return {
+      id: this.question.id,
+      number: this.question.number,
+      name: this.question.name,
+      description: this.question.description,
+      maxScore: this.question.maxScore,
+    };
   }
 
   get selectedLanguage() {
@@ -257,7 +269,7 @@ export class QuestionState {
     return `/lab${this.lab.id}/q${this.question.id}/lang${this.activeLanguageId}`;
   }
 
-  private async createMonacoFile(file: EditorFile, content: string = "") {
+  private async createMonacoFile(file: UIEditorFile, content: string = "") {
     const model = await this.monaco.createFile(file.id, content, file.language);
     const disposable = model!.onDidChangeContent(() => {
       this.fileChange$.next();
@@ -275,7 +287,7 @@ export class QuestionState {
       return;
     }
 
-    const initialFile: EditorFile = {
+    const initialFile: UIEditorFile = {
       id: `${this.pathPrefix}/main`,
       name: "main.py", // TODO: use proper extension based on language
       language: "python", // TODO: map languageId to monaco language
@@ -304,7 +316,7 @@ export class QuestionState {
       index += 1;
     }
 
-    const newFile: EditorFile = {
+    const newFile: UIEditorFile = {
       id: `${this.pathPrefix}/${withSuffix}`,
       name: withSuffix,
       language: "python", // TODO: use current language
@@ -352,7 +364,7 @@ export class QuestionState {
 
   reset = () => {
     // Reset all files to main with template content
-    const mainFile: EditorFile = {
+    const mainFile: UIEditorFile = {
       id: `${this.pathPrefix}/main`,
       name: "main.ts",
       language: "typescript",
@@ -393,7 +405,7 @@ export class QuestionState {
 
   // Custom testcase management methods
   addCustomTestcase = (input: string) => {
-    const newTestcase: UiCustomTestcase = {
+    const newTestcase: UICustomTestcase = {
       input,
       output: undefined,
     };

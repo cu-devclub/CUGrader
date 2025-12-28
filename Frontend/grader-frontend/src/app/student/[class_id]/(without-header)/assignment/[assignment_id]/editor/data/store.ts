@@ -1,4 +1,5 @@
-export { QuestionState, type CustomTestcase, type EditorFile, type UiCustomTestcase } from './store-2';
+export { QuestionState } from './store-2';
+export * from './ui-types';
 import type { StudentAssignmentDetails } from '@/lib/api/type';
 import { makeAutoObservable } from 'mobx';
 import { MonacoWrapper } from '../monaco';

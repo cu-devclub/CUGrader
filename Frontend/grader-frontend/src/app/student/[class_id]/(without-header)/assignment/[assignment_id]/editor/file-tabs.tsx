@@ -15,7 +15,7 @@ import { toast } from 'sonner';
 import { LanguageSelector } from "./shared";
 import { observer } from 'mobx-react-lite';
 import { useCodeSpaceStore } from './data';
-import { EditorFile } from "./data/store";
+import { UIEditorFile } from "./data/store";
 
 export const FileTabs = observer(() => {
   const store = useCodeSpaceStore();
@@ -40,7 +40,7 @@ export const FileTabs = observer(() => {
     return null; // Or a loading indicator
   }
 
-  const handleRenameFile = (file: EditorFile, newName: string) => {
+  const handleRenameFile = (file: UIEditorFile, newName: string) => {
     console.log(newName);
     if (newName.trim() === "") {
       toast.error("t.invalid-name");
@@ -57,15 +57,15 @@ export const FileTabs = observer(() => {
     toast.success("t.renamed");
   };
 
-  const handleDeleteFile = (file: EditorFile) => {
+  const handleDeleteFile = (file: UIEditorFile) => {
     deleteFile(file.id);
     // toast.success("File deleted");
     toast.success("File deleted", {
-      icon: <img src={`/logo.svg`}/>,
-    })
+      icon: <img src={`/logo.svg`} />,
+    });
   };
 
-  const canDeleteFile = (file: EditorFile) => {
+  const canDeleteFile = (file: UIEditorFile) => {
     return files.length > 1 && file !== files[0];
   };
 
