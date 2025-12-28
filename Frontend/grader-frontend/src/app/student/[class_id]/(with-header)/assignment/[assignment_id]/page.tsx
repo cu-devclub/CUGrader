@@ -26,7 +26,8 @@ export default function Page() {
     <main className="space-y-6 p-6">
       <div className="flex items-center gap-4">
         <Button variant="outline" size="sm" asChild>
-          <Link href="../">
+          {/* TODO: static path */}
+          <Link href="./">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Assignments
           </Link>
