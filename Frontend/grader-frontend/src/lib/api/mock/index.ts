@@ -13,6 +13,16 @@ interface Database {
   classes: DbClass[];
   assignments: DbAssignment[];
   questions: DbQuestion[];
+  submissions: DbSubmission[];
+}
+
+interface DbSubmission {
+  id: number;
+  questionId: number;
+  languageId: number;
+  code: { pageName: string; content: string }[];
+  status: "pending" | "pass" | "fail";
+  submittedAt: number; // timestamp
 }
 
 interface DbAssignment {
@@ -55,6 +65,7 @@ function createClient(persistence: Storage<Database>): APIClient {
   const classes = persistence.data.classes;
   const assignments = persistence.data.assignments;
   const questions = persistence.data.questions;
+  const submissions = persistence.data.submissions;
 
   function getClassById(id: number) {
     const target = persistence.data.classes.find((it) => it.classId === id);
@@ -496,46 +507,67 @@ function createClient(persistence: Storage<Database>): APIClient {
       },
 
       submit: async (questionId, languageId, codes) => {
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-        return { submissionId: Math.floor(Math.random() * 1000) + 1 };
+        const id = Math.floor(Math.random() * 1000) + 1;
+        submissions.push({
+          id,
+          questionId,
+          languageId,
+          code: codes,
+          status: "pending",
+          submittedAt: Date.now(),
+        });
+        persistence.persist();
+        return { submissionId: id };
       },
 
       getSubmission: async (questionId) => {
+        const sub = [...submissions].reverse().find(s => s.questionId === questionId);
+        if (!sub) return null;
+
+        const lang = (await client.supportedLanguages.list()).find(l => l.id === sub.languageId);
+
         return {
-          submissionId: Math.floor(Math.random() * 1000) + 1,
-          code: [
-            {
-              pageName: "main.ts",
-              content: "console.log('Hello, World!')",
-            },
-          ],
-          language: {
-            id: 6,
-            name: "Typescript",
-          },
+          submissionId: sub.id,
+          code: sub.code,
+          language: lang || { id: sub.languageId, name: "Unknown" },
         };
       },
 
       requestGrade: async (submissionId) => {
-        console.log(`[mock] Requesting grade for submission ${submissionId}`);
+        const sub = submissions.find(s => s.id === submissionId);
+        if (sub) {
+          sub.status = "pending";
+          sub.submittedAt = Date.now();
+          persistence.persist();
+        }
       },
 
       getSubmissionResult: async (submissionId) => {
+        const sub = submissions.find(s => s.id === submissionId);
+        if (!sub) throw new Error("Submission not found");
+
+        const question = questions.find(q => q.id === sub.questionId);
+        if (!question) throw new Error("Question not found");
+
+        // Simulate grading delay of 2 seconds
+        if (sub.status === "pending" && Date.now() - sub.submittedAt > 2000) {
+          sub.status = "pass";
+          persistence.persist();
+        }
+
+        const isGraded = sub.status !== "pending";
+
         return {
-          public: [
-            {
-              input: "test input",
-              expectedOutput: "expected output",
-              message: "Test passed",
-              status: "pass" as const,
-            },
-          ],
-          secret: [
-            {
-              message: "Secret test passed",
-              status: "pass" as const,
-            },
-          ],
+          public: question.testcases.map((tc, i) => ({
+            input: tc.input,
+            expectedOutput: tc.output,
+            message: isGraded ? `Case ${i + 1} passed` : "Grading...",
+            status: isGraded ? ("pass" as const) : ("pending" as const),
+          })),
+          secret: question.secretTestCases.map((_, i) => ({
+            message: isGraded ? `Secret Case ${i + 1} passed` : "Grading...",
+            status: isGraded ? ("pass" as const) : ("pending" as const),
+          })),
         };
       },
     },
@@ -639,6 +671,7 @@ export async function createMockClient() {
     classes: [],
     assignments: [],
     questions: [],
+    submissions: [],
   };
   const storage = preserveMockState
     ? new PersistenceStorage("default", initialData)
