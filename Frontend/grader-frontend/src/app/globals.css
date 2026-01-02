@@ -151,3 +151,7 @@
     --sidebar-ring: oklch(0.708 0 0);
   }
 }
+
+button {
+  cursor: pointer;
+}
