@@ -1,5 +1,4 @@
 'use client'
-import { PenLine } from "lucide-react";
 import {
     Avatar,
     AvatarFallback,
@@ -33,9 +32,6 @@ export function HeaderSub({data}:{data:HeaderType}) {
             <div className="flex items-center gap-2">
                 <div className=" Chip">
                     <span className="text-sm">{data.score}/{data.maxScore}</span>
-                </div>
-                <div className=" cursor-pointer">
-                    <PenLine size={14} className="text-chart-5" />
                 </div>
             </div>
         </div>

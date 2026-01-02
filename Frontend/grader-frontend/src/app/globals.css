@@ -136,7 +136,7 @@
 }
 
 .Chip{
-  @apply px-2 py-1 bg-pink-100 ring ring-pink-300 rounded-md text-sm
+  @apply px-2 py-1 bg-pink-100 ring ring-primary rounded-md text-sm
 }
 
 @layer base {
