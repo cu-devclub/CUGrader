@@ -1,0 +1,3 @@
+description: A unique identifier for a language, typically used to retrieve or reference an language in a system.
+type: integer
+example: 12345

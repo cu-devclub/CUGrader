@@ -1,0 +1,24 @@
+FROM golang:1.21 AS builder
+
+WORKDIR /app
+
+COPY go.mod go.sum ./
+
+# ตั้งค่า GOPROXY
+ENV GOPROXY=https://proxy.golang.org
+
+RUN go mod download && go mod verify
+
+COPY . .
+
+RUN go build -v -o /app/main .
+
+FROM alpine:latest
+
+WORKDIR /app
+
+COPY --from=builder /app/main .
+
+EXPOSE 5050
+
+CMD ["./main"]

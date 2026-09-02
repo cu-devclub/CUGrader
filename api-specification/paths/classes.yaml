@@ -1,0 +1,42 @@
+parameters:
+  - in: header
+    name: Authentication
+    schema:
+      $ref: "../components/schemas/WithJWT.yaml"
+servers:
+  - url: https://apicugrader.sittha.net/v1
+summary: List of class in year-semester
+get:
+  operationId: getClasses
+  tags: [class]
+  parameters:
+    - name: year-semester
+      description: The unique identifier of the class
+      in: path
+      required: true
+      schema:
+        type: string
+        description: "year-semester"
+  responses:
+    "200":
+      description: List of class object
+      content:
+        application/json:
+          schema:
+            properties:
+              assistant:
+                type: array
+                items:
+                  $ref: "../components/schemas/ClassObject.yaml"
+              study:
+                type: array
+                items:
+                  $ref: "../components/schemas/ClassObject.yaml"
+    "500":
+      $ref: '../components/responses/ErrServerIssue.yaml'
+    "400":
+      $ref: '../components/responses/ErrBadRequest.yaml'
+    "401":
+      $ref: '../components/responses/ErrUnauthorized.yaml'
+    "404":
+      $ref: '../components/responses/ErrNotFound.yaml'

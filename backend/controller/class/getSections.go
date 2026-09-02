@@ -1,0 +1,43 @@
+package class
+
+import (
+	gen "cugrader/api-gen"
+	"cugrader/logic/class"
+	"cugrader/logic/utils"
+	"fmt"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
+
+func GetSectionsHandler(c *gin.Context, classId gen.ClassId, params gen.GetSectionInClassParams) {
+	ClassExist, _ := utils.ClassIDExists(classId)
+	if !ClassExist {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Class not found"})
+		return
+	}
+
+	claims, err := utils.GetJWTClaims(*params.Authentication)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid or missing authentication token"})
+		return
+	}
+
+	if claims.Role == "student" {
+		sections, err := class.GetSectionsForUser(classId, claims.UserID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to retrieve sections"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"sections": sections})
+		return
+	}
+
+	sections, err := class.GetAllSections(classId)
+	if err != nil {
+		fmt.Print(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to retrieve sections"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"sections": sections})
+}

@@ -1,0 +1,43 @@
+summary: handle callback from google
+get:
+  servers:
+    - url: https://authcugrader.sittha.net/v1
+  responses:
+    "307":
+      description: redirect back to frotnend
+    "500":
+      $ref: '../components/responses/ErrServerIssue.yaml'
+post:
+  operationId: getUserDataFromGoogle
+  tags: [user]
+  servers:
+    - url: https://apicugrader.sittha.net/v1
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - "key"
+            - "credential"
+          properties:
+            key:
+              type: string
+              description: key for decrypt data
+            credential:
+              type: string
+              description: encrypted data
+  responses:
+    "200":
+      description: response access token
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              access-token:
+                $ref: '../components/schemas/WithJWT.yaml'
+    "500":
+      $ref: '../components/responses/ErrServerIssue.yaml'
+    "400":
+      $ref: '../components/responses/ErrBadRequest.yaml'

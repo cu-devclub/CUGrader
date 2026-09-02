@@ -1,0 +1,74 @@
+parameters:
+  - in: header
+    name: Authentication
+    schema:
+      $ref: "../components/schemas/WithJWT.yaml"
+servers:
+  - url: https://apicugrader.sittha.net/v1
+get:
+  operationId: getAssistantsInClass
+  tags: [assistant]
+  summary: "list ta and instructor by class"
+  parameters:
+    - name: ClassId
+      description: The unique identifier of the class
+      in: path
+      required: true
+      schema:
+        $ref: "../components/schemas/ClassId.yaml"
+  responses:
+    "200":
+      description: assistants array and instructor array
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              assistant:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    picture:
+                      description: url
+                      type: string
+                    leader:
+                      type: boolean
+                    email:
+                      type: string
+                  required:
+                    - "name"
+                    - "picture"
+                    - "leader"
+                    - "email"
+              instructor:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    picture:
+                      description: url
+                      type: string
+                    email:
+                      type: string
+                  required:
+                    - "name"
+                    - "picture"
+                    - "email"
+            required:
+              - "assistant"
+              - "instructor"
+    "500":
+      $ref: '../components/responses/ErrServerIssue.yaml'
+    "400":
+      $ref: '../components/responses/ErrBadRequest.yaml'
+    "401":
+      $ref: '../components/responses/ErrUnauthorized.yaml'
+    "403":
+      $ref: '../components/responses/ErrPermissionDecline.yaml'
+    "404":
+      $ref: '../components/responses/ErrNotFound.yaml'

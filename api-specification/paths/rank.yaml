@@ -1,0 +1,53 @@
+parameters:
+  - in: header
+    name: Authentication
+    schema:
+      $ref: "../components/schemas/WithJWT.yaml"
+servers:
+  - url: https://apicugrader.sittha.net/v1
+get:
+  operationId: getUserRank
+  tags: [user]
+  parameters:
+    - name: ClassId
+      in: path
+      required: true
+      schema:
+        $ref: "../components/schemas/ClassId.yaml"
+  responses:
+    "200":
+      description: get specific class info
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              rank:
+                type: integer
+                description: User's rank
+              students:
+                type: integer
+                description: number of students in class
+              rank_graph:
+                type: array
+                items:
+                  type: integer
+                  description: number of student in each bar (10% range)
+                  minimum: 0
+                minItems: 10
+                maxItems: 10
+              rank_graph_position:
+                type: integer
+                minimum: 0
+                maximum: 9
+                description: bar inedex position
+    "500":
+      $ref: '../components/responses/ErrServerIssue.yaml'
+    "400":
+      $ref: '../components/responses/ErrBadRequest.yaml'
+    "401":
+      $ref: '../components/responses/ErrUnauthorized.yaml'
+    "403":
+      $ref: '../components/responses/ErrPermissionDecline.yaml'
+    "404":
+      $ref: '../components/responses/ErrNotFound.yaml'

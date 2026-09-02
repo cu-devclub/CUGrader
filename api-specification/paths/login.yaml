@@ -1,0 +1,11 @@
+servers:
+  - url: https://authcugrader.sittha.net/v1
+summary: redirect to google OAuth2
+get:
+  operationId: redirectUserToAuthenticationSystem
+  tags: [user]
+  responses:
+    "307":
+      description: redirect to google OAuth2
+    "500":
+      $ref: '../components/responses/ErrServerIssue.yaml'

@@ -1,0 +1,3 @@
+description: A unique identifier for a additional file, typically used to retrieve or reference a specific additional file in a system.
+type: integer
+example: 1
