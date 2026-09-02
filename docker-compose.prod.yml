@@ -1,62 +1,98 @@
-version: "3.8"
-
 services:
   authenticator:
+    build:
+      context: ./Auth
+      dockerfile: Dockerfile
     image: ghcr.io/cu-devclub/cugrader/auth:latest
     container_name: authenticator
     ports:
       - "6000:6000"
     environment:
       - SERVICE_ENV=production
-      - CERT_PATH=/etc/ssl/auth/fullchain.pem
-      - KEY_PATH=/etc/ssl/auth/privkey.pem
-    volumes:
-      - /home/ubuntu/ssl/auth:/etc/ssl/auth:ro
+      - PORT=6000
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI}
+      - FRONTEND_URL=${FRONTEND_URL}
+      - COOKIE_SECRET=${COOKIE_SECRET}
+      - PUBLIC_KEY=${PUBLIC_KEY}
+    restart: always
 
   backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     image: ghcr.io/cu-devclub/cugrader/backend:latest
     container_name: backend
     ports:
       - "5000:5000"
     environment:
       - SERVICE_ENV=production
+      - PORT=5000
+      - MONGO_URI=mongodb://${MONGO_ROOT_USER:-root}:${MONGO_ROOT_PASSWORD}@mongodb:27017/cugrader?authSource=admin
+      - RABBIT_URI=amqp://${RABBITMQ_USER:-admin}:${RABBITMQ_PASS}@rabbitmq:5672/
+      - YSQL_DSN=postgres://${YSQL_USER:-yugabyte}:${YSQL_PASSWORD}@yugabyte:5433/cugrader?sslmode=disable
+      - JWT_KEY=${JWT_KEY}
+      - FILES_PATH=/app/temp
+      - PRIVATE_KEY=${PRIVATE_KEY}
     depends_on:
       - yugabytedb
+      - mongo
       - rabbitmq
+    volumes:
+      - backend_data:/app/temp
+    restart: always
 
   frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
     image: ghcr.io/cu-devclub/cugrader/frontend:latest
     container_name: frontend
     ports:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-
-  watchtower:
-    image: containrrr/watchtower
-    container_name: watchtower
+      - NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL:-http://localhost:5000}
+      - NEXT_PUBLIC_AUTHEN_URL=${NEXT_PUBLIC_AUTHEN_URL:-http://localhost:6000}
+      - NEXT_PUBLIC_AUTH_USE_TEST_API=false
+    depends_on:
+      - backend
     restart: always
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      - WATCHTOWER_CLEANUP=true
-      - WATCHTOWER_POLL_INTERVAL=60
 
-  minio:
-    image: minio/minio:latest
-    ports:
-      - "8000:8000"
-      - "8001:8001"
+  judge_service_python:
+    build:
+      context: ./judge_service/python
+      dockerfile: Dockerfile
+    image: ghcr.io/cu-devclub/cugrader/judge-python:latest
+    container_name: judge_service_python
     environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: miniopassword
+      - SERVICE_ENV=production
+      - YSQL_DSN=postgres://${YSQL_USER:-yugabyte}:${YSQL_PASSWORD}@yugabyte:5433/cugrader?sslmode=disable
+      - RABBIT_URI=amqp://${RABBITMQ_USER:-admin}:${RABBITMQ_PASS}@rabbitmq:5672/
+      - CHANNEL=python
+    privileged: true
+    restart: always
+    depends_on:
+      - yugabytedb
+      - rabbitmq
+
+  mongo:
+    image: mongo:8
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USER:-root}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD:-12345678}
+      - MONGO_INITDB_DATABASE=cugrader
     volumes:
-      - ./volume:/data
-    command: server --address ":8001" --console-address ":8000" /data
+      - mongo_data:/data/db
+      - ./mongo/init-mongo.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
     restart: always
 
   yugabytedb:
-    image: yugabytedb/yugabyte
+    image: yugabytedb/yugabyte:latest
     container_name: yugabyte
     ports:
       - "7000:7000"
@@ -64,27 +100,47 @@ services:
       - "15433:15433"
       - "5433:5433"
     environment:
-      YSQL_USER: yugabyte
-      YSQL_PASSWORD: yugabyte
+      YSQL_USER: ${YSQL_USER:-yugabyte}
+      YSQL_PASSWORD: ${YSQL_PASSWORD:-yugabyte}
     volumes:
       - yugabyte_data:/home/yugabyte/yb_data
+      - ./Yugabyte/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
     command: >
       bin/yugabyted start
       --base_dir=/home/yugabyte/yb_data
       --background=false
-    
+    restart: always
+
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
     ports:
-      - "5672:5672"    
-      - "15672:15672"  
+      - "5672:5672"
+      - "15672:15672"
     environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER:-admin}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASS:-guestpassword}
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+    restart: always
+
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    ports:
+      - "8000:8000"
+      - "8001:8001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-miniopassword}
+    volumes:
+      - minio_data:/data
+    command: server --address ":8001" --console-address ":8000" /data
+    restart: always
 
 volumes:
   yugabyte_data:
+  mongo_data:
   rabbitmq_data:
+  minio_data:
+  backend_data:

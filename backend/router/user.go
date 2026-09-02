@@ -27,7 +27,8 @@ func (s *Server) GetUserDataFromGoogle(c *gin.Context) {
 
 func (s *Server) UserForCreateTestUser(c *gin.Context) {
 	if !config.Is_dev {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "This is for develop env."})
+		c.JSON(http.StatusForbidden, gin.H{"error": "This is for develop env."})
+		return
 	}
 	user.TestCallback(c)
 }

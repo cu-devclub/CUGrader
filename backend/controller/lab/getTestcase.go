@@ -65,7 +65,7 @@ func GetMultilangTestcaseCodeByQuestionIDHandler(c *gin.Context, questionId gen.
 	var isAssistant bool
 	// isGetSecretTestcase := false
 	if claims.Role != "teacher" && claims.Role != "admin" {
-		isAssistant, err := utils.IsUserAnAssistantToQuestion(questionId, claims.UserID)
+		isAssistant, err = utils.IsUserAnAssistantToQuestion(questionId, claims.UserID)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to check access"})
 			return

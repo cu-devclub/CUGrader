@@ -1,21 +1,44 @@
-FROM node:21 AS build
+FROM node:20-alpine AS deps
 
 WORKDIR /app
 
-COPY grader-frontend/package.json grader-frontend/package-lock.json ./
-RUN npm ci --verbose
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
-COPY grader-frontend/. . 
-COPY grader-frontend/.env .env
+COPY grader-frontend/package.json grader-frontend/pnpm-lock.yaml* grader-frontend/pnpm-workspace.yaml* ./
+RUN pnpm install
 
-RUN npm run build --verbose
+FROM node:20-alpine AS builder
 
-FROM nginx:alpine
-RUN rm -rf /usr/share/nginx/html/*
-COPY --from=build /app/build /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+WORKDIR /app
 
-EXPOSE 80
-EXPOSE 443
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
-CMD ["nginx", "-g", "daemon off;"]
+COPY --from=deps /app/node_modules ./node_modules
+COPY grader-frontend/ ./
+
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
+
+RUN pnpm build
+
+FROM node:20-alpine AS runner
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
+
+COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
+
+EXPOSE 3000
+
+CMD ["node", "server.js"]

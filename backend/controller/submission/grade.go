@@ -27,22 +27,27 @@ func GradeUsersCode(c *gin.Context, params gen.GradeUsersCodeParams) {
 	exist, err := utils.SubmissionIdExists(req.SubmissionId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "error while checking existence of submissionId " + err.Error()})
+		return
 	}
 	if !exist {
 		c.JSON(http.StatusNotFound, gin.H{"message": "Submission not found"})
+		return
 	}
 
 	owner, err := utils.IsStudentOwnSubmissionId(claims.UserID, req.SubmissionId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "error while checking owner of submissionId " + err.Error()})
+		return
 	}
-	if !owner {
+	if !owner && claims.Role != "teacher" && claims.Role != "admin" {
 		c.JSON(http.StatusForbidden, gin.H{"message": "You don't own this submission"})
+		return
 	}
 
 	err = submission.GradeUsersCode(req.SubmissionId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "error while append queue " + err.Error()})
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Success"})

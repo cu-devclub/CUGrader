@@ -1,6 +1,7 @@
 package config
 
 import (
+	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
@@ -28,31 +29,58 @@ func LoadEnv() {
 	MongoURI = os.Getenv("MONGO_URI")
 	RabbitURI = os.Getenv("RABBIT_URI")
 	YSQLDSN = os.Getenv("YSQL_DSN")
-	JWT_key = []byte(os.Getenv("JWT_KEY"))
-	Is_dev = os.Getenv("SERVICE_ENV") == "development"
+	
+	jwtSecret := os.Getenv("JWT_KEY")
+	if jwtSecret == "" {
+		jwtSecret = "cugrader-default-jwt-secret-key-32chars!"
+	}
+	JWT_key = []byte(jwtSecret)
+	
+	Port = os.Getenv("PORT")
+	if Port == "" {
+		Port = "5000"
+	}
+
+	Is_dev = os.Getenv("SERVICE_ENV") == "development" || os.Getenv("SERVICE_ENV") == ""
+
+	Path = os.Getenv("FILES_PATH")
+	if Path == "" {
+		Path = "temp"
+	}
+	_ = os.MkdirAll(Path, 0755)
+
 	privKey, err := loadPrivateKeyFromEnv()
 	if err != nil {
-		log.Fatalf("Failed to load private key: %v", err)
+		log.Printf("Warning: private key not loaded: %v", err)
 	}
 	PrivKey = privKey
 
-	// Path = os.Getenv("FILES_PATH")
-	Path = "temp"
-
 	if MongoURI == "" || RabbitURI == "" || YSQLDSN == "" {
-		log.Fatal("Missing one or more required environment variables")
+		log.Println("Note: One or more database/queue URIs not set in environment, will use defaults or wait for env configuration")
 	}
 }
 
 func loadPrivateKeyFromEnv() (*rsa.PrivateKey, error) {
 	privKeyPEM := os.Getenv("PRIVATE_KEY")
+	if privKeyPEM == "" {
+		if Is_dev {
+			log.Println("Notice: No PRIVATE_KEY provided in development mode, generating ephemeral RSA key")
+			return rsa.GenerateKey(rand.Reader, 2048)
+		}
+		return nil, errors.New("missing PRIVATE_KEY environment variable")
+	}
 	block, _ := pem.Decode([]byte(privKeyPEM))
 	if block == nil {
 		return nil, errors.New("failed to parse PEM block containing the private key")
 	}
-	privKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
-	if err != nil {
-		return nil, err
+	if privKey, err := x509.ParsePKCS1PrivateKey(block.Bytes); err == nil {
+		return privKey, nil
 	}
-	return privKey, nil
+	parsedKey, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+	if err == nil {
+		if privKey, ok := parsedKey.(*rsa.PrivateKey); ok {
+			return privKey, nil
+		}
+	}
+	return nil, errors.New("failed to parse private key as PKCS1 or PKCS8")
 }

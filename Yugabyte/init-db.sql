@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS "class_student" (
     class_id INT NOT NULL REFERENCES "class" (id) ON DELETE CASCADE,
     user_id INT NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
     section_id INT NOT NULL REFERENCES "section" (id) ON DELETE CASCADE,
-    group_id INT NULL REFERENCES "groups" (id) ON DELETE CASCADE DEFAULT NULL,
+    group_id INT NULL REFERENCES "group" (id) ON DELETE CASCADE DEFAULT NULL,
     withdrawn BOOLEAN NOT NULL DEFAULT FALSE,
     withdrawn_at TIMESTAMP NULL DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -109,10 +109,10 @@ CREATE TABLE IF NOT EXISTS "lab_language" (
 );
 
 CREATE TABLE IF NOT EXISTS "assign_to" (
-    id SERIAL PRIMARY KEY,  
+    id SERIAL PRIMARY KEY,
     lab_id INT NOT NULL REFERENCES "lab" (id) ON DELETE CASCADE,
-    group_id INT NOT NULL REFERENCES "groups" (id) ON DELETE CASCADE,
-    PRIMARY KEY (lab_id, group_id)
+    group_id INT NOT NULL REFERENCES "group" (id) ON DELETE CASCADE,
+    UNIQUE (lab_id, group_id)
 );
 
 CREATE TABLE IF NOT EXISTS "question" (
@@ -132,20 +132,21 @@ CREATE TABLE IF NOT EXISTS "multilang_testcase" (
     id SERIAL PRIMARY KEY,
     question_id INT NOT NULL REFERENCES "question" (id) ON DELETE CASCADE,
     object_id CHAR(24) NOT NULL,
-    PRIMARY KEY (question_id, object_id)
+    UNIQUE (question_id, object_id)
 );
 
 CREATE TABLE IF NOT EXISTS "multilang_secret_testcase" (
     id SERIAL PRIMARY KEY,
     question_id INT NOT NULL REFERENCES "question" (id) ON DELETE CASCADE,
     object_id CHAR(24) NOT NULL,
-    PRIMARY KEY (question_id, object_id)
+    UNIQUE (question_id, object_id)
 );
 
 CREATE TABLE IF NOT EXISTS "addition_files" (
     id SERIAL PRIMARY KEY,
     lab_id INT NOT NULL REFERENCES "lab" (id) ON DELETE CASCADE,
     path VARCHAR(255) NOT NULL,
+    filename VARCHAR(255) NOT NULL,
     UNIQUE(lab_id, path)
 );
 
@@ -177,8 +178,8 @@ CREATE TABLE IF NOT EXISTS "exam_session" (
     user_id INT NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
     lab_id INT NOT NULL REFERENCES "lab" (id) ON DELETE CASCADE,
     ip_address VARCHAR(45) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
 CREATE TABLE IF NOT EXISTS "ticket" (
     id SERIAL PRIMARY KEY,
@@ -187,4 +188,6 @@ CREATE TABLE IF NOT EXISTS "ticket" (
     ip_address VARCHAR(45) NOT NULL,
     checkout_at TIMESTAMP NULL DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)
+);
+
+INSERT INTO system_language (name, service_name) VALUES ('Python', 'python') ON CONFLICT (name) DO NOTHING;

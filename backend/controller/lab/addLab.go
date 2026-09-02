@@ -6,6 +6,7 @@ import (
 	"cugrader/logic/utils"
 	labStuct "cugrader/structure/lab"
 	"encoding/json"
+	"mime/multipart"
 	"net/http"
 	"strconv"
 
@@ -65,8 +66,10 @@ func AddLabHandler(c *gin.Context, params gen.CreateLabParams) {
 		return
 	}
 
-	f, _ := c.MultipartForm()
-	addfiles := f.File["addfiles"]
+	var addfiles []*multipart.FileHeader
+	if f, err := c.MultipartForm(); err == nil && f != nil && f.File != nil {
+		addfiles = f.File["addfiles"]
+	}
 
 	_, err = lab.AddLab(req.ClassID, req.LabData, addfiles)
 	if err != nil {

@@ -35,13 +35,19 @@ async function parseBackendResponse(response: Response): Promise<BackendResponse
     const responseText = await response.text();
 
     if (response.ok) {
-        // Success: Backend returns Bearer token as plain text
-        return { token: responseText };
+        try {
+            const data = JSON.parse(responseText);
+            const token = data['access-token'] || data.token || (typeof data === 'string' ? data : responseText);
+            return { token };
+        } catch {
+            return { token: responseText };
+        }
     }
 
     // Error: Try to parse as JSON, fallback to plain text
     try {
-        return JSON.parse(responseText);
+        const errorData = JSON.parse(responseText);
+        return { error: errorData.error || errorData.message || responseText };
     } catch {
         return { error: responseText || `HTTP ${response.status}: ${response.statusText}` };
     }

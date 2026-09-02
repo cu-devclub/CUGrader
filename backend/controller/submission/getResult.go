@@ -19,22 +19,27 @@ func GetGradedReult(c *gin.Context, submissionId gen.SubmissionId, params gen.Ge
 	exist, err := utils.SubmissionIdExists(submissionId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "error while checking existence of submissionId " + err.Error()})
+		return
 	}
 	if !exist {
 		c.JSON(http.StatusNotFound, gin.H{"message": "Submission not found"})
+		return
 	}
 
 	owner, err := utils.IsStudentOwnSubmissionId(claims.UserID, submissionId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "error while checking owner of submissionId " + err.Error()})
+		return
 	}
-	if !owner {
+	if !owner && claims.Role != "teacher" && claims.Role != "admin" {
 		c.JSON(http.StatusForbidden, gin.H{"message": "You don't own this submission"})
+		return
 	}
 
 	result, err := submission.GetGradedReult(submissionId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "error while geting test result " + err.Error()})
+		return
 	}
 
 	c.JSON(http.StatusOK, result)

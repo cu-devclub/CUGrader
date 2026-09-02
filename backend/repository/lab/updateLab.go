@@ -223,7 +223,7 @@ func UpdateQuestionPredefine(QuestionID int, content string) error {
 
 func UpdateQuestionTestcase(QuestionID int, content string) error {
 	var ObjectID string
-	err := db.YSQL.QueryRow("SELECT t.testcase_object_id FROM lab JOIN question q ON testcase.id = q.testcase_id WHERE q.id = $1", QuestionID).Scan(&ObjectID)
+	err := db.YSQL.QueryRow("SELECT t.testcase_object_id FROM testcase t JOIN question q ON t.id = q.testcase_id WHERE q.id = $1", QuestionID).Scan(&ObjectID)
 	if err != nil {
 		return err
 	}
@@ -233,7 +233,7 @@ func UpdateQuestionTestcase(QuestionID int, content string) error {
 
 func UpdateQuestionSecretTestcase(QuestionID int, content string) error {
 	var ObjectID string
-	err := db.YSQL.QueryRow("SELECT t.secret_testcase_object_id FROM lab JOIN question q ON testcase.id = q.testcase_id WHERE q.id = $1", QuestionID).Scan(&ObjectID)
+	err := db.YSQL.QueryRow("SELECT t.secret_testcase_object_id FROM testcase t JOIN question q ON t.id = q.testcase_id WHERE q.id = $1", QuestionID).Scan(&ObjectID)
 	if err != nil {
 		return err
 	}

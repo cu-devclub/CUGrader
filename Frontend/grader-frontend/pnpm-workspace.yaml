@@ -1,8 +1,15 @@
-ignoredBuiltDependencies:
-  - '@openapitools/openapi-generator-cli'
-  - '@tailwindcss/oxide'
-  - sharp
-  - unrs-resolver
+allowBuilds:
+  '@nestjs/core': true
+  '@openapitools/openapi-generator-cli': true
+  '@parcel/watcher': true
+  '@swc/core': true
+  unrs-resolver: true
+  '@tailwindcss/oxide': true
+  sharp: true
 
-onlyBuiltDependencies:
-  - '@nestjs/core'
+overrides:
+  axios: ^1.18.0
+  nanoid: ^3.3.8
+  cross-spawn: ^7.0.6
+  path-to-regexp: ^6.3.0
+  ip-address: ^10.3.1
