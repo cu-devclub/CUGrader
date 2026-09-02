@@ -1,1 +1,5 @@
+grader-frontend/node_modules
+grader-frontend/.next
+grader-frontend/.git
 node_modules
+.next

@@ -1,8 +1,8 @@
-FROM golang:1.23-bookworm
+FROM golang:1.25-bookworm
 
 # Install required system packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git make g++ pkg-config libcap-dev libsystemd-dev python3 ca-certificates \
+    git make g++ pkg-config libcap-dev libsystemd-dev libseccomp-dev python3 ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 # Clone and build isolate
