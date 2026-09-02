@@ -135,6 +135,10 @@
   font-family: var(--font-sans);
 }
 
+.Chip{
+  @apply px-2 py-1 bg-pink-100 ring ring-primary rounded-md text-sm
+}
+
 @layer base {
   :root {
     --sidebar: oklch(0.985 0 0);
@@ -146,4 +150,8 @@
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.708 0 0);
   }
+}
+
+button {
+  cursor: pointer;
 }
