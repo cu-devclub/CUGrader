@@ -69,7 +69,7 @@ func EditClass(id int, pictureFile *multipart.FileHeader, csvFile *multipart.Fil
 			} else {
 				oldFilePath := filepath.Join(filesPath, uuidName+oldExt)
 				if err := os.Remove(oldFilePath); err != nil {
-					return fmt.Errorf("failed to delete old picture file " + err.Error())
+					return fmt.Errorf("failed to delete old picture file: %v", err)
 				}
 				savePath = filepath.Join(filesPath, uuidName+ext)
 				if err := class.UpdatePicturePath(picture_id, uuidName+ext); err != nil {

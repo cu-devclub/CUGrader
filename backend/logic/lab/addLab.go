@@ -76,7 +76,7 @@ func AddLab(ClassId int, LabData labStuct.LabData, addfiles []*multipart.FileHea
 
 		err = lab.InsertAddfile(labID, uuidName, file.Filename)
 		if err != nil {
-			return labID, fmt.Errorf("failed to insert picture to db: " + err.Error())
+			return labID, fmt.Errorf("failed to insert picture to db: %v", err)
 		}
 
 	}
