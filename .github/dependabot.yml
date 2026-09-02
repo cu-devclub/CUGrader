@@ -1,0 +1,45 @@
+version: 2
+updates:
+  # Maintain Go dependencies for backend
+  - package-ecosystem: "gomod"
+    directory: "/backend"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+
+  # Maintain Go dependencies for Auth
+  - package-ecosystem: "gomod"
+    directory: "/Auth"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+
+  # Maintain Go dependencies for python judge service
+  - package-ecosystem: "gomod"
+    directory: "/judge_service/python"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+
+  # Maintain npm/pnpm dependencies for Frontend
+  - package-ecosystem: "npm"
+    directory: "/Frontend/grader-frontend"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+
+  # Maintain Dockerfiles
+  - package-ecosystem: "docker"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "docker"
+    directory: "/Auth"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "docker"
+    directory: "/Frontend"
+    schedule:
+      interval: "weekly"
