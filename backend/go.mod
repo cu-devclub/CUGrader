@@ -3,11 +3,11 @@ module cugrader
 go 1.25.0
 
 require (
-	github.com/gin-gonic/gin v1.10.0
+	github.com/gin-gonic/gin v1.10.1
 	github.com/golang-jwt/jwt/v4 v4.5.2
 	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.10.9
-	github.com/oapi-codegen/runtime v1.1.1
+	github.com/oapi-codegen/runtime v1.7.0
 	github.com/streadway/amqp v1.1.0
 	go.mongodb.org/mongo-driver v1.17.9
 )
