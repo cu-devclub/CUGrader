@@ -1,0 +1,86 @@
+parameters:
+  - in: header
+    name: Authentication
+    schema:
+      $ref: "../components/schemas/WithJWT.yaml"
+servers:
+  - url: https://apicugrader.sittha.net/v1
+post:
+  operationId: insertStudentToClass
+  tags: [student]
+  summary: Insert student
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            ClassId:
+              $ref: "../components/schemas/ClassId.yaml"
+            email:
+              description: student's email
+              type: string
+            section:
+              description: section of student
+              type: integer
+            group:
+              description: group of student
+              type: string
+          required:
+            - "ClassId"
+            - "email"
+            - "section"
+  responses:
+    "200":
+      description: Empty JSON
+      content:
+        application/json:
+          schema:
+            type: object
+    "400":
+      $ref: '../components/responses/ErrBadRequest.yaml'
+    "401":
+      $ref: '../components/responses/ErrUnauthorized.yaml'
+    "500":
+      $ref: '../components/responses/ErrServerIssue.yaml'
+
+patch:
+  operationId: editStudentInClass
+  tags: [student]
+  summary: Edit student info
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            StudentId:
+              $ref: "../components/schemas/StudentId.yaml"
+            section:
+              description: section of student
+              type: integer
+            group:
+              description: group of student
+              type: string
+            withdrawal:
+              description: is student withdrawn
+              type: boolean
+          required:
+            - "StudentId"
+  responses:
+    "200":
+      description: Empty JSON
+      content:
+        application/json:
+          schema:
+            type: object
+    "500":
+      $ref: '../components/responses/ErrServerIssue.yaml'
+    "400":
+      $ref: '../components/responses/ErrBadRequest.yaml'
+    "401":
+      $ref: '../components/responses/ErrUnauthorized.yaml'
+    "403":
+      $ref: '../components/responses/ErrPermissionDecline.yaml'
+    "404":
+      $ref: '../components/responses/ErrNotFound.yaml'

@@ -1,6 +1,14 @@
-version: "3.8"
-
 services:
+    authenticator:
+        build:
+            context: ./Auth
+            dockerfile: Dockerfile
+        container_name: authenticator
+        ports:
+            - "6000:6000"
+        environment:
+            - SERVICE_ENV=development
+
     backend:
         build:
             context: ./Backend
@@ -9,7 +17,7 @@ services:
         ports:
             - "5000:5000"
         environment:
-            - NODE_ENV=development
+            - SERVICE_ENV=development
         depends_on:
             - yugabytedb
 
@@ -22,6 +30,19 @@ services:
             - "3000:3000"
         environment:
             - NODE_ENV=development
+
+    minio:
+        image: minio/minio:latest
+        ports:
+         - "8000:8000"
+         - "8001:8001"
+        environment:
+            MINIO_ROOT_USER: minioadmin
+            MINIO_ROOT_PASSWORD: miniopassword
+        volumes:
+         - minio_data:/data
+        command: server --address ":8001" --console-address ":8000" /data
+        restart: always
 
     yugabytedb:
         image: yugabytedb/yugabyte
@@ -40,6 +61,54 @@ services:
             bin/yugabyted start
             --base_dir=/home/yugabyte/yb_data
             --background=false
+    mongo:
+        image: mongo:8
+        container_name: mongodb
+        ports:
+            - "27017:27017"
+        environment:
+            - MONGO_INITDB_ROOT_USERNAME=root
+            - MONGO_INITDB_ROOT_PASSWORD=12345678
+            - MONGO_INITDB_DATABASE=cugrader
+        volumes:
+          - mongo_data:/data/db
+          - ./mongo/init-mongo.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    rabbitmq:
+        image: rabbitmq:3-management
+        container_name: rabbitmq
+        ports:
+            - "5672:5672"      # RabbitMQ main port
+            - "15672:15672"    # RabbitMQ management UI
+        environment:
+            - RABBITMQ_DEFAULT_USER=guest
+            - RABBITMQ_DEFAULT_PASS=guest
+
+    judge_service_python:
+        build:
+            context: ./judge_service/python
+            dockerfile: Dockerfile
+        container_name: judge_service_python
+        # environment:
+        #     - SERVICE_ENV=development
+        restart: unless-stopped
+        tty: true
+        stdin_open: true
+        privileged: true
+        cap_drop:
+        - ALL
+        cap_add:
+        - SYS_ADMIN
+        security_opt:
+        - seccomp=unconfined
+        - apparmor=unconfined
+        # volumes:
+        # - isolate-data:/var/local/lib/isolate
+        depends_on:
+            - yugabytedb
+            - rabbitmq
 
 volumes:
   yugabyte_data:
+  mongo_data:
+  rabbitmq_data:
+  minio_data:

@@ -1,0 +1,116 @@
+openapi: "3.0.0"
+servers:
+  - url: https://authcugrader.sittha.net/v1
+  - url: https://apicugrader.sittha.net/v1
+info:
+  version: 1.0.0
+  title: "CUGrader API server"
+paths:
+  /ping:
+    $ref: './paths/ping.yaml'
+  /picture/{PictureId}:
+    $ref: './paths/picture.yaml'
+
+  /login:
+    $ref: './paths/login.yaml'
+  /callback:
+    $ref: './paths/callback.yaml'
+  /testcallback:
+    $ref: './paths/testCallback.yaml'
+
+  /classes/semesters:
+    $ref: './paths/semesters.yaml'
+  /classes/classes/{year-semester}:
+    $ref: './paths/classes.yaml'
+  /class:
+    $ref: './paths/class.yaml'
+  /class/{ClassId}:
+    $ref: './paths/getClass.yaml'
+
+  /sections/{ClassId}:
+    $ref: './paths/sections.yaml'
+  /groups/{ClassId}:
+    $ref: './paths/groups.yaml'
+
+  /students:
+    $ref: './paths/student.yaml'
+  /students/{ClassId}:
+    $ref: './paths/getStudent.yaml'
+  /student/{StudentId}:
+    $ref: './paths/deleteStudent.yaml'
+  
+
+  /TA:
+    $ref: './paths/TA.yaml'
+  /TAs/{ClassId}:
+    $ref: './paths/getTA.yaml'
+  /TA/{AssistantId}:
+    $ref: './paths/deleteTA.yaml'
+
+  /near_due_date:
+    $ref: './paths/NearDueDate.yaml'
+
+  /lab:
+    $ref: './paths/lab.yaml'
+  /labs/{ClassId}:
+    $ref: './paths/getLabs.yaml'
+  /lab/{LabId}:
+    $ref: './paths/getLab.yaml'
+
+  /addfile/{AddFileId}:
+    $ref: './paths/addfile.yaml'
+  /question/{QuestionId}:
+    $ref: './paths/question.yaml'
+  /exam_pin/{LabId}:
+    $ref: './paths/examPin.yaml'
+  /testcase/{TestCaseId}:
+    $ref: './paths/testcase.yaml'
+  /multilang_testcase/{QuestionId}:
+    $ref: './paths/multilangtestcase.yaml'
+
+  /code:
+    $ref: './paths/code.yaml'
+  /code/{QuestionId}:
+    $ref: './paths/getCode.yaml'
+
+  /submit:
+    $ref: './paths/submit.yaml'
+  /result/{SubmissionId}:
+    $ref: './paths/result.yaml'
+
+  /language:
+    $ref: './paths/language.yaml'
+
+  /score/{ClassId}:
+    $ref: './paths/score.yaml'
+  /rank/{ClassId}:
+    $ref: './paths/rank.yaml'
+  /progress/{ClassId}:
+    $ref: './paths/progress.yaml'
+  /student_score/{LabId}:
+    $ref: './paths/student_score.yaml'
+
+  /ticket/{TicketId}:
+    $ref: './paths/paramTicket.yaml'
+  /ticket:
+    $ref: './paths/ticket.yaml'
+
+  /session/{LabId}:
+    $ref: './paths/session.yaml'
+  /checkpin:
+    $ref: './paths/checkpin.yaml'
+
+components:
+  schemas:
+    $ref: './components/schemas/schemas.yaml'
+  responses:
+    $ref: './components/responses/responses.yaml'
+
+tags:
+  - $ref: './tags/assistant.yaml'
+  - $ref: './tags/class.yaml'
+  - $ref: './tags/lab.yaml'
+  - $ref: './tags/student.yaml'
+  - $ref: './tags/submission.yaml'
+  - $ref: './tags/system.yaml'
+  - $ref: './tags/user.yaml'

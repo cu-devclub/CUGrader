@@ -1,0 +1,3 @@
+description: A unique identifier for a class_student, typically used to retrieve or reference an class_student in a system.
+type: integer
+example: 12345

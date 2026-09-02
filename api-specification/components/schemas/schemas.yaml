@@ -1,0 +1,36 @@
+Pong:
+  $ref: './pong.yaml'
+
+LabId:
+  $ref: './LabId.yaml'
+QuestionId:
+  $ref: './QuestionId.yaml'
+AddFileId:
+  $ref: './AddFileId.yaml'
+SubmissionId:
+  $ref: './SubmissionId.yaml'
+TestCaseId:
+  $ref: './TestCaseId.yaml'
+PictureId:
+  $ref: './PictureId.yaml'
+ClassId:
+  $ref: './ClassId.yaml'
+LanguageId:
+  $ref: './LanguageId.yaml'
+TicketId:
+  $ref: './TicketId.yaml'
+StudentId:
+  $ref: './StudentId.yaml'
+AssistantId:
+  $ref: './AssistantId.yaml'
+
+WithJWT:
+  $ref: './WithJWT.yaml'
+
+ClassObject:
+  $ref: './ClassObject.yaml'
+TAEditBody:
+  $ref: './TAEditBody.yaml'
+labEdit:
+  $ref: './labEdit.yaml'
+

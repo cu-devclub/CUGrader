@@ -1,0 +1,46 @@
+parameters:
+  - in: header
+    name: Authentication
+    schema:
+      $ref: "../components/schemas/WithJWT.yaml"
+servers:
+  - url: https://apicugrader.sittha.net/v1
+get:
+  operationId: getUserScore
+  tags: [user]
+  parameters:
+    - name: ClassId
+      in: path
+      required: true
+      schema:
+        $ref: "../components/schemas/ClassId.yaml"
+  responses:
+    "200":
+      description: get specific class info
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              score:
+                type: integer
+                description: class sum score
+              max_score:
+                type: integer
+                description: max class sum score
+              ratio_score:
+                type: integer
+                description: calculated score according ratio to teacher setting (x0.3 for now)
+              max_ratio_score:
+                type: integer
+                description: max calculated score according ratio to teacher setting (x0.3 for now)            
+    "500":
+      $ref: '../components/responses/ErrServerIssue.yaml'
+    "400":
+      $ref: '../components/responses/ErrBadRequest.yaml'
+    "401":
+      $ref: '../components/responses/ErrUnauthorized.yaml'
+    "403":
+      $ref: '../components/responses/ErrPermissionDecline.yaml'
+    "404":
+      $ref: '../components/responses/ErrNotFound.yaml'

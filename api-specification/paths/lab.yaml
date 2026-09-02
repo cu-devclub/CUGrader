@@ -1,0 +1,143 @@
+parameters:
+  - in: header
+    name: Authentication
+    schema:
+      $ref: "../components/schemas/WithJWT.yaml"
+servers:
+  - url: https://apicugrader.sittha.net/v1
+post:
+  operationId: createLab
+  tags: [lab]
+  summary: create lab
+  requestBody:
+    description: required all
+    content:
+      multipart/form-data:
+        schema:
+          properties:
+            ClassId:
+              $ref: "../components/schemas/ClassId.yaml"
+            lab_data:
+              $ref: "../components/schemas/labEdit.yaml"
+  responses:
+    "200":
+      description: Empty JSON
+      content:
+        application/json:
+          schema:
+            type: object
+    "500":
+      $ref: '../components/responses/ErrServerIssue.yaml'
+    "400":
+      $ref: '../components/responses/ErrBadRequest.yaml'
+    "401":
+      $ref: '../components/responses/ErrUnauthorized.yaml'
+patch:
+  operationId: updateLab
+  tags: [lab]
+  summary: edit lab
+  requestBody:
+    content:
+      multipart/form-data:
+        schema:
+          properties:
+            LabId:
+              $ref: "../components/schemas/LabId.yaml"
+            lab_data:
+              type: object
+              properties:
+                number:
+                  type: integer
+                name:
+                  type: string
+                publish:
+                  type: string
+                  description: datetime
+                due:
+                  type: string
+                  description: datetime
+                language_ids:
+                  type: array
+                  items:
+                    type: integer
+                close_on_due:
+                  type: boolean
+                exam_mode:
+                  type: boolean
+                show_score_on_lock:
+                  type: boolean
+                assign_to:
+                  type: array
+                  items:
+                    type: string
+                    description: group name
+                exam_pin:
+                  type: integer
+                testcase:
+                  type: string
+                secret_testcase:
+                  type: string
+                questions:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      QuestionId:
+                        $ref: "../components/schemas/QuestionId.yaml"
+                      number:
+                        type: integer
+                      name:
+                        type: string
+                      description:
+                        type: string
+                      answer:
+                        type: string
+                      predefine:
+                        type: string
+                      score:
+                        type: integer
+                      testcase:
+                        type: string
+                      secret_testcase:
+                        type: string  
+                      multilang_testcase:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            input:
+                              type: string
+                            output:
+                              type: string
+                      multilang_secret_testcase:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            input:
+                              type: string
+                            output:
+                              type: string
+                description:
+                  type: string
+                  description: Lab description
+                score:
+                  type: integer
+                  description: Score for lab testcase
+  responses:
+    "200":
+      description: Empty JSON
+      content:
+        application/json:
+          schema:
+            type: object
+    "500":
+      $ref: '../components/responses/ErrServerIssue.yaml'
+    "400":
+      $ref: '../components/responses/ErrBadRequest.yaml'
+    "401":
+      $ref: '../components/responses/ErrUnauthorized.yaml'
+    "403":
+      $ref: '../components/responses/ErrPermissionDecline.yaml'
+    "404":
+      $ref: '../components/responses/ErrNotFound.yaml'

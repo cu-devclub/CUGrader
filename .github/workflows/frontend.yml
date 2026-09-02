@@ -1,4 +1,4 @@
-name: Build & Push React App to GHCR
+name: Build & Push frontend to GHCR
 
 on:
   push:
@@ -15,15 +15,27 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      
-      # - name: Generate .env file from secrets
-      #   working-directory: ./frontend
-      #   run: |
-      #     echo "REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }}" >> .env
-      #     echo "REACT_APP_ENV=production" >> .env
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '21'
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        working-directory: ./Frontend/grader-frontend 
+        run: npm install
+
+      - name: Install lightningcss
+        working-directory: ./Frontend/grader-frontend 
+        run: npm install lightningcss --force
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v2
@@ -32,11 +44,23 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_PAT_J || secrets.GITHUB_TOKEN }}
 
+      - name: Generate .env from template
+        working-directory: ./Frontend/grader-frontend/
+        run: cp .env.template .env
+
+      - name: Debug .env exists
+        working-directory: ./Frontend/grader-frontend/
+        run: ls -la .env
+
       - name: Set lowercase repository
         id: set_repo
         run: |
           REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
           echo "REPO_LOWER=$REPO_LOWER" >> $GITHUB_ENV
+
+      - name: List files in context
+        working-directory: ./Frontend
+        run: ls -laR
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
@@ -45,5 +69,5 @@ jobs:
           file: ./Frontend/Dockerfile
           push: true
           tags: |
-            ghcr.io/cu-devclub/cugrader/frontend:latest
-            ghcr.io/cu-devclub/cugrader/frontend:${{ github.sha }}
+            ghcr.io/${{ env.REPO_LOWER }}:latest
+            ghcr.io/${{ env.REPO_LOWER }}:${{ github.sha }}
