@@ -1,13 +1,13 @@
 module CUGrader/Auth
 
-go 1.25.0
+go 1.26.0
 
 require (
 	github.com/gin-contrib/sessions v1.0.2
 	github.com/gin-gonic/gin v1.10.0
 	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
-	golang.org/x/oauth2 v0.36.0
+	golang.org/x/oauth2 v0.37.0
 	google.golang.org/api v0.264.0
 )
 
